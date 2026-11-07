@@ -1,11 +1,13 @@
 <div align="center">
 
-# 💸 Dropshipping COD · Calculadora de Utilidad Real
+# 💸 Synkops
 
-### ¿Cuánta plata te dejó de verdad tu tienda contra entrega?
+### Mi ecommerce contra entrega, en un solo lugar
 
-Cruza tus pedidos de **Dropi** con lo que pagaste en **Meta Ads** y te dice, en segundos,<br>
-cuánto ganaste, por qué, y qué palanca mover para ganar más.
+Acompaña cada producto de principio a fin: buscarlo, costearlo, montar su landing y su campaña,<br>
+leer el testeo y medir la utilidad real cruzando **Dropi** con **Meta Ads**.
+
+<sub>Antes "Calculadora de Utilidad Real". La interfaz de la app todavía no muestra el nombre Synkops.</sub>
 
 ![Sin instalación](https://img.shields.io/badge/instalación-ninguna-7a73ff?style=for-the-badge)
 ![100% local](https://img.shields.io/badge/datos-100%25%20en%20tu%20PC-34c38f?style=for-the-badge)
@@ -26,7 +28,7 @@ cuánto ganaste, por qué, y qué palanca mover para ganar más.
 
 - [🧩 Las partes de la app](#-las-partes-de-la-app)
 - [✨ Qué hace en 30 segundos](#-qué-hace-en-30-segundos)
-- [🚀 Empieza en 3 pasos](#-empieza-en-3-pasos)
+- [🚀 Empieza en 4 pasos](#-empieza-en-4-pasos)
 - [🔎 Buscar producto](#-buscar-producto)
 - [🛍️ Desarrollo de la landing](#️-desarrollo-de-la-landing)
 - [🎓 Entrenador de métricas](#-entrenador-de-métricas)
@@ -46,6 +48,8 @@ cuánto ganaste, por qué, y qué palanca mover para ganar más.
 ---
 
 ## 🧩 Las partes de la app
+
+Synkops es mi app personal: hoy la uso solo en mi PC y en el navegador. Quiero que centralice y automatice mi ecommerce, pero todavía no se conecta directamente con Dropi, Shopify ni Meta: los datos entran subiendo archivos o escribiéndolos a mano.
 
 Todo vive en una sola página (`index.html`). Las pestañas de la barra superior siguen el orden en que trabajo un producto:
 
@@ -82,7 +86,7 @@ En contra entrega (COD) lo que vende Meta **no** es lo que entra a tu bolsillo: 
 
 ---
 
-## 🚀 Empieza en 3 pasos
+## 🚀 Empieza en 4 pasos
 
 > [!TIP]
 > No hay que instalar nada. Es una página web que corre en tu propio navegador.
@@ -149,7 +153,7 @@ Módulo 5 de NovaSociety: lo que hago a mano para montar el producto en Shopify.
 - **Releasit** con ofertas de 1, 2 y 3 unidades (descuentos de 0%, 20% y 30%).
 - Títulos y etiquetas con unidad, regalo y garantía; prompts de miniaturas; TrustWill.
 - **Traer de mi candidato** llena nombre, ID de Dropi y precios desde Buscar producto.
-- **Meta Ads:** paso a paso según la estrategia que voy a montar (selector ABO / CBO; CBO aparece como "pronto"). ABO: campaña de testeo (1 campaña → 4 conjuntos → 1 anuncio con su video en cada uno, 30.000 al día por conjunto). Mapa interactivo de la campaña, tabla "campo → valor" en cada paso, nombre de la campaña (día mes - producto), fecha de inicio (mañana, 5:00 a. m.), revisión de la URL de la product page y prompt de 3 copies, títulos y descripciones.
+- **Meta Ads:** paso a paso según la estrategia que voy a montar (selector ABO / CBO; CBO aparece como "pronto"). ABO: campaña de testeo (1 campaña → 4 conjuntos → 1 anuncio con su video en cada uno, 30.000 al día por conjunto). Mapa informativo de la campaña, tabla "campo → valor" en cada paso, nombre de la campaña (día de mañana, mes y primer nombre del producto), fecha de inicio (mañana, 5:00 a. m.), URL de la product page con identificador editable, ciudades excluidas de Lugares y prompt de 3 copies, títulos y descripciones.
 - TikTok Ads aparece como "pronto".
 
 ---
@@ -456,6 +460,8 @@ Sin build, sin servidor y sin dependencias npm. Única librería externa: [Excel
 Cada capa solo usa las que están por encima en esta lista:
 
 ```
+specs/                Specs del proyecto; 00-estado-actual.md es la línea base
+
 img/
   autor.png           Logo del autor (pie de la app y del informe)
 
@@ -533,7 +539,16 @@ core.evaluate({ salesTotal: 800, prov: 3, sales7: 40 });   // semáforo VDO de u
 core.BY_PROVIDER.steps.map((s) => s.t);                    // fases de la estrategia por proveedor
 ```
 
-No hay runner de pruebas. Para revisar el pintado (capas `ui` y `app`) se carga `index.html` en **jsdom** y se simulan clics; `node --check archivo.js` revisa la sintaxis.
+No hay runner de pruebas. Para revisar el pintado (capas `ui` y `app`) se carga `index.html` en **jsdom** (`npm i jsdom@26`, fuera del repo) y se simulan clics; `node --check archivo.js` revisa la sintaxis.
+
+### Cómo se desarrolla (SDD)
+
+El proyecto sigue Spec Driven Design desde noviembre de 2026:
+
+- Las specs viven en `specs/`. Antes de escribir una nueva, revisa [`specs/00-estado-actual.md`](specs/00-estado-actual.md): documenta lo que ya existe y su deuda técnica.
+- Cada spec se trabaja en su propia rama: `spec-NN-slug`.
+- Los commits son atómicos.
+- Después de cada merge se actualizan `CLAUDE.md` y este README.
 
 </details>
 
@@ -596,11 +611,11 @@ Agradezco sinceramente el tiempo dedicado a revisar este proyecto. Valoro cualqu
 
 | Campo | Detalles |
 |:---|:---|
-| **Título** | Dropshipping COD · Calculadora de Utilidad Real |
+| **Título** | Synkops (antes Dropshipping COD · Calculadora de Utilidad Real) |
 | **Autor** | Saul Echeverri |
 | **Versión** | 1.1.0 |
 | **Fecha de creación** | 12 de octubre de 2026 |
-| **Última actualización** | 2 de noviembre de 2026 |
+| **Última actualización** | 7 de noviembre de 2026 |
 | **Notas adicionales** | Aplicación web local (HTML, CSS y JavaScript sin dependencias de compilación) con el método de NovaSociety: buscar y evaluar productos, montar la landing en Shopify, entrenador de métricas y el P&L real contra entrega cruzando Dropi y Meta Ads. |
 
 ---
