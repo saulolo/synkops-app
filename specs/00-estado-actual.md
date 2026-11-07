@@ -61,7 +61,7 @@ Acompaña un producto de principio a fin con el método de NovaSociety (Juan Her
 | Lint y formato | No hay configuración |
 | CI/CD | No hay: no existe `.github/` |
 | Versión | README dice 1.1.0; no hay tags ni otra fuente |
-| Repositorio | `github.com/saulolo/dropshipping-cod-pnl`, rama `main`, 26 commits |
+| Repositorio | `github.com/saulolo/synkops-app` (antes `dropshipping-cod-pnl`), rama `main`, 26 commits |
 
 Node solo se usa para probar el núcleo. `js/core/index.js` carga los módulos en orden y exporta sus funciones aplanadas.
 
@@ -360,7 +360,7 @@ El código no tiene comentarios `TODO` ni `FIXME`. El repositorio tampoco regist
 ### Documentación desactualizada
 
 - El encabezado de `trainer.js` dice "sin cambios de lógica", pero el Costeo ya usa `core.search` (`trainer.js:182,222,293`). Es un comentario de código y sigue sin cambiar.
-- Hay varios nombres en uso: Synkops en la documentación, `<title>` "NovaSociety · Entrenador de Métricas", `wb.creator = 'P&L COD'` y el repo `dropshipping-cod-pnl`.
+- Hay varios nombres en uso: Synkops en la documentación, `<title>` "NovaSociety · Entrenador de Métricas", y `wb.creator = 'P&L COD'`. El repo ya se llama `synkops-app`.
 - `README.md` y `CLAUDE.md` se actualizaron con esta spec: nombre, partes de la app, los 4 pasos de inicio, el mapa informativo de Meta Ads y el flujo SDD.
 
 ## 10. Criterios de aceptación
