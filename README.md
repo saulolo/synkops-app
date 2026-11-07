@@ -481,79 +481,89 @@ docs/referencia/
 
 css/
   base.css            Sistema de diseño: tokens, barra superior, tarjetas, botones, campos, tablas,
-                      módulos del entrenador, Buscar producto, Desarrollo y los temas (al final)
-  components.css      Solo lo propio del Tablero P&L (acotado a #v-pyl)
+                      aviso, indicador de desplegable y alias de tokens del tablero
+  modules/            Un CSS por módulo, en este orden de carga (la cascada depende de él):
+    trainer.css       Entrenador: Inicio, Costeo, simulador, escalera y pipeline
+    search.css        Buscar producto, Mi candidato, bitácora y estadísticas
+    quick.css         Guardado rápido
+    landing.css       Desarrollo → Shopify
+    ads.css           Desarrollo → Meta Ads
+  themes.css          Selector de tema, modo claro, temas oscuros y SVG con colores fijos
+  modules/pnl.css     Solo lo propio del Tablero P&L (acotado a #v-pyl)
   report.css          Informe PDF: documento claro en A4, visible solo al imprimir
 
+tests/
+  core.test.js        Núcleo en Node puro (costeo, guardado rápido, P&L)
+  smoke.test.js       jsdom: claves de PYL.*, 9 pestañas, navegación y consola limpia
+  fixtures/           CSV de prueba de Dropi (datos inventados) y claves de PYL.*
+
 js/
-  core/               Lógica de negocio pura. Sin DOM: también corre en Node.
-    parse.js          Texto normalizado, números locales, CSV, celdas de ExcelJS
-    dates.js          Fechas ISO, etiquetas de periodo
-    format.js         Formato es-CO (COP, %, x, montos compactos)
-    dropi.js          Reporte de órdenes Dropi
-    meta.js           Facturación y métricas de campañas Meta, asignación a producto
-    pnl.js            Ciclos de producto, reparto de inversión, agregado del P&L
-    diagnostics.js    Benchmarks del embudo y la cascada, historia ejecutiva, veredicto, semáforos KPI
-    insights.js       Periodo anterior, semanas, proyección, simulador, unit economics, plan de acción
-    excel.js          Plantilla y escritura del consolidado de 20 columnas
-    search.js         Buscar producto: LIMITS (única fuente de los umbrales), ciclo de vida, flujograma,
-                      estrategias de búsqueda (VDO y por proveedor), producto ganador, score, costeo y bitácora
-    landing.js        Desarrollo: pasos, prompts y números (LANDING) de la landing en Shopify
-    ads.js            Desarrollo → Meta Ads: estrategias (AD_STRATEGIES), pasos ABO (ABO_STEPS) y números (ADS)
-    quick.js          Guardado rápido: valida (nombre, ID, ID repetido), arma la lista y convierte el precio escrito a pesos
-    index.js          Solo Node: exporta todo el núcleo para pruebas
+  index.js            Solo Node: carga todos los core en orden y exporta el núcleo para pruebas
 
-  services/           Adaptadores a APIs del navegador
-    storage.js        localStorage (asignaciones, búsqueda de productos, guardado rápido, landing, Meta Ads) e IndexedDB (archivo vinculado)
-    files.js          Lectura de .xlsx/.csv, selector y descarga
-    consolidado.js    Archivo consolidado con File System Access (Chrome/Edge)
+  shared/             Lo que usan varios módulos
+    core/             parse.js (texto, números, CSV, celdas de ExcelJS), dates.js (fechas ISO), format.js (es-CO)
+    services/         storage.js (localStorage e IndexedDB), files.js (lectura de .xlsx/.csv, selector, descarga)
+    ui/               dom.js, tooltip.js, feedback.js
 
-  ui/                 Componentes que pintan el DOM. Reciben datos por parámetro.
-    dom.js, tooltip.js, feedback.js, upload-zones.js, notices.js, trend.js,
-    summary.js, cascade.js, funnel.js, diagnosis-panel.js, unit-table.js,
-    simulator.js, products-table.js, campaigns-table.js, presets.js, report.js,
-    search.js         Pestaña Buscar producto (flujograma, semáforo VDO, producto ganador, pirámide,
-                      selector de estrategias y fases de la estrategia por proveedor, fichas)
-    candidate.js      Evaluador de candidatos: formulario con foto, score /8, utilidad, bitácora y estadísticas
-    landing.js        Pestaña Desarrollo (pasos de la landing, prompts para copiar, progreso)
-    ads.js            Desarrollo → Meta Ads: mapa de la campaña y herramientas de sus pasos
-    quick.js          Guardado rápido: botón flotante, panel con formulario en fila y lista
+  modules/            Una carpeta por parte de la app, con sus capas adentro
+    pnl/              Tablero P&L
+      core/           dropi.js, meta.js, pnl.js, diagnostics.js, insights.js, excel.js
+      services/       consolidado.js (archivo consolidado con File System Access, Chrome/Edge)
+      ui/             upload-zones, notices, trend, summary, cascade, funnel, diagnosis-panel, unit-table,
+                      simulator, products-table, campaigns-table, presets y report
+      app/            filters.js, data-loader.js, save.js, report.js
+    search/           Buscar producto
+      core/search.js  LIMITS (única fuente de los umbrales), ciclo de vida, flujograma, estrategias (VDO y
+                      por proveedor), producto ganador, score, costeo y bitácora
+      ui/             search.js (flujograma, semáforo VDO, pirámide, estrategias, fichas) y
+                      candidate.js (evaluador: formulario con foto, score /8, utilidad, bitácora y estadísticas)
+      app/search.js   Estado (app.state.search) y paso del candidato al Costeo
+    quick/            Guardado rápido
+      core/quick.js   Valida (nombre, ID, ID repetido), arma la lista y convierte el precio escrito a pesos
+      ui/quick.js     Botón flotante, panel con formulario en fila y lista
+      app/quick.js    Estado (app.state.quick) y envío a Mi candidato (evento rapido:candidato)
+    landing/          Desarrollo → Shopify (core: pasos, prompts y números LANDING · ui · app)
+    ads/              Desarrollo → Meta Ads (core: AD_STRATEGIES, ABO_STEPS y ADS · ui: mapa y herramientas · app)
+    trainer/
+      app/trainer.js  Entrenador de métricas (fase 1: copiado del prototipo)
 
-  app/                Estado y casos de uso; conecta core, services y ui
+  app/                Estado y arranque de toda la app
     theme.js          Tema (data-theme en <html>); se carga en <head>, antes de pintar
-    trainer.js        Entrenador de métricas y navegación entre pestañas (fase 1: copiado del prototipo)
     state.js          Estado único de la aplicación
-    filters.js        Filtros, selección de producto, periodos rápidos
-    data-loader.js    Carga de reportes y asignación campaña → producto
-    save.js           Guardar en el consolidado, exportar, cambiar archivo
-    report.js         Reúne el cálculo actual y genera el informe PDF
-    search.js         Estado de Buscar producto (app.state.search) y paso del candidato al Costeo
-    landing.js        Estado de Desarrollo (app.state.landing) y "Traer de mi candidato"
-    ads.js            Estado de Meta Ads (app.state.ads) y sub-pestañas de Desarrollo
-    quick.js          Estado del guardado rápido (app.state.quick) y envío a Mi candidato (evento rapido:candidato)
-    main.js           render() y arranque. Va siempre de último.
+    nav.js            Navegación entre pestañas; avisa con el evento nav:vista
+    main.js           render() del tablero y arranque. Va siempre de último.
 ```
 
 ### Convenciones
 
 - **Sin `import`/`export`.** Los navegadores bloquean los ES modules en `file://`. Cada archivo es un IIFE que publica su API en el namespace global `PYL` (`PYL.core.pnl`, `PYL.ui.funnel`, etc.).
-- **El orden importa.** `index.html` carga los scripts en el orden de las capas. Un archivo nuevo va en su capa, antes de los que lo usan.
+- **El orden importa.** `index.html` carga los scripts en el orden de las capas (`core → services → ui → app`; dentro de cada capa, `shared` y luego los módulos), con `app/nav.js` antes de `main.js`. Los `<link>` de CSS también van en un orden fijo (ver el árbol). Un archivo nuevo va en `modules/<módulo>/<capa>/`, o en `shared/` si lo usan varios módulos, antes de los que lo usan.
+- **Carpeta = módulo, namespace = capa.** `js/modules/search/core/search.js` publica `PYL.core.search`. Un módulo solo usa `shared/` y los módulos que se cargan antes (`search` usa `pnl`; `quick` usa `search`; `ads` usa `landing` y `search`; `trainer` usa `search`).
+- **La navegación es de toda la app.** `app/nav.js` abre la vista y dispara `nav:vista`; cada módulo reacciona a ese evento.
 - **Solo la capa `app` modifica el estado.** Los componentes de `ui` reciben datos y callbacks (`onSelect`, `onAssign`).
-- **Los diagnósticos devuelven datos, no HTML.** El texto con formato se representa como segmentos: un string es texto plano, `{ b: '...' }` va en negrita y `{ a: '...', href }` es un enlace que abre en pestaña nueva. `ui/dom.js` (`rich`) los pinta.
+- **Los diagnósticos devuelven datos, no HTML.** El texto con formato se representa como segmentos: un string es texto plano, `{ b: '...' }` va en negrita y `{ a: '...', href }` es un enlace que abre en pestaña nueva. `shared/ui/dom.js` (`rich`) los pinta.
 - **Estilos solo en los `.css`.** Nada de `<style>` en `index.html`. Los colores de marca van con tokens (`var(--b)`, `rgba(var(--b-rgb),…)`), nunca escritos a mano.
 - **IDs únicos en toda la página** y archivos con finales de línea LF.
 
 ### Pruebas en Node
 
 ```js
-const core = require('./js/core/index.js');
+const core = require('./js/index.js');
 const dropi = core.buildDropi(core.parseCSV(texto));
 const a = core.aggregate(dropi.lines, [], { prod: '__all', from: null, to: null, iva: true, adsOverride: null }, null);
 core.evaluate({ salesTotal: 800, prov: 3, sales7: 40 });   // semáforo VDO de un candidato
 core.BY_PROVIDER.steps.map((s) => s.t);                    // fases de la estrategia por proveedor
 ```
 
-No hay runner de pruebas. Para revisar el pintado (capas `ui` y `app`) se carga `index.html` en **jsdom** (`npm i jsdom@26`, fuera del repo) y se simulan clics; `node --check archivo.js` revisa la sintaxis.
+Las pruebas viven en `tests/` y no necesitan runner:
+
+```sh
+node tests/core.test.js                                      # núcleo en Node puro
+NODE_PATH=<carpeta>/node_modules node tests/smoke.test.js   # abre index.html en jsdom
+node --check archivo.js                                      # sintaxis de un archivo
+```
+
+`smoke.test.js` necesita **jsdom** (`npm i jsdom@26` en una carpeta fuera del repo): revisa las claves de `PYL.*`, que las 9 pestañas abran, los eventos de navegación y que la consola esté limpia. Si agregas o quitas una clave de `PYL.*`, regenera `tests/fixtures/claves-pyl.json` con `node tests/smoke.test.js --claves`.
 
 ### Cómo se desarrolla (SDD)
 

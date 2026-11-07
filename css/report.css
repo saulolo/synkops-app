@@ -1,4 +1,4 @@
-/* Informe PDF (ui/report.js): documento claro en A4. Oculto en pantalla; al imprimir con
+/* Informe PDF (js/modules/pnl/ui/report.js): documento claro en A4. Oculto en pantalla; al imprimir con
    body.print-report solo se ve el informe. */
 .report {
   display: none;

@@ -1,7 +1,7 @@
 // Desarrollo → Meta Ads: guía paso a paso para crear la campaña en el Administrador de anuncios, por estrategia
 // (AD_STRATEGIES: ABO lista; CBO pendiente). ABO: 1 campaña → 4 conjuntos → 1 anuncio (1 video) por conjunto.
 // Contenido de los pasos y ayudas. Sin DOM.
-// Mismo formato de pasos que core/landing.js (t, where, p, items, prompts, tool, warn, tip) más:
+// Mismo formato de pasos que modules/landing/core/landing.js (t, where, p, items, prompts, tool, warn, tip) más:
 //   level  = nivel del Administrador donde se hace el paso ('camp' | 'set' | 'ad' | 'all');
 //   fields = [campo, valor] tal como aparecen en Meta.
 // Nada sensible aquí (correos, contraseñas, NIT): solo nombres de los activos.
@@ -44,7 +44,7 @@
   const LEVELS = { camp: 'Campaña', set: 'Conjunto de anuncios', ad: 'Anuncio', all: 'Toda la campaña' };
   const MONTHS = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
   const money = (v) => '$' + Number(v).toLocaleString('es-CO');
-  // Ofertas de Releasit tal como están en la landing (core/landing.js): "2 unidades con 20% de descuento y 3 con 30%".
+  // Ofertas de Releasit tal como están en la landing (modules/landing/core/landing.js): "2 unidades con 20% de descuento y 3 con 30%".
   const OFFERS = core.landing.LANDING.offers.filter((o) => o.pct)
     .map((o, i) => (i ? `${o.qty} con ${o.pct}%` : `${o.qty} unidades con ${o.pct}% de descuento`)).join(' y ');
 

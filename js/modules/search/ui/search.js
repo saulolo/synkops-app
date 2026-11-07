@@ -1,5 +1,5 @@
 // Pestaña Buscar producto: pinta el flujograma de DropKiller, el semáforo VDO del candidato, el ciclo de vida,
-// las estrategias de búsqueda (VDO y por proveedor) y las fichas de consulta. El formulario y la bitácora están en ui/candidate.js. Recibe datos y callbacks.
+// las estrategias de búsqueda (VDO y por proveedor) y las fichas de consulta. El formulario y la bitácora están en modules/search/ui/candidate.js. Recibe datos y callbacks.
 (() => {
   const PYL = globalThis.PYL;
   const { el, rich } = PYL.ui.dom;

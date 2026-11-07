@@ -1,0 +1,69 @@
+/* Desarrollo → Shopify (js/modules/landing). Reusa el flujograma de search.css. Se carga después de quick.css. */
+/* ---------- Desarrollo del producto (landing en Shopify) ---------- */
+/* Reusa el flujograma de Buscar producto (.b-flow, .fl, .fl-detail, .b-prog). */
+#v-desarrollo .seg button:disabled{cursor:not-allowed;opacity:.5}
+.ld-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+.ld-checks{list-style:none;margin:0;padding:0;display:grid;gap:8px;counter-reset:ld}
+.ld-check{all:unset;cursor:pointer;box-sizing:border-box;width:100%;display:flex;align-items:flex-start;gap:12px;padding:11px 13px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-size:14px;line-height:1.45;transition:border-color .2s,background .2s}
+.ld-more{margin-top:6px;padding:0 13px;font-size:13.5px}
+.ld-more summary{padding:8px 0}
+.ld-more .bd p{margin:0 0 6px;line-height:1.45}
+.ld-check:hover{border-color:var(--b)}
+.ld-check:focus-visible{outline:2px solid var(--b)}
+.ld-check i{width:22px;height:22px;flex-shrink:0;border-radius:7px;border:2px solid var(--line-2);display:grid;place-items:center;font-style:normal;font-size:13px;font-weight:900;color:#fff;transition:background .2s,border-color .2s}
+.ld-check.on{background:var(--g-bg);border-color:rgba(34,197,94,.45)}
+.ld-check.on i{background:var(--g);border-color:var(--g)}
+.ld-check.on span{color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(34,197,94,.6)}
+ol.ld-checks li{counter-increment:ld}
+ol.ld-checks .ld-check::before{content:counter(ld);order:2;margin-left:auto;font-size:11px;font-weight:900;color:var(--y-ink);background:var(--y-bg);border-radius:99px;padding:2px 8px}
+.ld-checks b,.ld-prompts b{color:var(--ink)}
+.ld-prompts h4,.ld-tool h4{margin:0 0 10px;font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--soft)}
+.ld-prompt{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--b);border-radius:12px;padding:12px 14px;margin-top:8px}
+.ld-prompt b{font-size:13.5px}
+.ld-prompt p{margin:8px 0 0;font-size:13.5px;color:var(--muted);font-style:italic;white-space:pre-line}
+.ld-copy{flex-shrink:0;transition:background .2s,border-color .2s,color .2s}
+.btn.ld-copy.copied,.btn.ld-copy.copied:hover,.ld-mini.copied{background:var(--g-bg);border-color:rgba(34,197,94,.45);color:var(--g-ink);opacity:1}
+.ld-prompt-tip{margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);font-size:12.5px;line-height:1.5;color:var(--soft)}
+.ld-prompt-tip b{color:var(--ink)}
+.ld-tool{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.ld-tool .field + .field{margin-top:12px}
+.ld-count{font-size:11.5px;font-weight:800;color:var(--soft);font-variant-numeric:tabular-nums}
+.ld-count.ok{color:var(--g-ink)}.ld-count.bad{color:var(--r-ink)}
+.ld-preview{background:var(--bg-2);border:1px dashed var(--line-2);border-radius:12px;padding:12px 14px}
+.ld-preview small,.ld-val small{display:block;font-size:11.5px;color:var(--soft)}
+.ld-title{display:block;font-weight:800;font-size:15px;margin-top:2px;word-break:break-word}
+.ld-val{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.ld-tool h4 + .ld-val,.ld-need + .ld-val{border-top:0}
+.ld-val em{display:block;font-size:11.5px;font-style:normal;color:var(--soft)}
+.ld-v{font-weight:800;word-break:break-word}
+.ld-val.off .ld-copy,.ld-offers.off{opacity:.45;pointer-events:none}
+.ld-need{margin:0 0 10px}
+.ld-have{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:13.5px;border-top:1px solid var(--line)}
+.ld-tool h4 + .ld-have{border-top:0}
+.ld-have i{width:10px;height:10px;border-radius:50%;background:var(--r);flex-shrink:0}
+.ld-have.ok i{background:var(--g)}
+.ld-have span{color:var(--muted)}
+.ld-have .ld-v{margin-left:auto;text-align:right}
+.ld-fields{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.ld-offers{display:grid;gap:10px;margin-top:10px}
+.ld-offer{display:flex;flex-direction:column;gap:6px;background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:12px}
+.ld-offer > .row{flex-wrap:wrap;gap:8px}
+.ld-fx{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;padding:8px 0;border-top:1px solid var(--line);font-size:13px}
+.ld-fx dt{color:var(--soft)}
+.ld-fx dd{margin:0;font-weight:700}
+/* Etiqueta de la oferta como se ve en Releasit: letras blancas sobre verde fosforescente */
+.ld-label{display:inline-block;margin-top:4px;padding:6px 10px;border-radius:8px;background:linear-gradient(90deg,#16c60c,#b8e600);color:#fff;font-size:12px;font-weight:800;letter-spacing:.02em;text-shadow:0 1px 1px rgba(0,0,0,.25)}
+.ld-offer-hot{border-color:rgba(34,197,94,.45);background:var(--g-bg)}
+.ld-offer-p{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.ld-big{font-family:ui-monospace,"SFMono-Regular",Consolas,monospace;font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
+.ld-offer-hot .ld-big{color:var(--g-ink)}
+.ld-strike{font-size:13px;color:var(--soft);text-decoration:line-through}
+/* "Producto que estoy montando": los 4 campos en una sola línea; el nombre, más ancho */
+#d-prod .ld-fields{grid-template-columns:minmax(0,2fr) repeat(3,minmax(0,1fr))}
+@media (max-width:900px){
+  .ld-fields,#d-prod .ld-fields{grid-template-columns:1fr}
+  .ld-val{flex-wrap:wrap}
+}
+@media (min-width:601px) and (max-width:900px){
+  #d-prod .ld-fields{grid-template-columns:1fr 1fr}
+}
