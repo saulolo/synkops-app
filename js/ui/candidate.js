@@ -378,5 +378,5 @@
     node.append(k, g);
   }
 
-  PYL.ui.candidate = { build, fill, syncChips, comp, scoreBox, cost, filters, counts, table, statsView, setPressed };
+  PYL.ui.candidate = { build, fill, syncChips, comp, scoreBox, cost, filters, counts, table, statsView, setPressed, copyBtn };
 })();

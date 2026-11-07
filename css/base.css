@@ -608,6 +608,61 @@ details.acc .bd{padding:0 0 16px;color:var(--muted);font-size:14px}
 .cd-photo-empty{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted);font-size:13.5px;pointer-events:none}
 .cd-photo-empty small{color:var(--soft);font-size:11.5px}
 .cd-photo-rm{align-self:flex-start}
+/* Guardado rápido (Buscar producto): botón flotante + panel. Solo tokens, sirve en todos los temas. */
+#v-buscar{padding-bottom:84px}
+.qk-btn{all:unset;cursor:pointer;position:fixed;right:20px;bottom:20px;z-index:30;width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--b),var(--b3));color:var(--on-b);box-shadow:0 10px 28px rgba(var(--b-rgb),.45);transition:transform .15s,filter .15s}
+.qk-btn:hover{filter:brightness(1.1);transform:translateY(-2px)}
+.qk-btn:focus-visible{outline:3px solid var(--b-ink);outline-offset:3px}
+.qk-btn.on{filter:brightness(.92)}
+.qk-count{position:absolute;top:-4px;right:-4px;min-width:21px;height:21px;padding:0 6px;border-radius:999px;display:grid;place-items:center;background:var(--r);color:#fff;font-size:11.5px;font-weight:800;line-height:1;border:2px solid var(--bg)}
+.qk-count[hidden]{display:none}
+/* El formulario y la barra quedan fijos; solo la lista se desplaza. */
+.qk-panel{position:fixed;right:20px;bottom:86px;z-index:30;width:min(580px,calc(100vw - 32px));max-height:calc(100vh - 120px);overflow:hidden;display:flex;flex-direction:column;gap:10px;padding:14px;background:linear-gradient(180deg,var(--card-2),var(--card));border:1px solid var(--line-2);border-radius:var(--rad);box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.qk-panel[hidden]{display:none}
+.qk-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-shrink:0}
+.qk-title{display:flex;flex-direction:column;gap:2px}
+.qk-title b{font-size:15px}
+.qk-title small{font-size:11.5px;color:var(--soft)}
+.qk-x{all:unset;cursor:pointer;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:var(--soft);font-size:14px;flex-shrink:0}
+.qk-x:hover{background:var(--card-2);color:var(--ink)}
+.qk-x:focus-visible{outline:2px solid var(--b)}
+/* Nombre, ID, precio, imagen y Guardar en una sola fila. */
+.qk-form{display:grid;grid-template-columns:minmax(0,1fr) 100px 112px 56px auto;gap:8px;align-items:end;flex-shrink:0}
+.qk-form .field{gap:4px;min-width:0}
+.qk-form .field label{font-size:11px}
+.qk-form .field input[type=text]{min-height:40px;padding:8px 10px;font-size:13.5px}
+.qk-photo-wrap{position:relative;width:56px;height:40px}
+.qk-photo{position:relative;display:grid;place-items:center;width:100%;height:100%;border:2px dashed var(--line-2);border-radius:10px;background:var(--bg-2);cursor:pointer;overflow:hidden;transition:border-color .2s}
+.qk-photo:hover{border-color:var(--b)}
+.qk-photo:focus-within{outline:2px solid var(--b)}
+.qk-photo-img{width:100%;height:100%;object-fit:contain;background:#fff}
+.qk-photo-img[hidden],.qk-photo-empty[hidden],.qk-photo-rm[hidden]{display:none}
+.qk-photo-empty{display:flex;flex-direction:column;align-items:center;line-height:1.1;color:var(--muted);pointer-events:none}
+.qk-photo-empty b{font-size:14px;font-weight:400}
+.qk-photo-empty small{color:var(--soft);font-size:9.5px}
+.qk-photo-rm{all:unset;cursor:pointer;position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:var(--r);color:#fff;font-size:10px;font-weight:800;line-height:1;border:1.5px solid var(--card)}
+.qk-photo-rm:focus-visible{outline:2px solid var(--b)}
+.qk-save{height:40px;box-sizing:border-box}
+.qk-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:8px;border-top:1px solid var(--line);flex-shrink:0}
+.qk-bar b{font-size:13px}
+.qk-bar .btn:disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
+.qk-list{display:flex;flex-direction:column;gap:6px;overflow-y:auto;min-height:0;padding-right:2px}
+.qk-none{margin:0;font-size:12.5px;color:var(--soft);text-align:center;padding:6px 0}
+.qk-row{display:flex;gap:10px;align-items:center;padding:6px 8px;border:1px solid var(--line);border-radius:12px;background:var(--bg-2)}
+.qk-thumb{width:44px;height:44px;border-radius:9px;object-fit:cover;flex-shrink:0;display:grid;place-items:center;background:var(--card);border:1px solid var(--line)}
+.qk-info{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}
+.qk-line{display:flex;align-items:center;gap:6px;min-width:0}
+.qk-name{font-size:13.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.qk-id{font-size:12px;color:var(--muted)}
+.qk-price{margin-left:4px;font-weight:700;color:var(--g-ink);white-space:nowrap}
+.qk-send{all:unset;cursor:pointer;flex-shrink:0;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:var(--b-ink);border:1px solid var(--line-2);transition:background .2s,color .2s}
+.qk-send:hover{background:var(--b-bg);border-color:var(--b)}
+.qk-send:focus-visible{outline:2px solid var(--b)}
+@media (max-width:480px){
+  .qk-form{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 56px}
+  .qk-form .field:first-child,.qk-save{grid-column:1/-1}
+  .qk-save{justify-self:end}
+}
 .cd-top{display:grid;grid-template-columns:minmax(220px,300px) minmax(0,1fr);gap:20px;align-items:start}
 .cd-top .cd-photo{width:100%}
 .cd-top-r{display:flex;flex-direction:column;gap:16px;min-width:0}

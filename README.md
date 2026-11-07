@@ -7,7 +7,7 @@
 Acompaña cada producto de principio a fin: buscarlo, costearlo, montar su landing y su campaña,<br>
 leer el testeo y medir la utilidad real cruzando **Dropi** con **Meta Ads**.
 
-<sub>Antes "Calculadora de Utilidad Real". La interfaz de la app todavía no muestra el nombre Synkops.</sub>
+<sub>**Synkops · Mi operación en sincronía.** Antes "Calculadora de Utilidad Real".</sub>
 
 ![Sin instalación](https://img.shields.io/badge/instalación-ninguna-7a73ff?style=for-the-badge)
 ![100% local](https://img.shields.io/badge/datos-100%25%20en%20tu%20PC-34c38f?style=for-the-badge)
@@ -56,7 +56,7 @@ Todo vive en una sola página (`index.html`). Las pestañas de la barra superior
 | Pestaña | Para qué sirve |
 |---|---|
 | 🏠 **Inicio** | Resumen del método de Juan Herrera (NovaSociety) y la cadena CPM → CPC → CPPI → CPA. |
-| 🔎 **Buscar producto** | Encontrar y evaluar un producto antes de gastar: flujograma de DropKiller, mi candidato con score, bitácora y estrategias de búsqueda. |
+| 🔎 **Buscar producto** | Encontrar y evaluar un producto antes de gastar: flujograma de DropKiller, mi candidato con score, bitácora y estrategias de búsqueda. Un botón flotante guarda productos al vuelo. |
 | 🧮 **Costeo** | Cuánto cobrar, cuánto me queda por pedido entregado y mi CPA máximo. |
 | 🛍️ **Desarrollo** | Montar la landing del producto en Shopify y crear su campaña en Meta Ads, paso a paso. |
 | 📏 **Hard Metrics** | Rangos de Meta Ads y TikTok Ads, con semáforo para mis datos. |
@@ -116,6 +116,17 @@ Módulo 4 de NovaSociety más el método VDO de DropKiller. La idea: no pregunta
 | 4 | **¿Es un producto ganador?** | 6 características (2 obligatorias). Las marco y se guardan con el candidato. |
 | 5 | **Estrategias de búsqueda** | Dos caminos para encontrar el producto (ver abajo). |
 | 6 | **Costeo →** | Salta a la pestaña Costeo con los datos del candidato. |
+
+### ⚡ Guardado rápido
+
+En esta pestaña hay un **botón flotante** (abajo a la derecha, con un numerito que cuenta lo guardado). Es una libreta para anotar productos al vuelo mientras busco; no calcula nada con ellos.
+
+- **Formulario en una fila:** Nombre, ID Dropi, Precio proveedor e Imagen. Nombre e ID son obligatorios; el precio y la imagen son opcionales.
+- **Precio:** lo escribo como `25000` o `25.000` y se ve como `$ 25.000`.
+- **Imagen:** copio una imagen y, con el panel abierto, presiono **Ctrl+V** (o toco el cuadro para elegir un archivo). Se guarda pequeña, solo como referencia.
+- **Lista:** cada producto muestra miniatura, nombre, ID y precio, con botón de copiar en nombre e ID. Un ID repetido no se guarda.
+- **Ícono de enviar** (a la derecha de cada producto): lleva nombre, ID, precio y foto a **Mi candidato** como producto nuevo. Si Mi candidato tiene algo sin guardar, pregunta antes. El producto se queda en la lista.
+- **🧹 Limpiar:** pregunta antes y vacía solo esta lista (libera el espacio de las fotos). Lo que ya envié a Mi candidato no se toca.
 
 ### 🧭 Estrategias de búsqueda
 
@@ -401,7 +412,7 @@ Pulsa **📄 Descargar informe PDF** (el botón morado arriba a la derecha, o *I
 ## 🔒 Privacidad
 
 - 🖥️ Todo se procesa **dentro de tu navegador**. Tus reportes no se suben a ningún servidor.
-- 💾 Lo que la app guarda en tu navegador: asignaciones campaña → producto, acceso a tu archivo consolidado, la bitácora de candidatos (con sus fotos) y los pasos marcados de Buscar producto y Desarrollo, lo que escribes en el entrenador y el tema elegido. Si borras los datos del navegador, eso se pierde.
+- 💾 Lo que la app guarda en tu navegador: asignaciones campaña → producto, acceso a tu archivo consolidado, la bitácora de candidatos (con sus fotos), el guardado rápido de productos y los pasos marcados de Buscar producto y Desarrollo, lo que escribes en el entrenador y el tema elegido. Si borras los datos del navegador, eso se pierde.
 - 🌐 Solo usa internet para descargar la librería de Excel y las tipografías, y cuando abres un enlace externo (por ejemplo, FastMoss).
 
 ---
@@ -489,10 +500,11 @@ js/
                       estrategias de búsqueda (VDO y por proveedor), producto ganador, score, costeo y bitácora
     landing.js        Desarrollo: pasos, prompts y números (LANDING) de la landing en Shopify
     ads.js            Desarrollo → Meta Ads: estrategias (AD_STRATEGIES), pasos ABO (ABO_STEPS) y números (ADS)
+    quick.js          Guardado rápido: valida (nombre, ID, ID repetido), arma la lista y convierte el precio escrito a pesos
     index.js          Solo Node: exporta todo el núcleo para pruebas
 
   services/           Adaptadores a APIs del navegador
-    storage.js        localStorage (asignaciones, búsqueda de productos, landing, Meta Ads) e IndexedDB (archivo vinculado)
+    storage.js        localStorage (asignaciones, búsqueda de productos, guardado rápido, landing, Meta Ads) e IndexedDB (archivo vinculado)
     files.js          Lectura de .xlsx/.csv, selector y descarga
     consolidado.js    Archivo consolidado con File System Access (Chrome/Edge)
 
@@ -505,6 +517,7 @@ js/
     candidate.js      Evaluador de candidatos: formulario con foto, score /8, utilidad, bitácora y estadísticas
     landing.js        Pestaña Desarrollo (pasos de la landing, prompts para copiar, progreso)
     ads.js            Desarrollo → Meta Ads: mapa de la campaña y herramientas de sus pasos
+    quick.js          Guardado rápido: botón flotante, panel con formulario en fila y lista
 
   app/                Estado y casos de uso; conecta core, services y ui
     theme.js          Tema (data-theme en <html>); se carga en <head>, antes de pintar
@@ -517,6 +530,7 @@ js/
     search.js         Estado de Buscar producto (app.state.search) y paso del candidato al Costeo
     landing.js        Estado de Desarrollo (app.state.landing) y "Traer de mi candidato"
     ads.js            Estado de Meta Ads (app.state.ads) y sub-pestañas de Desarrollo
+    quick.js          Estado del guardado rápido (app.state.quick) y envío a Mi candidato (evento rapido:candidato)
     main.js           render() y arranque. Va siempre de último.
 ```
 
