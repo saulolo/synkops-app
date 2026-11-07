@@ -9,7 +9,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&family=JetBrains+Mono:wght@500;700&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
 <link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/modules/trainer.css">
+<link rel="stylesheet" href="css/modules/search.css">
+<link rel="stylesheet" href="css/modules/quick.css">
+<link rel="stylesheet" href="css/modules/landing.css">
+<link rel="stylesheet" href="css/modules/ads.css">
+<link rel="stylesheet" href="css/themes.css">
+<link rel="stylesheet" href="css/modules/pnl.css">
 <link rel="stylesheet" href="css/report.css">
 <!-- Tema antes de pintar para que no destelle el modo oscuro -->
 <script src="js/app/theme.js"></script>
@@ -311,7 +317,7 @@
     <div class="bd" id="b-mistakes"></div>
   </details>
 
-  <!-- Guardado rápido: botón flotante + panel (lo arma js/ui/quick.js) -->
+  <!-- Guardado rápido: botón flotante + panel (lo arma js/modules/quick/ui/quick.js) -->
   <div class="qk" id="qk-root"></div>
 </section>
 
@@ -1012,7 +1018,7 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="tip" id="tip"></div>
-<!-- Informe PDF: solo visible al imprimir (ui/report.js) -->
+<!-- Informe PDF: solo visible al imprimir (js/modules/pnl/ui/report.js) -->
 <article class="report" id="report" aria-hidden="true"></article>
 <div class="modal-bg" id="modal">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-h">
@@ -1023,56 +1029,57 @@
 </div>
 
 <!-- Core: lógica de negocio pura (sin DOM) -->
-<script src="js/core/parse.js"></script>
-<script src="js/core/dates.js"></script>
-<script src="js/core/format.js"></script>
-<script src="js/core/dropi.js"></script>
-<script src="js/core/meta.js"></script>
-<script src="js/core/pnl.js"></script>
-<script src="js/core/diagnostics.js"></script>
-<script src="js/core/insights.js"></script>
-<script src="js/core/excel.js"></script>
-<script src="js/core/search.js"></script>
-<script src="js/core/landing.js"></script>
-<script src="js/core/ads.js"></script>
-<script src="js/core/quick.js"></script>
+<script src="js/shared/core/parse.js"></script>
+<script src="js/shared/core/dates.js"></script>
+<script src="js/shared/core/format.js"></script>
+<script src="js/modules/pnl/core/dropi.js"></script>
+<script src="js/modules/pnl/core/meta.js"></script>
+<script src="js/modules/pnl/core/pnl.js"></script>
+<script src="js/modules/pnl/core/diagnostics.js"></script>
+<script src="js/modules/pnl/core/insights.js"></script>
+<script src="js/modules/pnl/core/excel.js"></script>
+<script src="js/modules/search/core/search.js"></script>
+<script src="js/modules/landing/core/landing.js"></script>
+<script src="js/modules/ads/core/ads.js"></script>
+<script src="js/modules/quick/core/quick.js"></script>
 <!-- Services: archivos y almacenamiento del navegador -->
-<script src="js/services/storage.js"></script>
-<script src="js/services/files.js"></script>
-<script src="js/services/consolidado.js"></script>
+<script src="js/shared/services/storage.js"></script>
+<script src="js/shared/services/files.js"></script>
+<script src="js/modules/pnl/services/consolidado.js"></script>
 <!-- UI: componentes que pintan el DOM -->
-<script src="js/ui/dom.js"></script>
-<script src="js/ui/tooltip.js"></script>
-<script src="js/ui/feedback.js"></script>
-<script src="js/ui/upload-zones.js"></script>
-<script src="js/ui/notices.js"></script>
-<script src="js/ui/trend.js"></script>
-<script src="js/ui/summary.js"></script>
-<script src="js/ui/cascade.js"></script>
-<script src="js/ui/funnel.js"></script>
-<script src="js/ui/diagnosis-panel.js"></script>
-<script src="js/ui/unit-table.js"></script>
-<script src="js/ui/simulator.js"></script>
-<script src="js/ui/products-table.js"></script>
-<script src="js/ui/campaigns-table.js"></script>
-<script src="js/ui/report.js"></script>
-<script src="js/ui/presets.js"></script>
-<script src="js/ui/search.js"></script>
-<script src="js/ui/candidate.js"></script>
-<script src="js/ui/quick.js"></script>
-<script src="js/ui/landing.js"></script>
-<script src="js/ui/ads.js"></script>
+<script src="js/shared/ui/dom.js"></script>
+<script src="js/shared/ui/tooltip.js"></script>
+<script src="js/shared/ui/feedback.js"></script>
+<script src="js/modules/pnl/ui/upload-zones.js"></script>
+<script src="js/modules/pnl/ui/notices.js"></script>
+<script src="js/modules/pnl/ui/trend.js"></script>
+<script src="js/modules/pnl/ui/summary.js"></script>
+<script src="js/modules/pnl/ui/cascade.js"></script>
+<script src="js/modules/pnl/ui/funnel.js"></script>
+<script src="js/modules/pnl/ui/diagnosis-panel.js"></script>
+<script src="js/modules/pnl/ui/unit-table.js"></script>
+<script src="js/modules/pnl/ui/simulator.js"></script>
+<script src="js/modules/pnl/ui/products-table.js"></script>
+<script src="js/modules/pnl/ui/campaigns-table.js"></script>
+<script src="js/modules/pnl/ui/report.js"></script>
+<script src="js/modules/pnl/ui/presets.js"></script>
+<script src="js/modules/search/ui/search.js"></script>
+<script src="js/modules/search/ui/candidate.js"></script>
+<script src="js/modules/quick/ui/quick.js"></script>
+<script src="js/modules/landing/ui/landing.js"></script>
+<script src="js/modules/ads/ui/ads.js"></script>
 <!-- App: estado, casos de uso y arranque (main.js va al final) -->
 <script src="js/app/state.js"></script>
-<script src="js/app/filters.js"></script>
-<script src="js/app/data-loader.js"></script>
-<script src="js/app/save.js"></script>
-<script src="js/app/report.js"></script>
-<script src="js/app/search.js"></script>
-<script src="js/app/quick.js"></script>
-<script src="js/app/landing.js"></script>
-<script src="js/app/ads.js"></script>
-<script src="js/app/trainer.js"></script>
+<script src="js/modules/pnl/app/filters.js"></script>
+<script src="js/modules/pnl/app/data-loader.js"></script>
+<script src="js/modules/pnl/app/save.js"></script>
+<script src="js/modules/pnl/app/report.js"></script>
+<script src="js/modules/search/app/search.js"></script>
+<script src="js/modules/quick/app/quick.js"></script>
+<script src="js/modules/landing/app/landing.js"></script>
+<script src="js/modules/ads/app/ads.js"></script>
+<script src="js/modules/trainer/app/trainer.js"></script>
+<script src="js/app/nav.js"></script>
 <script src="js/app/main.js"></script>
 </body>
 </html>

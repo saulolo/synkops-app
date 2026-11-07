@@ -17,7 +17,7 @@
     unit: saved.unit || '', gift: saved.gift || '', warranty: saved.warranty || String(C.LANDING.warranty),
   });
 
-  // Avisa a la guía de Meta Ads (app/ads.js), que usa el nombre y el precio del producto.
+  // Avisa a la guía de Meta Ads (modules/ads/app/ads.js), que usa el nombre y el precio del producto.
   const persist = () => {
     if (!store.save(S)) toast('No pude guardar en el navegador.', 'error');
     document.dispatchEvent(new CustomEvent('landing:prod'));

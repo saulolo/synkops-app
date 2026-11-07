@@ -52,7 +52,7 @@
     toast('Guardado rápido limpio.', 'ok');
   }
 
-  // Manda una copia del producto a Mi candidato (lo recibe app/search.js). El producto sigue en la lista.
+  // Manda una copia del producto a Mi candidato (lo recibe modules/search/app/search.js). El producto sigue en la lista.
   function send(id) {
     const p = S.items.find((x) => x.id === id);
     if (!p) return;

@@ -1,0 +1,54 @@
+{
+  "core": [
+    "ads",
+    "dates",
+    "diagnostics",
+    "dropi",
+    "excel",
+    "format",
+    "insights",
+    "landing",
+    "meta",
+    "parse",
+    "pnl",
+    "quick",
+    "search"
+  ],
+  "services": [
+    "consolidado",
+    "files",
+    "storage"
+  ],
+  "ui": [
+    "ads",
+    "campaignsTable",
+    "candidate",
+    "cascade",
+    "diagnosisPanel",
+    "dom",
+    "feedback",
+    "funnel",
+    "landing",
+    "notices",
+    "presets",
+    "productsTable",
+    "quick",
+    "report",
+    "search",
+    "simulator",
+    "summary",
+    "tooltip",
+    "trend",
+    "unitTable",
+    "uploadZones"
+  ],
+  "app": [
+    "dataLoader",
+    "filters",
+    "render",
+    "report",
+    "save",
+    "state",
+    "theme"
+  ]
+}

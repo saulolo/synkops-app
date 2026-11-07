@@ -42,7 +42,7 @@
     const form = el('div', 'qk-form');
     const fn = field('qk-name', 'Nombre', 'Ej. Masajeador cervical');
     const fd = field('qk-dropi', 'ID Dropi', 'Ej. 1863859');
-    // Precio proveedor: escribo 25000 o 25.000 y se ve como $ 25.000 (solo se ven los dígitos; el monto lo lee app/quick.js).
+    // Precio proveedor: escribo 25000 o 25.000 y se ve como $ 25.000 (solo se ven los dígitos; el monto lo lee modules/quick/app/quick.js).
     const fp = field('qk-price', 'Precio proveedor', '$ 0');
     fp.x.inputMode = 'numeric';
     fp.x.addEventListener('input', () => {
@@ -138,7 +138,7 @@
     else v.items.forEach((it) => k.list.append(row(it, k.on)));
   }
 
-  // Valores escritos en el formulario (el precio sale como texto; app/quick.js lo convierte con core.quick.quickPrice).
+  // Valores escritos en el formulario (el precio sale como texto; modules/quick/app/quick.js lo convierte con core.quick.quickPrice).
   const read = (root) => ({ name: root._qk.name.value, dropi: root._qk.dropi.value, price: root._qk.price.value });
 
   // Vacía nombre, ID y precio, y deja el cursor en Nombre para el siguiente.

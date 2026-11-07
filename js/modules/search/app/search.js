@@ -176,7 +176,7 @@
     toast('Formulario limpio: listo para un producto nuevo.', 'ok');
   }
 
-  // "Enviar a Mi candidato" del guardado rápido (app/quick.js): llegan nombre, ID Dropi, precio proveedor y foto como producto nuevo.
+  // "Enviar a Mi candidato" del guardado rápido (modules/quick/app/quick.js): llegan nombre, ID Dropi, precio proveedor y foto como producto nuevo.
   // Solo pregunta si hay algo que se perdería (mismo criterio que "Limpiar formulario"); no toca la bitácora.
   document.addEventListener('rapido:candidato', async (e) => {
     const { name, dropi, price, photo: pic } = e.detail;

@@ -1,5 +1,5 @@
-// Entrenador de métricas: pestañas Inicio, Costeo, Hard Metrics, Simulador, Escalera y Creativos,
-// y la navegación entre pestañas (incluida la del tablero P&L).
+// Entrenador de métricas: pestañas Inicio, Costeo, Hard Metrics, Simulador, Escalera y Creativos.
+// La navegación entre pestañas está en js/app/nav.js.
 // Fase 1: es el código del prototipo (docs/referencia/novasociety-metricas-v2.html) sin cambios de lógica;
 // solo se renombraron #verdict → #t-verdict y #c-cpa → #c-cpa-esp para no chocar con el tablero.
 (function(){
@@ -54,16 +54,8 @@ function setProduct(p){
 }
 
 /* ===================== Navegación ===================== */
-function go(v){
-  $$(".view").forEach(function(s){ s.classList.toggle("on", s.id === "v-" + v); });
-  $$("#tabs button").forEach(function(b){ if(b.dataset.v === v){ b.setAttribute("aria-current", "page"); } else { b.removeAttribute("aria-current"); } });
-  store.set("ns_view", v);
-  window.scrollTo({ top: 0, behavior: "smooth" });
-  if(v === "escalera"){ growLadder(); }
-  if(v === "pyl"){ window.dispatchEvent(new Event("resize")); } // el tablero mide sus gráficas al hacerse visible
-}
-$$("#tabs button").forEach(function(b){ b.addEventListener("click", function(){ go(b.dataset.v); }); });
-$$("[data-go]").forEach(function(b){ b.addEventListener("click", function(){ go(b.dataset.go); }); });
+// La navegación vive en js/app/nav.js; aquí solo se reacciona a la pestaña que se abre.
+document.addEventListener("nav:vista", function(e){ if(e.detail.v === "escalera"){ growLadder(); } });
 
 /* ===================== Cadena (dashboard) ===================== */
 // Desplegable "¿Qué falla y cómo lo arreglo?": regla de NovaSociety arriba y, debajo, cómo la aterrizo
@@ -149,7 +141,7 @@ $$("#v-costeo .cs").forEach(function(box){
   t.addEventListener("change", function(){ t.value = fmt(cnum(t.id)); });
 });
 
-// ¿A cuánto lo vendo? (columna derecha): el precio sale del margen que quiero con core/search.js#priceFor
+// ¿A cuánto lo vendo? (columna derecha): el precio sale del margen que quiero con modules/search/core/search.js#priceFor
 // (mismo cálculo y redondeo de NovaSociety), más el CPA máximo (con la zona de mi CPA) y lo que me queda por pedido entregado.
 var lastPrice = null;
 function costSide(o){
@@ -298,7 +290,7 @@ function resetState(){
   var D = costDefaults();
   $("#c-reset").disabled = Object.keys(D).every(function(id){ return cnum(id) === D[id]; });
 }
-// Devuelve el "Véndelo a" a Buscar producto (js/app/search.js escucha el evento y llena Precio de venta).
+// Devuelve el "Véndelo a" a Buscar producto (js/modules/search/app/search.js escucha el evento y llena Precio de venta).
 $("#c-to-cand").addEventListener("click", function(){
   if(lastPrice){ document.dispatchEvent(new CustomEvent("costeo:precio", { detail: { price: lastPrice } })); }
 });
@@ -693,5 +685,4 @@ wiz(0);
 renderKanban();
 renderRing();
 culpa();
-go(store.get("ns_view", "dash"));
 })();

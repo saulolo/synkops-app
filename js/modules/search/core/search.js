@@ -308,7 +308,7 @@
   }
 
   // Color del margen: rojo menos de 10%, amarillo de 10% a 15%, verde desde 15% (mínimo sano) e ideal desde 20%.
-  // Los cortes son MARGIN del tablero (core/diagnostics.js).
+  // Los cortes son MARGIN del tablero (modules/pnl/core/diagnostics.js).
   function marginLevel(m) {
     const M = core.diagnostics.MARGIN;
     if (m == null) return null;
