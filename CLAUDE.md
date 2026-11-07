@@ -2,8 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-App de NovaSociety con cuatro partes en una sola página (`index.html`, pestañas en la barra superior):
-- **Entrenador de métricas** (Inicio, Costeo, Hard Metrics, Simulador, Escalera, Creativos): método de Juan Herrera. Fase 1: vive en `js/app/trainer.js`, copiado del prototipo `docs/referencia/novasociety-metricas-v2.html` sin cambios de lógica; también maneja la navegación entre pestañas. Fase 2 pendiente: separarlo en core/ui con tests.
+Synkops es una app de uso personal para operar un ecommerce contra entrega con el método de NovaSociety. Hoy se usa en un solo PC y en el navegador. El objetivo es centralizar y automatizar el negocio; todavía no hay conexiones directas: los datos entran con archivos o a mano. El nombre Synkops aún no está en la interfaz ni en el código (`<title>`, `PYL`, claves `pyl-*` y `ns_*`).
+
+Tiene cuatro partes en una sola página (`index.html`, pestañas en la barra superior):
+- **Entrenador de métricas** (Inicio, Costeo, Hard Metrics, Simulador, Escalera, Creativos): método de Juan Herrera. Fase 1: vive en `js/app/trainer.js`, copiado del prototipo `docs/referencia/novasociety-metricas-v2.html` (el Costeo ya calcula con `core.search`); también maneja la navegación entre pestañas. Por ser copia, aún no sigue las capas: persiste con su propio `store` en `localStorage` (claves `ns_*`) sin pasar por `services.storage`. Fase 2 pendiente: separarlo en core/ui con tests.
 - **Buscar producto** (pestaña `#v-buscar`, módulo 4 de NovaSociety + método VDO de DropKiller): ya con la arquitectura por capas. Umbrales y contenido en `js/core/search.js` (`LIMITS` es la única fuente de los números), pintado en `js/ui/search.js` (flujograma, semáforo VDO, producto ganador, pirámide, fichas) y `js/ui/candidate.js` (evaluador: formulario con foto, score /8, utilidad por entrega, bitácora y estadísticas), estado `app.state.search` en `js/app/search.js` (persistido con `services.storage.search`).
   - Orden de la página = ruta `.b-route`: 1 Flujograma DropKiller `#b-sec-flow` → 2 Mi candidato `#b-cand` → 3 Bitácora `#b-sec-log` → 4 Producto ganador `#b-sec-win` → 5 Estrategias de búsqueda `#b-sec-strat` → 6 Costeo. Los enlaces de la ruta abren el `<details>` si está cerrado.
   - Estrategias de búsqueda: selector `STRATEGIES` (`#b-strats`, guarda `state.search.strat` = `'vdo' | 'prov'`). Panel VDO `#b-st-vdo` (fichas `VDO`, pirámide `PYRAMID`, ciclo de vida `STAGES`); panel por proveedor `#b-st-prov` con `BY_PROVIDER` (proveedores Botania, Nibresma, Bodega de Belleza Int y aliado Goldbox; 4 fases filtrar → analizar → validar en FastMoss → testear; fase abierta en `state.search.provStep`). Sus números van en `LIMITS.byProv` (50 en 7 días, 500 en 30, analizar 15–20), distintos a los del VDO a propósito. La URL de FastMoss es la constante `FASTMOSS` de `core/search.js`.
@@ -16,6 +18,15 @@ App de NovaSociety con cuatro partes en una sola página (`index.html`, pestaña
 
 Todo corre en el navegador; UI y textos en español (es-CO). Ver `README.md` para el mapa de capas completo.
 
+## Flujo de trabajo (SDD)
+
+El proyecto sigue Spec Driven Design.
+
+- Las specs viven en `specs/`, que es donde las buscan `/spec` y `/spec-impl`. `specs/00-estado-actual.md` es la línea base: documenta lo que ya existía y su deuda técnica.
+- Cada spec se trabaja en su propia rama: `spec-NN-slug`.
+- Los commits son atómicos.
+- Después de cada merge se actualizan `CLAUDE.md` y `README.md`.
+
 ## Ejecutar y probar
 
 - **Sin build, sin servidor, sin dependencias npm.** Se abre con doble clic en `index.html` (`file://`). Única dependencia externa: ExcelJS por CDN.
@@ -24,8 +35,8 @@ Todo corre en el navegador; UI y textos en español (es-CO). Ver `README.md` par
   node -e "const core = require('./js/core/index.js'); /* core.aggregate, core.story, ... */"
   node --check js/ui/summary.js   # chequeo de sintaxis de cualquier archivo
   ```
-  `js/core/index.js` carga los módulos del núcleo en orden y exporta todas sus funciones aplanadas (`core.aggregate`, `core.buildDropi`, `core.parseCSV`, `core.story`...). Al crear un archivo nuevo en `core/`, agregarlo también a la lista de `index.js`.
-- Las capas `ui`/`app` se prueban cargando `index.html` en **jsdom** (`runScripts: 'dangerously'`, un `ResourceLoader` que salte las URL `http(s)` del CDN) y simulando clics. En jsdom con `file://` no hay `localStorage` ni `scrollTo`: la persistencia se revisa en el navegador. jsdom no está en el repo: se instala en el scratchpad.
+  `js/core/index.js` carga los módulos del núcleo en orden y exporta todas sus funciones aplanadas (`core.aggregate`, `core.buildDropi`, `core.parseCSV`, `core.story`...). Al crear un archivo nuevo en `core/`, agregarlo también a la lista de `index.js`. Lo aplanado es solo de Node: en el navegador el núcleo va por módulo (`PYL.core.pnl.aggregate`, `PYL.core.search.priceFor`). Al aplanar, un nombre repetido entre módulos se pisa sin aviso: hoy no hay ninguno, mantenerlos únicos.
+- Las capas `ui`/`app` se prueban cargando `index.html` en **jsdom** (`runScripts: 'dangerously'`, un `ResourceLoader` que salte las URL `http(s)` del CDN) y simulando clics. En jsdom con `file://` no hay `localStorage` ni `scrollTo` (el error de `scrollTo` en consola es esperado): la persistencia se revisa en el navegador. jsdom no está en el repo: se instala en el scratchpad con `npm i jsdom@26` (la versión 31 ya no exporta `ResourceLoader`).
 - El usuario revisa los cambios en su navegador: no levantar servidores ni automatizar Chrome.
 
 ## Reglas de arquitectura (no romper)
@@ -42,11 +53,13 @@ Todo corre en el navegador; UI y textos en español (es-CO). Ver `README.md` par
 
 ## Flujo de render
 
-`app/main.js#render()` es el único punto de pintado y se llama ante cualquier cambio (archivos, filtro de producto/fechas, IVA, presets):
+Buscar producto y Desarrollo no pasan por aquí: `app/search.js`, `app/landing.js` y `app/ads.js` se inician solos al cargar y tienen sus propios repintados; `main.js` solo inicia el tablero.
+
+En el Tablero P&L, `app/main.js#render()` (publicado como `app.render`) es el único punto de pintado y se llama ante cualquier cambio (archivos, filtro de producto/fechas, IVA, presets):
 1. `app.filters.read()` arma el filtro `f` (`prod`, `from`, `to`, `iva`, `adsOverride`).
 2. `core.pnl.aggregate(lines, meta, f, mx)` devuelve el objeto `a` con todo el P&L del filtro.
 3. `core/insights.js` deriva lecturas extra con el mismo `aggregate`: `previous` (rango de igual duración justo antes, para los deltas de los KPI), `weeks` (semanas lunes–domingo recortadas al filtro: mini-líneas y gráfica semanal), `projection` (pedidos en ruta × efectividad × `cpaMax`) y `unitBase`/`simulate` (simulador; con los valores reales reproduce `util` exacto). Estas lecturas usan siempre la inversión automática (`adsOverride: null`).
-4. Cada componente `ui.*` recibe `a` (y `x` = extras como `producto`/`periodo`) y se repinta. `S.current = { a, x, f, weeks }` guarda el último cálculo para redibujos parciales (resize, modo del embudo).
+4. Cada componente `ui.*` recibe `a` (y `x` = extras como `producto`/`periodo`) y se repinta. `S.current = { a, x, f, weeks, prev, products }` guarda el último cálculo para redibujos parciales (resize, modo del embudo), el guardado en Excel y el informe.
 
 Informe PDF: `app/report.js` toma `S.current` y llama a `ui.report.print`, que arma el documento en `#report` (fuera de `.wrap`), pone `body.print-report` y abre `window.print()`; `css/report.css` oculta todo lo demás al imprimir. El informe reutiliza la misma lógica que el tablero: `diagnostics.kpis/story/verdict/funnel/cascade`, `insights.actions/unitEconomics/projection`, `ui.summary.TIPS/delta` y `ui.notices.list`. Al agregar un indicador o regla, hazlo en `core` para que ambos lo muestren igual.
 
@@ -61,4 +74,4 @@ Conteos por pedido único Dropi: `rec` (recibidos), `can`, `ent` (entregados), `
 - `ads`: suma de cargos de facturación Meta en el rango (con IVA = cargo de tarjeta; sin IVA = ÷1,19). Por producto, cada cargo se asigna al producto con pedidos activos en esa fecha (ciclos de Dropi) y se reparte por gasto de campañas si hay solapamiento. Sin facturación se usan las métricas de campañas. En cuentas prepago solo cuenta el gasto, no las recargas.
 - `fmt(v, 'cop'|'pct'|'x')` de `core/format.js` devuelve `'—'` para null/no finitos; `div()` devuelve null si el divisor es 0.
 
-Benchmarks NovaSociety usados en semáforos y diagnósticos: efectividad ≥ 70%, devoluciones ≤ 25%, cancelación 15–20%, efectividad global (entregados/recibidos) ~60%, margen neto con cortes únicos en `MARGIN` de `core/diagnostics.js` (±2% equilibrio, 15% mínimo sano = veredicto Ganador, 20% ideal; no duplicar estos números), fletes ≤ 25% de lo cobrado, Ads ≤ 60% de la Wallet.
+Benchmarks NovaSociety usados en semáforos y diagnósticos: efectividad ≥ 70%, devoluciones ≤ 25%, cancelación 15–20% de referencia (el semáforo da sano hasta 25% y alerta sobre 30%), efectividad global (entregados/recibidos) ~60%, margen neto con cortes únicos en `MARGIN` de `core/diagnostics.js` (±2% equilibrio, 10% piso del amarillo en el evaluador de productos, 15% mínimo sano = veredicto Ganador, 20% ideal; no duplicar estos números), fletes ≤ 25% de lo cobrado, Ads ≤ 60% de la Wallet.
