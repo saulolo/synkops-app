@@ -176,6 +176,26 @@
     toast('Formulario limpio: listo para un producto nuevo.', 'ok');
   }
 
+  // "Enviar a Mi candidato" del guardado rápido (app/quick.js): llegan nombre, ID Dropi, precio proveedor y foto como producto nuevo.
+  // Solo pregunta si hay algo que se perdería (mismo criterio que "Limpiar formulario"); no toca la bitácora.
+  document.addEventListener('rapido:candidato', async (e) => {
+    const { name, dropi, price, photo: pic } = e.detail;
+    const editing = S.log.find((x) => x.id === S.editingId) || null;
+    if (C.unsaved(S.draft, editing)) {
+      const r = await PYL.ui.feedback.ask('Enviar a Mi candidato',
+        editing ? `"${editing.name || 'Sin nombre'}" tiene cambios sin guardar. ¿Lo reemplazo con "${name}"? Lo que está en la bitácora queda como estaba.`
+          : `Lo que escribí en Mi candidato no está guardado en la bitácora. ¿Lo reemplazo con "${name}"?`,
+        [{ r: 'send', label: 'Reemplazar' }]);
+      if (r !== 'send') return;
+    }
+    const d = { name, dropi };
+    if (price) d.price = price; // Precio proveedor de Mi candidato
+    if (pic) d.photo = pic;
+    loadDraft(d, null);
+    $('#b-cand').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    toast(`Pasé "${name}" a Mi candidato.`, 'ok');
+  });
+
   function open(id) {
     const p = S.log.find((x) => x.id === id); if (!p) return;
     loadDraft(JSON.parse(JSON.stringify(p)), id);

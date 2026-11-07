@@ -1,4 +1,4 @@
-// Persistencia en el navegador: asignaciones campaña → producto y búsqueda de productos (localStorage)
+// Persistencia en el navegador: asignaciones campaña → producto, búsqueda de productos y guardado rápido (localStorage)
 // y el acceso al archivo consolidado (IndexedDB, porque localStorage no guarda handles).
 (() => {
   const services = (globalThis.PYL.services ??= {});
@@ -31,6 +31,15 @@
     save: (s) => { try { localStorage.setItem(ADS_KEY, JSON.stringify(s)); return true; } catch { return false; } },
   };
 
+  // Buscar producto → guardado rápido: libreta de productos al vuelo (nombre, ID Dropi, foto).
+  // Clave propia para que "Limpiar" libere de verdad el espacio de las fotos.
+  const QUICK_KEY = 'pyl-quick';
+  const quick = {
+    load: () => { try { return JSON.parse(localStorage.getItem(QUICK_KEY) || 'null'); } catch { return null; } },
+    // false si no cupo (las fotos pesan): quien llama avisa al usuario.
+    save: (s) => { try { localStorage.setItem(QUICK_KEY, JSON.stringify(s)); return true; } catch { return false; } },
+  };
+
   // Almacén clave-valor mínimo; cualquier fallo devuelve null en vez de lanzar.
   const idb = (() => {
     const open = () => new Promise((res, rej) => {
@@ -47,5 +56,5 @@
     return { get: (k) => tx('readonly', (s) => s.get(k)), set: (k, v) => tx('readwrite', (s) => s.put(v, k)) };
   })();
 
-  services.storage = { campaignMap, search, landing, ads, idb };
+  services.storage = { campaignMap, search, landing, ads, quick, idb };
 })();
