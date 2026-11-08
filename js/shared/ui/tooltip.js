@@ -20,12 +20,12 @@
     place(t, ev);
   }
 
-  // tip: { h, p?, li?, table?, cls? } con li: [antes, palabra resaltada, clase, después] y
+  // tip: { h, p?, li?, warn?, table?, cls? } (warn = línea de advertencia ⚠) con li: [antes, palabra resaltada, clase, después] y
   // table: { head: [col1, col2], rows: [{ k, cells: [[viñetas…], [viñetas…]] }], on: k } (cada celda es una lista de viñetas; on = fila resaltada).
   // Solo se reconstruye al cambiar de concepto, para no reiniciar la animación con cada movimiento.
   function showInfo(ev, tip) {
     const t = $('#tip');
-    const key = tip.h + '|' + (tip.p || '') + '|' + JSON.stringify(tip.li || '') + '|' + (tip.table ? tip.table.on : ''); // avisos con el mismo título pero distinto contenido
+    const key = tip.h + '|' + (tip.p || '') + '|' + JSON.stringify(tip.li || '') + '|' + (tip.warn || '') + '|' + (tip.table ? tip.table.on : ''); // avisos con el mismo título pero distinto contenido
     if (t.dataset.k !== key || t.style.display !== 'block') {
       t.textContent = ''; t.className = 'tip wide' + (tip.table ? ' tbl' : '') + (tip.cls ? ' ' + tip.cls : ''); // cls: estilo propio de un módulo t.dataset.k = key;
       if (!tip.table) t.append(el('div', 'h', tip.h)); // el aviso con tabla va sin título
@@ -35,6 +35,7 @@
         tip.li.forEach(([pre, word, cls, post]) => { const l = el('li', null, pre); l.append(el('b', cls, word), post); ul.appendChild(l); });
         t.appendChild(ul);
       }
+      if (tip.warn) t.append(el('p', 'hm-warn', '⚠ ' + tip.warn));
       if (tip.table) t.appendChild(tableNode(tip.table));
       t.style.display = 'block';
     }

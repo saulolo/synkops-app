@@ -11,7 +11,7 @@ const caso = (nombre, fn) => casos.push([nombre, fn]);
 
 caso('exporta todas las funciones del núcleo aplanadas', () => {
   const claves = Object.keys(core).sort().join(',');
-  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,BY_PROVIDER,COST_DEFAULTS,COUNTRIES,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,LANDING,LEVELS,LIMITS,MARGIN,MISTAKES,MSP,PYRAMID,RESEARCH,SATURATION,SCORE_LEVELS,SCORE_MAX,STAGES,STATUS,STEPS,STRATEGIES,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,classify,competition,copText,count,cycles,defaultSlug,evaluate,fill,fmt,fullTitle,funnel,isDropi,isMetrics,key,kpis,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,roundLike,rowCells,score,scoreLevel,scoreParts,short,simulate,slugify,stage,stageRange,stats,story,strategy,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
+  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,COST_DEFAULTS,COUNTRIES,CTR_UNIQUE_WARN,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,LANDING,LEVELS,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCORE_LEVELS,SCORE_MAX,STAGES,STATUS,STEPS,STRATEGIES,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,classify,competition,copText,count,cycles,defaultSlug,evaluate,fill,fmt,fullTitle,funnel,isDropi,isMetrics,key,kpis,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,roundLike,rowCells,score,scoreLevel,scoreParts,short,simulate,slugify,stage,stageRange,stats,story,strategy,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
 });
 
 caso('Costeo: proveedor 30.000 da precio $99.900 y tope $21.617', () => {
@@ -94,6 +94,62 @@ caso('Hard Metrics: 5 filas en orden, dirección, destino y números del diagram
 caso('Hard Metrics: CPA genérico', () => {
   assert.deepStrictEqual(core.GENERIC_CPA, { escala: 12000, tope: 15000, apaga: 20000 });
   assert.strictEqual(core.copText(15000), '15.000');
+});
+
+caso('Métricas base: 5 fichas, fórmulas, notas y CTR único', () => {
+  const B = core.BASE_METRICS;
+  const H = core.HARD_METRICS;
+  const txt = (segs) => segs.map((s) => (typeof s === 'string' ? s : s.b)).join('');
+  assert.deepStrictEqual(B.map((m) => m.name), ['Presupuesto', 'Resultados', 'Impresiones', 'Monto gastado', 'Clics en el enlace']);
+  // Nombre largo del reporte solo donde es distinto.
+  assert.deepStrictEqual(B.filter((m) => m.csv).map((m) => [m.k, m.csv]), [['presupuesto', 'Presupuesto del conjunto de anuncios'], ['gasto', 'Monto gastado (COP)']]);
+  // Fórmula visual: claves que existen y divisores en el orden de la cadena.
+  const F = core.BASE_FORMULA;
+  assert.ok(B.some((m) => m.k === F.num) && B.some((m) => m.k === F.cap));
+  for (const d of F.divs) assert.ok((d.k ? B.some((m) => m.k === d.k) : d.label && d.uses) && H.some((r) => r.k === d.hm), 'divisor ' + (d.k || d.label));
+  assert.deepStrictEqual(F.divs.map((d) => d.hm), ['cpm', 'cpc', 'cppi', 'cpa']);
+  assert.deepStrictEqual(core.budgetSteps(3), [100000, 120000, 144000]);
+  assert.ok(!B.some((m) => /alcance/i.test(m.name)));
+  assert.ok(core.BASE_HEAD.title === 'Métricas base' && core.BASE_HEAD.sub);
+  for (const m of B) assert.ok(m.def && m.uses.length && m.ns.length, m.k + ' con def, uses y ns');
+  for (const m of B) for (const l of m.links) assert.ok(H.some((r) => r.k === l), m.k + ' enlaza ' + l);
+  assert.deepStrictEqual(B[0].links, []);
+  const ns = (k) => txt(B.find((m) => m.k === k).ns);
+  const uses = (k) => B.find((m) => m.k === k).uses.map(txt).join(' | ');
+  // Números: salen de NS_TEST, GENERIC_CPA y el CPM de HARD_METRICS.
+  assert.ok(ns('presupuesto').includes('100.000') && ns('presupuesto').includes('+20 %') && ns('presupuesto').includes('120.000 → 144.000'));
+  assert.deepStrictEqual(core.NS_TEST.cuts, [20000, 30000, 40000]);
+  assert.ok(ns('resultados').includes('12.000') && ns('resultados').includes('15.000') && ns('resultados').includes('20.000'));
+  assert.ok(ns('impresiones').includes('TikTok $ 6.000') && ns('impresiones').includes('Meta $ 20.000'));
+  assert.ok(ns('gasto').includes('20.000, 30.000 y 40.000'));
+  assert.ok(ns('clics').includes('el producto no interesa'));
+  // Fórmulas.
+  assert.ok(uses('resultados').includes('CPA = Monto gastado ÷ Resultados') && uses('resultados').includes('Costo por resultados'));
+  assert.ok(uses('impresiones').includes('CPM = Monto gastado ÷ Impresiones × 1.000') && !uses('impresiones').includes('CTR'));
+  assert.ok(['CPM', 'CPC', 'CPPI', 'CPA'].every((n) => uses('gasto').includes(n)) && uses('gasto').includes('CPPI = Monto gastado ÷ Pagos iniciados') && uses('gasto').includes('Costo x Checkout'));
+  assert.ok(uses('clics').includes('CPC = Monto gastado ÷ Clics en el enlace') && uses('clics').includes('por personas') && uses('clics').includes('No se calcula con impresiones'));
+  // Nombre del reporte: solo CTR y CPPI.
+  assert.deepStrictEqual(H.filter((r) => r.report).map((r) => [r.k, r.report]), [['ctr', 'CTR único (porcentaje de clics en el enlace)'], ['cppi', 'Costo x Checkout']]);
+  // CTR de Meta = CTR único, con el 2 % y la advertencia; TikTok igual.
+  const ctr = H.find((r) => r.k === 'ctr');
+  assert.deepStrictEqual(ctr.view.meta.tip.li[0].slice(0, 2), ['Meta (CTR único): ', '2 %']);
+  assert.deepStrictEqual(ctr.view.tiktok.tip.li[0].slice(0, 2), ['TikTok: ', '0,5 %']);
+  assert.ok(ctr.view.meta.tip.p.includes('No se mira'));
+  assert.ok(core.CTR_UNIQUE_WARN.includes('Límite por confirmar'));
+  assert.strictEqual(ctr.view.meta.tip.warn, core.CTR_UNIQUE_WARN);
+  assert.strictEqual(ctr.means.warn, core.CTR_UNIQUE_WARN);
+  assert.ok(ctr.means.signals[0].t.includes('2 % (Meta, CTR único)') && ctr.means.unique.includes('por personas'));
+  assert.ok(!ctr.view.tiktok.tip.warn);
+  // Fórmulas del panel de la "i": todas las métricas; el CTR con Meta (CTR único) y TikTok; una sola fuente con la tabla.
+  for (const r of H) assert.ok(Array.isArray(r.means.formula) && r.means.formula.length, r.k + ' con fórmula');
+  const f = (k) => H.find((r) => r.k === k).means.formula.map(txt).join(' | ');
+  assert.ok(f('ctr').includes('Meta (CTR único): personas que hicieron clic en el enlace ÷ personas que vieron el anuncio × 100') && f('ctr').includes('TikTok: clics ÷ impresiones × 100'));
+  assert.strictEqual(f('cpc'), 'Monto gastado ÷ Clics en el enlace');
+  assert.strictEqual(f('cpm'), 'Monto gastado ÷ Impresiones × 1.000');
+  assert.strictEqual(f('cppi'), 'Monto gastado ÷ Pagos iniciados');
+  assert.strictEqual(f('cpa'), 'Monto gastado ÷ Resultados');
+  for (const k of ['cpm', 'cpc', 'cpa']) assert.ok(B.some((m) => m.uses.map(txt).join(' ').includes(f(k))), k + ': misma fórmula en la tabla');
+  for (const r of H.filter((x) => x.k !== 'ctr')) assert.ok(!r.means.warn && !r.means.unique && !(r.view.meta.tip && r.view.meta.tip.warn), r.k + ' sin advertencia');
 });
 
 let fallos = 0;
