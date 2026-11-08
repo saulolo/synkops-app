@@ -32,6 +32,7 @@ leer el testeo y medir la utilidad real cruzando **Dropi** con **Meta Ads**.
 - [🔎 Buscar producto](#-buscar-producto)
 - [🛍️ Desarrollo de la landing](#️-desarrollo-de-la-landing)
 - [🎓 Entrenador de métricas](#-entrenador-de-métricas)
+- [📈 Escalado](#-escalado)
 - [🎨 Temas](#-temas)
 - [📂 Los archivos que necesitas](#-los-archivos-que-necesitas)
 - [🧭 Recorrido por el tablero](#-recorrido-por-el-tablero)
@@ -60,6 +61,7 @@ Todo vive en una sola página (`index.html`). Las pestañas de la barra superior
 | 🧮 **Costeo** | Cuánto cobrar, cuánto me queda por pedido entregado y mi CPA máximo. |
 | 🛍️ **Desarrollo** | Montar la landing del producto en Shopify y crear su campaña en Meta Ads, paso a paso. |
 | 📏 **Métricas** | Guía de consulta de las métricas duras (CTR, CPC, CPM, CPPI, CPA) para Meta y TikTok: qué significa cada una, su fórmula, sus rangos, qué falla y cómo se arregla; y un glosario de las métricas base del Administrador de anuncios con las que se calculan. |
+| 📈 **Escalado** | Aprendo la metodología de NovaSociety para el testeo: un paso a paso con los cortes de 20K / 30K / 40K, la cadena que reviso si apago, y un simulacro para practicar. Es para aprender: no lee mis campañas reales. |
 | 🧪 **Simulador** | Protocolo de testeo 20K / 30K / 40K: me dice si apago, sostengo o sigo. |
 | 🪜 **Escalera** | Los 15 escalones para escalar (+20% de presupuesto cada uno). |
 | 🎬 **Creativos** | Pipeline y cadencia de creativos, y cuándo el problema es el creativo. |
@@ -186,6 +188,25 @@ Las pestañas Inicio, Costeo, Métricas, Simulador, Escalera y Creativos siguen 
 - **Simulador:** reglas del testeo en 20K / 30K / 40K, con historial de evaluaciones.
 - **Escalera:** 15 escalones de +20%, decididos con el CPA de los últimos 3 días.
 - **Creativos:** pipeline, meta semanal y diagnóstico de si el problema es el creativo.
+
+---
+
+## 📈 Escalado
+
+Una pestaña para **aprender** cómo se decide en el testeo. No lee mis campañas ni mis datos: los casos son inventados. Las reglas son las de NovaSociety (las del MCP de NovaSociety), y las frases de cada veredicto son las del Lab.
+
+Tiene dos sub-pestañas: **🧪 Fase de testeo** y **🏄 Surfing Scaling** (hoy solo una tarjeta "Pronto" con lo que vendrá: escalado vertical +20 %, niveles y refresco de campañas).
+
+**Fase de testeo** es un paso a paso, como la guía de Meta Ads: lista de pasos a la izquierda, el detalle a la derecha y una barra de avance. Marco cada paso como hecho y se guarda en este navegador.
+
+1. **Arranque:** el testeo empieza con $ 100.000 al día y se mide por **gasto acumulado**, no por horas ni días. Una barra muestra los cortes de 20K, 30K y 40K, que caen el mismo día. Con la guía ABO (4 conjuntos × $ 30.000) el corte de 40K le llega a cada conjunto el día 2.
+2. **Corte 1 · 20.000:** miro los pagos iniciados. Con venta, maravilloso; 0 a 2 se apaga; 3 o 4, flojo; 5 o más, bien.
+3. **Corte 2 · 30.000:** miro el CPPI (gasto ÷ pagos iniciados), sin ventas y con venta.
+4. **Corte 3 · 40.000:** miro ventas y CPA contra el tope. Con 2 ventas o más y CPA dentro del tope, se deja gastar el día. Con 1 venta, o 2 o más con CPA sobre el tope, mantengo vigilando: esa es una **regla propia**, el MCP no la da y la app lo marca. Una caja explica de dónde sale el tope (el CPA máximo del costeo) y sus zonas de escala y apaga.
+5. **Si se apagó: la cadena:** CPM → CPC → CPPI → CPA (no se mira el CTR) y qué revisar en cada caso.
+6. **Practica:** un simulacro con dos modos:
+   - **🎯 Práctica:** 8 casos inventados, en orden al azar. Con "Avanzar" la barra se llena hasta el siguiente corte y aparecen los números. Elijo entre Apagar, Mantener vigilando, Seguir sin tocar o Dejar gastar el día; la app dice si acerté, por qué y me lleva al paso que lo explica. Al final veo mis aciertos y mi mejor puntaje, que se guarda.
+   - **🎛️ Juega con los números:** cambio presupuesto, gasto, pagos iniciados, ventas y tope, y veo el corte, el día del testeo, el CPPI, el CPA y qué diría el Lab.
 
 ---
 
@@ -420,7 +441,7 @@ Pulsa **📄 Descargar informe PDF** (el botón morado arriba a la derecha, o *I
 ## 🔒 Privacidad
 
 - 🖥️ Todo se procesa **dentro de tu navegador**. Tus reportes no se suben a ningún servidor.
-- 💾 Lo que la app guarda en tu navegador: asignaciones campaña → producto, acceso a tu archivo consolidado, la bitácora de candidatos (con sus fotos), el guardado rápido de productos y los pasos marcados de Buscar producto y Desarrollo, lo que escribes en el entrenador y el tema elegido. Si borras los datos del navegador, eso se pierde.
+- 💾 Lo que la app guarda en tu navegador: asignaciones campaña → producto, acceso a tu archivo consolidado, la bitácora de candidatos (con sus fotos), el guardado rápido de productos y los pasos marcados de Buscar producto, Desarrollo y Escalado (con tu mejor puntaje de práctica), lo que escribes en el entrenador y el tema elegido. Si borras los datos del navegador, eso se pierde.
 - 🌐 Solo usa internet para descargar la librería de Excel y las tipografías, y cuando abres un enlace externo (por ejemplo, FastMoss).
 
 ---
@@ -497,13 +518,14 @@ css/
     landing.css       Desarrollo → Shopify
     ads.css           Desarrollo → Meta Ads
     metrics.css       Métricas: ruta, diagrama de métricas duras, avisos, panel "i", botón Expandir y tabla de Métricas base
+    scaling.css       Escalado: barra de gasto, tarjetas de corte, simulacro y práctica
   themes.css          Selector de tema, modo claro, temas oscuros y SVG con colores fijos
   modules/pnl.css     Solo lo propio del Tablero P&L (acotado a #v-pyl)
   report.css          Informe PDF: documento claro en A4, visible solo al imprimir
 
 tests/
   core.test.js        Núcleo en Node puro (costeo, guardado rápido, P&L)
-  smoke.test.js       jsdom: claves de PYL.*, 9 pestañas, navegación y consola limpia
+  smoke.test.js       jsdom: claves de PYL.*, 10 pestañas, navegación y consola limpia
   fixtures/           CSV de prueba de Dropi (datos inventados) y claves de PYL.*
 
 js/
@@ -537,6 +559,10 @@ js/
       core/metrics.js Datos de las 5 métricas (números, avisos, diagnóstico, significado, fórmulas, nombre en el reporte) y de Métricas base
       ui/metrics.js   Diagrama, flechas SVG, avisos, panel "i", botón Expandir y tabla de Métricas base
       app/metrics.js  Estado (app.state.hardMetrics), flechas, expandir, Métricas base y ruta
+    scaling/          Escalado (SPEC 05): módulo informativo, no lee campañas reales
+      core/scaling.js Reglas del testeo (`testVerdict`, `cpaZones`), pasos, mapa de cortes, cadena, banco de 8 casos, práctica y "Juega con los números"
+      ui/scaling.js   Sub-pestañas, barra de gasto, tarjetas de corte, tope, cadena, práctica y simulacro
+      app/scaling.js  Estado (app.state.scaling), avance del paso a paso y persistencia (pyl-scaling)
     trainer/
       app/trainer.js  Entrenador de métricas (fase 1: copiado del prototipo)
 
@@ -551,7 +577,7 @@ js/
 
 - **Sin `import`/`export`.** Los navegadores bloquean los ES modules en `file://`. Cada archivo es un IIFE que publica su API en el namespace global `PYL` (`PYL.core.pnl`, `PYL.ui.funnel`, etc.).
 - **El orden importa.** `index.html` carga los scripts en el orden de las capas (`core → services → ui → app`; dentro de cada capa, `shared` y luego los módulos), con `app/nav.js` antes de `main.js`. Los `<link>` de CSS también van en un orden fijo (ver el árbol). Un archivo nuevo va en `modules/<módulo>/<capa>/`, o en `shared/` si lo usan varios módulos, antes de los que lo usan.
-- **Carpeta = módulo, namespace = capa.** `js/modules/search/core/search.js` publica `PYL.core.search`. Un módulo solo usa `shared/` y los módulos que se cargan antes (`search` usa `pnl`; `quick` usa `search`; `ads` usa `landing` y `search`; `metrics` solo usa `shared/`; `trainer` usa `search`).
+- **Carpeta = módulo, namespace = capa.** `js/modules/search/core/search.js` publica `PYL.core.search`. Un módulo solo usa `shared/` y los módulos que se cargan antes (`search` usa `pnl`; `quick` usa `search`; `ads` usa `landing` y `search`; `metrics` solo usa `shared/`; `scaling` usa `metrics`, `ads` y `landing`; `trainer` usa `search`).
 - **La navegación es de toda la app.** `app/nav.js` abre la vista y dispara `nav:vista`; cada módulo reacciona a ese evento.
 - **Solo la capa `app` modifica el estado.** Los componentes de `ui` reciben datos y callbacks (`onSelect`, `onAssign`).
 - **Los diagnósticos devuelven datos, no HTML.** El texto con formato se representa como segmentos: un string es texto plano, `{ b: '...' }` va en negrita y `{ a: '...', href }` es un enlace que abre en pestaña nueva. `shared/ui/dom.js` (`rich`) los pinta.
@@ -576,7 +602,7 @@ NODE_PATH=<carpeta>/node_modules node tests/smoke.test.js   # abre index.html en
 node --check archivo.js                                      # sintaxis de un archivo
 ```
 
-`smoke.test.js` necesita **jsdom** (`npm i jsdom@26` en una carpeta fuera del repo): revisa las claves de `PYL.*`, que las 9 pestañas abran, los eventos de navegación y que la consola esté limpia. Si agregas o quitas una clave de `PYL.*`, regenera `tests/fixtures/claves-pyl.json` con `node tests/smoke.test.js --claves`.
+`smoke.test.js` necesita **jsdom** (`npm i jsdom@26` en una carpeta fuera del repo): revisa las claves de `PYL.*`, que las 10 pestañas abran, los eventos de navegación y que la consola esté limpia. Si agregas o quitas una clave de `PYL.*`, regenera `tests/fixtures/claves-pyl.json` con `node tests/smoke.test.js --claves`.
 
 ### Cómo se desarrolla (SDD)
 

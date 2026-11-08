@@ -172,10 +172,10 @@
 
   // ---------- Detalle del paso activo ----------
   // ctx: { done, key, fill, st, v, tools?, levels?, last? }. tools = herramientas extra (las de otra guía, ej. Meta Ads);
-  // levels = nombres de s.level; last = { label, view } del botón del último paso (por defecto, ir al Costeo).
+  // levels = nombres de s.level; last = { label, view } del botón del último paso (por defecto, ir al Costeo; null = sin botón).
   function stepDetail(node, s, i, total, ctx, on) {
     node.textContent = '';
-    const tools = { ...TOOLS, ...(ctx.tools || {}) }, last = ctx.last || { label: 'Ir al Costeo →', view: 'costeo' };
+    const tools = { ...TOOLS, ...(ctx.tools || {}) }, last = ctx.last === null ? null : ctx.last || { label: 'Ir al Costeo →', view: 'costeo' };
     const box = el('div', 'fl-detail pop');
     const top = el('div', 'row between');
     top.append(el('span', 'tag tb', `Paso ${i + 1} de ${total}`), el('span', 'small', s.where));
@@ -225,7 +225,8 @@
 
     const nav = el('div', 'row mt');
     if (i > 0) nav.append(button('btn ghost sm', '← Anterior', on.prev));
-    nav.append(i < total - 1 ? button('btn sm', 'Siguiente paso →', on.next) : button('btn sm', last.label, () => on.go(last.view)));
+    if (i < total - 1) nav.append(button('btn sm', 'Siguiente paso →', on.next));
+    else if (last) nav.append(button('btn sm', last.label, () => on.go(last.view)));
     box.append(nav);
     node.append(box);
   }

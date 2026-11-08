@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="css/modules/landing.css">
 <link rel="stylesheet" href="css/modules/ads.css">
 <link rel="stylesheet" href="css/modules/metrics.css">
+<link rel="stylesheet" href="css/modules/scaling.css">
 <link rel="stylesheet" href="css/themes.css">
 <link rel="stylesheet" href="css/modules/pnl.css">
 <link rel="stylesheet" href="css/report.css">
@@ -47,6 +48,7 @@
       <button data-v="costeo">Costeo</button>
       <button data-v="desarrollo">Desarrollo</button>
       <button data-v="metricas">Métricas</button>
+      <button data-v="escalado">Escalado</button>
       <button data-v="sim">Simulador</button>
       <button data-v="escalera">Escalera</button>
       <button data-v="creativos">Creativos</button>
@@ -610,6 +612,34 @@
 </section>
 
 <!-- ================= MÓDULO 2 ================= -->
+<!-- ================= ESCALADO ================= -->
+<section class="view" id="v-escalado">
+  <div class="head">
+    <div>
+      <div class="eyebrow">Después de testear · aprendo a escalar</div>
+      <h1>Escalado</h1>
+      <p class="lead">Aprendo la metodología de NovaSociety paso a paso. Es para aprender: no lee mis campañas reales, los casos son inventados.</p>
+    </div>
+    <span class="tag tv">Criterio NovaSociety</span>
+  </div>
+
+  <div class="seg" id="es-parts" role="group" aria-label="Parte del escalado"></div>
+
+  <div class="card mt b-flow-card" id="es-test" hidden>
+    <div class="row between">
+      <div><h2 id="es-h"></h2><p class="muted b-sub" id="es-sub"></p></div>
+    </div>
+    <div class="b-prog mt" id="es-prog"></div>
+    <div class="b-flow mt">
+      <ol class="fl" id="es-steps"></ol>
+      <div class="fl-side" id="es-step" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <div class="card mt" id="es-soon" hidden></div>
+</section>
+
+<!-- ================= MÓDULO 2 ================= -->
 <section class="view" id="v-sim">
   <div class="head">
     <div>
@@ -1091,6 +1121,7 @@
 <script src="js/modules/ads/core/ads.js"></script>
 <script src="js/modules/quick/core/quick.js"></script>
 <script src="js/modules/metrics/core/metrics.js"></script>
+<script src="js/modules/scaling/core/scaling.js"></script>
 <!-- Services: archivos y almacenamiento del navegador -->
 <script src="js/shared/services/storage.js"></script>
 <script src="js/shared/services/files.js"></script>
@@ -1118,6 +1149,7 @@
 <script src="js/modules/landing/ui/landing.js"></script>
 <script src="js/modules/ads/ui/ads.js"></script>
 <script src="js/modules/metrics/ui/metrics.js"></script>
+<script src="js/modules/scaling/ui/scaling.js"></script>
 <!-- App: estado, casos de uso y arranque (main.js va al final) -->
 <script src="js/app/state.js"></script>
 <script src="js/modules/pnl/app/filters.js"></script>
@@ -1129,6 +1161,7 @@
 <script src="js/modules/landing/app/landing.js"></script>
 <script src="js/modules/ads/app/ads.js"></script>
 <script src="js/modules/metrics/app/metrics.js"></script>
+<script src="js/modules/scaling/app/scaling.js"></script>
 <script src="js/modules/trainer/app/trainer.js"></script>
 <script src="js/app/nav.js"></script>
 <script src="js/app/main.js"></script>

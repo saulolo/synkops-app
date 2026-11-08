@@ -31,6 +31,14 @@
     save: (s) => { try { localStorage.setItem(ADS_KEY, JSON.stringify(s)); return true; } catch { return false; } },
   };
 
+  // Escalado: sub-pestaña, paso y pasos hechos, modo del simulacro, mejor puntaje y números de "Juega con los números".
+  // La ronda de práctica en curso no se guarda.
+  const SCALING_KEY = 'pyl-scaling';
+  const scaling = {
+    load: () => { try { return JSON.parse(localStorage.getItem(SCALING_KEY) || 'null'); } catch { return null; } },
+    save: (s) => { try { localStorage.setItem(SCALING_KEY, JSON.stringify(s)); return true; } catch { return false; } },
+  };
+
   // Buscar producto → guardado rápido: libreta de productos al vuelo (nombre, ID Dropi, foto).
   // Clave propia para que "Limpiar" libere de verdad el espacio de las fotos.
   const QUICK_KEY = 'pyl-quick';
@@ -56,5 +64,5 @@
     return { get: (k) => tx('readonly', (s) => s.get(k)), set: (k, v) => tx('readwrite', (s) => s.put(v, k)) };
   })();
 
-  services.storage = { campaignMap, search, landing, ads, quick, idb };
+  services.storage = { campaignMap, search, landing, ads, scaling, quick, idb };
 })();
