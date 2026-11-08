@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="css/modules/quick.css">
 <link rel="stylesheet" href="css/modules/landing.css">
 <link rel="stylesheet" href="css/modules/ads.css">
+<link rel="stylesheet" href="css/modules/metrics.css">
 <link rel="stylesheet" href="css/themes.css">
 <link rel="stylesheet" href="css/modules/pnl.css">
 <link rel="stylesheet" href="css/report.css">
@@ -45,7 +46,7 @@
       <button data-v="buscar">Buscar producto</button>
       <button data-v="costeo">Costeo</button>
       <button data-v="desarrollo">Desarrollo</button>
-      <button data-v="metricas">Hard Metrics</button>
+      <button data-v="metricas">Métricas</button>
       <button data-v="sim">Simulador</button>
       <button data-v="escalera">Escalera</button>
       <button data-v="creativos">Creativos</button>
@@ -145,7 +146,7 @@
       <div><h2>La cadena que decide todo</h2><p class="muted" style="margin:0">Toca un eslabón. El primero que se rompe es mi problema; lo que viene después es consecuencia.</p></div>
       <span class="tag tv">Criterio NovaSociety</span>
     </div>
-    <svg class="chain-svg" viewBox="0 0 900 150" width="100%" role="img" aria-label="Cadena de métricas CPM, CPC, CPPI, CPA con flujo animado" style="margin-top:14px">
+    <svg class="chain-svg" viewBox="0 -34 900 184" width="100%" role="img" aria-label="Cadena de métricas CPM, CPC, CPPI, CPA con flujo animado" style="margin-top:14px">
       <defs>
         <linearGradient id="flow" x1="0" x2="1"><stop offset="0" style="stop-color:var(--b2)"/><stop offset="1" style="stop-color:var(--b)"/></linearGradient>
       </defs>
@@ -156,6 +157,13 @@
       <circle r="5" fill="#7DE6F6"><animateMotion dur="3.2s" repeatCount="indefinite"><mpath href="#fpath"/></animateMotion></circle>
       <circle r="4" style="fill:var(--b-ink)"><animateMotion dur="3.2s" begin="-1.1s" repeatCount="indefinite"><mpath href="#fpath"/></animateMotion></circle>
       <circle r="4" fill="#7DE6F6"><animateMotion dur="3.2s" begin="-2.2s" repeatCount="indefinite"><mpath href="#fpath"/></animateMotion></circle>
+      <g class="chain-split" aria-hidden="true">
+        <text x="223" y="-12" text-anchor="middle" style="fill:var(--c-ink)" font-size="13" font-weight="800" letter-spacing="1.6" font-family="Inter,sans-serif">MÉTRICAS ANTES DEL CLIC</text>
+        <rect x="30" y="4" width="387" height="3" rx="1.5" style="fill:var(--c-ink)" opacity=".45"/>
+        <text x="677" y="-12" text-anchor="middle" style="fill:var(--b-ink)" font-size="13" font-weight="800" letter-spacing="1.6" font-family="Inter,sans-serif">MÉTRICAS DESPUÉS DEL CLIC</text>
+        <rect x="484" y="4" width="387" height="3" rx="1.5" style="fill:var(--b-ink)" opacity=".45"/>
+        <line class="chain-split-line" x1="450.5" y1="-26" x2="450.5" y2="140" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="3 8"/>
+      </g>
       <g class="funnel-node" data-k="cpm" tabindex="0" role="button" aria-label="CPM">
         <rect x="30" y="25" width="160" height="100" rx="20" fill="#131B27" stroke="#2E3B50" stroke-width="2"/>
         <text x="110" y="62" text-anchor="middle" fill="#6E7B8F" font-size="12" font-weight="800" font-family="Inter,sans-serif">PASO 1</text>
@@ -177,7 +185,7 @@
         <text x="791" y="96" text-anchor="middle" fill="#E8EDF4" font-size="28" font-weight="900" font-family="Inter,sans-serif">CPA</text>
       </g>
     </svg>
-    <div class="note nn mt-s" id="chainInfo" aria-live="polite"></div>
+    <div class="note nn mt-s chain-info" aria-live="polite"></div>
   </div>
 
   <div class="note nn mt">
@@ -525,39 +533,69 @@
 <section class="view" id="v-metricas">
   <div class="head">
     <div>
-      <div class="eyebrow">Módulo 1</div>
-      <h1>Hard Metrics: Meta Ads vs. TikTok Ads</h1>
-      <p class="lead">Cambia de pestaña para ver los rangos de cada plataforma. En las métricas donde NovaSociety pone número (CPM, CPPI y CPA), escribe el mío en "Mi dato" y el semáforo me dice dónde estoy y qué hacer.</p>
-    </div>
-    <div class="seg" role="group" aria-label="Plataforma">
-      <button data-plat="meta" aria-pressed="true">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M3 15c0-5 2.5-9 5-9 3 0 5 9 8 9 2 0 3-2 3-4 0-3-1.5-5-3-5-3 0-5 9-8 9-2.5 0-5-3-5-5"/></svg>Meta Ads</button>
-      <button data-plat="tiktok" aria-pressed="false">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3v11a4 4 0 11-4-4"/><path d="M14 3c.5 3 2.5 5 5 5"/></svg>TikTok Ads</button>
-      <button data-plat="both" aria-pressed="false">Comparar</button>
+      <div class="eyebrow">Después de pautar · leo mis números</div>
+      <h1>Métricas: cómo leer mi campaña</h1>
+      <p class="lead">Las métricas dicen en qué punto del camino se está cayendo la venta: antes del clic (el anuncio y el producto) o después (la página y la oferta).</p>
     </div>
   </div>
 
-  <div class="tbl-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th style="width:190px">Métrica</th>
-          <th class="h-tt">Benchmark TikTok</th>
-          <th class="h-mt">Benchmark Meta</th>
-          <th>Rango ideal para escalar</th>
-          <th>Límite máximo permitido</th>
-          <th style="width:300px">Diagnóstico / Solución</th>
-        </tr>
-      </thead>
-      <tbody id="mtBody"></tbody>
-    </table>
+  <div id="hm-map"></div>
+
+  <div class="card mt hm-soon" id="hm-soft">
+    <div class="row between">
+      <div>
+        <h2>Soft Metrics</h2>
+        <p class="muted">Las métricas blandas miden cómo reacciona la gente al anuncio: Hook Rate, retención del video (25 / 50 / 75 %), Outbound CTR, ATC / IC y CVR.</p>
+      </div>
+      <span class="tag tb">Pronto</span>
+    </div>
   </div>
 
-  <div class="grid g3 mt">
-    <div class="note nb"><b>El CTR no decide.</b> En mis Gotas Focus el CTR llegó a 6,7% y no hubo ni una venta: el CPM estaba de 3 a 8 veces por encima del máximo. Por eso NovaSociety no lo mira.</div>
-    <div class="note ny"><b>El CPC no tiene número fijo.</b> NovaSociety lo lee en relación con el CPM: si el CPM está sano y el CPC sale caro, el producto no interesa. Por eso aquí no hay rango inventado.</div>
-    <div class="note nn"><b>El CPA es mío.</b> Sus rangos salen del costeo activo (arriba a la derecha). Cámbialo en la pestaña Costeo.</div>
+  <div class="card mt">
+    <div class="row between">
+      <div><h2>La cadena que decide todo</h2><p class="muted" style="margin:0">Toca un eslabón. El primero que se rompe es mi problema; lo que viene después es consecuencia.</p></div>
+      <span class="tag tv">Criterio NovaSociety</span>
+    </div>
+    <svg class="chain-svg" viewBox="0 -34 900 184" width="100%" role="img" aria-label="Cadena de métricas CPM, CPC, CPPI, CPA con flujo animado" style="margin-top:14px">
+      <defs>
+        <linearGradient id="flow2" x1="0" x2="1"><stop offset="0" style="stop-color:var(--b2)"/><stop offset="1" style="stop-color:var(--b)"/></linearGradient>
+      </defs>
+      <path id="fpath2" d="M110 75 H 790" stroke="#1E2836" stroke-width="6" stroke-linecap="round"/>
+      <path d="M110 75 H 790" stroke="url(#flow2)" stroke-width="2" stroke-dasharray="6 10" opacity=".7">
+        <animate attributeName="stroke-dashoffset" from="0" to="-160" dur="3s" repeatCount="indefinite"/>
+      </path>
+      <circle r="5" fill="#7DE6F6"><animateMotion dur="3.2s" repeatCount="indefinite"><mpath href="#fpath2"/></animateMotion></circle>
+      <circle r="4" style="fill:var(--b-ink)"><animateMotion dur="3.2s" begin="-1.1s" repeatCount="indefinite"><mpath href="#fpath2"/></animateMotion></circle>
+      <circle r="4" fill="#7DE6F6"><animateMotion dur="3.2s" begin="-2.2s" repeatCount="indefinite"><mpath href="#fpath2"/></animateMotion></circle>
+      <g class="chain-split" aria-hidden="true">
+        <text x="223" y="-12" text-anchor="middle" style="fill:var(--c-ink)" font-size="13" font-weight="800" letter-spacing="1.6" font-family="Inter,sans-serif">MÉTRICAS ANTES DEL CLIC</text>
+        <rect x="30" y="4" width="387" height="3" rx="1.5" style="fill:var(--c-ink)" opacity=".45"/>
+        <text x="677" y="-12" text-anchor="middle" style="fill:var(--b-ink)" font-size="13" font-weight="800" letter-spacing="1.6" font-family="Inter,sans-serif">MÉTRICAS DESPUÉS DEL CLIC</text>
+        <rect x="484" y="4" width="387" height="3" rx="1.5" style="fill:var(--b-ink)" opacity=".45"/>
+        <line class="chain-split-line" x1="450.5" y1="-26" x2="450.5" y2="140" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="3 8"/>
+      </g>
+      <g class="funnel-node" data-k="cpm" tabindex="0" role="button" aria-label="CPM">
+        <rect x="30" y="25" width="160" height="100" rx="20" fill="#131B27" stroke="#2E3B50" stroke-width="2"/>
+        <text x="110" y="62" text-anchor="middle" fill="#6E7B8F" font-size="12" font-weight="800" font-family="Inter,sans-serif">PASO 1</text>
+        <text x="110" y="96" text-anchor="middle" fill="#E8EDF4" font-size="28" font-weight="900" font-family="Inter,sans-serif">CPM</text>
+      </g>
+      <g class="funnel-node" data-k="cpc" tabindex="0" role="button" aria-label="CPC">
+        <rect x="257" y="25" width="160" height="100" rx="20" fill="#131B27" stroke="#2E3B50" stroke-width="2"/>
+        <text x="337" y="62" text-anchor="middle" fill="#6E7B8F" font-size="12" font-weight="800" font-family="Inter,sans-serif">PASO 2</text>
+        <text x="337" y="96" text-anchor="middle" fill="#E8EDF4" font-size="28" font-weight="900" font-family="Inter,sans-serif">CPC</text>
+      </g>
+      <g class="funnel-node" data-k="cppi" tabindex="0" role="button" aria-label="CPPI">
+        <rect x="484" y="25" width="160" height="100" rx="20" fill="#131B27" stroke="#2E3B50" stroke-width="2"/>
+        <text x="564" y="62" text-anchor="middle" fill="#6E7B8F" font-size="12" font-weight="800" font-family="Inter,sans-serif">PASO 3</text>
+        <text x="564" y="96" text-anchor="middle" fill="#E8EDF4" font-size="28" font-weight="900" font-family="Inter,sans-serif">CPPI</text>
+      </g>
+      <g class="funnel-node" data-k="cpa" tabindex="0" role="button" aria-label="CPA">
+        <rect x="711" y="25" width="160" height="100" rx="20" fill="#131B27" stroke="#2E3B50" stroke-width="2"/>
+        <text x="791" y="62" text-anchor="middle" fill="#6E7B8F" font-size="12" font-weight="800" font-family="Inter,sans-serif">PASO 4</text>
+        <text x="791" y="96" text-anchor="middle" fill="#E8EDF4" font-size="28" font-weight="900" font-family="Inter,sans-serif">CPA</text>
+      </g>
+    </svg>
+    <div class="note nn mt-s chain-info" aria-live="polite"></div>
   </div>
 </section>
 
@@ -1042,6 +1080,7 @@
 <script src="js/modules/landing/core/landing.js"></script>
 <script src="js/modules/ads/core/ads.js"></script>
 <script src="js/modules/quick/core/quick.js"></script>
+<script src="js/modules/metrics/core/metrics.js"></script>
 <!-- Services: archivos y almacenamiento del navegador -->
 <script src="js/shared/services/storage.js"></script>
 <script src="js/shared/services/files.js"></script>
@@ -1068,6 +1107,7 @@
 <script src="js/modules/quick/ui/quick.js"></script>
 <script src="js/modules/landing/ui/landing.js"></script>
 <script src="js/modules/ads/ui/ads.js"></script>
+<script src="js/modules/metrics/ui/metrics.js"></script>
 <!-- App: estado, casos de uso y arranque (main.js va al final) -->
 <script src="js/app/state.js"></script>
 <script src="js/modules/pnl/app/filters.js"></script>
@@ -1078,6 +1118,7 @@
 <script src="js/modules/quick/app/quick.js"></script>
 <script src="js/modules/landing/app/landing.js"></script>
 <script src="js/modules/ads/app/ads.js"></script>
+<script src="js/modules/metrics/app/metrics.js"></script>
 <script src="js/modules/trainer/app/trainer.js"></script>
 <script src="js/app/nav.js"></script>
 <script src="js/app/main.js"></script>
