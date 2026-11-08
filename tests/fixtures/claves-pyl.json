@@ -13,6 +13,7 @@
     "parse",
     "pnl",
     "quick",
+    "scaling",
     "search"
   ],
   "services": [
@@ -36,6 +37,7 @@
     "productsTable",
     "quick",
     "report",
+    "scaling",
     "search",
     "simulator",
     "summary",

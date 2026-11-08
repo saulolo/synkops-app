@@ -43,9 +43,9 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.deepStrictEqual(actual[capa], BASE_KEYS[capa], `Claves de PYL.${capa} distintas de la línea base`);
   }
 
-  // 2. Las 9 pestañas abren su vista y marcan aria-current.
+  // 2. Las 10 pestañas abren su vista y marcan aria-current.
   const tabs = [...document.querySelectorAll('#tabs button')];
-  assert.strictEqual(tabs.length, 9, 'Debe haber 9 pestañas');
+  assert.strictEqual(tabs.length, 10, 'Debe haber 10 pestañas');
   for (const b of tabs) {
     b.click();
     const on = [...document.querySelectorAll('.view.on')].map((v) => v.id);
@@ -212,6 +212,135 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   assert.ok(document.querySelector('#hm-soft').nextElementSibling.querySelector('.chain-info'), 'Y la cadena que decide todo queda después');
   assert.strictEqual(document.querySelector('#hm-chain'), null, 'Ya no existe la tarjeta del efecto de desencadenamiento');
   assert.strictEqual(document.querySelectorAll('[data-plat], #mtBody, [data-test]').length, 0, 'Ya no existe la tabla vieja ni el probador "Mi dato"');
+
+  // 8. Escalado (SPEC 05): pestaña después de Métricas, sub-pestañas y tarjeta "Pronto".
+  assert.deepStrictEqual(tabs.map((b) => b.dataset.v).slice(4, 6), ['metricas', 'escalado'], 'Escalado va justo después de Métricas');
+  const partes = [...document.querySelectorAll('#es-parts [data-part]')];
+  assert.deepStrictEqual(partes.map((b) => b.dataset.part), ['test', 'surf'], 'Dos sub-pestañas');
+  assert.ok(partes[0].getAttribute('aria-pressed') === 'true' && !document.querySelector('#es-test').hidden && document.querySelector('#es-soon').hidden, 'Abre en Fase de testeo');
+  partes[1].click();
+  assert.ok(document.querySelector('#es-test').hidden && !document.querySelector('#es-soon').hidden, 'Surfing Scaling muestra solo la tarjeta Pronto');
+  assert.ok(text('#es-soon').includes('Pronto') && text('#es-soon').includes('+20 %'), 'La tarjeta Pronto dice qué vendrá');
+  assert.strictEqual(document.querySelector('#es-parts [data-part="surf"]').getAttribute('aria-pressed'), 'true');
+  document.querySelector('#es-parts [data-part="test"]').click();
+  assert.ok(!document.querySelector('#es-test').hidden && document.querySelector('#es-soon').hidden, 'Vuelve a la Fase de testeo');
+  assert.ok(text('#v-escalado .lead').includes('no lee mis campañas reales'), 'El encabezado dice que es para aprender');
+  assert.strictEqual(PYL.app.state.scaling.part, 'test');
+  const ids = [...document.querySelectorAll('[id]')].map((n) => n.id), repetidos = ids.filter((id, i) => ids.indexOf(id) !== i);
+  assert.deepStrictEqual(repetidos, [], 'Ids repetidos: ' + repetidos.join(', '));
+
+  // 9. Escalado · Fase de testeo: 6 pasos, cada uno con su bloque, y el avance.
+  const paso = (i) => document.querySelectorAll('#es-steps .fl-node')[i].click();
+  assert.strictEqual(document.querySelectorAll('#es-steps .fl-item').length, 6, 'Seis pasos en la lista');
+  assert.deepStrictEqual([...document.querySelectorAll('#es-steps .fl-tx b')].map((n) => n.textContent), ['Arranque', 'Corte 1 · 20.000', 'Corte 2 · 30.000', 'Corte 3 · 40.000', 'Si se apagó: la cadena', 'Practica']);
+  assert.ok(text('#es-step').includes('Paso 1 de 6') && text('#es-step').includes('100.000 al día'), 'Abre en el paso 1');
+  assert.deepStrictEqual([...document.querySelectorAll('#es-step .es-bar-mark small')].map((n) => n.textContent.replace('Fin del día', '')), ['20K', '30K', '40K', '100K'], 'Barra con las marcas');
+  assert.ok(text('#es-step').includes('el corte de 40.000 le llega el día 2'), 'Nota ABO');
+  paso(1);
+  assert.ok(text('#es-step').includes('Paso 2 de 6') && document.querySelectorAll('#es-step .es-cut').length === 1, 'El paso 2 muestra solo su tarjeta');
+  assert.ok(text('#es-step .es-ex').includes('Así lo califica el Lab de NovaSociety') && text('#es-step .es-ex').includes('Flojo, se mantiene'), 'Mini-ejemplo resuelto');
+  assert.strictEqual(document.querySelector('#es-step .es-on').dataset.branch, 'c1-weak', 'Se ilumina la rama del ejemplo');
+  paso(2);
+  assert.deepStrictEqual([...document.querySelectorAll('#es-step .es-grp-h')].map((n) => n.textContent), ['Sin ventas', 'Con venta']);
+  assert.strictEqual(document.querySelector('#es-step .es-on').dataset.branch, 'c2-nosale-weak');
+  paso(3);
+  assert.ok(text('#es-step .es-own') === 'Regla propia' && document.querySelectorAll('#es-step .es-cut .es-br').length === 3, 'Corte 3 con Regla propia');
+  const topeTxt = text('#es-step .es-tope');
+  assert.ok(topeTxt.includes('El tope es el CPA máximo de tu costeo') && ['$ 12.000', '$ 20.000', '$ 16.494', '$ 27.489'].every((n) => topeTxt.includes(n)), 'Caja del tope');
+  paso(4);
+  assert.ok(text('#es-step .es-flow').replace(/s/g, '') === 'CPM→CPC→CPPI→CPA' && text('#es-step').includes('No se mira el CTR'), 'Cadena y CTR');
+  assert.strictEqual(document.querySelectorAll('#es-step .es-read').length, 3, 'Tres lecturas');
+  assert.ok(text('#es-step').includes('No apago antes de cruzar un corte'));
+  paso(5);
+  assert.strictEqual(document.querySelectorAll('#es-step .es-cuts .es-cut').length, 3, 'El paso 6 muestra el mapa de los 3 cortes');
+  assert.ok(document.querySelector('#es-step #es-sim'), 'y el lugar del simulacro');
+  assert.deepStrictEqual([...document.querySelectorAll('#es-step .fl-detail .row.mt button')].map((b) => b.textContent), ['← Anterior'], 'El último paso no lleva botón a otra pestaña');
+  // Avance: marcar el paso lo da por hecho y mueve la barra; desmarcar lo devuelve.
+  assert.strictEqual(document.querySelectorAll('#es-steps .fl-item.done').length, 0);
+  document.querySelector('#es-step .ld-check').click();
+  assert.strictEqual(document.querySelectorAll('#es-steps .fl-item.done').length, 1, 'Un paso hecho');
+  assert.ok(text('#es-prog').includes('1 de 6 pasos hechos') && document.querySelector('#es-prog .b-bar i').style.width.startsWith('16.6'), 'La barra de avance se mueve');
+  assert.deepStrictEqual([...PYL.app.state.scaling.test.done], ['practica']);
+  document.querySelector('#es-step .ld-check').click();
+  assert.strictEqual(document.querySelectorAll('#es-steps .fl-item.done').length, 0, 'Desmarcar lo devuelve');
+  assert.ok(!document.querySelector('#es-prog button'), 'Sin pasos hechos no hay "Empezar de nuevo"');
+  paso(0);
+
+  // 10. Escalado · Juega con los números (paso 6).
+  paso(5);
+  assert.deepStrictEqual([...document.querySelectorAll('#es-modes [data-mode]')].map((b) => b.dataset.mode), ['practice', 'free'], 'Dos modos');
+  document.querySelector('#es-modes [data-mode="free"]').click();
+  assert.strictEqual(document.querySelector('#es-modes [data-mode="free"]').getAttribute('aria-pressed'), 'true');
+  assert.strictEqual(PYL.app.state.scaling.mode, 'free', 'Se recuerda el modo');
+  assert.deepStrictEqual(['daily', 'tope'].map((k) => document.querySelector('#es-f-' + k).value), ['100000', '15000'], 'Arranca con 100.000 y tope 15.000');
+  assert.ok(text('#es-zones').includes('$ 12.000') && text('#es-zones').includes('$ 20.000'), 'Zonas del tope genérico');
+  const poner = (id, v) => { const x = document.querySelector('#es-f-' + id); x.value = v; x.dispatchEvent(new window.Event('input', { bubbles: true })); };
+  poner('tope', '32617');
+  assert.ok(text('#es-zones').includes('$ 26.094') && text('#es-zones').includes('$ 43.489'), 'Zonas con tope 32.617');
+  poner('tope', '15000');
+  poner('spend', '15000');
+  assert.ok(text('#es-free-out').includes('Deja correr sin tocar') && !document.querySelector('#es-step .es-on'), 'Antes del corte 1');
+  poner('spend', '25000'); poner('pi', '2');
+  assert.ok(text('#es-free-out').includes('Apagar') && text('#es-free-out').includes('Apágalo, a nadie le interesa'), 'Apagar en el corte 1');
+  assert.deepStrictEqual([...document.querySelectorAll('#es-step .es-on')].map((n) => n.dataset.branch), ['c1-off'], 'Se ilumina la rama c1-off');
+  assert.ok(text('#es-free-out').includes('Corte 1 · 20.000') && text('#es-free-out').includes('Día del testeo'), 'Corte y día');
+  poner('spend', '30000'); poner('pi', '5');
+  assert.ok(text('#es-free-out').includes('BASTANTE FLOJO') && text('#es-free-out').includes('$ 6.000'), 'Bastante flojo con CPPI 6.000');
+  assert.strictEqual(document.querySelector('#es-step .es-on').dataset.branch, 'c2-nosale-weak');
+  poner('spend', '40000'); poner('pi', '12'); poner('sales', '3');
+  assert.ok(text('#es-free-out').includes('Dejar gastar el día'), 'Dejar gastar con tope 15.000');
+  poner('tope', '12000');
+  assert.ok(text('#es-free-out').includes('Regla propia') && document.querySelector('#es-step .es-on').dataset.branch === 'c3-own', 'Regla propia con tope 12.000');
+  poner('daily', '30000');
+  assert.ok(text('#es-free-out').includes('Día del testeo2'), 'Gasto 40.000 con presupuesto 30.000 es el día 2');
+  poner('pi', '1');
+  assert.ok(text('#es-free-out').includes('Las ventas no pueden ser más que los pagos iniciados') && !document.querySelector('#es-step .es-on'), 'Aviso y sin veredicto');
+  assert.ok(text('#es-free-out').includes('CPPI$ 40.000'), 'El CPPI se sigue mostrando');
+  assert.strictEqual(document.querySelector('#es-free-bar .es-bar-fill').style.width.slice(0, 4), '57.1', 'La barra sigue el gasto');
+  poner('sales', '0'); poner('pi', '0');
+  assert.ok(text('#es-free-out').includes('CPPI—') && text('#es-free-out').includes('CPA—'), 'Sin pagos iniciados ni ventas: —');
+  document.querySelector('#es-modes [data-mode="practice"]').click();
+  assert.ok(!document.querySelector('#es-free-out') && PYL.app.state.scaling.mode === 'practice', 'Volver a Práctica');
+  paso(0);
+
+  // 11. Escalado · Práctica (paso 6).
+  paso(5);
+  const run = () => PYL.app.state.scaling.run, vista = () => PYL.core.scaling.practiceView(run());
+  assert.strictEqual(PYL.app.state.scaling.mode, 'practice');
+  assert.ok(document.querySelector('#es-adv') && text('#es-adv').startsWith('Avanzar hasta el corte') && !document.querySelector('.es-dec'), 'Antes de avanzar solo está "Avanzar"');
+  assert.strictEqual(document.querySelector('#es-mode .es-bar-fill').dataset.spend, '0', 'La barra parte en 0');
+  document.querySelector('#es-adv').click();
+  assert.strictEqual(document.querySelectorAll('#es-mode .es-dec').length, 4, 'Cuatro botones de decisión');
+  assert.deepStrictEqual([...document.querySelectorAll('#es-mode .es-dec b')].map((b) => b.textContent), ['Apagar', 'Mantener vigilando', 'Seguir sin tocar', 'Dejar gastar el día']);
+  assert.ok(['Gasto', 'Pagos iniciados', 'Ventas', 'CPPI', 'CPA'].every((n) => text('#es-mode .es-stats').includes(n)), 'Se ven los números del caso');
+  assert.strictEqual(document.querySelector('#es-mode .es-bar-fill').dataset.spend, String(vista().to), 'La barra llega al corte');
+  assert.ok(!document.querySelector('#es-fb') && !document.querySelector('#es-step .es-on'), 'Sin decisión no hay explicación ni rama iluminada');
+  // Decisión equivocada: fallo, la correcta, explicación y rama iluminada; "Ver el paso" abre el paso del corte.
+  const v0 = vista(), mala = ['off', 'watch', 'go', 'spend'].find((k) => k !== v0.verdict.action);
+  document.querySelector('#es-mode .es-dec[data-action="' + mala + '"]').click();
+  assert.ok(text('#es-fb').includes('No era esa') && text('#es-fb').includes('Así lo califica el Lab de NovaSociety') && text('#es-fb').includes(v0.verdict.veredicto), 'Fallo con explicación');
+  assert.strictEqual(document.querySelectorAll('#es-mode .es-wrong').length, 1);
+  assert.strictEqual(document.querySelector('#es-mode .es-right').dataset.action, v0.verdict.action, 'Marca la correcta');
+  assert.strictEqual(document.querySelector('#es-step .es-on').dataset.branch, v0.verdict.branch, 'Se ilumina la rama');
+  assert.ok([...document.querySelectorAll('#es-mode .es-dec')].every((b) => b.disabled), 'Ya no se puede decidir de nuevo');
+  document.querySelector('#es-see').click();
+  assert.ok(text('#es-step').includes('Paso ' + v0.verdict.step + ' de 6'), '"Ver el paso" abre el paso del corte');
+  paso(5);
+  assert.ok(document.querySelector('#es-fb'), 'Al volver, la ronda sigue donde estaba');
+  // Resto de la ronda acertando: termina con 18 de 19 (95 %); el mejor puntaje queda guardado.
+  let guarda = 0;
+  while (!document.querySelector('#es-end') && guarda++ < 100) {
+    if (document.querySelector('#es-adv')) document.querySelector('#es-adv').click();
+    else if (document.querySelector('#es-fb')) document.querySelector('#es-next').click();
+    else document.querySelector('#es-mode .es-dec[data-action="' + vista().verdict.action + '"]').click();
+  }
+  assert.ok(text('#es-end').includes('18 de 19 decisiones acertadas') && text('#es-end').includes('(95 %)') && text('#es-end').includes('Mejor puntaje: 95 %'), 'Fin de la ronda');
+  assert.strictEqual(PYL.app.state.scaling.best, 95, 'El mejor puntaje queda en el estado');
+  document.querySelector('#es-again').click();
+  assert.ok(document.querySelector('#es-adv') && !document.querySelector('#es-end') && run().total === 0, 'Otra ronda empieza de cero');
+  assert.strictEqual(PYL.app.state.scaling.best, 95, 'El mejor puntaje se mantiene');
+  assert.deepStrictEqual([...run().order].sort(), [...PYL.core.scaling.TEST_CASES.map((c) => c.id)].sort(), 'La ronda pasa por los 8 casos');
+  paso(0);
 
   return new Promise((ok) => setTimeout(ok, 200)).then(() => {
     assert.ok(ladder.classList.contains('grown'), 'La escalera debe terminar crecida');
