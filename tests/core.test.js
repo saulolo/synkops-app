@@ -11,7 +11,7 @@ const caso = (nombre, fn) => casos.push([nombre, fn]);
 
 caso('exporta todas las funciones del núcleo aplanadas', () => {
   const claves = Object.keys(core).sort().join(',');
-  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,LANDING,LEVELS,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALING_SOON,SCORE_LEVELS,SCORE_MAX,STAGES,STATUS,STEPS,STRATEGIES,TESTING_PARTS,TEST_ACTIONS,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_STEPS,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,classify,competition,copText,count,cpaZones,cycles,defaultSlug,evaluate,fill,fmt,fullTitle,funnel,isDropi,isMetrics,key,kpis,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,roundLike,rowCells,score,scoreLevel,scoreParts,short,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
+  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,LADDER_BLOCKS,LANDING,LEVELS,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_STEPS,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,classify,competition,copText,count,cpaZones,cycles,defaultSlug,evaluate,fill,fmt,fullTitle,funnel,isDropi,isMetrics,key,kpis,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
 });
 
 caso('Costeo: proveedor 30.000 da precio $99.900 y tope $21.617', () => {
@@ -303,14 +303,242 @@ caso('Testeo: partes en orden, Lectura real deshabilitada con su tarjeta Pronto 
   assert.ok(txt(sn.items[1]).includes(core.NS_TEST.cuts.map(core.copText).join(', ').replace(/, ([^,]*)$/, ' y $1')), 'Cortes desde NS_TEST');
   assert.ok(txt(sn.items[2]).includes(core.TEST_ACTIONS.map((a) => a.t.toLowerCase())[0]), 'Decisiones desde TEST_ACTIONS');
   const p4 = JSON.stringify(core.TEST_STEPS[3]);
-  assert.ok(p4.includes('pestaña Escalado, hoy «Pronto»') && !p4.includes('Surfing Scaling'), 'Frase del paso 4');
+  assert.ok(p4.includes('pasa a escalado (pestaña Escalado).') && !p4.includes('Pronto') && !p4.includes('Surfing Scaling'), 'Frase del paso 4');
 });
 
-caso('Escalado: SCALING_SOON dice +20 % desde NS_TEST.step', () => {
-  const S = core.SCALING_SOON, txt = (a) => a.map((x) => (typeof x === 'string' ? x : x.b)).join('');
-  assert.strictEqual(S.h, 'Surfing Scaling');
-  assert.strictEqual(S.items.length, 3);
-  assert.ok(txt(S.items[0]).includes('+' + Math.round(core.NS_TEST.step * 100) + ' %'));
+// ---------- Escalado · Surfing Scaling (SPEC 07) ----------
+const sv = (days, level = 3, tope = 15000) => core.scaleVerdict({ days, level, tope });
+const dd = (spend, sales, pi = sales + 3) => ({ spend, sales, pi });
+// Tres días con el mismo gasto y las ventas dadas.
+const tres = (spend, s) => s.map((n) => dd(spend, n));
+
+caso('Escalado: la escalera de 15 escalones es la del MCP y se calcula desde NS_TEST', () => {
+  assert.deepStrictEqual(core.scaleLadder(15), [100000, 120000, 144000, 173000, 207000, 249000, 299000, 358000, 430000, 516000, 619000, 743000, 892000, 1070000, 1280000]);
+  assert.strictEqual(core.scaleLadder()[0], core.NS_TEST.budget);
+  assert.strictEqual(core.scaleLadder(3).length, 3);
+  assert.deepStrictEqual(core.LADDER_BLOCKS.map((b) => [b.from, b.to, b.t]), [[0, 4, 'Testeo y confirmación'], [5, 9, 'Zona de crecimiento'], [10, 14, 'Alto volumen']]);
+  assert.strictEqual(core.SCALE_RULES.levels, 15);
+});
+
+caso('Escalado: scaleVerdict, zonas de la ventana y sus bordes (tope 15.000: escala 12.000, apaga 20.000)', () => {
+  // CPA igual en los 3 días: el gasto y las ventas dan el CPA justo.
+  const w = (spend, sales) => sv(tres(spend, [sales, sales, sales]));
+  assert.strictEqual(w(120000, 11).branch, 'zone-up');          // 10.909 < escala
+  assert.strictEqual(w(120000, 10).branch, 'zone-hold');        // justo en escala: ya no sube
+  assert.strictEqual(w(150000, 10).branch, 'zone-hold');        // justo en el tope: se sostiene
+  assert.strictEqual(w(150001, 10).branch, 'zone-down');        // apenas sobre el tope
+  assert.strictEqual(w(200000, 10).branch, 'zone-down');        // justo en apaga: todavía baja
+  const off = w(200001, 10);                                    // sobre apaga en los 3 días: regla dura (ver abajo)
+  assert.strictEqual(off.branch, 'off-hard');
+  // Ventana sobre apaga sin que los dos últimos días lo estén: zona de apagar, baja y no apaga.
+  const zoff = sv([dd(300000, 10), dd(300000, 10), dd(150000, 10)]);
+  assert.deepStrictEqual([zoff.branch, zoff.action, zoff.dura], ['zone-off', 'down', false]);
+  assert.ok(JSON.stringify(zoff.detalle).includes('nada se apaga por un solo día'));
+  // Forma del Lab.
+  const up = w(120000, 11);
+  assert.deepStrictEqual([up.fase, up.action, up.light, up.source, up.toca, up.zone], ['escalando', 'up', 'g', 'lab', 'Subir un escalón', 'up']);
+  assert.deepStrictEqual([up.from, up.to, up.budget], [3, 4, 207000]);
+  assert.ok(Math.abs(up.cpaWin - 120000 / 11) < 1e-9);
+  assert.ok(Array.isArray(up.detalle) && Array.isArray(up.senales));
+  // Con menos días (día 2) usa los que hay; con más de 3 solo cuentan los últimos 3.
+  assert.strictEqual(sv([dd(120000, 11)]).branch, 'zone-up');
+  assert.strictEqual(sv([dd(900000, 1), ...tres(120000, [11, 11, 11])]).branch, 'zone-up');
+  // El tope cambia las zonas: con tope 20.000 un CPA de 15.000 ya sube (escala = 16.000).
+  assert.strictEqual(sv(tres(150000, [10, 10, 10]), 3, 20000).branch, 'zone-up');
+});
+
+caso('Escalado: día flojo (ayer justo en ×1,5), regla dura y excepción de un solo día', () => {
+  // Venían a 12.000 (120.000 con 10 ventas); ayer a 17.999 → flojo; a 18.000 (×1,5 exacto) → baja.
+  const flojo = (spendAyer, salesAyer) => sv([dd(120000, 10), dd(120000, 10), dd(spendAyer, salesAyer)]);
+  assert.strictEqual(flojo(179990, 10).branch, 'flojo-hold');
+  assert.strictEqual(flojo(179990, 10).action, 'hold');
+  const exacto = flojo(180000, 10);
+  assert.deepStrictEqual([exacto.branch, exacto.action, exacto.to], ['flojo-down', 'down', 2]);
+  assert.strictEqual(flojo(180001, 10).branch, 'flojo-down');
+  // Ayer sin ventas pero con gasto (y con pagos iniciados): baja, no apaga.
+  assert.strictEqual(flojo(100000, 0).branch, 'flojo-down');
+  // Si los días anteriores ya eran malos, no hay día flojo: manda la zona de la ventana.
+  assert.strictEqual(sv([dd(160000, 10), dd(160000, 10), dd(160000, 10)]).branch, 'zone-down');
+  // Ayer más barato o igual que los anteriores no es día flojo.
+  assert.strictEqual(sv([dd(130000, 10), dd(130000, 10), dd(120000, 10)]).branch, 'zone-hold');
+  // Regla dura: dos días seguidos sobre apaga (o sin ventas con gasto).
+  const dura = sv([dd(120000, 10), dd(200001, 10), dd(200001, 10)]);
+  assert.deepStrictEqual([dura.branch, dura.action, dura.dura, dura.to, dura.budget, dura.light], ['off-hard', 'off', true, null, 0, 'r']);
+  assert.notStrictEqual(sv([dd(120000, 10), dd(200000, 10), dd(200001, 10)]).branch, 'off-hard', 'justo en apaga no cuenta como sobre apaga');
+  assert.strictEqual(sv([dd(100000, 0), dd(100000, 0)]).branch, 'off-hard');
+  assert.notStrictEqual(sv([dd(200001, 10), dd(120000, 10), dd(200001, 10)]).branch, 'off-hard', 'dos días sobre apaga pero no seguidos');
+  // Excepción de un solo día: 0 ventas, 0 pagos iniciados y el doble de apaga (40.000) gastado.
+  const uno = sv([dd(120000, 10), dd(120000, 10), dd(40000, 0, 0)]);
+  assert.deepStrictEqual([uno.branch, uno.dura, uno.action], ['off-single', true, 'off']);
+  assert.notStrictEqual(sv([dd(120000, 10), dd(120000, 10), dd(39999, 0, 0)]).branch, 'off-single');
+  assert.notStrictEqual(sv([dd(120000, 10), dd(120000, 10), dd(40000, 0, 1)]).branch, 'off-single', 'con un pago iniciado no aplica');
+});
+
+caso('Escalado: escalón base y escalón 15', () => {
+  const bueno = tres(100000, [11, 11, 11]);
+  const malo = tres(150001, [10, 10, 10]);
+  // N15 (índice 14): subir se sostiene con la nota; la rama sigue siendo zone-up.
+  const n15 = sv(bueno, 14);
+  assert.deepStrictEqual([n15.branch, n15.action, n15.from, n15.to, n15.budget], ['zone-up', 'hold', 14, 14, 1280000]);
+  assert.ok(JSON.stringify(n15.detalle).includes('Último escalón'));
+  assert.strictEqual(sv(bueno, 13).to, 14);
+  // N1 (índice 0): bajar se queda en N1 con la nota; bajar dos desde N2 también queda en N1.
+  const n1 = sv(malo, 0);
+  assert.deepStrictEqual([n1.action, n1.from, n1.to, n1.budget], ['down', 0, 0, 100000]);
+  assert.ok(JSON.stringify(n1.detalle).includes('escalón base'));
+  const d2 = core.scaleGuard({ kind: 'dawn', spend: 36000, sales: 0, level: 1, tope: 15000 });
+  assert.deepStrictEqual([d2.action, d2.to, d2.budget], ['down2', 0, 100000]);
+  assert.strictEqual(core.scaleGuard({ kind: 'dawn', spend: 36000, sales: 0, level: 6, tope: 15000 }).to, 4);
+  // Apagar no tiene escalón nuevo.
+  assert.strictEqual(sv([dd(100000, 0), dd(100000, 0)], 5).to, null);
+});
+
+caso('Escalado: scaleGuard (curso) en sus bordes: 1 CPA = 12.000 y 3 CPA = 36.000', () => {
+  const g = (kind, spend, sales, level = 4) => core.scaleGuard({ kind, spend, sales, level, tope: 15000 });
+  assert.deepStrictEqual([g('raise', 11999, 0).branch, g('raise', 12000, 0).branch, g('raise', 12000, 1).branch], ['raise-hold', 'raise-down', 'raise-hold']);
+  assert.deepStrictEqual([g('dawn', 35999, 0).branch, g('dawn', 36000, 1).branch, g('dawn', 36000, 0).branch, g('dawn', 36000, 2).branch], ['dawn-hold', 'dawn-down2', 'dawn-down2', 'dawn-hold']);
+  const r = g('raise', 12000, 0);
+  assert.deepStrictEqual([r.source, r.fase, r.action, r.from, r.to, r.budget, r.dura, r.cpaWin, r.zone], ['curso', 'escalando', 'down', 4, 3, 173000, false, null, null]);
+  assert.strictEqual(g('dawn', 36000, 1).to, 2);
+  // Los montos salen de escala (zonas del tope): con tope 20.000, escala = 16.000.
+  assert.strictEqual(core.scaleGuard({ kind: 'raise', spend: 15999, sales: 0, level: 4, tope: 20000 }).branch, 'raise-hold');
+  assert.strictEqual(core.scaleGuard({ kind: 'raise', spend: 16000, sales: 0, level: 4, tope: 20000 }).branch, 'raise-down');
+  assert.deepStrictEqual(core.SCALE_GUARDS.map((x) => [x.k, x.amount]), [['raise', 12000], ['dawn', 36000]]);
+  // Las reglas del curso llevan source 'curso'; las del MCP 'lab'.
+  assert.ok(core.SCALE_MAP.filter((m) => m.source === 'curso').every((m) => /^(raise|dawn)-/.test(m.id)));
+  assert.ok(core.SCALE_MAP.filter((m) => m.source === 'lab').every((m) => !/^(raise|dawn)-/.test(m.id)));
+});
+
+caso('Escalado: SCALE_MAP = exactamente las ramas que devuelven scaleVerdict y scaleGuard', () => {
+  const alcanzadas = new Set();
+  const ventas = [0, 4, 6, 8, 10, 11, 12];
+  const dias = [];
+  for (const spend of [40000, 39999, 100000, 120000, 150000, 160000, 200000, 210000]) for (const sales of ventas) for (const pi of [0, sales]) dias.push(dd(spend, sales, pi));
+  const ayeres = [dd(120000, 10), dd(180000, 10), dd(180001, 10), dd(100000, 0), dd(40000, 0, 0), dd(200001, 10), dd(120000, 12)];
+  for (const a of dias) for (const b of dias) for (const c of ayeres) {
+    for (const tope of [12000, 15000]) {
+      alcanzadas.add(sv([a, b, c], 3, tope).branch);
+      alcanzadas.add(sv([b, c], 3, tope).branch);
+    }
+  }
+  for (const kind of ['raise', 'dawn']) for (const spend of [0, 11999, 12000, 35999, 36000]) for (const sales of [0, 1, 2]) alcanzadas.add(core.scaleGuard({ kind, spend, sales, level: 3, tope: 15000 }).branch);
+  const ids = core.SCALE_MAP.map((m) => m.id);
+  assert.strictEqual(new Set(ids).size, ids.length, 'ids únicos');
+  assert.deepStrictEqual([...alcanzadas].sort(), [...ids].sort(), 'ramas del mapa = ramas de las funciones');
+  // La regla dura va marcada "dura" en el mapa.
+  assert.deepStrictEqual(core.SCALE_MAP.filter((m) => m.dura).map((m) => m.id), ['off-hard', 'off-single']);
+  assert.ok(core.SCALE_MAP.every((m) => ['g', 'y', 'r'].includes(m.light) && m.cond.length && m.t.length));
+});
+
+caso('Escalado: scaleCheck y scaleFree (Juega con los números)', () => {
+  const ok = core.SCALE_FREE();
+  assert.strictEqual(core.scaleCheck(ok), null);
+  assert.strictEqual(ok.tope, core.GENERIC_CPA.tope);
+  assert.strictEqual(ok.days.length, 3);
+  const con = (o) => ({ ...core.SCALE_FREE(), ...o });
+  const masVentas = con({ days: [dd(100000, 5, 4), dd(100000, 5, 6), dd(100000, 5, 6)] });
+  assert.strictEqual(core.scaleCheck(masVentas), 'El día 1 tiene más ventas que pagos iniciados');
+  const f = core.scaleFree(masVentas);
+  assert.strictEqual(f.verdict, null);
+  assert.ok(f.err);
+  assert.deepStrictEqual(f.cpas.map((c) => Math.round(c)), [20000, 20000, 20000]);
+  assert.ok(core.scaleCheck(con({ level: 15 })) && core.scaleCheck(con({ level: -1 })) && core.scaleCheck(con({ level: 1.5 })));
+  assert.ok(core.scaleCheck(con({ tope: 0 })));
+  assert.ok(core.scaleCheck(con({ days: [dd(NaN, 1, 1)] })));
+  assert.ok(core.scaleCheck(con({ days: [] })));
+  // Con datos buenos: CPA por día, CPA de la ventana = gasto total ÷ ventas totales, zona, veredicto y presupuesto.
+  const buenos = con({ level: 2, days: [dd(120000, 10, 12), dd(120000, 8, 9), dd(144000, 9, 11)] });
+  const r = core.scaleFree(buenos);
+  assert.strictEqual(r.err, null);
+  assert.deepStrictEqual(r.cpas, [12000, 15000, 16000]);
+  assert.ok(Math.abs(r.cpaWin - 384000 / 27) < 1e-9);
+  assert.strictEqual(r.zone, 'hold');
+  assert.deepStrictEqual(r.zones, { escala: 12000, tope: 15000, apaga: 20000 });
+  assert.strictEqual(r.budget, 144000);
+  assert.strictEqual(r.verdict.branch, 'flojo-hold');
+  assert.strictEqual(core.scaleZone(0, 0, r.zones), null);
+  assert.strictEqual(core.scaleZone(1, 0, r.zones), 'off');
+});
+
+caso('Escalado: sub-pestañas, métodos y 7 pasos de Surfing Scaling', () => {
+  assert.deepStrictEqual(core.SCALING_PARTS.map((p) => [p.k, !!p.disabled]), [['real', true], ['scale', false], ['sim', true]]);
+  assert.deepStrictEqual(core.SCALING_PARTS.map((p) => p.t), ['📂 Lectura real · pronto', '📈 Fase de escalado', '⚠️ Simulador · revisar']);
+  assert.ok(core.SCALING_PARTS[0].soon.h && core.SCALING_PARTS[0].soon.items.length);
+  assert.strictEqual(core.scalingPart('real').k, 'scale');
+  assert.strictEqual(core.scalingPart('sim').k, 'scale');
+  assert.strictEqual(core.scalingPart('x').k, 'scale');
+  assert.deepStrictEqual(core.SCALE_METHODS.map((m) => [m.k, m.icon, !!m.steps, !!m.soon]), [['surf', '🏄', true, false], ['horiz', '🔀', false, true], ['refresh', '🔄', false, true]]);
+  assert.ok(core.SCALE_METHODS[0].d.includes('+20 %'), 'el +20 % sale de NS_TEST.step');
+  assert.strictEqual(core.scaleMethod('refresh').k, 'surf', 'Un método sin pasos no se abre');
+  assert.strictEqual(core.scaleMethod('x').k, 'surf');
+  assert.strictEqual(core.scaleMethod('surf').k, 'surf');
+  const S = core.SURF_STEPS, txt = (a) => JSON.stringify(a);
+  assert.deepStrictEqual(S.map((s) => s.k), ['empieza', 'zonas', 'escalera', 'ventana', 'reglas', 'proteccion', 'practica']);
+  assert.deepStrictEqual(S.map((s) => s.tool), [['start'], ['zones'], ['ladder'], ['window'], ['rules'], ['guard'], ['map', 'sim']]);
+  assert.ok(S.every((s) => s.items.length === 1 && s.items[0].k === 'ok' && s.p.length && s.where));
+  // Paso 1: el día 1 es testeo y el primer escalón es el día 2; las dos fuentes con su etiqueta.
+  assert.deepStrictEqual(S[0].start.timeline.map((t) => t.day.split(' ·')[0]), ['Día 1', 'Corte 40.000', 'Fin del día', 'Día 2']);
+  assert.ok(txt(S[0].start.timeline[3].t).includes('$ 100.000') && txt(S[0].start.timeline[3].t).includes('$ 120.000'));
+  assert.deepStrictEqual(S[0].start.sources.map((s) => s.tag), ['Lab', 'Regla del curso']);
+  assert.ok(txt(S[0].start.sources[1].t).includes('Nunca el día 1'));
+  // Paso 2: tope genérico y uno de costeo (el mismo ejemplo de Testeo).
+  assert.deepStrictEqual(S[1].zones.examples, [15000, 20617]);
+  assert.deepStrictEqual(core.cpaZones(S[1].zones.examples[0]), { escala: 12000, tope: 15000, apaga: 20000 });
+  // Paso 4: la frase del curso y 3 días de ejemplo.
+  assert.ok(txt(S[3].tip).includes('Ayer solo prende la alerta') && txt(S[3].tip).includes('pesa el CPA'));
+  assert.strictEqual(S[3].window.days.length, 3);
+  assert.strictEqual(S[3].window.tope, core.GENERIC_CPA.tope);
+});
+
+caso('Escalado: práctica, cada caso tiene respuesta y la califica scaleVerdict/scaleGuard', () => {
+  const ids = core.SCALE_CASES.map((c) => c.id);
+  assert.strictEqual(new Set(ids).size, ids.length);
+  assert.deepStrictEqual(core.SCALE_ACTIONS.map((a) => [a.k, a.icon]), [['up', '⬆️'], ['hold', '='], ['down', '⬇️'], ['down2', '⏬'], ['off', '🛑']]);
+  assert.strictEqual(core.SCALE_PRACTICE.tope, core.GENERIC_CPA.tope);
+  const respuesta = (c) => (c.kind === 'guard'
+    ? core.scaleGuard({ kind: c.guard, spend: c.spend, sales: c.sales, level: c.level, tope: 15000 })
+    : sv(c.days, c.level)).action;
+  for (const c of core.SCALE_CASES) assert.ok(core.SCALE_ACTIONS.some((a) => a.k === respuesta(c)), c.id + ' tiene respuesta');
+  // El banco usa las cinco decisiones del simulacro.
+  assert.deepStrictEqual([...new Set(core.SCALE_CASES.map(respuesta))].sort(), ['down', 'down2', 'hold', 'off', 'up']);
+  // Orden al azar: con rnd fijo es una permutación de los casos.
+  const orden = core.scalePracticeOrder(() => 0.3);
+  assert.deepStrictEqual([...orden].sort(), [...ids].sort());
+  // Una ronda completa contestando siempre bien: 100 %.
+  let r = core.scalePracticeNew(ids);
+  assert.strictEqual(core.scalePracticeDecide(r, 'up'), r, 'no se decide antes de ver el caso');
+  for (const c of core.SCALE_CASES) {
+    r = core.scalePracticeShow(r);
+    const v = core.scalePracticeView(r);
+    assert.strictEqual(v.name, c.name);
+    assert.strictEqual(v.level, c.level);
+    assert.strictEqual(!!v.days, c.kind === 'day');
+    assert.strictEqual(core.scalePracticeNext(r), r, '"Siguiente" sin decidir no hace nada');
+    r = core.scalePracticeDecide(r, respuesta(c));
+    assert.strictEqual(core.scalePracticeDecide(r, 'off'), r, 'no se decide dos veces');
+    assert.strictEqual(core.scalePracticeView(r).last.ok, true);
+    r = core.scalePracticeNext(r);
+  }
+  assert.strictEqual(core.scalePracticeView(r).over, true);
+  assert.deepStrictEqual(core.scalePracticeView(r).score, { hits: ids.length, total: ids.length, pct: 100 });
+  // Un error: la correcta sale del veredicto; el mejor puntaje solo sube.
+  let e = core.scalePracticeShow(core.scalePracticeNew(['s5']));
+  e = core.scalePracticeDecide(e, 'up');
+  assert.deepStrictEqual(e.last, { chosen: 'up', correct: 'off', ok: false });
+  const ve = core.scalePracticeView(e);
+  assert.deepStrictEqual([ve.last.chosen.t, ve.last.correct.t, ve.verdict.branch, ve.lastCase], ['Subir un escalón', 'Apagar', 'off-hard', true]);
+  assert.strictEqual(core.scalePracticeBest(100, r), 100);
+  assert.strictEqual(core.scalePracticeBest(50, e), 50);
+  assert.strictEqual(core.scalePracticeBest(null, core.scalePracticeNew(ids)), null);
+  assert.strictEqual(core.scalePracticeBest(null, r), 100);
+});
+
+caso('Escalado: ningún número a mano (todo sale de NS_TEST, GENERIC_CPA y cpaZones) y SCALING_SOON desaparece', () => {
+  assert.strictEqual(core.scaleLadder(2)[1], core.NS_TEST.budget * (1 + core.NS_TEST.step));
+  assert.deepStrictEqual(core.cpaZones(core.GENERIC_CPA.tope), { escala: core.GENERIC_CPA.escala, tope: core.GENERIC_CPA.tope, apaga: core.GENERIC_CPA.apaga });
+  assert.strictEqual(core.SCALING_SOON, undefined);
+  assert.strictEqual(core.SCALE_GUARDS[0].amount, core.GENERIC_CPA.escala * core.SCALE_RULES.raiseCpa);
+  assert.strictEqual(core.SCALE_GUARDS[1].amount, core.GENERIC_CPA.escala * core.SCALE_RULES.dawnCpa);
 });
 
 caso('Escalado: testFree (Juega con los números) y barra del simulacro', () => {

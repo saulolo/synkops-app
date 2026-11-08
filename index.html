@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="css/modules/ads.css">
 <link rel="stylesheet" href="css/modules/metrics.css">
 <link rel="stylesheet" href="css/modules/testing.css">
+<link rel="stylesheet" href="css/modules/scaling.css">
 <link rel="stylesheet" href="css/themes.css">
 <link rel="stylesheet" href="css/modules/pnl.css">
 <link rel="stylesheet" href="css/report.css">
@@ -646,12 +647,31 @@
     <div>
       <div class="eyebrow">Después de testear · aprendo a escalar</div>
       <h1>Escalado</h1>
-      <p class="lead">Cuando un conjunto pasa el testeo, se escala. Aquí aprenderé cómo, con la metodología de NovaSociety.</p>
+      <p class="lead">Cuando un conjunto pasa el testeo y vende con ganancia, se escala: se sube su inversión sin perder lo ganado. Aquí aprendo cuándo subir, sostener, bajar o apagar, con distintos métodos.</p>
     </div>
     <span class="tag tv">Criterio NovaSociety</span>
   </div>
 
-  <div class="card mt" id="es-soon"></div>
+  <div class="seg" id="es-parts" role="group" aria-label="Parte del escalado"></div>
+
+  <div id="es-scale">
+    <div class="st-tabs mt es-methods" id="es-methods" role="group" aria-label="Método de escalado"></div>
+
+    <div class="card mt b-flow-card" id="es-surf">
+      <div class="row between">
+        <div><h2 id="es-h"></h2><p class="muted b-sub" id="es-sub"></p></div>
+      </div>
+      <div class="b-prog mt" id="es-prog"></div>
+      <div class="b-flow mt">
+        <ol class="fl" id="es-steps"></ol>
+        <div class="fl-side" id="es-step" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <div class="card mt" id="es-soon" hidden></div>
+  </div>
+
+  <div class="card mt" id="es-real-soon" hidden></div>
 </section>
 
 <!-- ================= MÓDULO 3 ================= -->
@@ -1098,6 +1118,7 @@
 <script src="js/modules/ads/ui/ads.js"></script>
 <script src="js/modules/metrics/ui/metrics.js"></script>
 <script src="js/modules/testing/ui/testing.js"></script>
+<script src="js/modules/scaling/ui/scaling.js"></script>
 <!-- App: estado, casos de uso y arranque (main.js va al final) -->
 <script src="js/app/state.js"></script>
 <script src="js/modules/pnl/app/filters.js"></script>

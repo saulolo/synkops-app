@@ -185,7 +185,7 @@
       p: ['Con ', { b: money(K2) }, ' gastados miro el ', { b: 'CPPI' }, ' (gasto ÷ pagos iniciados) y si ya hay venta. Cambian los límites: con venta se exige un CPPI más bajo.'],
       items: OK(['Sé qué hacer según el CPPI, con y sin ventas, en el corte 2.']) },
     { k: 'corte3', t: 'Corte 3 · ' + copText(K3), where: 'Gasto acumulado ' + copText(K3), cut: 3, example: ex(K3, 12, 3), tool: ['cut', 'tope'],
-      p: ['Con ', { b: money(K3) }, ' gastados miro las ', { b: 'ventas' }, ' y el ', { b: 'CPA' }, ' (gasto ÷ ventas) contra el tope. Si deja gastar el día, pasa a escalado (pestaña Escalado, hoy «Pronto»).'],
+      p: ['Con ', { b: money(K3) }, ' gastados miro las ', { b: 'ventas' }, ' y el ', { b: 'CPA' }, ' (gasto ÷ ventas) contra el tope. Si deja gastar el día, pasa a escalado (pestaña Escalado).'],
       items: OK(['Sé qué hacer según las ventas y el CPA en el corte 3.']),
       tope: { examples: [GENERIC_CPA.tope, 20617] } },
     { k: 'cadena', t: 'Si se apagó: la cadena', where: 'Qué revisar', tool: ['chain'],
