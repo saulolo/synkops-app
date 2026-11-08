@@ -230,13 +230,161 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   assert.strictEqual(text('#v-testeo h1'), 'Testeo');
   assert.ok(text('#v-testeo .lead').includes('primera prueba de un anuncio') && text('#v-testeo .eyebrow').includes('Después de pautar'), 'Encabezado de Testeo');
   assert.strictEqual(PYL.app.state.testing.part, 'test');
-  // 8b. Escalado (SPEC 06): pestaña después de Testeo, una sola tarjeta "Pronto", sin sub-pestañas.
+  // 8b. Escalado (SPEC 07): pestaña después de Testeo, 3 sub-pestañas, métodos y Surfing Scaling en 7 pasos.
   assert.deepStrictEqual(tabs.map((b) => b.dataset.v).slice(4, 7), ['metricas', 'testeo', 'escalado'], 'Escalado va justo después de Testeo');
   assert.strictEqual(text('#v-escalado h1'), 'Escalado');
   assert.ok(text('#v-escalado .eyebrow').includes('Después de testear') && text('#v-escalado .lead').includes('se escala'), 'Encabezado de Escalado');
-  assert.ok(text('#es-soon').includes('Surfing Scaling') && text('#es-soon').includes('Pronto') && text('#es-soon').includes('+20 %'), 'Tarjeta Pronto de Surfing Scaling');
-  assert.strictEqual(document.querySelectorAll('#v-escalado .seg, #v-escalado [data-part]').length, 0, 'Sin sub-pestañas');
-  assert.deepStrictEqual([...document.querySelectorAll('[id^="es-"]')].map((n) => n.id), ['es-soon'], '#es-soon es el único id #es-');
+  const esPartes = [...document.querySelectorAll('#es-parts [data-part]')];
+  assert.strictEqual(document.querySelector('#es-parts').getAttribute('aria-label'), 'Parte del escalado');
+  assert.deepStrictEqual(esPartes.map((b) => b.dataset.part), ['real', 'scale', 'sim'], 'Lectura real, Fase de escalado y Simulador');
+  assert.deepStrictEqual(esPartes.map((b) => b.textContent), ['📂 Lectura real · pronto', '📈 Fase de escalado', '⚠️ Simulador · revisar']);
+  assert.deepStrictEqual(esPartes.map((b) => b.disabled), [true, false, true], 'Solo la Fase de escalado está abierta');
+  assert.ok(esPartes[1].getAttribute('aria-pressed') === 'true' && !document.querySelector('#es-scale').hidden && document.querySelector('#es-real-soon').hidden, 'Abre en Fase de escalado');
+  esPartes[0].click(); esPartes[2].click();
+  assert.strictEqual(PYL.app.state.scaling.part, 'scale', 'Las partes apagadas no se abren');
+  // Métodos: 3 tarjetas; Surfing Scaling abierto; los otros dos "pronto" abren su tarjeta.
+  const metodos = [...document.querySelectorAll('#es-methods .st-tab')];
+  assert.deepStrictEqual(metodos.map((b) => b.querySelector('b').textContent), ['Surfing Scaling', 'Escalado horizontal · pronto', 'Refresco de creativos · pronto']);
+  assert.deepStrictEqual(metodos.map((b) => b.querySelector('.st-ic').textContent), ['🏄', '🔀', '🔄']);
+  assert.ok(text('#es-methods .st-tab small').includes('+20 % por escalón'), 'El +20 % sale de NS_TEST.step');
+  assert.ok(metodos[0].getAttribute('aria-pressed') === 'true' && !document.querySelector('#es-surf').hidden && document.querySelector('#es-soon').hidden, 'Surfing Scaling abierto');
+  assert.deepStrictEqual(metodos.map((b) => b.disabled), [false, true, true], 'Los métodos "pronto" están deshabilitados');
+  metodos[1].click(); metodos[2].click();
+  assert.ok(!document.querySelector('#es-surf').hidden && document.querySelector('#es-soon').hidden && PYL.app.state.scaling.method === 'surf', 'Un método "pronto" no se abre');
+  // Siete pasos con avance.
+  const esPaso = (i) => document.querySelectorAll('#es-steps .fl-node')[i].click();
+  assert.strictEqual(text('#es-h'), 'Surfing Scaling');
+  assert.deepStrictEqual([...document.querySelectorAll('#es-steps .fl-tx b')].map((n) => n.textContent), ['Cuándo empieza', 'Zonas de CPA', 'La escalera', 'La ventana de 3 días', 'Día malo y regla dura', 'Protección durante el día', 'Practica']);
+  assert.ok(text('#es-step').includes('Paso 1 de 7') && text('#es-prog').includes('0 de 7 pasos hechos'), 'Abre en el paso 1 de 7');
+  // Paso 1: línea de tiempo y las dos fuentes.
+  assert.deepStrictEqual([...document.querySelectorAll('#es-step .es-node b')].map((n) => n.textContent), ['Día 1 · testeo', 'Corte 40.000', 'Fin del día', 'Día 2 · primer escalón']);
+  assert.deepStrictEqual([...document.querySelectorAll('#es-step .es-source .tag')].map((n) => n.textContent), ['Lab', 'Regla del curso']);
+  assert.ok(text('#es-step .es-source[data-source="curso"]').includes('Nunca el día 1'), 'La regla del curso dice "nunca el día 1"');
+  document.querySelectorAll('#es-step .es-node')[3].click();
+  assert.ok(text('#es-step .es-line-note').includes('$ 100.000') && text('#es-step .es-line-note').includes('$ 120.000') && document.querySelector('#es-step .es-step.on').dataset.k === 'd2', 'El día 2 sube de 100.000 a 120.000');
+  // Paso 2: zonas con tope editable.
+  esPaso(1);
+  assert.ok(text('#es-step').includes('Paso 2 de 7'), 'Paso 2');
+  assert.deepStrictEqual([...document.querySelectorAll('#es-zones .es-z')].map((n) => n.textContent), ['Sube', 'Sostiene', 'Baja', 'Apaga'], 'Cuatro zonas');
+  assert.ok(text('#es-zones').includes('$ 12.000') && text('#es-zones').includes('$ 15.000') && text('#es-zones').includes('$ 20.000'), 'Zonas del tope genérico');
+  const esTope = document.querySelector('#es-f-tope');
+  esTope.value = '32617'; esTope.dispatchEvent(new window.Event('input', { bubbles: true }));
+  assert.ok(text('#es-zones').includes('$ 26.094') && text('#es-zones').includes('$ 43.489'), 'Las zonas cambian con el tope');
+  document.querySelector('#es-step [data-tope="20617"]').click();
+  assert.ok(esTope.value === '20617' && text('#es-zones').includes('$ 16.494'), 'El botón del costeo pone su tope');
+  esTope.value = '0'; esTope.dispatchEvent(new window.Event('input', { bubbles: true }));
+  assert.ok(text('#es-zones').includes('mayor que 0') && !document.querySelector('#es-zones .es-z'), 'Tope 0 avisa');
+  // Paso 3: escalera de 15 escalones en 3 bloques, clicable.
+  esPaso(2);
+  assert.strictEqual(document.querySelectorAll('#es-step .es-ls').length, 15, 'Quince escalones');
+  assert.deepStrictEqual([...document.querySelectorAll('#es-step .es-lb-h')].map((n) => n.textContent), ['Testeo y confirmación', 'Zona de crecimiento', 'Alto volumen']);
+  assert.deepStrictEqual([...document.querySelectorAll('#es-step .es-lb')].map((b) => b.querySelectorAll('.es-ls').length), [5, 5, 5], 'Cinco por bloque');
+  assert.ok(text('#es-ld').includes('N1 · $ 100.000') && text('#es-ld').includes('Escalón base'), 'Arranca en N1');
+  document.querySelectorAll('#es-step .es-ls')[5].click();
+  assert.ok(text('#es-ld').includes('N6 · $ 249.000') && text('#es-ld').includes('+20 % sobre N5') && text('#es-ld').includes('$ 207.000') && text('#es-ld').includes('Zona de crecimiento'), 'N6 muestra el +20 %');
+  document.querySelectorAll('#es-step .es-ls')[14].click();
+  assert.ok(text('#es-ld').includes('N15 · $ 1.280.000') && text('#es-ld').includes('Alto volumen'), 'N15');
+  assert.strictEqual(document.querySelectorAll('#es-step .es-ls[aria-pressed="true"]').length, 1, 'Un escalón elegido');
+  // Paso 4: ventana de 3 días.
+  esPaso(3);
+  assert.deepStrictEqual([...document.querySelectorAll('#es-step .es-day > b:first-child')].map((n) => n.textContent), ['Hace 3 días', 'Anteayer', 'Ayer']);
+  assert.ok(text('#es-step .es-win').includes('$ 384.000') && text('#es-step .es-win').includes('27 ventas') && text('#es-step .es-win').includes('$ 14.222'), 'CPA de la ventana = gasto total ÷ ventas totales');
+  assert.ok(document.querySelector('#es-step .es-zbar-pin') && text('#es-step').includes('Ayer solo prende la alerta') && text('#es-step').includes('pesa el CPA'), 'CPA sobre la barra y el mensaje');
+  // Paso 5: ramas del MCP, la regla dura marcada.
+  esPaso(4);
+  assert.deepStrictEqual([...document.querySelectorAll('#es-step .es-br')].map((n) => n.dataset.branch), ['off-hard', 'off-single', 'flojo-hold', 'flojo-down', 'zone-up', 'zone-hold', 'zone-down', 'zone-off'], 'Las 8 salidas del día');
+  assert.deepStrictEqual([...document.querySelectorAll('#es-step .es-br')].filter((n) => n.querySelector('.es-dura')).map((n) => n.dataset.branch), ['off-hard', 'off-single'], 'Regla dura marcada');
+  assert.strictEqual(document.querySelectorAll('#es-step .es-src').length, 0, 'Ninguna del curso en este paso');
+  // Paso 6: protecciones del curso.
+  esPaso(5);
+  assert.deepStrictEqual([...document.querySelectorAll('#es-step .es-guard h5')].map((n) => n.textContent), ['Subida sin ventas', 'Amanecer rojo']);
+  assert.ok([...document.querySelectorAll('#es-step .es-guard')].every((g) => g.querySelector('.tag').textContent === 'Regla del curso'), 'Etiqueta Regla del curso');
+  assert.ok(text('#es-step .es-guard[data-guard="raise"]').includes('$ 12.000') && text('#es-step .es-guard[data-guard="dawn"]').includes('$ 36.000'), 'Montos desde escala: 12.000 y 36.000');
+  assert.deepStrictEqual([...document.querySelectorAll('#es-step .es-br')].map((n) => n.dataset.branch), ['raise-down', 'raise-hold', 'dawn-down2', 'dawn-hold']);
+  // Paso 7: mapa completo y lugar del simulacro; el último paso no lleva botón a otra pestaña.
+  esPaso(6);
+  assert.ok(text('#es-step').includes('Paso 7 de 7') && document.querySelectorAll('#es-step .es-br').length === 12 && document.querySelector('#es-step #es-sim'), 'Paso 7: mapa de 12 ramas y simulacro');
+  assert.deepStrictEqual([...document.querySelectorAll('#es-step .fl-detail .row.mt button')].map((b) => b.textContent), ['← Anterior'], 'El último paso solo tiene "← Anterior"');
+  // Simulacro (paso 7): dos modos, práctica por rondas y "Juega con los números".
+  assert.deepStrictEqual([...document.querySelectorAll('#es-modes [data-mode]')].map((b) => b.dataset.mode), ['practice', 'free'], 'Dos modos');
+  assert.strictEqual(document.querySelector('#es-modes [data-mode="practice"]').getAttribute('aria-pressed'), 'true', 'Abre en Práctica');
+  assert.strictEqual(document.querySelectorAll('#es-mode .es-dec').length, 5, 'Cinco decisiones');
+  assert.deepStrictEqual([...document.querySelectorAll('#es-mode .es-dec')].map((b) => b.dataset.action), ['up', 'hold', 'down', 'down2', 'off']);
+  assert.ok(text('#es-mode').includes('Aciertos 0 de 0 decisiones') && text('#es-mode').includes('Escalón actual'), 'Muestra el caso con su escalón');
+  // Una ronda de 3 casos conocidos: s1 (sube), s5 (regla dura) y s9 (protección del curso).
+  const esModo = (k) => document.querySelector('#es-modes [data-mode="' + k + '"]').click();
+  esModo('free');
+  PYL.app.state.scaling.run = PYL.core.scaling.scalePracticeNew(['s1', 's5', 's9']);
+  esModo('practice');
+  assert.ok(text('#es-mode').includes('Caso 1 de 3 · Conjunto 1') && text('#es-mode').includes('N2 · $ 120.000') && document.querySelectorAll('#es-mode .es-day').length === 3, 'Caso 1: escalón y 3 días');
+  assert.ok(!document.querySelector('#es-fb') && !document.querySelector('#es-step .es-on'), 'Antes de decidir no hay veredicto ni rama iluminada');
+  document.querySelector('#es-mode [data-action="hold"]').click();
+  assert.ok(text('#es-fb').includes('❌') && text('#es-fb').includes('Elegiste = Sostener') && text('#es-fb').includes('tocaba ⬆️ Subir un escalón'), 'Fallo: dice cuál era');
+  assert.ok(document.querySelector('#es-mode [data-action="up"]').classList.contains('es-right') && document.querySelector('#es-mode [data-action="hold"]').classList.contains('es-wrong'), 'Marca la correcta y la elegida');
+  assert.ok([...document.querySelectorAll('#es-mode .es-dec')].every((b) => b.disabled), 'No se decide dos veces');
+  assert.strictEqual(document.querySelector('#es-step .es-on').dataset.branch, 'zone-up', 'Se ilumina la rama del caso');
+  assert.ok(text('#es-fb').includes('Así lo califica el Lab') && text('#es-fb').includes('Pasa de N2') && text('#es-fb').includes('a N3 · $ 144.000') && document.querySelector('#es-fb .es-zbar-pin'), 'Veredicto, escalón nuevo y CPA en la barra');
+  assert.ok(text('#es-mode').includes('Aciertos 0 de 1 decisiones'));
+  document.querySelector('#es-next').click();
+  assert.ok(text('#es-mode').includes('Caso 2 de 3 · Conjunto 5') && !document.querySelector('#es-fb') && !document.querySelector('#es-step .es-on'), 'Caso 2 sin veredicto');
+  document.querySelector('#es-mode [data-action="off"]').click();
+  assert.ok(text('#es-fb').includes('✅') && text('#es-fb').includes('REGLA DURA') && text('#es-fb').includes('Se apaga el conjunto') && document.querySelector('#es-step .es-on').dataset.branch === 'off-hard', 'Regla dura');
+  document.querySelector('#es-next').click();
+  assert.ok(text('#es-mode').includes('Conjunto 9') && !document.querySelector('#es-mode .es-day') && text('#es-mode').includes('Acabas de subir'), 'Caso de protección: un momento del día');
+  document.querySelector('#es-mode [data-action="down"]').click();
+  assert.ok(text('#es-fb').includes('✅') && text('#es-fb').includes('regla del curso') && text('#es-fb .tag') === 'Regla del curso' && document.querySelector('#es-step .es-on').dataset.branch === 'raise-down', 'Protección del curso');
+  assert.strictEqual(text('#es-next'), 'Ver el resultado →', 'El último caso lleva al resultado');
+  document.querySelector('#es-next').click();
+  assert.ok(text('#es-end').includes('2 de 3 decisiones acertadas (67 %)') && text('#es-end').includes('Mejor puntaje: 67 %'), 'Fin de ronda');
+  assert.strictEqual(PYL.app.state.scaling.best, 67, 'Se guarda el mejor puntaje');
+  assert.ok(!document.querySelector('#es-step .es-on'), 'Sin rama iluminada al terminar');
+  document.querySelector('#es-again').click();
+  assert.ok(!document.querySelector('#es-end') && document.querySelectorAll('#es-mode .es-dec').length === 5 && text('#es-mode').includes('Aciertos 0 de 0'), 'Otra ronda');
+  // Juega con los números.
+  esModo('free');
+  assert.strictEqual(PYL.app.state.scaling.mode, 'free', 'Se recuerda el modo');
+  assert.ok(!document.querySelector('#es-mode .es-dec') && document.querySelector('#es-free-out'), 'Modo libre');
+  const esPoner = (id, v) => { const x = document.querySelector('#es-f-' + id); x.value = v; x.dispatchEvent(new window.Event(x.tagName === 'SELECT' ? 'change' : 'input', { bubbles: true })); };
+  assert.deepStrictEqual(['level', 'tope', 'd0-spend', 'd0-sales', 'd2-pi'].map((id) => document.querySelector('#es-f-' + id).value), ['0', '15000', '100000', '10', '12'], 'Arranca en N1 con el tope genérico y 3 días');
+  assert.ok(text('#es-zones').includes('$ 12.000') && text('#es-zones').includes('$ 15.000') && text('#es-zones').includes('$ 20.000'), 'Zonas del tope genérico');
+  assert.deepStrictEqual([...document.querySelectorAll('#es-mode [data-cpa]')].map((n) => n.textContent), ['CPA $ 10.000', 'CPA $ 11.111', 'CPA $ 12.500'], 'CPA de cada día');
+  assert.ok(text('#es-free-out').includes('FUE UN DÍA FLOJO') && text('#es-free-out').includes('Escalón nuevoSostener'.slice(0, 13)) && document.querySelector('#es-step .es-on').dataset.branch === 'flojo-hold', 'Día flojo y rama iluminada');
+  assert.ok(text('#es-free-out').includes('CPA de la ventana$ 11.111') && text('#es-free-out').includes('ZonaSube') && document.querySelector('#es-free-out .es-zbar-pin'), 'CPA de la ventana, zona y barra');
+  esPoner('d2-spend', '80000');
+  assert.ok(text('#es-free-out').includes('SUBE') && document.querySelector('#es-step .es-on').dataset.branch === 'zone-up' && text('#es-free-out').includes('Escalón nuevo$ 120.000'), 'Ayer más barato: sube a N2');
+  esPoner('level', '14');
+  assert.ok(text('#es-free-out').includes('Último escalón') && text('#es-free-out').includes('Escalón actual$ 1.280.000') && PYL.app.state.scaling.free.level === 14, 'En N15 subir se sostiene');
+  esPoner('level', '0');
+  esPoner('d0-spend', '300000'); esPoner('d1-spend', '300000');
+  assert.ok(text('#es-free-out').includes('REGLA DURA') === false && document.querySelector('#es-step .es-on'), 'Sin regla dura si ayer es barato');
+  esPoner('d1-spend', '250000'); esPoner('d2-spend', '250000');
+  assert.ok(text('#es-free-out').includes('REGLA DURA: APÁGALO') && text('#es-free-out').includes('Escalón nuevoApagado') && document.querySelector('#es-step .es-on').dataset.branch === 'off-hard', 'Dos días seguidos sobre apaga: se apaga');
+  esPoner('tope', '32617');
+  assert.ok(text('#es-zones').includes('$ 26.094') && text('#es-zones').includes('$ 43.489') && PYL.app.state.scaling.free.tope === 32617, 'Las zonas siguen el tope');
+  esPoner('tope', '15000');
+  esPoner('d2-sales', '50');
+  assert.ok(text('#es-free-out').includes('El día 3 tiene más ventas que pagos iniciados') && !document.querySelector('#es-step .es-on') && !text('#es-free-out').includes('Así lo califica'), 'Más ventas que pagos iniciados: aviso y sin veredicto');
+  assert.ok(text('#es-free-out').includes('CPA de la ventana') && document.querySelector('#es-mode [data-cpa="2"]').textContent.startsWith('CPA'), 'Los CPA se siguen mostrando');
+  esPoner('d2-pi', '60');
+  assert.ok(!text('#es-free-out').includes('más ventas que pagos') && document.querySelector('#es-free-out .es-ex'), 'Al corregirlo vuelve el veredicto');
+  esModo('practice');
+  assert.ok(!document.querySelector('#es-free-out') && PYL.app.state.scaling.mode === 'practice', 'Volver a Práctica');
+  // Avance: una casilla por paso y "Empezar de nuevo".
+  assert.strictEqual(document.querySelectorAll('#es-steps .fl-item.done').length, 0);
+  document.querySelector('#es-step .ld-check').click();
+  assert.strictEqual(document.querySelectorAll('#es-steps .fl-item.done').length, 1, 'Un paso hecho');
+  assert.ok(text('#es-prog').includes('1 de 7 pasos hechos') && document.querySelector('#es-prog .b-bar i').style.width.startsWith('14.2'), 'La barra avanza');
+  assert.deepStrictEqual([...PYL.app.state.scaling.plans.surf.done], ['practica']);
+  assert.ok(document.querySelector('#es-prog button'), 'Con un paso hecho aparece "Empezar de nuevo"');
+  document.querySelector('#es-step .ld-check').click();
+  assert.strictEqual(document.querySelectorAll('#es-steps .fl-item.done').length, 0, 'Desmarcar lo devuelve');
+  assert.ok(!document.querySelector('#es-prog button'), 'Sin pasos hechos no hay "Empezar de nuevo"');
+  esPaso(0);
+  assert.deepStrictEqual(Object.keys(PYL.app.state.scaling).sort(), ['best', 'free', 'method', 'mode', 'part', 'plans', 'run'], 'Estado de Escalado');
+  // Ids #es- únicos y ninguno de Testeo repetido.
+  const esIds = [...document.querySelectorAll('[id^="es-"]')].map((n) => n.id);
+  assert.deepStrictEqual(esIds.filter((id, i) => esIds.indexOf(id) !== i), [], 'Ids #es- repetidos');
+  assert.ok(['es-parts', 'es-scale', 'es-methods', 'es-surf', 'es-h', 'es-sub', 'es-prog', 'es-steps', 'es-step', 'es-soon', 'es-real-soon'].every((id) => esIds.includes(id)), 'Ids de la estructura');
   const ids = [...document.querySelectorAll('[id]')].map((n) => n.id), repetidos = ids.filter((id, i) => ids.indexOf(id) !== i);
   assert.deepStrictEqual(repetidos, [], 'Ids repetidos: ' + repetidos.join(', '));
 
