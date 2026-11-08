@@ -1,9 +1,9 @@
 # SPEC 04 — Métricas base en la pestaña Métricas
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 02, SPEC 03
 > **Fecha:** 2026-11-07
-> **Objetivo:** Agregar a la pestaña Métricas una tarjeta desplegable "Métricas base" (cerrada al cargar) con 5 métricas: Presupuesto, Resultados, Impresiones, Monto gastado y Clics en el enlace, en una tabla glosario: una fila por métrica con ícono, nombre, qué es, la Hard Metric que da (con su fórmula) y la nota de NovaSociety. Cada métrica trae su definición, la fórmula que la une con las Hard Metrics y la nota de NovaSociety. También se agrega al CTR y al CPPI el nombre con que salen en el reporte de Meta, y el CTR de Meta pasa a tratarse como CTR único.
+> **Objetivo:** Agregar a la pestaña Métricas una tarjeta desplegable "Métricas base" (cerrada al cargar) con 5 métricas: Presupuesto, Resultados, Impresiones, Monto gastado y Clics en el enlace, en una tabla glosario: una fila por métrica con nombre, qué es, la Hard Metric que da (con su fórmula) y la nota de NovaSociety. Cada métrica trae su definición, la fórmula que la une con las Hard Metrics y la nota de NovaSociety. También se agrega al CTR y al CPPI el nombre con que salen en el reporte de Meta, y el CTR de Meta pasa a tratarse como CTR único.
 
 ## Por qué existe esta spec
 
@@ -171,7 +171,7 @@ Convenciones:
 
 ### `js/modules/metrics/ui/metrics.js` → `PYL.ui.metrics`
 
-- Nueva `base(node, head, rows, formula)`: pinta en el `<details>` `node` el `<summary>` (cabecera) y la tabla glosario (filas en el orden de `formula`; la que es solo `label`, Pagos iniciados, va en el pie). Los íconos son de la UI (presentación). No cambia el estado ni abre la tarjeta.
+- Nueva `base(node, head, rows, formula)`: pinta en el `<details>` `node` el `<summary>` (cabecera) y la tabla glosario (filas en el orden de `formula`; la que es solo `label`, Pagos iniciados, va en el pie). No cambia el estado ni abre la tarjeta.
 - En el panel de la "i", si la fila trae `report`, se pinta la línea "En el reporte de Meta: «…»" debajo de la frase simple. Si `means` trae `unique`, se pinta debajo de esa línea. Si trae `warn`, se pinta una línea con ⚠ en color de alerta (`.hm-warn`). El aviso del número de Meta del CTR lleva la misma línea.
 
 ### `js/modules/metrics/app/metrics.js`
