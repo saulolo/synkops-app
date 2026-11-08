@@ -22,5 +22,7 @@ function go(v){
 $$("#tabs button").forEach(function(b){ b.addEventListener("click", function(){ go(b.dataset.v); }); });
 $$("[data-go]").forEach(function(b){ b.addEventListener("click", function(){ go(b.dataset.go); }); });
 
-go(store.get("ns_view", "dash"));
+var vista0 = store.get("ns_view", "dash");
+if(!document.getElementById("v-" + vista0)){ vista0 = "dash"; } // una vista que ya no existe (ej. "sim") abre Inicio
+go(vista0);
 })();

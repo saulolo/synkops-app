@@ -1,4 +1,4 @@
-/* Entrenador de métricas (js/modules/trainer): Inicio, Costeo, Simulador, Escalera y Creativos. Se carga después de base.css. */
+/* Entrenador de métricas (js/modules/trainer): Inicio, Costeo, Escalera y Creativos. Se carga después de base.css. */
 /* ---------- Dashboard ---------- */
 .hero{display:grid;grid-template-columns:1.1fr 1fr;gap:10px;align-items:center;padding:30px 34px;overflow:hidden;position:relative}
 .hero h1{font-size:38px}
@@ -138,37 +138,8 @@
 .leg i{width:11px;height:11px;border-radius:4px;flex-shrink:0}
 .leg b{margin-left:auto;font-variant-numeric:tabular-nums}
 
-/* ---------- Simulator ---------- */
-.track{position:relative;height:16px;border-radius:99px;background:var(--bg-2);border:1px solid var(--line);margin:34px 0 30px;overflow:visible}
-.track .fill{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:linear-gradient(90deg,var(--b2),var(--b));width:0;transition:width 1s cubic-bezier(.2,.8,.2,1),background .4s}
-.track .mk{position:absolute;top:-10px;bottom:-10px;width:2px;background:var(--line-2)}
-.track .mk span{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:800;color:var(--muted);white-space:nowrap}
-.track .mk.hit{background:#fff}
-.track .mk.hit span{color:#fff}
-.track .tip{position:absolute;bottom:-28px;transform:translateX(-50%);font-size:11.5px;font-weight:800;color:var(--c-ink);white-space:nowrap;transition:left 1s cubic-bezier(.2,.8,.2,1)}
-.sema{display:flex;flex-direction:column;gap:10px;background:#05070A;border:1px solid var(--line);border-radius:22px;padding:14px;width:74px;align-items:center;box-shadow:inset 0 2px 8px rgba(0,0,0,.6)}
-.sema i{width:42px;height:42px;border-radius:50%;background:#1A2230;transition:background .35s,box-shadow .35s;display:block}
-.sema i.on-r{background:var(--r);box-shadow:0 0 24px var(--r)}
-.sema i.on-y{background:var(--y);box-shadow:0 0 24px var(--y)}
-.sema i.on-g{background:var(--g);box-shadow:0 0 24px var(--g)}
-.verdict{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
-.verdict .body{flex:1;min-width:240px}
-.verdict .big{font-size:27px;font-weight:900;letter-spacing:-.02em;line-height:1.15}
-.verdict ul{margin:10px 0 0;padding-left:18px;color:var(--muted);font-size:14px}
-.verdict li{margin:4px 0}
-.pop{animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
-@keyframes pop{from{transform:scale(.94);opacity:.3}to{transform:none;opacity:1}}
+/* ---------- Atajos de periodo ---------- */
 .presets{display:flex;gap:8px;flex-wrap:wrap}
-.hist{display:flex;flex-direction:column;gap:8px;max-height:330px;overflow:auto}
-.hist-item{display:flex;align-items:center;gap:10px;background:var(--bg-2);border:1px solid var(--line);border-radius:11px;padding:10px 12px;font-size:12.5px;animation:in .3s}
-.hist-item .t{color:var(--soft);font-variant-numeric:tabular-nums}
-.hist-item .d{margin-left:auto}
-.rules-mini{display:grid;gap:10px}
-.rm{display:flex;gap:12px;align-items:flex-start;background:var(--bg-2);border:1px solid var(--line);border-radius:13px;padding:13px}
-.rm .k{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-weight:900;font-size:13px;flex-shrink:0;background:var(--card-2);border:1px solid var(--line-2)}
-.rm.active{border-color:var(--b);box-shadow:0 0 0 3px var(--b-bg)}
-.rm.active .k{background:var(--b);color:var(--on-b);border-color:var(--b)}
-.rm ul{margin:4px 0 0;padding-left:16px;font-size:12.5px;color:var(--muted)}
 
 /* ---------- Ladder ---------- */
 .ladder{display:flex;align-items:flex-end;gap:7px;height:300px;padding:10px 4px 0;overflow-x:auto}

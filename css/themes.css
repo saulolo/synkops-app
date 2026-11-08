@@ -39,10 +39,10 @@
 [data-theme="light"] .nn{background:rgba(15,23,42,.03)}
 [data-theme="light"] tbody tr:hover{background:rgba(15,23,42,.025)}
 [data-theme="light"] .light:not(.g):not(.y):not(.r){background:#D3DAE4}
-[data-theme="light"] .zmark,[data-theme="light"] .track .mk.hit{background:var(--ink)}
+[data-theme="light"] .zmark{background:var(--ink)}
 [data-theme="light"] .zmark{box-shadow:0 0 10px rgba(15,23,42,.35)}
 [data-theme="light"] .zmark span{background:var(--ink);color:#fff}
-[data-theme="light"] .track .mk.hit span,[data-theme="light"] .step[aria-pressed="true"] .amt{color:var(--ink)}
+[data-theme="light"] .step[aria-pressed="true"] .amt{color:var(--ink)}
 [data-theme="light"] .step .bar{border-color:rgba(15,23,42,.08)}
 [data-theme="light"] .step[aria-pressed="true"] .bar{box-shadow:0 0 0 2px var(--ink),0 0 18px rgba(15,23,42,.2)}
 [data-theme="light"] .toast{background:#0F172A;color:#fff;box-shadow:0 12px 40px rgba(15,23,42,.3)}

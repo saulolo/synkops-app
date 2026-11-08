@@ -14,7 +14,8 @@
     "pnl",
     "quick",
     "scaling",
-    "search"
+    "search",
+    "testing"
   ],
   "services": [
     "consolidado",
@@ -37,10 +38,10 @@
     "productsTable",
     "quick",
     "report",
-    "scaling",
     "search",
     "simulator",
     "summary",
+    "testing",
     "tooltip",
     "trend",
     "unitTable",
