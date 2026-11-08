@@ -11,7 +11,7 @@ const caso = (nombre, fn) => casos.push([nombre, fn]);
 
 caso('exporta todas las funciones del núcleo aplanadas', () => {
   const claves = Object.keys(core).sort().join(',');
-  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,LANDING,LEVELS,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,STAGES,STATUS,STEPS,STRATEGIES,TEST_ACTIONS,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_STEPS,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,classify,competition,copText,count,cpaZones,cycles,defaultSlug,evaluate,fill,fmt,fullTitle,funnel,isDropi,isMetrics,key,kpis,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,roundLike,rowCells,scalingPart,score,scoreLevel,scoreParts,short,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
+  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,LANDING,LEVELS,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALING_SOON,SCORE_LEVELS,SCORE_MAX,STAGES,STATUS,STEPS,STRATEGIES,TESTING_PARTS,TEST_ACTIONS,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_STEPS,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,classify,competition,copText,count,cpaZones,cycles,defaultSlug,evaluate,fill,fmt,fullTitle,funnel,isDropi,isMetrics,key,kpis,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,roundLike,rowCells,score,scoreLevel,scoreParts,short,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
 });
 
 caso('Costeo: proveedor 30.000 da precio $99.900 y tope $21.617', () => {
@@ -288,6 +288,29 @@ caso('Escalado: 6 pasos en orden, tarjetas de corte y ramas que testVerdict devu
   assert.ok(txt(core.TEST_CHAIN.reads[2].fix).includes('la página, la oferta o el formulario'));
   assert.ok(txt(core.TEST_CHAIN.note).includes('No apago antes de cruzar un corte'));
   assert.ok(core.TEST_HEAD.h === 'Fase de testeo' && core.TEST_HEAD.sub.includes('20.000, 30.000 y 40.000'));
+});
+
+caso('Testeo: partes en orden, Lectura real deshabilitada con su tarjeta Pronto y frase del paso 4', () => {
+  assert.deepStrictEqual(core.TESTING_PARTS.map((p) => p.k), ['real', 'test', 'sim']);
+  assert.ok(core.TESTING_PARTS[2].t.includes('revisar') && core.TESTING_PARTS[2].disabled, 'Simulador deshabilitado y con aviso de revisar');
+  assert.strictEqual(core.testingPart('sim').k, 'test', 'Una parte deshabilitada cae en test');
+  assert.ok(core.TESTING_PARTS[0].disabled && core.TESTING_PARTS[0].soon && !core.TESTING_PARTS[1].disabled, 'Solo Lectura real está deshabilitada');
+  assert.strictEqual(core.testingPart('surf').k, 'test', 'Un valor viejo cae en test');
+  assert.strictEqual(core.testingPart('real').k, 'test', 'Una parte deshabilitada cae en la primera abierta');
+  assert.strictEqual(core.testingPart('test').k, 'test');
+  const sn = core.TESTING_PARTS[0].soon, txt = (a) => a.map((x) => (typeof x === 'string' ? x : x.b)).join('');
+  assert.strictEqual(sn.items.length, 4);
+  assert.ok(txt(sn.items[1]).includes(core.NS_TEST.cuts.map(core.copText).join(', ').replace(/, ([^,]*)$/, ' y $1')), 'Cortes desde NS_TEST');
+  assert.ok(txt(sn.items[2]).includes(core.TEST_ACTIONS.map((a) => a.t.toLowerCase())[0]), 'Decisiones desde TEST_ACTIONS');
+  const p4 = JSON.stringify(core.TEST_STEPS[3]);
+  assert.ok(p4.includes('pestaña Escalado, hoy «Pronto»') && !p4.includes('Surfing Scaling'), 'Frase del paso 4');
+});
+
+caso('Escalado: SCALING_SOON dice +20 % desde NS_TEST.step', () => {
+  const S = core.SCALING_SOON, txt = (a) => a.map((x) => (typeof x === 'string' ? x : x.b)).join('');
+  assert.strictEqual(S.h, 'Surfing Scaling');
+  assert.strictEqual(S.items.length, 3);
+  assert.ok(txt(S.items[0]).includes('+' + Math.round(core.NS_TEST.step * 100) + ' %'));
 });
 
 caso('Escalado: testFree (Juega con los números) y barra del simulacro', () => {

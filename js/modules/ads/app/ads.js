@@ -51,7 +51,7 @@
     UL.stepList($('#ma-steps'), steps, prog, i, select);
     UL.stepDetail($('#ma-step'), s, i, total, {
       done: P.done, key: L.key, fill: (t) => L.fill(t, { producto: prod().name, precio: prod().price }), st: { done: P.done }, v: view(),
-      tools: U.TOOLS, levels: C.LEVELS, last: { label: 'Leer el testeo en el Simulador →', view: 'sim' },
+      tools: U.TOOLS, levels: C.LEVELS, last: { label: 'Leer el testeo →', view: 'testeo' },
     }, {
       toggle: (k) => { P.done[k] = !P.done[k]; persist(); render(); },
       clearStep: () => { s.items.forEach((it) => { delete P.done[L.key(s, it)]; }); persist(); render(); },

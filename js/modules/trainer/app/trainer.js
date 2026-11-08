@@ -1,4 +1,4 @@
-// Entrenador de métricas: pestañas Inicio, Costeo, Hard Metrics, Simulador, Escalera y Creativos.
+// Entrenador de métricas: pestañas Inicio, Costeo, Hard Metrics, Escalera y Creativos.
 // La navegación entre pestañas está en js/app/nav.js.
 // Fase 1: es el código del prototipo (docs/referencia/novasociety-metricas-v2.html) sin cambios de lógica;
 // solo se renombraron #verdict → #t-verdict y #c-cpa → #c-cpa-esp para no chocar con el tablero.
@@ -50,7 +50,7 @@ function renderPill(){
 }
 function setProduct(p){
   S = p; store.set("ns_prod", S);
-  renderPill(); $("#s-tope").value = Math.round(S.tope); renderLevel(); runPanel(); wiz(0); chain(chainK);
+  renderPill(); renderLevel(); runPanel(); wiz(0); chain(chainK);
 }
 
 /* ===================== Navegación ===================== */
@@ -312,93 +312,6 @@ $("#c-apply").addEventListener("click", function(){
 });
 $("#c-generic").addEventListener("click", function(){ setProduct(GENERIC); toast("Volví al genérico de NovaSociety: 12.000 / 15.000 / 20.000"); });
 
-/* ===================== Módulo 2 · Simulador ===================== */
-var PRESETS = {
-  g2: { g: 26480, pi: 0, v: 0, tope: 20617, n: "Gotas Focus · conj. 2" },
-  g4: { g: 20530, pi: 2, v: 0, tope: 20617, n: "Gotas Focus · conj. 4" },
-  r3: { g: 22670, pi: 9, v: 2, tope: 24667, n: "Recolector · conj. 3" }
-};
-$$("[data-preset]").forEach(function(b){
-  b.addEventListener("click", function(){
-    var p = PRESETS[b.dataset.preset];
-    $("#s-gasto").value = p.g; $("#s-pi").value = p.pi; $("#s-v").value = p.v; $("#s-tope").value = p.tope;
-    updTrack(); evaluate(p.n);
-  });
-});
-function updTrack(){
-  var g = val("s-gasto"), max = 50000, pct = Math.min(100, g / max * 100);
-  $("#trackFill").style.width = pct + "%";
-  $("#trackTip").style.left = Math.max(4, Math.min(96, pct)) + "%";
-  $("#trackTip").textContent = money(g);
-  [20, 30, 40].forEach(function(k){ $("#mk" + k).classList.toggle("hit", g >= k * 1000); });
-  $("#trackFill").style.background = g >= 40000 ? "linear-gradient(90deg,var(--b2),var(--b),var(--v))" : "linear-gradient(90deg,var(--b2),var(--b))";
-}
-["s-gasto"].forEach(function(id){ $("#" + id).addEventListener("input", updTrack); });
-function setLight(c){
-  ["r","y","g"].forEach(function(x){ $("#L-" + x).className = (x === c ? "on-" + x : ""); });
-}
-var hist = store.get("ns_hist", []);
-function renderHist(){
-  if(!hist.length){ $("#hist").innerHTML = '<div class="small">Todavía no evalúo ningún conjunto.</div>'; return; }
-  $("#hist").innerHTML = hist.map(function(h){
-    var cls = h.c === "r" ? "tr" : h.c === "y" ? "ty" : h.c === "g" ? "tg" : "tb";
-    return '<div class="hist-item"><span class="t">' + h.t + '</span><span>' + h.n + ' · ' + money(h.g) + ' · ' + h.pi + ' PI · ' + h.v + ' V</span><span class="d tag ' + cls + '">' + h.short + '</span></div>';
-  }).join("");
-}
-$("#h-clear").addEventListener("click", function(){ hist = []; store.set("ns_hist", hist); renderHist(); });
-
-function evaluate(label){
-  var g = val("s-gasto"), pi = val("s-pi"), v = val("s-v"), tope = val("s-tope");
-  var cppi = pi > 0 ? g / pi : Infinity, cpa = v > 0 ? g / v : Infinity;
-  var c, big, short, corte, items = [], active = null;
-
-  if(g < 20000){
-    corte = "Antes del primer corte";
-    if(v >= 1){ c = "g"; big = "✨ MARAVILLOSO"; short = "Maravilloso"; items.push("Ya hay venta antes de los 20.000. No lo toques: déjalo correr."); }
-    else { c = "b"; big = "⏳ DEJA CORRER"; short = "Deja correr"; items.push("Faltan " + money(20000 - g) + " para el corte de 20K. Con poco gasto los datos todavía no son confiables."); }
-  } else if(g < 30000){
-    corte = "Corte 20K · pagos iniciados"; active = 20;
-    if(v >= 1){ c = "g"; big = "✨ MARAVILLOSO"; short = "Maravilloso"; items.push(v + " venta(s) en el primer corte. Sigue hasta el de 30K."); }
-    else if(pi <= 2){ c = "r"; big = "🛑 APAGAR INMEDIATO"; short = "Apagar"; items.push(pi + " pago(s) iniciado(s) con " + money(g) + ": de 0 a 2 se apaga."); items.push("Revisa la cadena: ¿el CPM estaba por encima del máximo? ¿El CPC caro?"); }
-    else if(pi <= 4){ c = "y"; big = "⚠️ MANTENER DÉBIL"; short = "Débil"; items.push(pi + " pagos iniciados: flojo pero se mantiene. Próximo corte en 30K (faltan " + money(30000 - g) + ")."); }
-    else { c = "g"; big = "✅ BIEN, SIGUE"; short = "Bien"; items.push(pi + " pagos iniciados: buena señal. Próximo corte en 30K."); }
-  } else if(g < 40000){
-    corte = "Corte 30K · CPPI"; active = 30;
-    if(v === 0){
-      if(cppi > 6000){ c = "r"; big = "🛑 APAGAR INMEDIATO"; short = "Apagar"; items.push("CPPI de " + money(cppi) + " sin ventas: por encima de 6.000."); }
-      else if(cppi > 5000){ c = "y"; big = "⚠️ MANTENER DÉBIL"; short = "Débil"; items.push("CPPI de " + money(cppi) + ": bastante flojo (5.000–6.000). Llega a 40K y decide."); }
-      else { c = "g"; big = "✅ SE SOSTIENE"; short = "Sostiene"; items.push("CPPI de " + money(cppi) + ": 5.000 o menos. Sigue hasta 40K; si ahí no hay venta, se apaga."); }
-    } else {
-      if(cppi < 4000){ c = "g"; big = "✅ BUENO"; short = "Bueno"; items.push("CPPI de " + money(cppi) + " con " + v + " venta(s)."); }
-      else if(cppi <= 5000){ c = "y"; big = "⚠️ SE SOSTIENE"; short = "Sostiene"; items.push("CPPI de " + money(cppi) + ": entre 4.000 y 5.000."); }
-      else { c = "y"; big = "⚠️ FLOJO"; short = "Flojo"; items.push("CPPI de " + money(cppi) + ": por encima de 5.000 aunque hay venta."); }
-    }
-  } else {
-    corte = "Corte 40K · decisión del día"; active = 40;
-    if(v === 0){ c = "r"; big = "🛑 APAGAR INMEDIATO"; short = "Apagar"; items.push("40.000 gastados sin ventas: se apaga aunque el CPPI (" + money(cppi) + ") se vea bien."); if(cppi <= 5000){ items.push("CPPI bueno sin ventas: el problema es página, oferta o formulario."); } }
-    else if(v >= 2 && cpa <= tope){ c = "g"; big = "🚀 DEJA GASTAR EL DÍA · A ESCALAR"; short = "Escalar"; items.push(v + " ventas con CPA de " + money(cpa) + ", dentro del tope (" + money(tope) + ")."); items.push("Déjalo gastar el presupuesto completo del día. Ya no es testeo: pasa a la escalera (módulo 3)."); }
-    else if(v >= 2){ c = "y"; big = "⚠️ CPA SOBRE EL TOPE"; short = "Sobre tope"; items.push(v + " ventas, pero CPA de " + money(cpa) + " por encima del tope (" + money(tope) + "). No cumple para dejarlo gastar el día."); }
-    else { c = "y"; big = "⚠️ CASO LÍMITE"; short = "Límite"; items.push("La regla pide 2 o más ventas. Con 1 venta mi CPA es " + money(cpa) + " contra un tope de " + money(tope) + ": compáralos y decide con cuidado."); }
-  }
-
-  var vc = $("#t-verdict"); vc.classList.remove("pop"); void vc.offsetWidth; vc.classList.add("pop");
-  setLight(c === "b" ? null : c);
-  $("#vCorte").textContent = corte;
-  $("#vBig").textContent = big;
-  $("#vBig").style.color = c === "r" ? "var(--r-ink)" : c === "y" ? "var(--y-ink)" : c === "g" ? "var(--g-ink)" : "var(--b-ink)";
-  $("#vList").innerHTML = items.map(function(i){ return "<li>" + i + "</li>"; }).join("");
-  $("#vKpis").innerHTML =
-    '<div class="kpi"><div class="l">CPPI</div><div class="v">' + money(cppi) + '</div><div class="s">Gasto ÷ pagos iniciados</div></div>' +
-    '<div class="kpi"><div class="l">CPA</div><div class="v">' + money(cpa) + '</div><div class="s">Tope ' + money(tope) + '</div></div>' +
-    '<div class="kpi"><div class="l">Siguiente corte</div><div class="v">' + (g < 20000 ? "20K" : g < 30000 ? "30K" : g < 40000 ? "40K" : "—") + '</div><div class="s">' + (g < 40000 ? "Faltan " + money((g < 20000 ? 20000 : g < 30000 ? 30000 : 40000) - g) : "Ya pasó los 3 cortes") + '</div></div>';
-  [20, 30, 40].forEach(function(k){ $("#rm" + k).classList.toggle("active", active === k); });
-
-  var now = new Date();
-  hist.unshift({ t: now.getHours() + ":" + String(now.getMinutes()).padStart(2, "0"), n: label || "Conjunto", g: g, pi: pi, v: v, c: c, short: short });
-  hist = hist.slice(0, 10); store.set("ns_hist", hist); renderHist();
-}
-$("#s-eval").addEventListener("click", function(){ evaluate("Manual"); });
-
 /* ===================== Módulo 3 · Escalera ===================== */
 var selLv = store.get("ns_lv2", 1);
 function short(b){ return b >= 1000000 ? (b / 1000000).toFixed(2).replace(".", ",") + "M" : Math.round(b / 1000) + "K"; }
@@ -588,9 +501,6 @@ function culpa(){
 /* ===================== Init ===================== */
 renderPill();
 costeo();
-$("#s-tope").value = Math.round(S.tope);
-updTrack();
-renderHist();
 buildLadder();
 renderLevel();
 $("#l-nivel").value = 1;

@@ -31,12 +31,20 @@
     save: (s) => { try { localStorage.setItem(ADS_KEY, JSON.stringify(s)); return true; } catch { return false; } },
   };
 
-  // Escalado: sub-pestaña, paso y pasos hechos, modo del simulacro, mejor puntaje y números de "Juega con los números".
-  // La ronda de práctica en curso no se guarda.
-  const SCALING_KEY = 'pyl-scaling';
-  const scaling = {
-    load: () => { try { return JSON.parse(localStorage.getItem(SCALING_KEY) || 'null'); } catch { return null; } },
-    save: (s) => { try { localStorage.setItem(SCALING_KEY, JSON.stringify(s)); return true; } catch { return false; } },
+  // Testeo: sub-pestaña, paso y pasos hechos, modo del simulacro, mejor puntaje y números de "Juega con los números".
+  // La ronda de práctica en curso no se guarda. Migración única: antes la clave era pyl-scaling.
+  const TESTING_KEY = 'pyl-testing', OLD_TESTING_KEY = 'pyl-scaling';
+  const testing = {
+    load: () => {
+      try {
+        if (localStorage.getItem(TESTING_KEY) === null) {
+          const old = localStorage.getItem(OLD_TESTING_KEY);
+          if (old !== null) { localStorage.setItem(TESTING_KEY, old); localStorage.removeItem(OLD_TESTING_KEY); }
+        }
+        return JSON.parse(localStorage.getItem(TESTING_KEY) || 'null');
+      } catch { return null; }
+    },
+    save: (s) => { try { localStorage.setItem(TESTING_KEY, JSON.stringify(s)); return true; } catch { return false; } },
   };
 
   // Buscar producto → guardado rápido: libreta de productos al vuelo (nombre, ID Dropi, foto).
@@ -64,5 +72,5 @@
     return { get: (k) => tx('readonly', (s) => s.get(k)), set: (k, v) => tx('readwrite', (s) => s.put(v, k)) };
   })();
 
-  services.storage = { campaignMap, search, landing, ads, scaling, quick, idb };
+  services.storage = { campaignMap, search, landing, ads, testing, quick, idb };
 })();

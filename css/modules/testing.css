@@ -1,0 +1,89 @@
+/* Testeo (js/modules/testing/): módulo informativo para aprender la metodología. Prefijo .ts-.
+   Solo tokens de color (--b, --card, --line…) para que los 7 temas funcionen. */
+
+/* ---------- Tarjeta "Pronto" ---------- */
+.ts-soon{display:flex;flex-direction:column;align-items:center;text-align:center;max-width:560px;margin:0 auto;padding:18px 0}
+.ts-soon p{margin:6px 0 0}
+.ts-soon-ic{width:64px;height:64px;border-radius:18px;display:grid;place-items:center;font-size:30px;background:var(--card);border:1px dashed var(--line-2);margin-bottom:10px}
+.ts-soon-list{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:8px;text-align:left;color:var(--muted);font-size:14px}
+.ts-soon-list li{padding-left:18px;position:relative}
+.ts-soon-list li::before{content:'';position:absolute;left:0;top:.55em;width:7px;height:7px;border-radius:50%;background:var(--b)}
+
+/* ---------- Barra de gasto acumulado ---------- */
+.ts-tool h4,.ts-tope h4{margin:0 0 8px;font-size:15px}
+.ts-bar{padding:6px 0 38px}
+.ts-bar-track{position:relative;height:12px;border-radius:99px;background:var(--bg-2);border:1px solid var(--line)}
+.ts-bar-fill{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:linear-gradient(90deg,var(--b2),var(--b));transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.ts-bar-mark{position:absolute;top:-4px;bottom:-4px;width:2px;margin-left:-1px;background:var(--ink);border-radius:2px}
+.ts-bar-mark small{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:6px;font-size:12px;font-weight:800;white-space:nowrap;text-align:center}
+.ts-bar-mark small em{display:block;font-style:normal;font-weight:600;font-size:11px;color:var(--soft)}
+.ts-bar-mark.end{background:var(--b)}
+.ts-bar-mark.end small{transform:translateX(-100%);left:100%;text-align:right}
+@media (prefers-reduced-motion:reduce){.ts-bar-fill{transition:none}}
+
+/* ---------- Tarjetas de corte (semáforo) ---------- */
+.ts-cuts{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.ts-cut{background:var(--card);border:1px solid var(--line);border-radius:var(--rad);padding:14px;display:grid;gap:8px;align-content:start}
+.ts-cut-h{margin:0;font-size:16px}
+.ts-cut-look{margin:0;color:var(--muted)}
+.ts-grp{display:grid;gap:6px;padding-top:6px;border-top:1px dashed var(--line-2)}
+.ts-grp-h{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.ts-br{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;padding:8px 10px;border-radius:11px;border:1px solid var(--line);background:var(--card-2);font-size:13.5px;line-height:1.4;transition:background .25s,border-color .25s,box-shadow .25s}
+.ts-br.ts-r{border-left:4px solid var(--r)}
+.ts-br.ts-y{border-left:4px solid var(--y)}
+.ts-br.ts-g{border-left:4px solid var(--g)}
+.ts-cond{font-weight:700}
+.ts-arrow{color:var(--soft)}
+.ts-br.ts-on{box-shadow:0 0 0 2px var(--b);background:var(--b-bg)}
+.ts-own{margin-left:auto}
+
+/* ---------- Mini-ejemplo ---------- */
+.ts-ex{margin-top:12px;padding:12px 14px;border-radius:var(--rad);border:1px solid var(--line);background:var(--card-2)}
+.ts-ex.ts-r{border-left:4px solid var(--r)}.ts-ex.ts-y{border-left:4px solid var(--y)}.ts-ex.ts-g{border-left:4px solid var(--g)}
+.ts-ex-h{display:block;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-size:11px}
+.ts-ex p{margin:6px 0 0}
+.ts-ex-n{font-weight:700}
+
+/* ---------- Caja del tope ---------- */
+.ts-tope-list{margin:8px 0 0;padding-left:18px;display:grid;gap:4px}
+
+/* ---------- Cadena ---------- */
+.ts-flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.ts-flow-n{padding:6px 14px;border-radius:99px;background:var(--b-bg);color:var(--b-ink);font-weight:800}
+.ts-flow-a{color:var(--soft)}
+.ts-ctr{margin:8px 0 0}
+.ts-reads{display:grid;gap:10px;margin-top:12px}
+.ts-read{padding:12px 14px;border:1px solid var(--line);border-radius:var(--rad);background:var(--card-2)}
+.ts-read p{margin:0}
+.ts-read-w{font-weight:700}
+.ts-read-f{margin-top:4px!important;color:var(--muted)}
+
+/* ---------- Simulacro ---------- */
+#ts-modes{flex-wrap:wrap;max-width:100%}
+.ts-free-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:10px}
+.ts-spend input[type=range]{width:100%;accent-color:var(--b);cursor:pointer;min-height:0;padding:0;border:0;background:none}
+.ts-zones{min-height:1.2em}
+.ts-free-bar{margin-top:14px}
+.ts-free-out{margin-top:6px}
+.ts-ex.ts-w{border-left:4px solid var(--line-2)}
+.ts-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:10px}
+.ts-stat{padding:10px 12px;border-radius:12px;background:var(--card-2);border:1px solid var(--line)}
+.ts-stat small{display:block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.ts-stat b{font-size:16px}
+
+/* ---------- Práctica ---------- */
+.ts-pr-head{flex-wrap:wrap;gap:6px 12px;margin-bottom:4px}
+.ts-pr-q{margin:14px 0 8px;font-weight:700}
+.ts-decs{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.ts-dec{justify-content:center;white-space:normal;text-align:center}
+.ts-dec:disabled{opacity:1;cursor:default}
+.ts-dec.ts-right{background:var(--g-bg);border-color:var(--g);color:var(--g-ink)}
+.ts-dec.ts-wrong{background:var(--r-bg);border-color:var(--r);color:var(--r-ink)}
+.ts-fb{margin-top:12px;padding:12px 14px;border-radius:var(--rad);border:1px solid var(--line);background:var(--card-2)}
+.ts-fb.ts-g{border-left:4px solid var(--g)}
+.ts-fb.ts-r{border-left:4px solid var(--r)}
+.ts-fb p{margin:6px 0 0}
+.ts-fb-h{font-size:15px}
+
+/* Sub-pestaña que todavía no se puede abrir (Lectura real): se ve apagada, como TikTok Ads en Desarrollo. */
+#v-testeo .seg button:disabled{cursor:not-allowed;opacity:.5}

@@ -32,7 +32,7 @@ leer el testeo y medir la utilidad real cruzando **Dropi** con **Meta Ads**.
 - [🔎 Buscar producto](#-buscar-producto)
 - [🛍️ Desarrollo de la landing](#️-desarrollo-de-la-landing)
 - [🎓 Entrenador de métricas](#-entrenador-de-métricas)
-- [📈 Escalado](#-escalado)
+- [🧪 Testeo y 📈 Escalado](#-testeo-y--escalado)
 - [🎨 Temas](#-temas)
 - [📂 Los archivos que necesitas](#-los-archivos-que-necesitas)
 - [🧭 Recorrido por el tablero](#-recorrido-por-el-tablero)
@@ -61,8 +61,8 @@ Todo vive en una sola página (`index.html`). Las pestañas de la barra superior
 | 🧮 **Costeo** | Cuánto cobrar, cuánto me queda por pedido entregado y mi CPA máximo. |
 | 🛍️ **Desarrollo** | Montar la landing del producto en Shopify y crear su campaña en Meta Ads, paso a paso. |
 | 📏 **Métricas** | Guía de consulta de las métricas duras (CTR, CPC, CPM, CPPI, CPA) para Meta y TikTok: qué significa cada una, su fórmula, sus rangos, qué falla y cómo se arregla; y un glosario de las métricas base del Administrador de anuncios con las que se calculan. |
-| 📈 **Escalado** | Aprendo la metodología de NovaSociety para el testeo: un paso a paso con los cortes de 20K / 30K / 40K, la cadena que reviso si apago, y un simulacro para practicar. Es para aprender: no lee mis campañas reales. |
-| 🧪 **Simulador** | Protocolo de testeo 20K / 30K / 40K: me dice si apago, sostengo o sigo. |
+| 🧪 **Testeo** | Aprendo el testeo de NovaSociety: un paso a paso con los cortes de 20K / 30K / 40K, la cadena que reviso si apago, y un simulacro para practicar. Es para aprender: no lee mis campañas reales. |
+| 📈 **Escalado** | Pronto: aquí aprenderé a escalar un conjunto que ya pasó el testeo (Surfing Scaling). |
 | 🪜 **Escalera** | Los 15 escalones para escalar (+20% de presupuesto cada uno). |
 | 🎬 **Creativos** | Pipeline y cadencia de creativos, y cuándo el problema es el creativo. |
 | 💸 **Tablero P&L** | La utilidad real contra entrega cruzando Dropi y Meta Ads (lo que explica la mayor parte de este documento). |
@@ -173,10 +173,10 @@ Módulo 5 de NovaSociety: lo que hago a mano para montar el producto en Shopify.
 
 ## 🎓 Entrenador de métricas
 
-Las pestañas Inicio, Costeo, Métricas, Simulador, Escalera y Creativos siguen el método de Juan Herrera:
+Las pestañas Inicio, Costeo, Métricas, Escalera y Creativos siguen el método de Juan Herrera:
 
 - **Costeo:** el precio sale del margen que quiero, redondeado a x4.900 / x9.900 (igual que el MCP de NovaSociety). Calcula el CPA máximo, la zona de escala y la zona de apagar. Con **Poner este precio en mi candidato** el precio vuelve a Buscar producto.
-- **Lectura de métricas:** arriba, una ruta para saltar a cada sección (Métricas duras, Métricas base, Métricas blandas, La cadena que decide todo) y un botón **Simulador →**.
+- **Lectura de métricas:** arriba, una ruta para saltar a cada sección (Métricas duras, Métricas base, Métricas blandas, La cadena que decide todo) y un botón **Testeo →**.
 - **Métricas duras:** un diagrama animado "Las 5 métricas más importantes" (TikTok · ¿Cómo se logra? · Meta) con CTR, CPC, CPM, CPPI y CPA. Es una guía de orientación con números fijos, no usa mis datos.
   - Paso el mouse por un **número** y veo su límite máximo permitido en esa plataforma (y el rango ideal); por **¿Cómo se logra?**, una tabla con el diagnóstico si falla y la palanca de solución.
   - El botón **i** de cada métrica abre una explicación en palabras simples: qué mide, su **fórmula**, una comparación cotidiana y su semáforo de señales. En CTR y CPPI dice además cómo se llaman en el reporte de Meta.
@@ -185,17 +185,18 @@ Las pestañas Inicio, Costeo, Métricas, Simulador, Escalera y Creativos siguen 
   - **Métricas base** (se abre con **Abrir +**): una tabla con Presupuesto, Monto gastado, Impresiones, Clics en el enlace y Resultados: qué es cada una, qué métrica dura da (con su fórmula) y la nota de NovaSociety. Al pie, Pagos iniciados → CPPI («Costo x Checkout»).
   - **Métricas blandas:** reservada para más adelante.
   - Debajo está la tarjeta **La cadena que decide todo** (la misma de Inicio), con las métricas antes y después del clic; al tocar un paso se abre su desplegable.
-- **Simulador:** reglas del testeo en 20K / 30K / 40K, con historial de evaluaciones.
 - **Escalera:** 15 escalones de +20%, decididos con el CPA de los últimos 3 días.
 - **Creativos:** pipeline, meta semanal y diagnóstico de si el problema es el creativo.
 
 ---
 
-## 📈 Escalado
+## 🧪 Testeo y 📈 Escalado
 
-Una pestaña para **aprender** cómo se decide en el testeo. No lee mis campañas ni mis datos: los casos son inventados. Las reglas son las de NovaSociety (las del MCP de NovaSociety), y las frases de cada veredicto son las del Lab.
+**Testeo** es una pestaña para **aprender** cómo se decide en el testeo, la primera prueba de un anuncio. No lee mis campañas ni mis datos: los casos son inventados. Las reglas son las de NovaSociety (las del MCP de NovaSociety), y las frases de cada veredicto son las del Lab.
 
-Tiene dos sub-pestañas: **🧪 Fase de testeo** y **🏄 Surfing Scaling** (hoy solo una tarjeta "Pronto" con lo que vendrá: escalado vertical +20 %, niveles y refresco de campañas).
+Tiene tres sub-pestañas: **📂 Lectura real · pronto** (subir el reporte de mis campañas y que la app diga qué hacer con cada conjunto), **🧪 Fase de testeo** (la única abierta) y **⚠️ Simulador · revisar**. Las dos que dicen "pronto" o "revisar" se ven apagadas y todavía no se pueden abrir.
+
+**Escalado** es la pestaña que sigue a Testeo. Hoy solo anuncia **🏄 Surfing Scaling** (escalado vertical +20 %, niveles de presupuesto y refresco de campañas) con una tarjeta "Pronto".
 
 **Fase de testeo** es un paso a paso, como la guía de Meta Ads: lista de pasos a la izquierda, el detalle a la derecha y una barra de avance. Marco cada paso como hecho y se guarda en este navegador.
 
@@ -441,7 +442,7 @@ Pulsa **📄 Descargar informe PDF** (el botón morado arriba a la derecha, o *I
 ## 🔒 Privacidad
 
 - 🖥️ Todo se procesa **dentro de tu navegador**. Tus reportes no se suben a ningún servidor.
-- 💾 Lo que la app guarda en tu navegador: asignaciones campaña → producto, acceso a tu archivo consolidado, la bitácora de candidatos (con sus fotos), el guardado rápido de productos y los pasos marcados de Buscar producto, Desarrollo y Escalado (con tu mejor puntaje de práctica), lo que escribes en el entrenador y el tema elegido. Si borras los datos del navegador, eso se pierde.
+- 💾 Lo que la app guarda en tu navegador: asignaciones campaña → producto, acceso a tu archivo consolidado, la bitácora de candidatos (con sus fotos), el guardado rápido de productos y los pasos marcados de Buscar producto, Desarrollo y Testeo (con tu mejor puntaje de práctica), lo que escribes en el entrenador y el tema elegido. Si borras los datos del navegador, eso se pierde.
 - 🌐 Solo usa internet para descargar la librería de Excel y las tipografías, y cuando abres un enlace externo (por ejemplo, FastMoss).
 
 ---
@@ -512,13 +513,13 @@ css/
   base.css            Sistema de diseño: tokens, barra superior, tarjetas, botones, campos, tablas,
                       aviso, indicador de desplegable y alias de tokens del tablero
   modules/            Un CSS por módulo, en este orden de carga (la cascada depende de él):
-    trainer.css       Entrenador: Inicio, Costeo, simulador, escalera y pipeline
+    trainer.css       Entrenador: Inicio, Costeo, escalera y pipeline
     search.css        Buscar producto, Mi candidato, bitácora y estadísticas
     quick.css         Guardado rápido
     landing.css       Desarrollo → Shopify
     ads.css           Desarrollo → Meta Ads
     metrics.css       Métricas: ruta, diagrama de métricas duras, avisos, panel "i", botón Expandir y tabla de Métricas base
-    scaling.css       Escalado: barra de gasto, tarjetas de corte, simulacro y práctica
+    testing.css       Testeo: barra de gasto, tarjetas de corte, simulacro y práctica
   themes.css          Selector de tema, modo claro, temas oscuros y SVG con colores fijos
   modules/pnl.css     Solo lo propio del Tablero P&L (acotado a #v-pyl)
   report.css          Informe PDF: documento claro en A4, visible solo al imprimir
@@ -559,10 +560,13 @@ js/
       core/metrics.js Datos de las 5 métricas (números, avisos, diagnóstico, significado, fórmulas, nombre en el reporte) y de Métricas base
       ui/metrics.js   Diagrama, flechas SVG, avisos, panel "i", botón Expandir y tabla de Métricas base
       app/metrics.js  Estado (app.state.hardMetrics), flechas, expandir, Métricas base y ruta
-    scaling/          Escalado (SPEC 05): módulo informativo, no lee campañas reales
-      core/scaling.js Reglas del testeo (`testVerdict`, `cpaZones`), pasos, mapa de cortes, cadena, banco de 8 casos, práctica y "Juega con los números"
-      ui/scaling.js   Sub-pestañas, barra de gasto, tarjetas de corte, tope, cadena, práctica y simulacro
-      app/scaling.js  Estado (app.state.scaling), avance del paso a paso y persistencia (pyl-scaling)
+    testing/          Testeo (SPEC 05 y 06): módulo informativo, no lee campañas reales
+      core/testing.js Reglas del testeo (`testVerdict`, `cpaZones`), partes, pasos, mapa de cortes, cadena, banco de 8 casos, práctica y "Juega con los números"
+      ui/testing.js   Sub-pestañas, tarjeta "Pronto", barra de gasto, tarjetas de corte, tope, cadena, práctica y simulacro
+      app/testing.js  Estado (app.state.testing), avance del paso a paso y persistencia (pyl-testing; migra pyl-scaling)
+    scaling/          Escalado (SPEC 06): solo anuncia Surfing Scaling
+      core/scaling.js Tarjeta "Pronto" de Surfing Scaling (`SCALING_SOON`)
+      app/scaling.js  Pinta la tarjeta con `ui.testing.soon`; sin estado ni guardado
     trainer/
       app/trainer.js  Entrenador de métricas (fase 1: copiado del prototipo)
 
@@ -577,7 +581,7 @@ js/
 
 - **Sin `import`/`export`.** Los navegadores bloquean los ES modules en `file://`. Cada archivo es un IIFE que publica su API en el namespace global `PYL` (`PYL.core.pnl`, `PYL.ui.funnel`, etc.).
 - **El orden importa.** `index.html` carga los scripts en el orden de las capas (`core → services → ui → app`; dentro de cada capa, `shared` y luego los módulos), con `app/nav.js` antes de `main.js`. Los `<link>` de CSS también van en un orden fijo (ver el árbol). Un archivo nuevo va en `modules/<módulo>/<capa>/`, o en `shared/` si lo usan varios módulos, antes de los que lo usan.
-- **Carpeta = módulo, namespace = capa.** `js/modules/search/core/search.js` publica `PYL.core.search`. Un módulo solo usa `shared/` y los módulos que se cargan antes (`search` usa `pnl`; `quick` usa `search`; `ads` usa `landing` y `search`; `metrics` solo usa `shared/`; `scaling` usa `metrics`, `ads` y `landing`; `trainer` usa `search`).
+- **Carpeta = módulo, namespace = capa.** `js/modules/search/core/search.js` publica `PYL.core.search`. Un módulo solo usa `shared/` y los módulos que se cargan antes (`search` usa `pnl`; `quick` usa `search`; `ads` usa `landing` y `search`; `metrics` solo usa `shared/`; `testing` usa `metrics`, `ads` y `landing`; `scaling` usa `metrics` y `testing`; `trainer` usa `search`).
 - **La navegación es de toda la app.** `app/nav.js` abre la vista y dispara `nav:vista`; cada módulo reacciona a ese evento.
 - **Solo la capa `app` modifica el estado.** Los componentes de `ui` reciben datos y callbacks (`onSelect`, `onAssign`).
 - **Los diagnósticos devuelven datos, no HTML.** El texto con formato se representa como segmentos: un string es texto plano, `{ b: '...' }` va en negrita y `{ a: '...', href }` es un enlace que abre en pestaña nueva. `shared/ui/dom.js` (`rich`) los pinta.
