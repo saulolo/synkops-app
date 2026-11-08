@@ -59,7 +59,7 @@ Todo vive en una sola página (`index.html`). Las pestañas de la barra superior
 | 🔎 **Buscar producto** | Encontrar y evaluar un producto antes de gastar: flujograma de DropKiller, mi candidato con score, bitácora y estrategias de búsqueda. Un botón flotante guarda productos al vuelo. |
 | 🧮 **Costeo** | Cuánto cobrar, cuánto me queda por pedido entregado y mi CPA máximo. |
 | 🛍️ **Desarrollo** | Montar la landing del producto en Shopify y crear su campaña en Meta Ads, paso a paso. |
-| 📏 **Métricas** | Guía de consulta de las métricas duras (CTR, CPC, CPM, CPPI, CPA) para Meta y TikTok: qué significa cada una, sus rangos, qué falla y cómo se arregla. |
+| 📏 **Métricas** | Guía de consulta de las métricas duras (CTR, CPC, CPM, CPPI, CPA) para Meta y TikTok: qué significa cada una, su fórmula, sus rangos, qué falla y cómo se arregla; y un glosario de las métricas base del Administrador de anuncios con las que se calculan. |
 | 🧪 **Simulador** | Protocolo de testeo 20K / 30K / 40K: me dice si apago, sostengo o sigo. |
 | 🪜 **Escalera** | Los 15 escalones para escalar (+20% de presupuesto cada uno). |
 | 🎬 **Creativos** | Pipeline y cadencia de creativos, y cuándo el problema es el creativo. |
@@ -174,10 +174,14 @@ Módulo 5 de NovaSociety: lo que hago a mano para montar el producto en Shopify.
 Las pestañas Inicio, Costeo, Métricas, Simulador, Escalera y Creativos siguen el método de Juan Herrera:
 
 - **Costeo:** el precio sale del margen que quiero, redondeado a x4.900 / x9.900 (igual que el MCP de NovaSociety). Calcula el CPA máximo, la zona de escala y la zona de apagar. Con **Poner este precio en mi candidato** el precio vuelve a Buscar producto.
-- **Métricas · Hard Metrics:** un diagrama animado "Las 5 métricas más importantes" (TikTok · ¿Cómo se logra? · Meta) con CTR, CPC, CPM, CPPI y CPA. Es una guía de orientación con números fijos, no usa mis datos.
+- **Lectura de métricas:** arriba, una ruta para saltar a cada sección (Métricas duras, Métricas base, Métricas blandas, La cadena que decide todo) y un botón **Simulador →**.
+- **Métricas duras:** un diagrama animado "Las 5 métricas más importantes" (TikTok · ¿Cómo se logra? · Meta) con CTR, CPC, CPM, CPPI y CPA. Es una guía de orientación con números fijos, no usa mis datos.
   - Paso el mouse por un **número** y veo su límite máximo permitido en esa plataforma (y el rango ideal); por **¿Cómo se logra?**, una tabla con el diagnóstico si falla y la palanca de solución.
-  - El botón **i** de cada métrica abre una explicación en palabras simples: qué mide, una comparación cotidiana y su semáforo de señales.
+  - El botón **i** de cada métrica abre una explicación en palabras simples: qué mide, su **fórmula**, una comparación cotidiana y su semáforo de señales. En CTR y CPPI dice además cómo se llaman en el reporte de Meta.
+  - En Meta el CTR es el **CTR único** (cuenta personas, no impresiones). Se mantiene el límite de 2 %, con un aviso ⚠ de que falta confirmar el límite propio del CTR único.
   - Con **Expandir** (o un clic en un espacio vacío de la tarjeta) el diagrama se ensancha para ver mejor las flechas.
+  - **Métricas base** (se abre con **Abrir +**): una tabla con Presupuesto, Monto gastado, Impresiones, Clics en el enlace y Resultados: qué es cada una, qué métrica dura da (con su fórmula) y la nota de NovaSociety. Al pie, Pagos iniciados → CPPI («Costo x Checkout»).
+  - **Métricas blandas:** reservada para más adelante.
   - Debajo está la tarjeta **La cadena que decide todo** (la misma de Inicio), con las métricas antes y después del clic; al tocar un paso se abre su desplegable.
 - **Simulador:** reglas del testeo en 20K / 30K / 40K, con historial de evaluaciones.
 - **Escalera:** 15 escalones de +20%, decididos con el CPA de los últimos 3 días.
@@ -492,7 +496,7 @@ css/
     quick.css         Guardado rápido
     landing.css       Desarrollo → Shopify
     ads.css           Desarrollo → Meta Ads
-    metrics.css       Métricas: diagrama Hard Metrics, avisos, panel "i" y botón Expandir
+    metrics.css       Métricas: ruta, diagrama de métricas duras, avisos, panel "i", botón Expandir y tabla de Métricas base
   themes.css          Selector de tema, modo claro, temas oscuros y SVG con colores fijos
   modules/pnl.css     Solo lo propio del Tablero P&L (acotado a #v-pyl)
   report.css          Informe PDF: documento claro en A4, visible solo al imprimir
@@ -529,10 +533,10 @@ js/
       app/quick.js    Estado (app.state.quick) y envío a Mi candidato (evento rapido:candidato)
     landing/          Desarrollo → Shopify (core: pasos, prompts y números LANDING · ui · app)
     ads/              Desarrollo → Meta Ads (core: AD_STRATEGIES, ABO_STEPS y ADS · ui: mapa y herramientas · app)
-    metrics/          Métricas → Hard Metrics (SPEC 03)
-      core/metrics.js Datos de las 5 métricas: números del diagrama, avisos de límite, diagnóstico, solución y significado
-      ui/metrics.js   Diagrama, flechas SVG, avisos, panel "i" y botón Expandir
-      app/metrics.js  Estado (app.state.hardMetrics), dibujo de flechas y expandir
+    metrics/          Métricas → métricas duras (SPEC 03) y Métricas base (SPEC 04)
+      core/metrics.js Datos de las 5 métricas (números, avisos, diagnóstico, significado, fórmulas, nombre en el reporte) y de Métricas base
+      ui/metrics.js   Diagrama, flechas SVG, avisos, panel "i", botón Expandir y tabla de Métricas base
+      app/metrics.js  Estado (app.state.hardMetrics), flechas, expandir, Métricas base y ruta
     trainer/
       app/trainer.js  Entrenador de métricas (fase 1: copiado del prototipo)
 

@@ -206,6 +206,91 @@
 .hm-colhead.c b{padding:9px 20px;font-size:15px;border-radius:999px;color:var(--on-b);background:linear-gradient(135deg,var(--b),var(--b2));box-shadow:0 10px 24px -10px var(--b)}
 .hm-cap-r{font-size:14px;color:var(--ink)}
 
+/* ---------- Métricas base: <details> cerrado al cargar; por dentro, una tabla glosario (sin tarjetas internas) ----------
+   Métrica · Qué es · Da · NovaSociety; en celular cada fila se apila con sus rótulos.
+   El botón "Abrir + / Cerrar –" copia el aspecto de .b-sec de search.css (metrics no usa search); deuda: llevarlo a base.css. */
+.hm-base{padding:22px 24px}
+.hm-base > summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.hm-base > summary::-webkit-details-marker{display:none}
+.hm-base > summary h2{margin-bottom:2px}
+.hm-base > summary .hm-base-sub{display:block;margin:0;font-size:14.5px}
+.hm-base > summary::after{content:"Abrir  +";flex-shrink:0;white-space:pre;padding:11px 20px;border-radius:999px;background:linear-gradient(135deg,var(--b),var(--b2));color:var(--on-b);font-weight:900;font-size:14.5px;letter-spacing:.02em;box-shadow:0 8px 22px rgba(var(--b-rgb),.4);animation:hm-pulse 2.2s ease-in-out infinite;transition:transform .2s,filter .2s}
+.hm-base > summary:hover::after{transform:translateY(-1px) scale(1.04);filter:brightness(1.12)}
+.hm-base[open] > summary::after{content:"Cerrar  –";animation:none;background:var(--bg-2);color:var(--b-ink);box-shadow:inset 0 0 0 1px rgba(var(--b-rgb),.5)}
+.hm-base > summary:focus-visible{outline:2px solid var(--b);outline-offset:4px;border-radius:10px}
+.hm-base:not([open]){border-color:rgba(var(--b-rgb),.4)}
+@keyframes hm-pulse{0%,100%{box-shadow:0 8px 22px rgba(var(--b-rgb),.4),0 0 0 0 rgba(var(--b-rgb),.45)}50%{box-shadow:0 8px 22px rgba(var(--b-rgb),.4),0 0 0 9px rgba(var(--b-rgb),0)}}
+
+.hm-base-body{margin-top:20px;padding-top:26px;border-top:1px solid var(--line);animation:hm-base-in .35s ease-out}
+@keyframes hm-base-in{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+/* Tabla glosario: sin bordes pesados, solo líneas finas entre filas. */
+.hm-base-table{width:100%;border-collapse:collapse;table-layout:fixed}
+.hm-base-table th{padding:0 14px 12px;text-align:left;font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.hm-base-table th:nth-child(1){width:22%}
+.hm-base-table th:nth-child(2){width:28%}
+.hm-base-table th:nth-child(3){width:27%}
+.hm-base-table td{padding:16px 14px;vertical-align:top;border-top:1px solid var(--line);font-size:13.5px;line-height:1.5}
+.hm-base-row{transition:background .2s}
+.hm-base-row:hover{background:rgba(var(--b-rgb),.05)}
+.hm-base-name b{display:block;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+.hm-base-csv{display:block;margin-top:2px;font-size:11.5px;color:var(--muted);opacity:.85}
+.hm-base-table td.hm-base-def{color:var(--muted)}
+.hm-base-gives{display:inline-flex;align-items:center;gap:8px}
+.hm-base-gives.is-text{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--b-ink)}
+.hm-base-chip{display:inline-block;padding:4px 14px;border-radius:999px;background:linear-gradient(135deg,var(--b),var(--b2));color:var(--on-b);font-weight:900;font-size:13px;letter-spacing:.04em}
+.hm-base-factor{font-size:12px;font-weight:600;color:var(--muted)}
+.hm-base-use{margin:6px 0 0;font-size:12px;line-height:1.45;color:var(--muted)}
+.hm-base-use b{color:var(--ink)}
+.hm-base-table td.hm-base-ns{color:var(--ink);font-size:13px}
+.hm-base-ns b{color:var(--b-ink)}
+
+/* Pie: Pagos iniciados → CPPI. */
+.hm-base-foot{margin-top:4px;padding:14px;border-top:1px solid var(--line)}
+.hm-base-footrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}
+.hm-base-footname{font-size:14px;color:var(--ink)}
+.hm-base-arrow{color:var(--b-ink);font-weight:900}
+.hm-base-footrow .hm-base-use{margin:0;flex-basis:100%}
+
+@media (max-width:760px){
+  .hm-base-table,.hm-base-table tbody,.hm-base-table tr,.hm-base-table td{display:block;width:100%}
+  .hm-base-table thead{display:none}
+  .hm-base-table tr{padding:14px 0;border-top:1px solid var(--line)}
+  .hm-base-table td{padding:4px 2px;border:0}
+  .hm-base-table td.hm-base-m{display:block;margin-bottom:6px}
+  .hm-base-table td:not(.hm-base-m)::before{content:attr(data-label);display:block;font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+  .hm-base-foot{padding:14px 2px}
+}
+@media (max-width:560px){
+  .hm-base{padding:18px 14px}
+  .hm-base > summary{flex-wrap:wrap}
+}
+@media (prefers-reduced-motion:reduce){.hm-base > summary::after,.hm-base-body{animation:none}}
+
+/* ---------- Ruta de la pestaña (.hm-route): mismo aspecto que .b-route de search.css (metrics no usa search; deuda: llevarla a base.css) ---------- */
+.hm-route{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.hm-route a,.hm-route button{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:9px;padding:9px 14px 9px 9px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:13px;font-weight:700;color:var(--muted);transition:border-color .2s,color .2s,transform .2s}
+.hm-route a:hover,.hm-route button:hover{color:var(--ink);border-color:var(--b);transform:translateY(-1px)}
+.hm-route a:focus-visible,.hm-route button:focus-visible{outline:2px solid var(--b)}
+.hm-route span{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--b-bg);color:var(--b-ink);font-size:12px;font-weight:900}
+.hm-route button{background:var(--b-bg);border-color:rgba(var(--b-rgb),.4);color:var(--b-ink)}
+#v-metricas #hm-map,#v-metricas #hm-base,#v-metricas #hm-soft,#v-metricas #hm-cadena{scroll-margin-top:90px}
+@media (prefers-reduced-motion:reduce){.hm-route a,.hm-route button{transition:none}}
+
+/* Fórmula en el panel de la "i". */
+.hm-pop-formula{margin:0 18px 12px;padding:10px 12px;border-radius:12px;background:var(--mbg);box-shadow:inset 0 0 0 1px var(--line)}
+.hm-pop-formula p{margin:0;font-size:13px;line-height:1.45;color:var(--ink);font-variant-numeric:tabular-nums}
+.hm-pop-formula p+p{margin-top:4px}
+.hm-pop-formula b{color:var(--mc)}
+.hm-pop-flbl{display:block;margin-bottom:4px;font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+/* ---------- Nombre del reporte, CTR único y advertencia de límite sin confirmar ---------- */
+.hm-pop-report{margin:0 18px 8px;font-size:12.5px;line-height:1.4;color:var(--muted)}
+.hm-pop-report b{color:var(--mc);font-weight:700}
+.hm-pop-unique{margin:0 18px 10px;font-size:12.5px;line-height:1.45;color:var(--muted)}
+.hm-warn{margin:0;padding:8px 11px;border-radius:10px;background:var(--y-bg);color:var(--y-ink);box-shadow:inset 0 0 0 1px rgba(234,179,8,.35);font-size:12px;line-height:1.45}
+.hm-pop>.hm-warn{margin:0 18px 12px}
+#tip.hm-tip p.hm-warn{margin:10px 0 0;color:var(--y-ink)}
+
 /* ---------- Expandir el diagrama (solo esta tarjeta) ---------- */
 .hm-intro{position:relative}
 .hm-expand{position:absolute;top:0;right:4px;display:inline-flex;align-items:center;gap:9px;padding:10px 18px 10px 14px;border-radius:12px;border:0;background:linear-gradient(135deg,var(--b),var(--b3));color:var(--on-b);font:inherit;font-size:13.5px;font-weight:700;cursor:pointer;box-shadow:0 8px 22px -8px rgba(var(--b-rgb),.75),inset 0 1px 0 rgba(255,255,255,.18);transition:filter .15s,transform .15s,box-shadow .15s}
@@ -231,7 +316,7 @@
 }
 @media (min-width:1600px){.hm-map.hm-wide{--eg:76px}}
 
-/* ---------- Soft Metrics: apartado reservado (pronto), en sombra ---------- */
+/* ---------- Métricas blandas (#hm-soft): apartado reservado (pronto), en sombra ---------- */
 .hm-soon{border-style:dashed;border-color:var(--line-2);opacity:.5;filter:grayscale(.55);-webkit-mask-image:linear-gradient(180deg,#000 35%,rgba(0,0,0,.35) 100%);mask-image:linear-gradient(180deg,#000 35%,rgba(0,0,0,.35) 100%);transition:opacity .25s,filter .25s}
 .hm-soon:hover{opacity:.8;filter:none}
 .hm-soon>.row{padding-bottom:16px;border-bottom:1px solid var(--line)}

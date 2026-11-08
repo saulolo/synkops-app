@@ -77,7 +77,19 @@
       r.append(el('span', 'hm-pop-dot'), txt);
       sigs.append(r);
     });
-    box.append(head, simple, analogy, sigs);
+    box.append(head, simple);
+    // Cómo se calcula (una línea por plataforma cuando difieren, como el CTR).
+    if (m.formula) {
+      const f = el('div', 'hm-pop-formula');
+      f.append(el('span', 'hm-pop-flbl', 'Fórmula'));
+      m.formula.forEach((line) => { const p = el('p'); rich(p, line); f.append(p); });
+      box.append(f);
+    }
+    // Nombre con que sale la métrica en el reporte de Meta y, si lo trae, cómo la cuenta cada plataforma.
+    if (row.report) { const r = el('p', 'hm-pop-report', 'En el reporte de Meta: '); r.append(el('b', null, '«' + row.report + '»')); box.append(r); }
+    if (m.unique) box.append(el('p', 'hm-pop-unique', m.unique));
+    box.append(analogy, sigs);
+    if (m.warn) box.append(el('p', 'hm-warn', '⚠ ' + m.warn));
     if (m.note) { const n = el('div', 'hm-pop-note'); n.append(el('b', null, 'Ojo · '), m.note); box.append(n); }
     return box;
   }
@@ -118,7 +130,7 @@
     const j = row.view[plat.id];
     const v = el('div', 'hm-val');
     const big = el('b', 'hm-main z-g', j.main);
-    if (j.tip) tooltip.attach(big, j.tip.h, j.tip); // aviso al pasar el mouse por el número (CTR: "No se mira")
+    if (j.tip) tooltip.attach(big, j.tip.h, j.tip); // aviso al pasar el mouse por el número (CTR: "No se mira" y, en Meta, la advertencia)
     v.append(el('span', 'hm-plat-tag', plat.name), big);
     if (j.ref) v.append(el('small', 'hm-ref', j.ref));
     return v;
@@ -160,7 +172,7 @@
     const brace = el('div', 'hm-brace'); brace.setAttribute('aria-hidden', 'true');
     // Cabecera del apartado: va dentro del contenedor porque habrá otro parecido para las métricas blandas.
     const intro = el('div', 'hm-intro');
-    intro.append(el('h2', null, 'Hard Metrics'), el('p', 'muted', 'Toca una métrica para ver cómo se lee, sus rangos, qué falla y cómo se arregla.'));
+    intro.append(el('h2', null, 'Métricas duras'), el('p', 'muted', 'Toca una métrica para ver cómo se lee, sus rangos, qué falla y cómo se arregla.'));
     // Botón para expandir el diagrama (también se expande con un clic en un espacio vacío de la tarjeta).
     const tg = el('button', 'hm-expand'); tg.type = 'button';
     tg.append(el('span', 'hm-expand-ico', '⤢'), el('span', 'hm-expand-txt', 'Expandir'));
@@ -368,7 +380,75 @@
     return true;
   }
 
+  /* ---------- Métricas base ---------- */
+  // Tarjeta desplegable (<details>, la abre el usuario) con los números crudos del Administrador de anuncios en una
+  // tabla glosario: Métrica · Qué es · Da · NovaSociety. Dentro no hay avisos, "i" ni clics.
+  //   head    = { title, sub }                                       (BASE_HEAD)
+  //   rows    = métricas { k, name, csv?, def, uses, ns }             (BASE_METRICS)
+  //   formula = { cap, num, divs: [{ k | label, hm, factor?, uses? }] } (BASE_FORMULA): orden de las filas;
+  //             un divisor que es solo label (Pagos iniciados) va en el pie de la tabla
+  const BASE_COLS = ['Métrica', 'Qué es', 'Da', 'NovaSociety'];
+  function base(node, head, rows, formula) {
+    node.textContent = '';
+    const byK = (k) => rows.find((m) => m.k === k);
+    const hmName = (k) => HARD_METRICS.find((r) => r.k === k).name;
+    const segs = (cls, s) => { const p = el('p', cls); rich(p, s); return p; };
+    const chip = (k, factor) => {
+      const c = el('span', 'hm-base-gives');
+      c.append(el('b', 'hm-base-chip', hmName(k)));
+      if (factor) c.append(el('span', 'hm-base-factor', factor));
+      return c;
+    };
+    const td = (cls, label) => { const c = el('td', cls); c.dataset.label = label; return c; };
+
+    const sum = el('summary'), hd = el('div');
+    hd.append(el('h2', null, head.title), el('p', 'muted hm-base-sub', head.sub));
+    sum.append(hd);
+
+    const table = el('table', 'hm-base-table');
+    const thead = el('thead'), hr = el('tr');
+    BASE_COLS.forEach((h) => hr.append(el('th', null, h)));
+    thead.append(hr);
+    const tbody = el('tbody');
+
+    // Filas: lo que se gasta (tope y numerador) y luego las métricas que dan Hard Metric, en el orden de la cadena.
+    const order = [{ k: formula.cap, gives: 'Tope diario' }, { k: formula.num, gives: 'Numerador' }]
+      .concat(formula.divs.filter((d) => d.k));
+    order.forEach((d) => {
+      const m = byK(d.k);
+      const tr = el('tr', 'hm-base-row m-' + m.k); tr.dataset.k = m.k;
+      const c1 = td('hm-base-m', BASE_COLS[0]);
+      const name = el('div', 'hm-base-name');
+      name.append(el('b', null, m.name));
+      if (m.csv) name.append(el('small', 'hm-base-csv', '«' + m.csv + '»'));
+      c1.append(name);
+      const c2 = td('hm-base-def', BASE_COLS[1]); c2.textContent = m.def;
+      const c3 = td('hm-base-da', BASE_COLS[2]);
+      c3.append(d.hm ? chip(d.hm, d.factor) : el('span', 'hm-base-gives is-text', d.gives));
+      m.uses.forEach((u) => c3.append(segs('hm-base-use', u)));
+      const c4 = td('hm-base-ns', BASE_COLS[3]); rich(c4, m.ns);
+      tr.append(c1, c2, c3, c4);
+      tbody.append(tr);
+    });
+    table.append(thead, tbody);
+
+    // Pie: las métricas que no tienen fila propia (Pagos iniciados → CPPI).
+    const foot = el('div', 'hm-base-foot');
+    formula.divs.filter((d) => !d.k).forEach((d) => {
+      const line = el('div', 'hm-base-footrow');
+      const arrow = el('span', 'hm-base-arrow', '→'); arrow.setAttribute('aria-hidden', 'true');
+      line.append(el('b', 'hm-base-footname', d.label), arrow, chip(d.hm));
+      d.uses.forEach((u) => line.append(segs('hm-base-use', u)));
+      foot.append(line);
+    });
+
+    const body = el('div', 'hm-base-body');
+    body.append(table, foot);
+    node.append(sum, body);
+  }
+
   (PYL.ui.metrics ??= {}).map = map;
+  PYL.ui.metrics.base = base;
   PYL.ui.metrics.mark = mark;
   PYL.ui.metrics.expand = expand;
   PYL.ui.metrics.drawArrows = drawArrows;

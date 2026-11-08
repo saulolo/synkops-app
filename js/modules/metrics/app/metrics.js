@@ -5,6 +5,7 @@
 //   click en la tarjeta  alterna expandido / contraído (solo cambia el ancho y la separación; no cambia datos)
 //   nav:vista        { v }                                    al abrir Hard Metrics dibuja las flechas; la primera vez, animadas
 //   resize                                                    vuelve a medir y dibujar las flechas
+//   click en la ruta (.hm-route)                              abre Métricas base si estaba cerrada
 (() => {
   const PYL = globalThis.PYL;
   const { $ } = PYL.ui.dom;
@@ -52,6 +53,8 @@
 
   function render() {
     const { map } = nodes();
+    const baseNode = $('#hm-base');
+    if (baseNode) U.base(baseNode, C.BASE_HEAD, C.BASE_METRICS, C.BASE_FORMULA); // una vez al cargar: no tiene estado (el <details> lo abre y cierra el navegador)
     if (map) {
       U.map(map, C.HARD_METRICS, { pick, toggle: () => setExpanded(!S.expanded) });
       U.expand(map, S.expanded);
@@ -71,6 +74,12 @@
   document.fonts?.ready.then(() => requestAnimationFrame(drawArrows));
 
   render();
+
+  // Ruta de la pestaña (.hm-route): si el destino es un desplegable cerrado (Métricas base), se abre al ir a él.
+  document.querySelectorAll('.hm-route a[href^="#"]').forEach((a) => a.addEventListener('click', () => {
+    const t = $(a.getAttribute('href'));
+    if (t && t.tagName === 'DETAILS') t.open = true;
+  }));
 
   // Un clic en un espacio vacío de la tarjeta también expande o contrae (los botones, avisos y la "i" siguen con lo suyo).
   const mapNode = nodes().map;
