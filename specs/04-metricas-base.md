@@ -212,60 +212,60 @@ Convenciones:
 
 **Tarjeta**
 
-- [ ] En `#v-metricas` el orden es `#hm-map` → `#hm-base` → `#hm-soft` → "La cadena que decide todo".
-- [ ] La tarjeta tiene el título "Métricas base" con barrita de acento y su subtítulo.
-- [ ] Al cargar la página la tarjeta está cerrada y muestra el botón "Abrir +"; al abrirla dice "Cerrar –". Al recargar vuelve cerrada.
-- [ ] Por dentro no hay tarjetas internas: una tabla glosario con las columnas Métrica, Qué es, Da y NovaSociety, y 5 filas en orden (Presupuesto, Monto gastado, Impresiones, Clics en el enlace, Resultados), sin íconos. Impresiones, Clics en el enlace y Resultados muestran su chip CPM, CPC y CPA. El pie dice Pagos iniciados → CPPI con «Costo x Checkout». No hay Alcance.
-- [ ] Los nombres son los cortos: "Presupuesto" y "Monto gastado", con «Presupuesto del conjunto de anuncios» y «Monto gastado (COP)» en letra pequeña debajo. Resultados, Impresiones y Clics en el enlace no llevan nombre largo.
-- [ ] Cada métrica muestra su nombre y su definición (Pagos iniciados va solo en el pie).
-- [ ] Resultados muestra "CPA = Monto gastado ÷ Resultados" y el nombre "Costo por resultados".
-- [ ] Impresiones muestra la fórmula del CPM y no la del CTR.
-- [ ] Monto gastado nombra CPM, CPC, CPPI y CPA, y muestra "CPPI = Monto gastado ÷ Pagos iniciados" con el nombre "Costo x Checkout".
-- [ ] Clics en el enlace muestra la fórmula del CPC. Explica que el "CTR único (porcentaje de clics en el enlace)" se calcula por personas y no con impresiones.
-- [ ] Las 5 métricas muestran la nota "NovaSociety".
-- [ ] Las notas dicen:
+- [x] En `#v-metricas` el orden es `#hm-map` → `#hm-base` → `#hm-soft` → "La cadena que decide todo".
+- [x] La tarjeta tiene el título "Métricas base" con barrita de acento y su subtítulo.
+- [x] Al cargar la página la tarjeta está cerrada y muestra el botón "Abrir +"; al abrirla dice "Cerrar –". Al recargar vuelve cerrada.
+- [x] Por dentro no hay tarjetas internas: una tabla glosario con las columnas Métrica, Qué es, Da y NovaSociety, y 5 filas en orden (Presupuesto, Monto gastado, Impresiones, Clics en el enlace, Resultados), sin íconos. Impresiones, Clics en el enlace y Resultados muestran su chip CPM, CPC y CPA. El pie dice Pagos iniciados → CPPI con «Costo x Checkout». No hay Alcance.
+- [x] Los nombres son los cortos: "Presupuesto" y "Monto gastado", con «Presupuesto del conjunto de anuncios» y «Monto gastado (COP)» en letra pequeña debajo. Resultados, Impresiones y Clics en el enlace no llevan nombre largo.
+- [x] Cada métrica muestra su nombre y su definición (Pagos iniciados va solo en el pie).
+- [x] Resultados muestra "CPA = Monto gastado ÷ Resultados" y el nombre "Costo por resultados".
+- [x] Impresiones muestra la fórmula del CPM y no la del CTR.
+- [x] Monto gastado nombra CPM, CPC, CPPI y CPA, y muestra "CPPI = Monto gastado ÷ Pagos iniciados" con el nombre "Costo x Checkout".
+- [x] Clics en el enlace muestra la fórmula del CPC. Explica que el "CTR único (porcentaje de clics en el enlace)" se calcula por personas y no con impresiones.
+- [x] Las 5 métricas muestran la nota "NovaSociety".
+- [x] Las notas dicen:
   - 100.000 al día y +20 % por escalón.
   - 12.000 / 15.000 / 20.000.
   - TikTok 6.000 y Meta 20.000.
   - 20.000 / 30.000 / 40.000.
   - "el producto no interesa".
-- [ ] Dentro de la tarjeta no hay aviso al pasar el mouse, botón "i" ni comportamiento al hacer clic: solo se abre y se cierra la tarjeta.
+- [x] Dentro de la tarjeta no hay aviso al pasar el mouse, botón "i" ni comportamiento al hacer clic: solo se abre y se cierra la tarjeta.
 
 **Hard Metrics**
 
-- [ ] El panel de la "i" del CTR dice "En el reporte de Meta: «CTR único (porcentaje de clics en el enlace)»".
-- [ ] El panel de la "i" del CPPI dice "En el reporte de Meta: «Costo x Checkout»".
-- [ ] Los paneles de CPM, CPC y CPA no traen esa línea.
-- [ ] El aviso del número del CTR de Meta dice "Meta (CTR único): 2 %" y conserva la nota "No se mira…".
-- [ ] El aviso del número del CTR de Meta y la "i" del CTR muestran la advertencia ⚠ "Límite por confirmar…" en color de alerta.
-- [ ] El aviso del número del CTR de TikTok sigue diciendo "TikTok: 0,5 %" y no tiene la advertencia.
-- [ ] La "i" del CTR muestra la señal "2 % (Meta, CTR único)" y explica que Meta lo cuenta por personas y TikTok con impresiones.
-- [ ] El botón de la métrica sigue diciendo "CTR" en los dos lados. Los números grandes del diagrama no cambian: > 2 % y > 0,5 %.
+- [x] El panel de la "i" del CTR dice "En el reporte de Meta: «CTR único (porcentaje de clics en el enlace)»".
+- [x] El panel de la "i" del CPPI dice "En el reporte de Meta: «Costo x Checkout»".
+- [x] Los paneles de CPM, CPC y CPA no traen esa línea.
+- [x] El aviso del número del CTR de Meta dice "Meta (CTR único): 2 %" y conserva la nota "No se mira…".
+- [x] El aviso del número del CTR de Meta y la "i" del CTR muestran la advertencia ⚠ "Límite por confirmar…" en color de alerta.
+- [x] El aviso del número del CTR de TikTok sigue diciendo "TikTok: 0,5 %" y no tiene la advertencia.
+- [x] La "i" del CTR muestra la señal "2 % (Meta, CTR único)" y explica que Meta lo cuenta por personas y TikTok con impresiones.
+- [x] El botón de la métrica sigue diciendo "CTR" en los dos lados. Los números grandes del diagrama no cambian: > 2 % y > 0,5 %.
 
 **Pestaña Métricas**
 
-- [ ] El título dice "Lectura de métricas" (sin dos puntos).
-- [ ] La tarjeta del diagrama dice "Métricas duras".
-- [ ] Bajo el encabezado hay una ruta igual a la de Buscar producto: Métricas duras, Métricas base, Métricas blandas, La cadena que decide todo y el botón "Simulador →". Cada enlace lleva a su tarjeta; el de Métricas base la abre.
-- [ ] La tarjeta reservada dice "Métricas blandas" (antes "Soft Metrics").
-- [ ] El panel de la "i" de cada métrica muestra su fórmula; el del CTR, una para Meta (CTR único) y otra para TikTok.
+- [x] El título dice "Lectura de métricas" (sin dos puntos).
+- [x] La tarjeta del diagrama dice "Métricas duras".
+- [x] Bajo el encabezado hay una ruta igual a la de Buscar producto: Métricas duras, Métricas base, Métricas blandas, La cadena que decide todo y el botón "Simulador →". Cada enlace lleva a su tarjeta; el de Métricas base la abre.
+- [x] La tarjeta reservada dice "Métricas blandas" (antes "Soft Metrics").
+- [x] El panel de la "i" de cada métrica muestra su fórmula; el del CTR, una para Meta (CTR único) y otra para TikTok.
 
 **Diseño** (revisado en el navegador)
 
-- [ ] En PC la tabla se lee de corrido, con columnas alineadas, y la tarjeta mide lo mismo que las demás.
-- [ ] Se ve minimalista: sin cajas con borde por métrica, con líneas finas y el acento solo en los chips y el botón.
-- [ ] En pantallas angostas cada fila se apila con sus rótulos, sin scroll horizontal.
-- [ ] El botón "Abrir + / Cerrar –" se ve igual que el de las tarjetas de Buscar producto.
-- [ ] Se lee bien en los 7 temas, claros y oscuros.
-- [ ] Expandir o contraer el diagrama `#hm-map` no mueve ni rompe la tarjeta nueva.
+- [x] En PC la tabla se lee de corrido, con columnas alineadas, y la tarjeta mide lo mismo que las demás.
+- [x] Se ve minimalista: sin cajas con borde por métrica, con líneas finas y el acento solo en los chips y el botón.
+- [x] En pantallas angostas cada fila se apila con sus rótulos, sin scroll horizontal.
+- [x] El botón "Abrir + / Cerrar –" se ve igual que el de las tarjetas de Buscar producto.
+- [x] Se lee bien en los 7 temas, claros y oscuros.
+- [x] Expandir o contraer el diagrama `#hm-map` no mueve ni rompe la tarjeta nueva.
 
 **Calidad**
 
-- [ ] `PYL.core.metrics` sigue sin tocar el DOM.
-- [ ] Ningún número de las notas se escribe dos veces: salen de `GENERIC_CPA`, `NS_TEST` o `HARD_METRICS` (revisado en el código).
-- [ ] Pasan `node tests/core.test.js`, `tests/smoke.test.js` y `node --check` de cada archivo tocado.
-- [ ] `claves-pyl.json` coincide con `--claves` y la consola queda limpia.
-- [ ] No hay ids repetidos en `index.html`.
+- [x] `PYL.core.metrics` sigue sin tocar el DOM.
+- [x] Ningún número de las notas se escribe dos veces: salen de `GENERIC_CPA`, `NS_TEST` o `HARD_METRICS` (revisado en el código).
+- [x] Pasan `node tests/core.test.js`, `tests/smoke.test.js` y `node --check` de cada archivo tocado.
+- [x] `claves-pyl.json` coincide con `--claves` y la consola queda limpia.
+- [x] No hay ids repetidos en `index.html`.
 
 ## Decisiones
 
