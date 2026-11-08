@@ -7,7 +7,9 @@
   function place(t, ev) {
     const tw = t.offsetWidth, th = t.offsetHeight;
     t.style.left = Math.min(Math.max(8, ev.pageX - tw / 2), document.documentElement.clientWidth - tw - 8) + 'px';
-    t.style.top = ev.pageY - th - 14 + 'px';
+    // Arriba del cursor; si no cabe (aviso alto), abajo.
+    const up = ev.pageY - th - 14;
+    t.style.top = (up < window.scrollY + 8 ? ev.pageY + 18 : up) + 'px';
   }
 
   // lines: [título, valor, detalle]; las vacías se omiten.
@@ -18,21 +20,44 @@
     place(t, ev);
   }
 
-  // tip: { h, p, li? } con li: [antes, palabra resaltada, clase, después].
+  // tip: { h, p?, li?, table?, cls? } con li: [antes, palabra resaltada, clase, después] y
+  // table: { head: [col1, col2], rows: [{ k, cells: [[viñetas…], [viñetas…]] }], on: k } (cada celda es una lista de viñetas; on = fila resaltada).
   // Solo se reconstruye al cambiar de concepto, para no reiniciar la animación con cada movimiento.
   function showInfo(ev, tip) {
     const t = $('#tip');
-    if (t.dataset.k !== tip.h || t.style.display !== 'block') {
-      t.textContent = ''; t.className = 'tip wide'; t.dataset.k = tip.h;
-      t.append(el('div', 'h', tip.h), el('p', null, tip.p));
+    const key = tip.h + '|' + (tip.p || '') + '|' + JSON.stringify(tip.li || '') + '|' + (tip.table ? tip.table.on : ''); // avisos con el mismo título pero distinto contenido
+    if (t.dataset.k !== key || t.style.display !== 'block') {
+      t.textContent = ''; t.className = 'tip wide' + (tip.table ? ' tbl' : '') + (tip.cls ? ' ' + tip.cls : ''); // cls: estilo propio de un módulo t.dataset.k = key;
+      if (!tip.table) t.append(el('div', 'h', tip.h)); // el aviso con tabla va sin título
+      if (tip.p) t.append(el('p', null, tip.p));
       if (tip.li) {
         const ul = el('ul');
         tip.li.forEach(([pre, word, cls, post]) => { const l = el('li', null, pre); l.append(el('b', cls, word), post); ul.appendChild(l); });
         t.appendChild(ul);
       }
+      if (tip.table) t.appendChild(tableNode(tip.table));
       t.style.display = 'block';
     }
     place(t, ev);
+  }
+
+  // Tabla de un aviso: encabezado y una fila por métrica; las celdas son listas de viñetas (string o { b }).
+  function tableNode(tb) {
+    const table = el('table'), thead = el('thead'), hr = el('tr');
+    tb.head.forEach((h) => hr.appendChild(el('th', null, h)));
+    thead.appendChild(hr); table.appendChild(thead);
+    const tbody = el('tbody');
+    tb.rows.forEach((r) => {
+      const tr = el('tr', r.k === tb.on ? 'on' : null);
+      r.cells.forEach((items) => {
+        const td = el('td'), ul = el('ul');
+        items.forEach((seg) => { const li = el('li'); PYL.ui.dom.rich(li, Array.isArray(seg) ? seg : [seg]); ul.appendChild(li); });
+        td.appendChild(ul); tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    return table;
   }
 
   function hide() { $('#tip').style.display = 'none'; }
@@ -40,7 +65,7 @@
   // Conecta un nodo .info a su explicación: tooltip al pasar el mouse o al enfocarlo con el teclado.
   function attach(node, name, tip) {
     node.tabIndex = 0;
-    node.setAttribute('aria-label', `${name}. ${tip.p}`);
+    node.setAttribute('aria-label', tip.p ? `${name}. ${tip.p}` : name);
     node.addEventListener('mousemove', (ev) => showInfo(ev, tip));
     node.addEventListener('mouseleave', hide);
     node.addEventListener('blur', hide);

@@ -52,6 +52,9 @@ main.main{max-width:1240px;margin:0 auto;padding:30px 24px 90px}
 .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--c-ink);margin-bottom:8px}
 h1{font-size:32px;line-height:1.12;letter-spacing:-.025em;margin:0;font-weight:900}
 h2{font-size:19px;letter-spacing:-.01em;margin:0 0 4px;font-weight:800}
+/* Título de tarjeta con barrita de acento (el mismo de la cabecera de Hard Metrics) en las pestañas del entrenador, métricas, buscar, desarrollo y costeo. */
+:is(#v-dash,#v-buscar,#v-desarrollo,#v-costeo,#v-metricas,#v-sim,#v-escalera,#v-creativos) .card h2{display:flex;align-items:center;gap:10px;font-size:22px;letter-spacing:-.02em;margin:0 0 6px}
+:is(#v-dash,#v-buscar,#v-desarrollo,#v-costeo,#v-metricas,#v-sim,#v-escalera,#v-creativos) .card h2::before{content:'';flex:none;width:5px;height:22px;border-radius:3px;background:linear-gradient(180deg,var(--b),var(--b2))}
 h3{font-size:15px;margin:0 0 6px;font-weight:700}
 .lead{color:var(--muted);max-width:720px;margin:8px 0 0;font-size:15.5px}
 .card{background:linear-gradient(180deg,var(--card-2),var(--card));border:1px solid var(--line);border-radius:var(--rad);padding:22px;box-shadow:var(--shadow)}
@@ -115,22 +118,9 @@ thead th{background:var(--bg-2);font-size:11px;letter-spacing:.07em;text-transfo
 tbody tr{transition:background .2s}
 tbody tr:hover{background:rgba(255,255,255,.02)}
 tbody tr:last-child td{border-bottom:none}
-.met{display:flex;gap:11px;align-items:flex-start}
-.met .ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex-shrink:0}
-.met b{font-size:15.5px;display:block}
-.met small{color:var(--soft);font-size:11.5px;display:block;margin-top:2px}
-.col-on{background:rgba(var(--b-rgb),.07)}
-th.col-on{color:var(--b-ink)}
-.col-off{opacity:.45}
 .v{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
-.tester{display:flex;align-items:center;gap:8px;margin-top:10px}
-.tester input{width:110px;background:var(--bg-2);border:1px solid var(--line-2);border-radius:9px;padding:7px 9px;font-size:13px;font-weight:700;min-height:36px}
-.tester input:focus{outline:none;border-color:var(--b)}
 .light{width:14px;height:14px;border-radius:50%;background:#2A3442;flex-shrink:0;transition:background .25s,box-shadow .25s}
 .light.g{background:var(--g);box-shadow:0 0 12px var(--g)}.light.y{background:var(--y);box-shadow:0 0 12px var(--y)}.light.r{background:var(--r);box-shadow:0 0 12px var(--r)}
-.diag{font-size:13px;color:var(--muted);line-height:1.5}
-.diag-live{margin-top:8px;font-size:12.5px;font-weight:600;border-radius:9px;padding:7px 9px;display:none}
-.diag-live.on{display:block}
 
 /* ---------- Toast ---------- */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(30px);background:#fff;color:#0B0F14;font-weight:700;font-size:13.5px;padding:12px 18px;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:50;max-width:90vw;text-align:center}

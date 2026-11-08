@@ -50,7 +50,7 @@ function renderPill(){
 }
 function setProduct(p){
   S = p; store.set("ns_prod", S);
-  renderPill(); renderTable(); $("#s-tope").value = Math.round(S.tope); renderLevel(); runPanel(); wiz(0); chain(chainK);
+  renderPill(); $("#s-tope").value = Math.round(S.tope); renderLevel(); runPanel(); wiz(0); chain(chainK);
 }
 
 /* ===================== Navegación ===================== */
@@ -104,9 +104,15 @@ var CHAIN = {
   }
 };
 var chainK = "cpm";
-function chain(k){
+var chainOpen = false; // al empezar, el desplegable va contraído; al tocar un paso se abre
+function chain(k, open){
   chainK = k;
-  $("#chainInfo").innerHTML = typeof CHAIN[k] === "function" ? CHAIN[k]() : CHAIN[k];
+  if(open !== undefined){ chainOpen = open; }
+  var info = typeof CHAIN[k] === "function" ? CHAIN[k]() : CHAIN[k];
+  $$(".chain-info").forEach(function(n){ // Inicio y Métricas muestran la misma cadena
+    n.innerHTML = info;
+    var d = n.querySelector("details"); if(d){ d.open = chainOpen; }
+  });
   $$(".funnel-node").forEach(function(n){
     var r = n.querySelector("rect");
     var on = n.dataset.k === k;
@@ -115,8 +121,8 @@ function chain(k){
   });
 }
 $$(".funnel-node").forEach(function(n){
-  n.addEventListener("click", function(){ chain(n.dataset.k); });
-  n.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); chain(n.dataset.k); } });
+  n.addEventListener("click", function(){ chain(n.dataset.k, true); });
+  n.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); chain(n.dataset.k, true); } });
 });
 chain("cpm");
 
@@ -305,97 +311,6 @@ $("#c-apply").addEventListener("click", function(){
   else { toast("Con estos números no hay tope: revisa el costeo"); }
 });
 $("#c-generic").addEventListener("click", function(){ setProduct(GENERIC); toast("Volví al genérico de NovaSociety: 12.000 / 15.000 / 20.000"); });
-
-/* ===================== Módulo 1 · Tabla ===================== */
-var plat = "meta";
-var ICON = {
-  ctr: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 4l7 17 2.5-7.4L21 11z"/></svg>',
-  cpc: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5c0-1.2 1.1-2 2.5-2s2.5.8 2.5 2-1.1 1.8-2.5 2.2-2.5 1-2.5 2.3 1.1 2 2.5 2 2.5-.8 2.5-2"/></svg>',
-  cpm: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>',
-  cppi: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="20" r="1.4"/><circle cx="19" cy="20" r="1.4"/><path d="M1 2h4l2.7 13.4a2 2 0 002 1.6h9.6a2 2 0 002-1.6L23 6H6"/></svg>',
-  cpa: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>'
-};
-function rows(){
-  return [
-    { k: "ctr", name: "CTR", sub: "Clics ÷ impresiones", color: "var(--c-ink)", bg: "var(--c-bg)", src: "juan", noTest: true,
-      meta: { bench: "No se mira" }, tiktok: { bench: "No se mira" }, idealTxt: "No aplica", limitTxt: "No aplica",
-      diag: "NovaSociety no lo mira: no decide ni para apagar ni para escalar. Mis Gotas Focus tuvieron CTR de hasta 6,7% y cero ventas." },
-    { k: "cpc", name: "CPC", sub: "Gasto ÷ clics en el enlace", color: "var(--v-ink)", bg: "var(--v-bg)", src: "juan", noTest: true,
-      meta: { bench: "Sin número fijo" }, tiktok: { bench: "Sin número fijo" }, idealTxt: "Se lee con el CPM sano", limitTxt: "Sin número fijo",
-      diag: "Segundo eslabón. CPM sano + CPC caro = el producto no interesa: la gente no quiere ver más información ni comprarlo. Otro video no lo arregla." },
-    { k: "cpm", name: "CPM", sub: "Costo por 1.000 impresiones", color: "var(--b-ink)", bg: "var(--b-bg)", src: "juan", dir: "down", unit: "$",
-      meta: { bench: "≤ 20.000", ideal: 20000, limit: 20000 }, tiktok: { bench: "≤ 6.000", ideal: 6000, limit: 6000 },
-      diag: "Primer eslabón. Caro = el creativo no engancha. Solución: creativos nuevos, con el gancho en los primeros 3 segundos.",
-      live: { g: "CPM sano: por debajo del máximo.", y: "CPM sano: por debajo del máximo.", r: "CPM roto: creativos nuevos con gancho de 3 segundos. Lo demás es consecuencia." } },
-    { k: "cppi", name: "CPPI", sub: "Gasto ÷ pagos iniciados", color: "var(--o-ink)", bg: "var(--o-bg)", src: "juan", dir: "down", unit: "$",
-      meta: { bench: "< 4.000", ideal: 4000, limit: 6000 }, tiktok: { bench: "< 4.000", ideal: 4000, limit: 6000 },
-      diag: "Clave en el corte de 30K. Bueno sin ventas = página, oferta o formulario: más confianza, menos fricción.",
-      live: { g: "CPPI bueno: la gente quiere pagar.", y: "Flojo (4.000–6.000): vigílalo hasta el siguiente corte.", r: "Por encima de 6.000 sin ventas, se apaga." } },
-    { k: "cpa", name: "CPA", sub: "Gasto ÷ ventas", color: "var(--g-ink)", bg: "var(--g-bg)", src: "juan", dir: "down", unit: "$",
-      meta: { bench: "Según costeo", ideal: S.escala, limit: S.tope }, tiktok: { bench: "Según costeo", ideal: S.escala, limit: S.tope },
-      diag: "El número final. Por encima del tope: baja un escalón (−20%). Dos días en zona de apagar (> " + fmt(S.apaga) + "): apaga.",
-      live: { g: "Zona de escala: sube un escalón.", y: "Zona de sostener: mantén el presupuesto.", r: "Sobre el tope: baja un escalón; 2 días en zona de apagar, apaga." } }
-  ];
-}
-function fv(x, unit){ return unit === "%" ? String(x).replace(".", ",") + " %" : fmt(x); }
-function rangeTxt(r, p){
-  var o = r[p];
-  if(r.noTest){ return { ideal: r.idealTxt, limit: r.limitTxt }; }
-  if(r.k === "cpm"){ return { ideal: "Por debajo de " + fmt(o.limit), limit: fmt(o.limit) }; }
-  if(r.dir === "up"){ return { ideal: "≥ " + fv(o.ideal, r.unit), limit: "Mínimo " + fv(o.limit, r.unit) }; }
-  return { ideal: (r.k === "cppi" ? "< " : "≤ ") + fv(o.ideal, r.unit), limit: fv(o.limit, r.unit) };
-}
-function light(r, p, v){
-  var o = r[p];
-  if(r.dir === "up"){ return v >= o.ideal ? "g" : (v >= o.limit ? "y" : "r"); }
-  return v <= o.ideal ? "g" : (v <= o.limit ? "y" : "r");
-}
-function renderTable(){
-  var R = rows(), html = "";
-  R.forEach(function(r){
-    var idealCell, limitCell, tester = "";
-    if(plat === "both"){
-      var m = rangeTxt(r, "meta"), t = rangeTxt(r, "tiktok");
-      idealCell = '<div><span class="soft">Meta</span> <span class="v">' + m.ideal + '</span></div><div><span class="soft">TikTok</span> <span class="v">' + t.ideal + '</span></div>';
-      limitCell = '<div><span class="soft">Meta</span> <span class="v">' + m.limit + '</span></div><div><span class="soft">TikTok</span> <span class="v">' + t.limit + '</span></div>';
-    } else {
-      var x = rangeTxt(r, plat);
-      idealCell = '<span class="v" style="color:' + (r.noTest ? "var(--muted)" : "var(--g-ink)") + '">' + x.ideal + '</span>' + (r.k === "cppi" ? '<div class="small">Flojo 4.000–6.000</div>' : "") + (r.k === "cpa" ? '<div class="small">Zona de escala</div>' : "");
-      limitCell = '<span class="v" style="color:' + (r.noTest ? "var(--muted)" : "var(--r-ink)") + '">' + x.limit + '</span>' + (r.k === "cpa" ? '<div class="small">Tope · apaga &gt; ' + fmt(S.apaga) + '</div>' : "") + (r.k === "cppi" ? '<div class="small">Sin ventas a 30K, se apaga</div>' : "");
-      tester = r.noTest ? "" : '<div class="tester"><span class="light" id="lt-' + r.k + '"></span><input type="number" step="any" data-test="' + r.k + '" placeholder="Mi dato" aria-label="Prueba mi ' + r.name + '"></div><div class="diag-live" id="dl-' + r.k + '"></div>';
-    }
-    var srcTag = r.noTest ? '<span class="tag tn">No decide sola</span>' : '<span class="tag tv">Criterio NovaSociety</span>';
-    html += '<tr>' +
-      '<td><div class="met"><div class="ic" style="background:' + r.bg + ';color:' + r.color + '">' + ICON[r.k] + '</div><div><b>' + r.name + '</b><small>' + r.sub + '</small><div style="margin-top:6px">' + srcTag + '</div>' + tester + '</div></div></td>' +
-      '<td class="c-tt"><span class="v">' + r.tiktok.bench + '</span></td>' +
-      '<td class="c-mt"><span class="v">' + r.meta.bench + '</span></td>' +
-      '<td>' + idealCell + '</td>' +
-      '<td>' + limitCell + '</td>' +
-      '<td class="diag">' + r.diag + '</td></tr>';
-  });
-  $("#mtBody").innerHTML = html;
-  var onMeta = plat === "meta", onTT = plat === "tiktok";
-  $$(".c-mt, .h-mt").forEach(function(c){ c.classList.toggle("col-on", onMeta); c.classList.toggle("col-off", onTT); });
-  $$(".c-tt, .h-tt").forEach(function(c){ c.classList.toggle("col-on", onTT); c.classList.toggle("col-off", onMeta); });
-  $$("[data-test]").forEach(function(inp){
-    inp.addEventListener("input", function(){
-      var r = R.filter(function(x){ return x.k === inp.dataset.test; })[0];
-      var lt = $("#lt-" + r.k), dl = $("#dl-" + r.k);
-      if(inp.value === ""){ lt.className = "light"; dl.className = "diag-live"; return; }
-      var c = light(r, plat, parseFloat(inp.value));
-      lt.className = "light " + c;
-      dl.className = "diag-live on " + (c === "g" ? "ng" : c === "y" ? "ny" : "nr");
-      dl.textContent = r.live[c];
-    });
-  });
-}
-$$("[data-plat]").forEach(function(b){
-  b.addEventListener("click", function(){
-    plat = b.dataset.plat;
-    $$("[data-plat]").forEach(function(x){ x.setAttribute("aria-pressed", x === b); });
-    renderTable();
-  });
-});
 
 /* ===================== Módulo 2 · Simulador ===================== */
 var PRESETS = {
@@ -673,7 +588,6 @@ function culpa(){
 /* ===================== Init ===================== */
 renderPill();
 costeo();
-renderTable();
 $("#s-tope").value = Math.round(S.tope);
 updTrack();
 renderHist();
