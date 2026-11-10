@@ -134,7 +134,7 @@ En esta pestaña hay un **botón flotante** (abajo a la derecha, encima del de P
 
 Junto al Guardado rápido hay un segundo **botón flotante azul** (esquina de abajo a la derecha, con el logo de DropKiller). Arma el prompt para buscar diamantes en bruto con el **MCP de DropKiller** bajo el método VDO: lo copio, lo pego en Claude y los resultados se quedan allá.
 
-- **Filtros:** ventas totales (mín./máx., con el aviso «Tolero hasta 3.000»), proveedores, ventas recientes (7 o 30 días), fecha de creación (3 o 6 meses), stock, veces restockeado y categoría. Si dejo un campo vacío, el prompt usa el valor que se ve en gris.
+- **Filtros:** ventas totales (mín./máx., con el aviso «Tolero hasta 3.000»), proveedores, ventas recientes (7 o 30 días), fecha de creación (3 o 6 meses), stock (mínimo 80, máximo vacío = sin máximo), veces restockeado y categoría. Si dejo un campo vacío, el prompt usa el valor que se ve en gris.
 - **Categoría:** vacía = «Todos (Salud, Belleza y bienestar primero)»; el prompt la abre a cualquier nicho pero prioriza esos y exige el perfil de producto del punto 8.
 - **Números:** enteros (acepta `2.000`). Si algo no es válido o el mínimo supera al máximo, el campo se marca en rojo y no se genera el prompt.
 - **✨ Generar prompt** lo arma con los filtros; **📋 Copiar prompt** lo copia y avisa. El cuadro **no se llena solo** al cambiar un campo y **queda limpio cuando cierro la ventana** (✕, Esc o el botón); los filtros se conservan hasta recargar la página.

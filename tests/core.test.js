@@ -641,7 +641,7 @@ caso('Prompt DropKiller: formulario vacío usa todos los valores por defecto', (
   assert.deepStrictEqual(r.errors, {});
   const t = core.dkPrompt(r.values);
   for (const x of ['mínimo de 100 y máximo de 2.000', 'entre 10 y 100 ventas en los últimos 7 días', 'Creados de 3 meses para acá',
-    'mínimo 80 y máximo 100 unidades', 'Máximo 3 proveedores', 'entre 0 y 5 veces', 'Ventas (Totales/7 días)',
+    'mínimo 80 unidades, sin máximo', 'Máximo 3 proveedores', 'entre 0 y 5 veces', 'Ventas (Totales/7 días)',
     'TODAS (puede ser cualquier nicho; prioriza Salud, Belleza y bienestar), PERO cumple el perfil del punto 8']) assert.ok(t.includes(x), 'Falta: ' + x);
   assert.ok(!t.includes('{{'), 'No quedan variables sin reemplazar');
 });
@@ -668,6 +668,10 @@ caso('Prompt DropKiller: validación (negativos, decimales, texto y mín. > máx
   // Un mínimo escrito mayor que el máximo por defecto también falla.
   assert.deepStrictEqual(Object.keys(e({ totMin: '5000' }).errors).sort(), ['totMax', 'totMin']);
   assert.strictEqual(e({ totMin: '0', restMin: '0' }).ok, true);
+  // Stock: sin máximo no hay par que validar; con máximo escrito sí.
+  assert.strictEqual(e({ stockMin: '999' }).ok, true);
+  assert.deepStrictEqual(Object.keys(e({ stockMin: '999', stockMax: '100' }).errors).sort(), ['stockMax', 'stockMin']);
+  assert.ok(core.dkPrompt(e({ stockMax: '150' }).values).includes('mínimo 80 y máximo 150 unidades'));
 });
 
 caso('Prompt DropKiller: dkN y placeholders', () => {
@@ -676,7 +680,7 @@ caso('Prompt DropKiller: dkN y placeholders', () => {
   assert.strictEqual(core.dkN(1234567), '1.234.567');
   const p7 = core.dkPlaceholders(7), p30 = core.dkPlaceholders(30);
   assert.deepStrictEqual([p7.totMin, p7.totMax, p7.recMin, p7.recMax, p7.stockMin, p7.stockMax, p7.provMax, p7.restMin, p7.restMax],
-    ['100', '2.000', '10', '100', '80', '100', '3', '0', '5']);
+    ['100', '2.000', '10', '100', '80', 'Sin máximo', '3', '0', '5']);
   assert.deepStrictEqual([p30.recMin, p30.recMax], ['100', '500']);
   assert.strictEqual(p7.categoria, 'Todos (Salud, Belleza y bienestar primero)');
   assert.strictEqual(core.DK_TOT_TOLERANCE, 3000);

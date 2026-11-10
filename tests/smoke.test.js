@@ -550,11 +550,12 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.ok($('#dk-prompt').value.includes('Creados de 6 meses para acá'), '6 meses');
     // Error: marca el campo, mensaje bajo el par y el prompt no cambia.
     const antes = $('#dk-prompt').value;
-    poner('#dk-f-stock-min', '999'); $('#dk-gen').click();
+    poner('#dk-f-stock-max', '50'); $('#dk-gen').click();
     assert.ok($('#dk-f-stock-min').classList.contains('dk-bad') && $('#dk-f-stock-min').getAttribute('aria-invalid') === 'true' && $('#dk-f-stock-max').classList.contains('dk-bad'), 'Los dos campos del par se marcan');
     assert.ok($('#dk-err-stock').textContent.includes('mínimo es mayor'), 'Mensaje bajo el par');
     assert.strictEqual($('#dk-prompt').value, antes, 'Con error el prompt se queda con el último texto válido');
-    poner('#dk-f-stock-min', '');
+    poner('#dk-f-stock-max', '');
+    assert.strictEqual($('#dk-f-stock-max').placeholder, 'Sin máximo');
     assert.ok(!$('#dk-f-stock-min').classList.contains('dk-bad') && !$('#dk-err-stock').textContent && $('#dk-f-stock-min').getAttribute('aria-invalid') !== 'true', 'Corregir quita la marca');
     // Categoría escrita.
     poner('#dk-f-cat', 'Belleza'); $('#dk-gen').click();

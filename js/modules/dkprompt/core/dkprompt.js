@@ -9,7 +9,7 @@
     recDias: 7,
     rec: { 7: { min: 10, max: 100 }, 30: { min: 100, max: 500 } },
     meses: 3, // 3 | 6
-    stockMin: 80, stockMax: 100,
+    stockMin: 80, stockMax: null, // null = sin máximo
     provMax: 3,
     restMin: 0, restMax: 5,
     categoria: 'Todos (Salud, Belleza y bienestar primero)',
@@ -18,6 +18,7 @@
   // Lo máximo de ventas totales que tolero (aviso en el formulario; el filtro por defecto sigue en DK_DEFAULTS.totMax).
   const DK_TOT_TOLERANCE = 3000;
 
+  const DK_NO_MAX = 'Sin máximo';
   const ERR_INT = 'Escribe un número entero', ERR_NEG = 'No puede ser negativo', ERR_PAIR = 'El mínimo es mayor que el máximo';
 
   // Miles es-CO a mano: toLocaleString('es-CO') deja "2000" en números de 4 cifras.
@@ -37,7 +38,7 @@
   // Textos de los placeholders (= valores por defecto) para la ventana elegida.
   const dkPlaceholders = (recDias) => {
     const out = {};
-    for (const [k, v] of Object.entries(defaults(recDias))) out[k] = dkN(v);
+    for (const [k, v] of Object.entries(defaults(recDias))) out[k] = v === null ? DK_NO_MAX : dkN(v);
     out.categoria = DK_DEFAULTS.categoria;
     return out;
   };
@@ -58,12 +59,12 @@
     const values = {}, errors = {};
     for (const k of Object.keys(def)) {
       const t = clean(f[k]);
-      if (!t) { values[k] = def[k]; continue; }
+      if (!t) { values[k] = def[k]; continue; } // def null = sin máximo
       const r = parse(t);
       if (r.err) errors[k] = r.err; else values[k] = r.n;
     }
     for (const [lo, hi] of [['totMin', 'totMax'], ['recMin', 'recMax'], ['stockMin', 'stockMax'], ['restMin', 'restMax']]) {
-      if (!errors[lo] && !errors[hi] && values[lo] > values[hi]) errors[lo] = errors[hi] = ERR_PAIR;
+      if (!errors[lo] && !errors[hi] && values[hi] !== null && values[lo] > values[hi]) errors[lo] = errors[hi] = ERR_PAIR;
     }
     const cat = clean(f.categoria);
     values.categoria = !cat || cat === DK_DEFAULTS.categoria ? DK_OPEN_CAT : cat;
@@ -79,7 +80,7 @@ Aplica estrictamente esta lógica de filtrado en tu búsqueda:
 1. Ventas Totales: Rango mínimo de ${dkN(v.totMin)} y máximo de ${dkN(v.totMax)} ventas. (Importante: Suma las ventas totales de los proveedores que lo tengan para asegurar que el global no pase de ${dkN(v.totMax)}).
 2. Tracción reciente: Debe tener movimiento actual (entre ${dkN(v.recMin)} y ${dkN(v.recMax)} ventas en los últimos ${v.recDias} días).
 3. Fecha de creación: Creados de ${v.meses} meses para acá.
-4. Stock: Buen inventario (mínimo ${dkN(v.stockMin)} y máximo ${dkN(v.stockMax)} unidades).
+4. Stock: Buen inventario (${v.stockMax === null ? `mínimo ${dkN(v.stockMin)} unidades, sin máximo` : `mínimo ${dkN(v.stockMin)} y máximo ${dkN(v.stockMax)} unidades`}).
 5. Proveedores: Máximo ${dkN(v.provMax)} proveedores en todo Dropi Colombia (ideal para mi estrategia de exclusividad).
 6. Veces restockeado: entre ${dkN(v.restMin)} y ${dkN(v.restMax)} veces.
 7. Categoría: ${v.categoria}.
