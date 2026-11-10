@@ -1,0 +1,14 @@
+/* Prompt buscar anuncios (js/modules/adprompt): botón flotante y panel en Desarrollo. Se carga después de ads.css. */
+/* Reutiliza .dk-btn/.dk-panel/.dk-cell (dkprompt.css) y .qk-photo* (quick.css); aquí solo va lo propio. */
+/* El botón usa el verde #16a34a fijo (pedido del usuario), igual en todos los temas. */
+#v-desarrollo{padding-bottom:90px}
+.ap-btn{background:#16a34a;box-shadow:0 10px 28px rgba(22,163,74,.45)}
+.ap-panel{width:min(360px,calc(100vw - 32px));--fab:#22c55e}
+.ap-top{display:flex;gap:12px;align-items:flex-start}
+.ap-top>.dk-cell:first-child{flex:1}
+.ap-photo-cell{flex:none}
+.ap-photo-wrap{width:64px;height:32px}
+.ap-panel .ap-gen{background:#16a34a;border-color:#16a34a;color:#fff}
+/* Dos filas de botones del mismo ancho: arriba (sobre los campos) Importar | Copiar; abajo (tras el prompt) Limpiar | Generar. */
+.ap-acts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.ap-acts .btn{justify-content:center;text-align:center;white-space:nowrap}

@@ -1,5 +1,6 @@
 {
   "core": [
+    "adprompt",
     "ads",
     "dates",
     "diagnostics",
@@ -24,6 +25,7 @@
     "storage"
   ],
   "ui": [
+    "adprompt",
     "ads",
     "campaignsTable",
     "candidate",

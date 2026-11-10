@@ -585,7 +585,69 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.strictEqual(PYL.app.state.dkprompt.open, false);
   };
 
-  return dkTest().then(fresca).then((d2) => {
+  // 10. Prompt buscar anuncios: botón flotante verde y panel en Desarrollo.
+  const apTest = async () => {
+    let copiado = null;
+    Object.defineProperty(window.navigator, 'clipboard', { configurable: true, value: { writeText: async (t) => { copiado = t; } } });
+    const $ = (q) => document.querySelector(q);
+    const poner = (id, v) => { const x = $(id); x.value = v; x.dispatchEvent(new window.Event('input', { bubbles: true })); };
+    assert.ok($('#v-desarrollo #ap-root #ap-btn') && !$('#v-buscar #ap-btn'), 'El botón va solo en Desarrollo');
+    assert.ok($('#ap-btn svg') && $('#ap-btn').title === 'Prompt buscar anuncios' && $('#ap-panel').hidden, 'Ícono, título y panel cerrado');
+    $('#ap-btn').click();
+    assert.ok(!$('#ap-panel').hidden && $('#ap-btn').getAttribute('aria-expanded') === 'true', 'El botón abre el panel');
+    assert.deepStrictEqual([$('#ap-f-days').placeholder, $('#ap-f-seen').placeholder, $('#ap-f-country').placeholder], ['Mínimo 7 días', 'Últimos 7 días', 'Colombia'], 'Placeholders');
+    assert.ok(!$('#ap-f-name').classList.contains('dk-bad'), 'El nombre vacío no se marca al abrir');
+    // Sin nombre: generar marca el campo y no arma nada.
+    $('#ap-gen').click();
+    assert.ok($('#ap-f-name').classList.contains('dk-bad') && $('#ap-err-name').textContent.includes('nombre') && $('#ap-prompt').value === '', 'Nombre obligatorio');
+    // Importar: sin candidato avisa; con candidato trae nombre e imagen.
+    const draft = PYL.app.state.search.draft, antes = { name: draft.name, photo: draft.photo };
+    draft.name = ''; delete draft.photo;
+    $('#ap-import').click();
+    assert.ok(/No hay producto/.test($('#toast').textContent) && $('#ap-f-name').value === '', 'Importar sin candidato avisa');
+    draft.name = 'Faja Térmica'; draft.photo = 'data:image/png;base64,AAAA';
+    $('#ap-import').click();
+    assert.strictEqual($('#ap-f-name').value, 'Faja Térmica', 'Importa el nombre');
+    assert.ok(!$('#ap-photo img').hidden && $('#ap-photo img').getAttribute('src') === draft.photo && !$('#ap-f-name').classList.contains('dk-bad'), 'Importa la imagen y quita la marca');
+    draft.name = antes.name; if (antes.photo) draft.photo = antes.photo; else delete draft.photo;
+    $('#ap-gen').click();
+    const base = $('#ap-prompt').value;
+    assert.ok(base.includes('producto: Faja Térmica.') && base.includes('Mínimo 7 días') && base.includes('Últimos 7 días') && base.includes('EXCLUIR Colombia (buscar USA, España, LATAM)'), 'Genera con los valores por defecto');
+    assert.ok(!base.includes('data:image'), 'El prompt es solo texto');
+    // Lo escrito no cambia el prompt hasta volver a generar; un número inválido lo deja como estaba.
+    poner('#ap-f-days', '14'); poner('#ap-f-country', 'México');
+    assert.strictEqual($('#ap-prompt').value, base, 'El prompt no cambia solo');
+    $('#ap-gen').click();
+    assert.ok($('#ap-prompt').value.includes('Mínimo 14 días') && $('#ap-prompt').value.includes('EXCLUIR México'), 'Generar usa lo escrito');
+    const ok = $('#ap-prompt').value;
+    poner('#ap-f-seen', '0'); $('#ap-gen').click();
+    assert.ok($('#ap-f-seen').classList.contains('dk-bad') && $('#ap-err-seen').textContent && $('#ap-prompt').value === ok, 'Con error se queda el último prompt válido');
+    poner('#ap-f-seen', '');
+    $('#ap-copy').click();
+    await new Promise((r) => setTimeout(r, 20));
+    assert.strictEqual(copiado, ok, 'Copia el prompt');
+    // Quitar la imagen, Esc y ✕.
+    $('#ap-root .qk-photo-rm').click();
+    assert.ok($('#ap-photo img').hidden && PYL.app.state.adprompt.photo === '', 'Quita la imagen');
+    document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    assert.ok($('#ap-panel').hidden && $('#ap-prompt').value === '', 'Esc cierra y limpia el prompt');
+    $('#ap-btn').click();
+    assert.strictEqual($('#ap-f-name').value, 'Faja Térmica', 'Los campos se conservan');
+    $('#dk-btn').click();
+    assert.ok($('#ap-panel').hidden && !$('#dk-panel').hidden, 'Abrir otro flotante cierra este');
+    // Limpiar deja todo en blanco: campos, imagen, prompt y marcas.
+    $('#dk-x').click(); $('#ap-btn').click();
+    PYL.app.state.adprompt.photo = 'data:image/png;base64,AAAA';
+    poner('#ap-f-seen', '0'); poner('#ap-f-seen', '3'); $('#ap-gen').click();
+    assert.ok($('#ap-prompt').value.includes('Últimos 3 días') && !$('#ap-photo img').hidden);
+    $('#ap-clear').click();
+    assert.deepStrictEqual(['#ap-f-name', '#ap-f-days', '#ap-f-seen', '#ap-f-country', '#ap-prompt'].map((q) => $(q).value), ['', '', '', '', ''], 'Limpiar vacía campos y prompt');
+    assert.ok($('#ap-photo img').hidden && PYL.app.state.adprompt.photo === '' && !$('#ap-f-name').classList.contains('dk-bad') && !$('#ap-panel').hidden, 'Limpiar quita la imagen, no marca el nombre y deja el panel abierto');
+    $('#ap-x').click();
+    assert.ok($('#ap-panel').hidden && PYL.app.state.adprompt.open === false, '✕ cierra');
+  };
+
+  return dkTest().then(apTest).then(fresca).then((d2) => {
     const doc2 = d2.window.document;
     assert.deepStrictEqual([...doc2.querySelectorAll('#b-strats .st-tab')].map((b) => b.textContent.length > 0), [true, true], 'Estrategias muestra solo 2 tarjetas');
     assert.deepStrictEqual([...d2.window.PYL.core.search.STRATEGIES.map((x) => x.k)], ['vdo', 'prov'], 'STRATEGIES = vdo y prov');

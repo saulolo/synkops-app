@@ -180,6 +180,18 @@ Módulo 5 de NovaSociety: lo que hago a mano para montar el producto en Shopify.
 - **Meta Ads:** paso a paso según la estrategia que voy a montar (selector ABO / CBO; CBO aparece como "pronto"). ABO: campaña de testeo (1 campaña → 4 conjuntos → 1 anuncio con su video en cada uno, 30.000 al día por conjunto). Mapa informativo de la campaña, tabla "campo → valor" en cada paso, nombre de la campaña (día de mañana, mes y primer nombre del producto), fecha de inicio (mañana, 5:00 a. m.), URL de la product page con identificador editable, ciudades excluidas de Lugares y prompt de 3 copies, títulos y descripciones.
 - TikTok Ads aparece como "pronto".
 
+### 📣 Prompt buscar anuncios
+
+En esta pestaña hay un **botón flotante verde** (esquina de abajo a la derecha, con un megáfono y una lupa). Arma el prompt para buscar con el **MCP de DropKiller** los anuncios que ya corren de mi producto: lo copio, lo pego en Claude y adjunto la imagen.
+
+- **Campos:** Nombre del producto (obligatorio), Imagen, Días activos, Última vez visto y País a excluir. Si dejo un campo vacío, el prompt usa el valor que se ve en gris (7 días, 7 días, Colombia).
+- **Imagen:** es solo un recordatorio de cuál adjuntar en Claude; el prompt es texto. Se importa, se pega con **Ctrl+V** o se elige como archivo.
+- **📥 Importar** trae el nombre y la imagen del producto abierto en **Mi candidato**. Si no hay ninguno, avisa.
+- **Días:** escribo solo el número (`14`); el prompt arma «Mínimo 14 días». Si no es un entero de 1 o más, el campo se marca en rojo y no se genera el prompt.
+- **Botones:** arriba, **📥 Importar** y **📋 Copiar prompt**; abajo, **🧹 Limpiar** (deja campos, imagen y prompt en blanco, sin preguntar) y **✨ Generar prompt**.
+- El cuadro **no se llena solo** al cambiar un campo y **queda limpio cuando cierro la ventana** (✕, Esc o el botón); los campos se conservan hasta recargar la página. Nada se guarda en el navegador.
+- «buscar USA, España, LATAM» va fijo en el prompt.
+
 ---
 
 ## 🎓 Entrenador de métricas
@@ -526,10 +538,11 @@ css/
   modules/            Un CSS por módulo, en este orden de carga (la cascada depende de él):
     trainer.css       Entrenador: Inicio, Costeo, escalera y pipeline
     search.css        Buscar producto, Mi candidato, bitácora y estadísticas
-    quick.css         Guardado rápido
-    dkprompt.css      Prompt DropKiller: botón azul y panel con los filtros
+    quick.css         Guardado rápido (título del panel con barrita de acento)
+    dkprompt.css      Prompt DropKiller: botón azul y panel con los filtros; título del panel con barrita (--fab)
     landing.css       Desarrollo → Shopify
     ads.css           Desarrollo → Meta Ads
+    adprompt.css      Prompt buscar anuncios: botón verde (reutiliza .dk-* y .qk-photo*)
     metrics.css       Métricas: ruta, diagrama de métricas duras, avisos, panel "i", botón Expandir y tabla de Métricas base
     testing.css       Testeo: barra de gasto, tarjetas de corte, simulacro y práctica
   themes.css          Selector de tema, modo claro, temas oscuros y SVG con colores fijos
@@ -537,8 +550,8 @@ css/
   report.css          Informe PDF: documento claro en A4, visible solo al imprimir
 
 tests/
-  core.test.js        Núcleo en Node puro (costeo, guardado rápido, prompt DropKiller, P&L)
-  smoke.test.js       jsdom: claves de PYL.*, 10 pestañas, navegación, panel Prompt DropKiller y consola limpia
+  core.test.js        Núcleo en Node puro (costeo, guardado rápido, prompt DropKiller, prompt buscar anuncios, P&L)
+  smoke.test.js       jsdom: claves de PYL.*, 10 pestañas, navegación, paneles Prompt DropKiller y Prompt buscar anuncios y consola limpia
   fixtures/           CSV de prueba de Dropi (datos inventados) y claves de PYL.*
 
 js/
@@ -570,6 +583,10 @@ js/
       core/dkprompt.js Valores por defecto, validación (dkValues) y plantilla del prompt (dkPrompt); sin DOM
       ui/dkprompt.js  Botón flotante con el logo, cuadrícula de filtros y cuadro del prompt
       app/dkprompt.js Estado (app.state.dkprompt: open, form, last), Generar, Copiar y cierre con Esc
+    adprompt/         Prompt buscar anuncios (botón flotante verde en Desarrollo)
+      core/adprompt.js Valores por defecto, validación (apValues), importar de Mi candidato (apImport) y plantilla (apPrompt); sin DOM
+      ui/adprompt.js  Botón flotante con megáfono y lupa, formulario (nombre, imagen, días activos, última vez visto, país) y cuadro del prompt
+      app/adprompt.js Estado (app.state.adprompt: open, form, photo, last), Importar, Generar, Copiar y cierre con Esc
     landing/          Desarrollo → Shopify (core: pasos, prompts y números LANDING · ui · app)
     ads/              Desarrollo → Meta Ads (core: AD_STRATEGIES, ABO_STEPS y ADS · ui: mapa y herramientas · app)
     metrics/          Métricas → métricas duras (SPEC 03) y Métricas base (SPEC 04)
@@ -597,7 +614,7 @@ js/
 
 - **Sin `import`/`export`.** Los navegadores bloquean los ES modules en `file://`. Cada archivo es un IIFE que publica su API en el namespace global `PYL` (`PYL.core.pnl`, `PYL.ui.funnel`, etc.).
 - **El orden importa.** `index.html` carga los scripts en el orden de las capas (`core → services → ui → app`; dentro de cada capa, `shared` y luego los módulos), con `app/nav.js` antes de `main.js`. Los `<link>` de CSS también van en un orden fijo (ver el árbol). Un archivo nuevo va en `modules/<módulo>/<capa>/`, o en `shared/` si lo usan varios módulos, antes de los que lo usan.
-- **Carpeta = módulo, namespace = capa.** `js/modules/search/core/search.js` publica `PYL.core.search`. Un módulo solo usa `shared/` y los módulos que se cargan antes (`search` usa `pnl`; `quick` usa `search`; `dkprompt` solo usa `shared/` (se coordina con `quick` por el evento `flotante:abierto`); `ads` usa `landing` y `search`; `metrics` solo usa `shared/`; `testing` usa `metrics`, `ads` y `landing`; `scaling` usa `metrics` y `testing`; `trainer` usa `search`).
+- **Carpeta = módulo, namespace = capa.** `js/modules/search/core/search.js` publica `PYL.core.search`. Un módulo solo usa `shared/` y los módulos que se cargan antes (`search` usa `pnl`; `quick` usa `search`; `dkprompt` solo usa `shared/` (se coordina con `quick` por el evento `flotante:abierto`); `adprompt` usa `search` (candidato abierto) y los estilos de `dkprompt` y `quick`; `ads` usa `landing` y `search`; `metrics` solo usa `shared/`; `testing` usa `metrics`, `ads` y `landing`; `scaling` usa `metrics` y `testing`; `trainer` usa `search`).
 - **La navegación es de toda la app.** `app/nav.js` abre la vista y dispara `nav:vista`; cada módulo reacciona a ese evento.
 - **Solo la capa `app` modifica el estado.** Los componentes de `ui` reciben datos y callbacks (`onSelect`, `onAssign`).
 - **Los diagnósticos devuelven datos, no HTML.** El texto con formato se representa como segmentos: un string es texto plano, `{ b: '...' }` va en negrita y `{ a: '...', href }` es un enlace que abre en pestaña nueva. `shared/ui/dom.js` (`rich`) los pinta.

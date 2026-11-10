@@ -255,7 +255,7 @@
     },
     {
       k: 'resultados', name: 'Resultados',
-      def: 'Número de veces que tu anuncio logró el objetivo que elegiste para la campaña, por ejemplo una compra.',
+      def: 'Número de ventas que generaron tus anuncios. Como el objetivo de tus campañas es Compras, cada resultado es una venta. Si es 0, la inversión no se convirtió en pedidos.',
       uses: [[{ b: 'CPA' }, ' = ' + FORMULA.cpa + ' (en el reporte: «Costo por resultados»)']],
       links: ['cpa'],
       ns: ['Zonas del CPA: escala bajo ', { b: '$ ' + money(GENERIC_CPA.escala) }, ', tope ', { b: '$ ' + money(GENERIC_CPA.tope) }, ', apaga sobre ', { b: '$ ' + money(GENERIC_CPA.apaga) }],

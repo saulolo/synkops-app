@@ -11,7 +11,7 @@ const caso = (nombre, fn) => casos.push([nombre, fn]);
 
 caso('exporta todas las funciones del núcleo aplanadas', () => {
   const claves = Object.keys(core).sort().join(',');
-  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,LADDER_BLOCKS,LANDING,LEVELS,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_STEPS,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,isDropi,isMetrics,key,kpis,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
+  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,LADDER_BLOCKS,LANDING,LEVELS,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_STEPS,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,isDropi,isMetrics,key,kpis,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
 });
 
 caso('Costeo: proveedor 30.000 da precio $99.900 y tope $21.617', () => {
@@ -684,6 +684,28 @@ caso('Prompt DropKiller: dkN y placeholders', () => {
   assert.deepStrictEqual([p30.recMin, p30.recMax], ['100', '500']);
   assert.strictEqual(p7.categoria, 'Todos (Salud, Belleza y bienestar primero)');
   assert.strictEqual(core.DK_TOT_TOLERANCE, 3000);
+});
+
+caso('Prompt buscar anuncios: defectos, valores escritos y plantilla', () => {
+  const r = core.apValues({ name: '  Faja Térmica  ' });
+  assert.strictEqual(r.ok, true);
+  assert.deepStrictEqual(r.values, { name: 'Faja Térmica', dias: 7, visto: 7, pais: 'Colombia' });
+  const t = core.apPrompt(r.values);
+  for (const x of ['para el producto: Faja Térmica. Usa la imagen adjunta', 'Días activos: Mínimo 7 días (indica rentabilidad).',
+    'Última vez visto: Últimos 7 días (anuncio vivo).', 'País: EXCLUIR Colombia (buscar USA, España, LATAM).',
+    'Lista los 3 mejores anuncios encontrados.', 'Indica si dirigen a Landing Page o WhatsApp.']) assert.ok(t.includes(x), 'Falta: ' + x);
+  const t2 = core.apPrompt(core.apValues({ name: 'X', dias: '14', visto: '1', pais: ' México ' }).values);
+  assert.ok(t2.includes('Mínimo 14 días') && t2.includes('Últimos 1 día (') && t2.includes('EXCLUIR México (buscar USA, España, LATAM)'));
+  assert.deepStrictEqual(core.apPlaceholders(), { name: 'Nombre del producto', dias: 'Mínimo 7 días', visto: 'Últimos 7 días', pais: 'Colombia' });
+});
+
+caso('Prompt buscar anuncios: validación e importar de Mi candidato', () => {
+  assert.deepStrictEqual(core.apValues({}).errors, { name: 'Escribe el nombre del producto' });
+  for (const bad of ['0', '-3', '1.5', 'abc']) assert.deepStrictEqual(Object.keys(core.apValues({ name: 'X', dias: bad, visto: bad }).errors), ['dias', 'visto'], bad);
+  assert.strictEqual(core.apImport(null), null);
+  assert.strictEqual(core.apImport({ name: '  ', photo: 'data:x' }), null);
+  assert.deepStrictEqual(core.apImport({ name: ' Faja ', photo: 'data:x', dropi: '1' }), { name: 'Faja', photo: 'data:x' });
+  assert.deepStrictEqual(core.apImport({ name: 'Faja' }), { name: 'Faja', photo: '' });
 });
 
 let fallos = 0;
