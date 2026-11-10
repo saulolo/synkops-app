@@ -1,0 +1,48 @@
+/* Prompt DropKiller (js/modules/dkprompt): botón flotante y panel en Buscar producto. Se carga después de quick.css. */
+/* El botón usa el azul #022fd9 fijo (pedido del usuario), igual en todos los temas. */
+/* Los estilos del botón y el panel copian a .qk-btn/.qk-panel (deuda: llevarlos a base.css como .fab/.fab-panel). Solo tokens. */
+.dk-btn{all:unset;cursor:pointer;position:fixed;right:20px;bottom:20px;z-index:30;width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:#022fd9;color:#fff;box-shadow:0 10px 28px rgba(2,47,217,.45);transition:transform .15s,filter .15s}
+.dk-btn:hover{filter:brightness(1.1);transform:translateY(-2px)}
+.dk-btn:focus-visible{outline:3px solid var(--b-ink);outline-offset:3px}
+.dk-btn.on{filter:brightness(.92)}
+.dk-panel{position:fixed;right:20px;bottom:86px;z-index:30;width:min(520px,calc(100vw - 32px));max-height:calc(100vh - 120px);overflow-y:auto;display:flex;flex-direction:column;gap:7px;padding:11px 13px;background:linear-gradient(180deg,var(--card-2),var(--card));border:1px solid var(--line-2);border-radius:var(--rad);box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.dk-panel[hidden]{display:none}
+.dk-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.dk-title{display:flex;flex-direction:column;gap:2px}
+.dk-title b{font-size:15px}
+.dk-title small{font-size:11.5px;color:var(--soft)}
+.dk-x{all:unset;cursor:pointer;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:var(--soft);font-size:14px;flex-shrink:0}
+.dk-x:hover{background:var(--card-2);color:var(--ink)}
+.dk-x:focus-visible{outline:2px solid var(--b)}
+/* Cuadrícula de 2 columnas: cada celda lleva la etiqueta arriba y el control (30 px) debajo, así todo queda alineado. */
+.dk-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 16px}
+.dk-cell{display:flex;flex-direction:column;gap:4px;min-width:0}
+.dk-wide{grid-column:1/-1}
+.dk-cell-head{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:22px}
+.dk-lab{font-size:12.5px;font-weight:600;color:var(--muted);white-space:nowrap}
+.dk-hint{font-size:11px;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.dk-err{font-size:11.5px;font-weight:600;color:var(--r)}
+.dk-err:empty{display:none}
+.dk-pair{display:flex;align-items:center;gap:6px}
+.dk-sep{color:var(--soft);font-size:12.5px}
+.dk-cell input[type=text]{background:var(--bg-2);border:1px solid var(--line-2);border-radius:10px;padding:4px 9px;height:32px;font-size:13px;font-weight:700;width:100%;flex:1;min-width:0;box-sizing:border-box;transition:border-color .15s,box-shadow .15s}
+.dk-cell input[type=text]:focus{outline:none;border-color:var(--b);box-shadow:0 0 0 3px var(--b-bg)}
+.dk-cell input.dk-bad{border-color:var(--r)}
+/* Interruptor de dos opciones: el radio queda oculto y la opción elegida se resalta. */
+.dk-seg{display:flex;gap:3px;padding:3px;background:var(--bg-2);border:1px solid var(--line-2);border-radius:10px;height:32px;box-sizing:border-box}
+.dk-seg-sm{height:24px;padding:2px;border-radius:8px}
+.dk-radio{flex:1;position:relative;cursor:pointer;display:flex}
+.dk-radio input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.dk-radio span{flex:1;display:grid;place-items:center;padding:0 10px;border-radius:7px;font-size:12.5px;font-weight:700;color:var(--muted);white-space:nowrap;transition:background .15s,color .15s}
+.dk-seg-sm .dk-radio span{font-size:11.5px;padding:0 8px;border-radius:6px}
+.dk-radio input:checked+span{background:#022fd9;color:#fff}
+.dk-radio input:focus-visible+span{outline:2px solid var(--b);outline-offset:1px}
+.dk-out{display:flex;flex-direction:column;gap:5px;padding-top:7px;border-top:1px solid var(--line)}
+.dk-out label{font-size:12.5px;font-weight:600;color:var(--muted)}
+.dk-out textarea{width:100%;box-sizing:border-box;min-height:84px;height:84px;resize:vertical;background:var(--bg-2);border:1px solid var(--line-2);border-radius:10px;padding:6px 9px;font:inherit;font-size:12px;line-height:1.35;color:var(--ink)}
+.dk-acts{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.dk-hint{grid-column:2;font-size:11px;line-height:1.2;color:var(--soft)}
+.dk-out textarea::placeholder{color:var(--soft)}
+@media (max-width:480px){
+  .dk-form{grid-template-columns:minmax(0,1fr)}
+}

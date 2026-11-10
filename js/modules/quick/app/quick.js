@@ -22,7 +22,10 @@
     return false;
   };
 
-  const setOpen = (open) => { S.open = open; render(); if (open) U.focus(root); };
+  const setOpen = (open) => {
+    S.open = open; render();
+    if (open) { document.dispatchEvent(new CustomEvent('flotante:abierto', { detail: { id: 'qk' } })); U.focus(root); }
+  };
 
   function save() {
     const form = U.read(root);
@@ -73,6 +76,9 @@
     send,
   });
   render();
+
+  // Abrir otro botón flotante cierra este panel.
+  document.addEventListener('flotante:abierto', (e) => { if (e.detail && e.detail.id !== 'qk' && S.open) setOpen(false); });
 
   // Esc cierra el panel (salvo que haya un diálogo abierto encima).
   document.addEventListener('keydown', (e) => {

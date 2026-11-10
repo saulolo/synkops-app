@@ -11,7 +11,7 @@ const caso = (nombre, fn) => casos.push([nombre, fn]);
 
 caso('exporta todas las funciones del núcleo aplanadas', () => {
   const claves = Object.keys(core).sort().join(',');
-  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,LADDER_BLOCKS,LANDING,LEVELS,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_STEPS,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,classify,competition,copText,count,cpaZones,cycles,defaultSlug,evaluate,fill,fmt,fullTitle,funnel,isDropi,isMetrics,key,kpis,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
+  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,LADDER_BLOCKS,LANDING,LEVELS,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_STEPS,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,isDropi,isMetrics,key,kpis,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
 });
 
 caso('Costeo: proveedor 30.000 da precio $99.900 y tope $21.617', () => {
@@ -633,6 +633,53 @@ caso('Escalado: la ronda de práctica (orden, decisiones, fin de caso y puntaje)
   assert.strictEqual(core.practiceBest(50, g.r), 95);
   assert.strictEqual(core.practiceBest(null, core.practiceNew(ids)), null);
   assert.strictEqual(core.practiceView(core.practiceNew(ids)).lastCase, false);
+});
+
+caso('Prompt DropKiller: formulario vacío usa todos los valores por defecto', () => {
+  const r = core.dkValues({ recDias: 7, meses: 3 });
+  assert.strictEqual(r.ok, true);
+  assert.deepStrictEqual(r.errors, {});
+  const t = core.dkPrompt(r.values);
+  for (const x of ['mínimo de 100 y máximo de 2.000', 'entre 10 y 100 ventas en los últimos 7 días', 'Creados de 3 meses para acá',
+    'mínimo 80 y máximo 100 unidades', 'Máximo 3 proveedores', 'entre 0 y 5 veces', 'Ventas (Totales/7 días)',
+    'TODAS (puede ser cualquier nicho; prioriza Salud, Belleza y bienestar), PERO cumple el perfil del punto 8']) assert.ok(t.includes(x), 'Falta: ' + x);
+  assert.ok(!t.includes('{{'), 'No quedan variables sin reemplazar');
+});
+
+caso('Prompt DropKiller: 30 días, 6 meses y categoría escrita', () => {
+  const t = core.dkPrompt(core.dkValues({ recDias: 30, meses: 6, categoria: '  Hogar  ' }).values);
+  assert.ok(t.includes('entre 100 y 500 ventas en los últimos 30 días') && t.includes('Ventas (Totales/30 días)'));
+  assert.ok(t.includes('Creados de 6 meses para acá'));
+  assert.ok(t.includes('7. Categoría: Hogar.') && !t.includes('PERO cumple'));
+  // Vacía o igual al placeholder: abierta.
+  for (const c of ['', '  ', core.DK_DEFAULTS.categoria]) assert.ok(core.dkPrompt(core.dkValues({ recDias: 7, meses: 3, categoria: c }).values).includes('PERO cumple el perfil del punto 8'));
+  // Lo escrito gana al defecto, y el defecto de Ventas recientes sigue a la ventana.
+  const v = core.dkValues({ recDias: 30, meses: 3, totMax: '1.500', recMin: '120' }).values;
+  assert.strictEqual(v.totMax, 1500); assert.strictEqual(v.recMin, 120); assert.strictEqual(v.recMax, 500);
+});
+
+caso('Prompt DropKiller: validación (negativos, decimales, texto y mín. > máx.)', () => {
+  const e = (f) => core.dkValues({ recDias: 7, meses: 3, ...f });
+  assert.strictEqual(e({ totMin: '-5' }).ok, false);
+  assert.deepStrictEqual(e({ totMin: '-5' }).errors, { totMin: 'No puede ser negativo' });
+  assert.deepStrictEqual(e({ stockMax: '1.5' }).errors, { stockMax: 'Escribe un número entero' });
+  assert.deepStrictEqual(e({ provMax: 'abc' }).errors, { provMax: 'Escribe un número entero' });
+  assert.deepStrictEqual(e({ restMin: '9', restMax: '2' }).errors, { restMin: 'El mínimo es mayor que el máximo', restMax: 'El mínimo es mayor que el máximo' });
+  // Un mínimo escrito mayor que el máximo por defecto también falla.
+  assert.deepStrictEqual(Object.keys(e({ totMin: '5000' }).errors).sort(), ['totMax', 'totMin']);
+  assert.strictEqual(e({ totMin: '0', restMin: '0' }).ok, true);
+});
+
+caso('Prompt DropKiller: dkN y placeholders', () => {
+  assert.strictEqual(core.dkN(2000), '2.000');
+  assert.strictEqual(core.dkN(100), '100');
+  assert.strictEqual(core.dkN(1234567), '1.234.567');
+  const p7 = core.dkPlaceholders(7), p30 = core.dkPlaceholders(30);
+  assert.deepStrictEqual([p7.totMin, p7.totMax, p7.recMin, p7.recMax, p7.stockMin, p7.stockMax, p7.provMax, p7.restMin, p7.restMax],
+    ['100', '2.000', '10', '100', '80', '100', '3', '0', '5']);
+  assert.deepStrictEqual([p30.recMin, p30.recMax], ['100', '500']);
+  assert.strictEqual(p7.categoria, 'Todos (Salud, Belleza y bienestar primero)');
+  assert.strictEqual(core.DK_TOT_TOLERANCE, 3000);
 });
 
 let fallos = 0;

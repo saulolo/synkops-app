@@ -64,6 +64,9 @@
     save: (s) => { try { localStorage.setItem(QUICK_KEY, JSON.stringify(s)); return true; } catch { return false; } },
   };
 
+  // Limpieza única: la SPEC 08 (búsqueda automática, descartada) guardaba en pyl-auto; ya nadie la lee.
+  try { localStorage.removeItem('pyl-auto'); } catch { /* sin almacenamiento */ }
+
   // Almacén clave-valor mínimo; cualquier fallo devuelve null en vez de lanzar.
   const idb = (() => {
     const open = () => new Promise((res, rej) => {
