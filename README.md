@@ -57,7 +57,7 @@ Todo vive en una sola página (`index.html`). Las pestañas de la barra superior
 | Pestaña | Para qué sirve |
 |---|---|
 | 🏠 **Inicio** | Resumen del método de Juan Herrera (NovaSociety) y la cadena CPM → CPC → CPPI → CPA. |
-| 🔎 **Buscar producto** | Encontrar y evaluar un producto antes de gastar: flujograma de DropKiller, mi candidato con score, bitácora y estrategias de búsqueda. Un botón flotante guarda productos al vuelo. |
+| 🔎 **Buscar producto** | Encontrar y evaluar un producto antes de gastar: flujograma de DropKiller, mi candidato con score, bitácora y estrategias de búsqueda. Un botón flotante guarda productos al vuelo y otro arma el prompt para buscar en DropKiller. |
 | 🧮 **Costeo** | Cuánto cobrar, cuánto me queda por pedido entregado y mi CPA máximo. |
 | 🛍️ **Desarrollo** | Montar la landing del producto en Shopify y crear su campaña en Meta Ads, paso a paso. |
 | 📏 **Métricas** | Guía de consulta de las métricas duras (CTR, CPC, CPM, CPPI, CPA) para Meta y TikTok: qué significa cada una, su fórmula, sus rangos, qué falla y cómo se arregla; y un glosario de las métricas base del Administrador de anuncios con las que se calculan. |
@@ -121,7 +121,7 @@ Módulo 4 de NovaSociety más el método VDO de DropKiller. La idea: no pregunta
 
 ### ⚡ Guardado rápido
 
-En esta pestaña hay un **botón flotante** (abajo a la derecha, con un numerito que cuenta lo guardado). Es una libreta para anotar productos al vuelo mientras busco; no calcula nada con ellos.
+En esta pestaña hay un **botón flotante** (abajo a la derecha, encima del de Prompt DropKiller, con un numerito que cuenta lo guardado). Es una libreta para anotar productos al vuelo mientras busco; no calcula nada con ellos.
 
 - **Formulario en una fila:** Nombre, ID Dropi, Precio proveedor e Imagen. Nombre e ID son obligatorios; el precio y la imagen son opcionales.
 - **Precio:** lo escribo como `25000` o `25.000` y se ve como `$ 25.000`.
@@ -129,6 +129,17 @@ En esta pestaña hay un **botón flotante** (abajo a la derecha, con un numerito
 - **Lista:** cada producto muestra miniatura, nombre, ID y precio, con botón de copiar en nombre e ID. Un ID repetido no se guarda.
 - **Ícono de enviar** (a la derecha de cada producto): lleva nombre, ID, precio y foto a **Mi candidato** como producto nuevo. Si Mi candidato tiene algo sin guardar, pregunta antes. El producto se queda en la lista.
 - **🧹 Limpiar:** pregunta antes y vacía solo esta lista (libera el espacio de las fotos). Lo que ya envié a Mi candidato no se toca.
+
+### 🧠 Prompt DropKiller
+
+Junto al Guardado rápido hay un segundo **botón flotante azul** (esquina de abajo a la derecha, con el logo de DropKiller). Arma el prompt para buscar diamantes en bruto con el **MCP de DropKiller** bajo el método VDO: lo copio, lo pego en Claude y los resultados se quedan allá.
+
+- **Filtros:** ventas totales (mín./máx., con el aviso «Tolero hasta 3.000»), proveedores, ventas recientes (7 o 30 días), fecha de creación (3 o 6 meses), stock, veces restockeado y categoría. Si dejo un campo vacío, el prompt usa el valor que se ve en gris.
+- **Categoría:** vacía = «Todos (Salud, Belleza y bienestar primero)»; el prompt la abre a cualquier nicho pero prioriza esos y exige el perfil de producto del punto 8.
+- **Números:** enteros (acepta `2.000`). Si algo no es válido o el mínimo supera al máximo, el campo se marca en rojo y no se genera el prompt.
+- **✨ Generar prompt** lo arma con los filtros; **📋 Copiar prompt** lo copia y avisa. El cuadro **no se llena solo** al cambiar un campo y **queda limpio cuando cierro la ventana** (✕, Esc o el botón); los filtros se conservan hasta recargar la página.
+- País (Colombia), plataforma (Dropi) y los 5 resultados van fijos. Nada se guarda en el navegador.
+- Abrir este panel cierra el del Guardado rápido, y al revés.
 
 ### 🧭 Estrategias de búsqueda
 
@@ -516,6 +527,7 @@ css/
     trainer.css       Entrenador: Inicio, Costeo, escalera y pipeline
     search.css        Buscar producto, Mi candidato, bitácora y estadísticas
     quick.css         Guardado rápido
+    dkprompt.css      Prompt DropKiller: botón azul y panel con los filtros
     landing.css       Desarrollo → Shopify
     ads.css           Desarrollo → Meta Ads
     metrics.css       Métricas: ruta, diagrama de métricas duras, avisos, panel "i", botón Expandir y tabla de Métricas base
@@ -525,8 +537,8 @@ css/
   report.css          Informe PDF: documento claro en A4, visible solo al imprimir
 
 tests/
-  core.test.js        Núcleo en Node puro (costeo, guardado rápido, P&L)
-  smoke.test.js       jsdom: claves de PYL.*, 10 pestañas, navegación y consola limpia
+  core.test.js        Núcleo en Node puro (costeo, guardado rápido, prompt DropKiller, P&L)
+  smoke.test.js       jsdom: claves de PYL.*, 10 pestañas, navegación, panel Prompt DropKiller y consola limpia
   fixtures/           CSV de prueba de Dropi (datos inventados) y claves de PYL.*
 
 js/
@@ -554,6 +566,10 @@ js/
       core/quick.js   Valida (nombre, ID, ID repetido), arma la lista y convierte el precio escrito a pesos
       ui/quick.js     Botón flotante, panel con formulario en fila y lista
       app/quick.js    Estado (app.state.quick) y envío a Mi candidato (evento rapido:candidato)
+    dkprompt/         Prompt DropKiller (SPEC 09)
+      core/dkprompt.js Valores por defecto, validación (dkValues) y plantilla del prompt (dkPrompt); sin DOM
+      ui/dkprompt.js  Botón flotante con el logo, cuadrícula de filtros y cuadro del prompt
+      app/dkprompt.js Estado (app.state.dkprompt: open, form, last), Generar, Copiar y cierre con Esc
     landing/          Desarrollo → Shopify (core: pasos, prompts y números LANDING · ui · app)
     ads/              Desarrollo → Meta Ads (core: AD_STRATEGIES, ABO_STEPS y ADS · ui: mapa y herramientas · app)
     metrics/          Métricas → métricas duras (SPEC 03) y Métricas base (SPEC 04)
@@ -581,7 +597,7 @@ js/
 
 - **Sin `import`/`export`.** Los navegadores bloquean los ES modules en `file://`. Cada archivo es un IIFE que publica su API en el namespace global `PYL` (`PYL.core.pnl`, `PYL.ui.funnel`, etc.).
 - **El orden importa.** `index.html` carga los scripts en el orden de las capas (`core → services → ui → app`; dentro de cada capa, `shared` y luego los módulos), con `app/nav.js` antes de `main.js`. Los `<link>` de CSS también van en un orden fijo (ver el árbol). Un archivo nuevo va en `modules/<módulo>/<capa>/`, o en `shared/` si lo usan varios módulos, antes de los que lo usan.
-- **Carpeta = módulo, namespace = capa.** `js/modules/search/core/search.js` publica `PYL.core.search`. Un módulo solo usa `shared/` y los módulos que se cargan antes (`search` usa `pnl`; `quick` usa `search`; `ads` usa `landing` y `search`; `metrics` solo usa `shared/`; `testing` usa `metrics`, `ads` y `landing`; `scaling` usa `metrics` y `testing`; `trainer` usa `search`).
+- **Carpeta = módulo, namespace = capa.** `js/modules/search/core/search.js` publica `PYL.core.search`. Un módulo solo usa `shared/` y los módulos que se cargan antes (`search` usa `pnl`; `quick` usa `search`; `dkprompt` solo usa `shared/` (se coordina con `quick` por el evento `flotante:abierto`); `ads` usa `landing` y `search`; `metrics` solo usa `shared/`; `testing` usa `metrics`, `ads` y `landing`; `scaling` usa `metrics` y `testing`; `trainer` usa `search`).
 - **La navegación es de toda la app.** `app/nav.js` abre la vista y dispara `nav:vista`; cada módulo reacciona a ese evento.
 - **Solo la capa `app` modifica el estado.** Los componentes de `ui` reciben datos y callbacks (`onSelect`, `onAssign`).
 - **Los diagnósticos devuelven datos, no HTML.** El texto con formato se representa como segmentos: un string es texto plano, `{ b: '...' }` va en negrita y `{ a: '...', href }` es un enlace que abre en pestaña nueva. `shared/ui/dom.js` (`rich`) los pinta.

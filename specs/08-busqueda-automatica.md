@@ -1,6 +1,6 @@
 # SPEC 08 — Búsqueda automática con DropKiller
 
-> **Estado:** Aprobado
+> **Estado:** Obsoleto
 > **Depende de:** SPEC 01, SPEC 02
 > **Fecha:** 2026-11-10
 > **Objetivo:** Agregar a Buscar producto una tercera estrategia, "🤖 Búsqueda automática", que arma con presets editables el prompt para el MCP de DropKiller (y su instrucción diaria para `/schedule`), recibe el JSON que devuelve Claude y lo muestra como un Scorecard re-chequeado, con historial y envío a Mi candidato o al Guardado rápido.
