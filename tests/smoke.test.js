@@ -501,7 +501,99 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   assert.deepStrictEqual([...run().order].sort(), [...PYL.core.testing.TEST_CASES.map((c) => c.id)].sort(), 'La ronda pasa por los 8 casos');
   paso(0);
 
-  return new Promise((ok) => setTimeout(ok, 200)).then(() => {
+  // 8. Rastros de la SPEC 08 (SPEC 09): Estrategias solo VDO y Por proveedor, 'auto' guardado cae en VDO y pyl-auto se borra.
+  // En jsdom con file:// no hay localStorage: se arma otra página con uno simulado.
+  const store = { 'pyl-search': JSON.stringify({ strat: 'auto' }), 'pyl-auto': '{"hist":[]}' };
+  const fresca = () => JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
+    runScripts: 'dangerously', resources: new Loader(), pretendToBeVisual: true, virtualConsole,
+    beforeParse(w) {
+      Object.defineProperty(w, 'localStorage', { configurable: true, value: {
+        getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: (k) => { delete store[k]; },
+      } });
+    },
+  }).then((d) => new Promise((ok) => { if (d.window.document.readyState === 'complete') ok(d); else d.window.addEventListener('load', () => ok(d)); }));
+
+  // 9. Prompt DropKiller (SPEC 09): botón flotante y panel en Buscar producto.
+  const dkTest = async () => {
+    let copiado = null;
+    Object.defineProperty(window.navigator, 'clipboard', { configurable: true, value: { writeText: async (t) => { copiado = t; } } });
+    const $ = (q) => document.querySelector(q);
+    const poner = (id, v) => { const x = $(id); x.value = v; x.dispatchEvent(new window.Event('input', { bubbles: true })); };
+    assert.ok($('#v-buscar #dk-btn') && $('#qk-root').nextElementSibling === $('#dk-root'), '#dk-root va dentro de #v-buscar, justo después de #qk-root');
+    assert.ok(!$('#v-desarrollo #dk-btn') && document.querySelectorAll('[id="dk-btn"]').length === 1, 'Un solo botón, solo en Buscar producto');
+    assert.ok($('#dk-btn svg') && $('#dk-btn').title === 'Prompt DropKiller', 'El botón lleva el ícono SVG y su título');
+    assert.ok($('#dk-panel').hidden, 'El panel empieza cerrado');
+    $('#dk-btn').click();
+    assert.ok(!$('#dk-panel').hidden && $('#dk-btn').getAttribute('aria-expanded') === 'true', 'El botón abre el panel');
+    assert.ok($('#dk-prompt').readOnly && $('#dk-prompt').value === '' && $('#dk-prompt').placeholder.includes('Generar prompt'), 'El prompt empieza vacío');
+    $('#dk-copy').click();
+    assert.ok(/Primero toca/.test($('#toast').textContent) && copiado === null, 'Copiar sin generar avisa y no copia');
+    assert.ok($('#dk-f-tot-max').closest('.dk-cell').querySelector('.dk-hint').textContent.includes('3.000'), 'Aviso de tolerancia de 3.000 ventas totales');
+    assert.strictEqual($('#dk-f-cat').placeholder, 'Todos (Salud, Belleza y bienestar primero)', 'Placeholder de Categoría');
+    $('#dk-gen').click();
+    const base = $('#dk-prompt').value;
+    assert.ok(base.includes('máximo de 2.000') && base.includes('últimos 7 días') && base.includes('7. Categoría: TODAS') && base.includes('PERO cumple el perfil del punto 8'), 'Generar arma el prompt con los valores por defecto');
+    assert.deepStrictEqual([$('#dk-f-tot-min').placeholder, $('#dk-f-tot-max').placeholder, $('#dk-f-rec-min').placeholder, $('#dk-f-rec-max').placeholder], ['100', '2.000', '10', '100'], 'Placeholders por defecto');
+    // Cambiar un campo no cambia el prompt hasta volver a generar.
+    poner('#dk-f-tot-max', '1500');
+    assert.strictEqual($('#dk-prompt').value, base, 'El prompt no cambia solo');
+    $('#dk-gen').click();
+    assert.ok($('#dk-prompt').value.includes('máximo de 1.500'), 'Generar usa lo escrito');
+    // 30 días: cambian los placeholders de Ventas recientes y el texto; lo escrito no se toca.
+    poner('#dk-f-rec-min', '12');
+    $('#dk-f-rec-30').click();
+    assert.deepStrictEqual([$('#dk-f-rec-min').placeholder, $('#dk-f-rec-max').placeholder], ['100', '500'], 'Placeholders de 30 días');
+    assert.strictEqual($('#dk-f-rec-min').value, '12', 'Lo ya escrito no se toca');
+    $('#dk-gen').click();
+    assert.ok($('#dk-prompt').value.includes('entre 12 y 500 ventas en los últimos 30 días') && $('#dk-prompt').value.includes('Totales/30 días'));
+    $('#dk-f-age-6').click(); $('#dk-gen').click();
+    assert.ok($('#dk-prompt').value.includes('Creados de 6 meses para acá'), '6 meses');
+    // Error: marca el campo, mensaje bajo el par y el prompt no cambia.
+    const antes = $('#dk-prompt').value;
+    poner('#dk-f-stock-min', '999'); $('#dk-gen').click();
+    assert.ok($('#dk-f-stock-min').classList.contains('dk-bad') && $('#dk-f-stock-min').getAttribute('aria-invalid') === 'true' && $('#dk-f-stock-max').classList.contains('dk-bad'), 'Los dos campos del par se marcan');
+    assert.ok($('#dk-err-stock').textContent.includes('mínimo es mayor'), 'Mensaje bajo el par');
+    assert.strictEqual($('#dk-prompt').value, antes, 'Con error el prompt se queda con el último texto válido');
+    poner('#dk-f-stock-min', '');
+    assert.ok(!$('#dk-f-stock-min').classList.contains('dk-bad') && !$('#dk-err-stock').textContent && $('#dk-f-stock-min').getAttribute('aria-invalid') !== 'true', 'Corregir quita la marca');
+    // Categoría escrita.
+    poner('#dk-f-cat', 'Belleza'); $('#dk-gen').click();
+    assert.ok($('#dk-prompt').value.includes('7. Categoría: Belleza.'));
+    // Copiar avisa en #toast y copia el texto.
+    $('#dk-copy').click();
+    await new Promise((ok) => setTimeout(ok, 20));
+    assert.strictEqual(copiado, $('#dk-prompt').value, 'Copia el prompt');
+    assert.ok($('#toast').classList.contains('show') && /copi/i.test($('#toast').textContent), 'Avisa en #toast');
+    // Abrir uno cierra el otro.
+    $('#qk-btn').click();
+    assert.ok($('#dk-panel').hidden && !$('#qk-panel').hidden, 'Abrir Guardado rápido cierra el de DropKiller');
+    $('#dk-btn').click();
+    assert.ok(!$('#dk-panel').hidden && $('#qk-panel').hidden, 'Abrir DropKiller cierra el Guardado rápido');
+    // Esc, ✕ y volver a tocar el botón cierran.
+    document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    assert.ok($('#dk-panel').hidden, 'Esc cierra');
+    assert.strictEqual($('#dk-prompt').value, '', 'Al cerrar, el cuadro del prompt queda limpio');
+    $('#dk-btn').click();
+    assert.strictEqual($('#dk-prompt').value, '', 'Al reabrir sigue limpio');
+    $('#dk-gen').click(); $('#dk-btn').click();
+    assert.strictEqual($('#dk-prompt').value, '', 'Cerrar con el botón también limpia'); $('#dk-btn').click(); $('#dk-btn').click();
+    $('#dk-btn').click(); $('#dk-x').click();
+    assert.ok($('#dk-panel').hidden, '✕ cierra');
+    $('#dk-btn').click(); $('#dk-btn').click();
+    assert.ok($('#dk-panel').hidden, 'Tocar el botón otra vez cierra');
+    assert.strictEqual(PYL.app.state.dkprompt.open, false);
+  };
+
+  return dkTest().then(fresca).then((d2) => {
+    const doc2 = d2.window.document;
+    assert.deepStrictEqual([...doc2.querySelectorAll('#b-strats .st-tab')].map((b) => b.textContent.length > 0), [true, true], 'Estrategias muestra solo 2 tarjetas');
+    assert.deepStrictEqual([...d2.window.PYL.core.search.STRATEGIES.map((x) => x.k)], ['vdo', 'prov'], 'STRATEGIES = vdo y prov');
+    assert.ok(!doc2.querySelector('#b-st-auto') && !doc2.querySelector('[id^="hu-"]'), 'No existe #b-st-auto ni #hu-');
+    assert.ok(!doc2.querySelector('#b-st-vdo').hidden && doc2.querySelector('#b-st-prov').hidden, "strat 'auto' guardado abre VDO");
+    assert.ok(!('pyl-auto' in store), 'Se borra pyl-auto una sola vez al cargar');
+    assert.ok('pyl-search' in store, 'No se toca pyl-search');
+    d2.window.close();
+  }).then(() => new Promise((ok) => setTimeout(ok, 200))).then(() => {
     assert.ok(ladder.classList.contains('grown'), 'La escalera debe terminar crecida');
     // 7. Consola limpia salvo scrollTo.
     const malos = errores.filter((m) => !esperado(m));
