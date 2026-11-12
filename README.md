@@ -108,12 +108,12 @@ En contra entrega (COD) lo que vende Meta **no** es lo que entra a tu bolsillo: 
 
 ## 🔎 Buscar producto
 
-Módulo 4 de NovaSociety más el método VDO de DropKiller. La idea: no preguntarme "¿qué producto vendo?", sino "¿qué problema le arde a la gente?", y dejar que los datos decidan. La ruta de arriba lleva a cada parte:
+Módulo 4 de NovaSociety más el método VDO de DropKiller. La idea: no preguntarme "¿qué producto vendo?", sino "¿qué problema le arde a la gente?", y dejar que los datos decidan. La ruta de arriba lleva a cada parte y resalta la sección en la que estoy (al tocarla o al desplazar la página):
 
 | # | Parte | Qué hago ahí |
 |:-:|---|---|
 | 1 | **Flujograma DropKiller** | 7 pasos con sus filtros (ventas totales 100–2.000, 7 días 10–100, 30 días 100–500, stock mínimo 80…). Cada rombo es una decisión: si la respuesta es no, descarto. Marco los pasos hechos. |
-| 2 | **Mi candidato** | Formulario con foto, ventas, proveedores, anunciantes y costos. Calcula solo el **score /8**, la **utilidad por entrega** y el semáforo **¿Lo testeo?** del método VDO. **Costear →** pasa el producto a la pestaña Costeo. |
+| 2 | **Mi candidato** | Formulario con foto, ventas, proveedores, anunciantes y costos. Calcula solo el **score /8**, la **utilidad por entrega** y el semáforo **¿Lo testeo?** del método VDO. Al guardar, el producto se queda en el formulario (pasa a "Editando"); solo **🧹 Limpiar formulario** lo vacía. **Costear →** pasa el producto a la pestaña Costeo. |
 | 3 | **Bitácora** | Los productos que voy evaluando. Lápiz = editar, papelera = eliminar, botones para copiar nombre e ID de Dropi. Filtros, búsqueda y vista de estadísticas. |
 | 4 | **¿Es un producto ganador?** | 6 características (2 obligatorias). Las marco y se guardan con el candidato. |
 | 5 | **Estrategias de búsqueda** | Dos caminos para encontrar el producto (ver abajo). |
@@ -128,6 +128,7 @@ En esta pestaña hay un **botón flotante** (abajo a la derecha, encima del de P
 - **Imagen:** copio una imagen y, con el panel abierto, presiono **Ctrl+V** (o toco el cuadro para elegir un archivo). Se guarda pequeña, solo como referencia.
 - **Lista:** cada producto muestra miniatura, nombre, ID y precio, con botón de copiar en nombre e ID. Un ID repetido no se guarda.
 - **Ícono de enviar** (a la derecha de cada producto): lleva nombre, ID, precio y foto a **Mi candidato** como producto nuevo. Si Mi candidato tiene algo sin guardar, pregunta antes. El producto se queda en la lista.
+- **Papelera** (al lado del de enviar): elimina solo ese producto de la lista; pregunta antes, como en la bitácora.
 - **🧹 Limpiar:** pregunta antes y vacía solo esta lista (libera el espacio de las fotos). Lo que ya envié a Mi candidato no se toca.
 
 ### 🧠 Prompt DropKiller
@@ -170,7 +171,7 @@ En **FastMoss** (enlace directo a [fastmoss.com/es](https://www.fastmoss.com/es)
 
 ## 🛍️ Desarrollo de la landing
 
-Módulo 5 de NovaSociety: lo que hago a mano para montar el producto en Shopify. La descripción en HTML la entrega la skill de Claude **"Mi Página Vida Nova"**; la pestaña guía el resto, paso a paso y con casillas que se guardan:
+Módulo 5 de NovaSociety: lo que hago a mano para montar el producto en Shopify. La descripción en HTML la entrega la skill de Claude **"Mi Página Vida Nova"**; la pestaña guía el resto, paso a paso y con casillas que se guardan. Las sub-pestañas van numeradas (**1** Landing en Shopify, **2** Meta Ads, **3** TikTok Ads · pronto):
 
 - Prompts para el título y las imágenes; subir imágenes a *Contenido → Archivos* y pegar sus URL en el HTML.
 - Precios, identificador de URL, Dropify e inventario.
@@ -199,7 +200,7 @@ En esta pestaña hay un **botón flotante verde** (esquina de abajo a la derecha
 Las pestañas Inicio, Costeo, Métricas, Escalera y Creativos siguen el método de Juan Herrera:
 
 - **Costeo:** el precio sale del margen que quiero, redondeado a x4.900 / x9.900 (igual que el MCP de NovaSociety). Calcula el CPA máximo, la zona de escala y la zona de apagar. Con **Poner este precio en mi candidato** el precio vuelve a Buscar producto.
-- **Lectura de métricas:** arriba, una ruta para saltar a cada sección (Métricas duras, Métricas base, Métricas blandas, La cadena que decide todo) y un botón **Testeo →**.
+- **Lectura de métricas:** arriba, una ruta (resalta la sección en la que estoy) para saltar a cada sección (Métricas duras, Métricas base, Métricas blandas, La cadena que decide todo) y un botón **Testeo →**.
 - **Métricas duras:** un diagrama animado "Las 5 métricas más importantes" (TikTok · ¿Cómo se logra? · Meta) con CTR, CPC, CPM, CPPI y CPA. Es una guía de orientación con números fijos, no usa mis datos.
   - Paso el mouse por un **número** y veo su límite máximo permitido en esa plataforma (y el rango ideal); por **¿Cómo se logra?**, una tabla con el diagnóstico si falla y la palanca de solución.
   - El botón **i** de cada métrica abre una explicación en palabras simples: qué mide, su **fórmula**, una comparación cotidiana y su semáforo de señales. En CTR y CPPI dice además cómo se llaman en el reporte de Meta.
@@ -576,7 +577,7 @@ js/
                       candidate.js (evaluador: formulario con foto, score /8, utilidad, bitácora y estadísticas)
       app/search.js   Estado (app.state.search) y paso del candidato al Costeo
     quick/            Guardado rápido
-      core/quick.js   Valida (nombre, ID, ID repetido), arma la lista y convierte el precio escrito a pesos
+      core/quick.js   Valida (nombre, ID, ID repetido), arma la lista, quita un producto y convierte el precio escrito a pesos
       ui/quick.js     Botón flotante, panel con formulario en fila y lista
       app/quick.js    Estado (app.state.quick) y envío a Mi candidato (evento rapido:candidato)
     dkprompt/         Prompt DropKiller (SPEC 09)

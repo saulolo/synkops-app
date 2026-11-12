@@ -110,6 +110,15 @@ h3{font-size:15px;margin:0 0 6px;font-weight:700}
 .seg button{all:unset;cursor:pointer;padding:9px 16px;border-radius:9px;font-size:13.5px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:8px}
 .seg button[aria-pressed="true"]{background:var(--card-2);color:var(--ink);box-shadow:0 0 0 1px var(--line-2) inset}
 .seg button:focus-visible{outline:2px solid var(--b)}
+/* Ruta de una pestaña (.b-route en Buscar producto, .hm-route en Métricas): mismo aspecto que .seg, con número. La sección en la que estoy lleva .on (ui.dom.route). */
+.b-route,.hm-route{display:flex;flex-wrap:wrap;gap:4px;width:fit-content;max-width:100%;background:var(--bg-2);border:1px solid var(--line);border-radius:13px;padding:4px}
+.b-route a,.b-route button,.hm-route a,.hm-route button{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:7px 14px 7px 8px;border-radius:9px;font-size:13.5px;font-weight:700;color:var(--muted);transition:background .2s,color .2s}
+.b-route a:hover,.b-route button:hover,.hm-route a:hover,.hm-route button:hover{color:var(--ink)}
+.b-route a:focus-visible,.b-route button:focus-visible,.hm-route a:focus-visible,.hm-route button:focus-visible{outline:2px solid var(--b)}
+.b-route .on,.hm-route .on{background:var(--card-2);color:var(--ink);box-shadow:0 0 0 1px var(--line-2) inset}
+.b-route span,.hm-route span{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--b-bg);color:var(--b-ink);font-size:12px;font-weight:900}
+.b-route button,.hm-route button{color:var(--b-ink)}
+@media (prefers-reduced-motion:reduce){.b-route a,.b-route button,.hm-route a,.hm-route button{transition:none}}
 .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:var(--card)}
 table{border-collapse:collapse;width:100%;font-size:13.5px}
 .tbl-wrap table{min-width:1040px}

@@ -136,7 +136,8 @@
     if (i >= 0) S.log[i] = p; else S.log.unshift(p);
     persist(); // si no cupo, queda en la sesión y persist() ya avisó
     toast(i >= 0 ? `Actualicé ${name}.` : `Guardé ${name} en la bitácora.`, 'ok');
-    loadDraft({}, null);
+    // El producto se queda abierto en el formulario (ahora "Editando"): solo "Limpiar formulario" lo vacía.
+    loadDraft({ ...p }, p.id);
   }
 
   // id = producto de la bitácora (botón de la fila); sin id, el que estoy editando.
@@ -245,6 +246,7 @@
   $('#b-dup').addEventListener('click', duplicate);
   $('#b-del').addEventListener('click', () => del());
   // Los enlaces de la ruta abren la sección si está contraída.
+  PYL.ui.dom.route(document.querySelector('.b-route'));
   document.querySelectorAll('.b-route a[href^="#"]').forEach((a) => a.addEventListener('click', () => { const t = $(a.getAttribute('href')); if (t && t.tagName === 'DETAILS') t.open = true; }));
   $('#b-q').addEventListener('input', (e) => { S.q = e.target.value; renderLog(); });
   $('#b-views').addEventListener('click', (e) => { const b = e.target.closest('[data-bview]'); if (b) { S.view = b.dataset.bview; persist(); renderLog(); } });

@@ -76,6 +76,7 @@
   render();
 
   // Ruta de la pestaña (.hm-route): si el destino es un desplegable cerrado (Métricas base), se abre al ir a él.
+  PYL.ui.dom.route(document.querySelector('.hm-route'));
   document.querySelectorAll('.hm-route a[href^="#"]').forEach((a) => a.addEventListener('click', () => {
     const t = $(a.getAttribute('href'));
     if (t && t.tagName === 'DETAILS') t.open = true;

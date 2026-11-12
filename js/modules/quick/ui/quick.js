@@ -1,6 +1,6 @@
 // Guardado rápido (pestaña Buscar producto): botón flotante con numerito y panel pequeño para anotar
 // productos al vuelo (nombre, ID Dropi, imagen). Recibe datos y callbacks; no guarda estado.
-// on = { toggle(), close(), save(), photo(file), photoClear(), clear(), copy(text), send(id) }.
+// on = { toggle(), close(), save(), photo(file), photoClear(), clear(), copy(text), send(id), del(id) }.
 (() => {
   const PYL = globalThis.PYL;
   const { el } = PYL.ui.dom;
@@ -9,6 +9,9 @@
   const ICON_BOLT = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg>';
 
   const ICON_SEND = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>';
+
+  // Misma papelera de la bitácora (modules/search/ui/candidate.js).
+  const ICON_DEL = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>';
 
   function field(id, label, ph) {
     const box = el('div', 'field');
@@ -115,7 +118,12 @@
     send.title = 'Enviar a Mi candidato'; send.setAttribute('aria-label', 'Enviar ' + it.name + ' a Mi candidato');
     send.addEventListener('click', () => on.send(it.id));
 
-    r.append(info, send);
+    // Papelera: quita solo este producto de la lista (mismo botón que la bitácora, `.cd-act.del` de search.css).
+    const del = el('button', 'cd-act del qk-del'); del.type = 'button'; del.innerHTML = ICON_DEL;
+    del.title = 'Eliminar del guardado rápido'; del.setAttribute('aria-label', 'Eliminar ' + it.name + ' del guardado rápido');
+    del.addEventListener('click', () => on.del(it.id));
+
+    r.append(info, send, del);
     return r;
   }
 

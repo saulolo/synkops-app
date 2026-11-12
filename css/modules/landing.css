@@ -2,6 +2,8 @@
 /* ---------- Desarrollo del producto (landing en Shopify) ---------- */
 /* Reusa el flujograma de Buscar producto (.b-flow, .fl, .fl-detail, .b-prog). */
 #v-desarrollo .seg button:disabled{cursor:not-allowed;opacity:.5}
+/* Número de cada sub-pestaña: mismo círculo que la ruta .b-route (base.css). */
+#d-parts button span{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--b-bg);color:var(--b-ink);font-size:12px;font-weight:900}
 .ld-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
 .ld-checks{list-style:none;margin:0;padding:0;display:grid;gap:8px;counter-reset:ld}
 .ld-check{all:unset;cursor:pointer;box-sizing:border-box;width:100%;display:flex;align-items:flex-start;gap:12px;padding:11px 13px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-size:14px;line-height:1.45;transition:border-color .2s,background .2s}

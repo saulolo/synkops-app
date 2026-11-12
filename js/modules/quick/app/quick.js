@@ -55,6 +55,16 @@
     toast('Guardado rápido limpio.', 'ok');
   }
 
+  // Papelera de cada fila: quita solo ese producto (pregunta antes, como la bitácora).
+  async function del(id) {
+    const p = S.items.find((x) => x.id === id);
+    if (!p) return;
+    const r = await PYL.ui.feedback.ask('Eliminar producto', `¿Elimino "${p.name}" del guardado rápido? No se puede deshacer.`, [{ r: 'del', label: 'Eliminar' }]);
+    if (r !== 'del') return;
+    S.items = C.quickRemove(S.items, id); persist(); render();
+    toast(`Eliminé "${p.name}" del guardado rápido.`, 'ok');
+  }
+
   // Manda una copia del producto a Mi candidato (lo recibe modules/search/app/search.js). El producto sigue en la lista.
   function send(id) {
     const p = S.items.find((x) => x.id === id);
@@ -74,6 +84,7 @@
     photoClear: () => { S.photo = ''; render(); },
     clear,
     send,
+    del,
   });
   render();
 

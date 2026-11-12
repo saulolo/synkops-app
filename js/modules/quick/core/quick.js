@@ -31,5 +31,8 @@
     return [item, ...(items || [])];
   };
 
-  core.quick = { quickCheck, quickAdd, quickPrice };
+  // Lista nueva sin el producto de ese id. No toca la lista recibida.
+  const quickRemove = (items, id) => (items || []).filter((x) => x.id !== id);
+
+  core.quick = { quickCheck, quickAdd, quickPrice, quickRemove };
 })();
