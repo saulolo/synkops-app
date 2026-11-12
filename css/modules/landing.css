@@ -60,11 +60,29 @@ ol.ld-checks .ld-check::before{content:counter(ld);order:2;margin-left:auto;font
 .ld-big{font-family:ui-monospace,"SFMono-Regular",Consolas,monospace;font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
 .ld-offer-hot .ld-big{color:var(--g-ink)}
 .ld-strike{font-size:13px;color:var(--soft);text-decoration:line-through}
+/* Dato que pide un prompt (p.ask): campo + "Generar prompt" */
+.ld-ask{display:flex;align-items:flex-end;gap:12px;margin:10px 0}
+.ld-ask .field{flex:1;min-width:0;margin:0}
+.ld-ask .btn{flex:none}
+/* URL de la product page (paso 2 de la landing y paso 1 de Meta Ads) */
+.ld-slug{flex:1;min-width:0;display:flex;align-items:center;background:var(--bg-2);border:1px solid var(--line-2);border-radius:11px;transition:border-color .15s,box-shadow .15s}
+.ld-slug:focus-within{border-color:var(--b);box-shadow:0 0 0 3px var(--b-bg)}
+.ld-base{padding-left:13px;font-size:15.5px;font-weight:700;color:var(--soft);white-space:nowrap}
+.field .ld-slug input,.field .ld-slug input:focus{flex:1;min-width:0;background:none;border:0;box-shadow:none;padding-left:0}
+.ld-url{display:flex;align-items:center;gap:12px}
+.ld-url .ld-copy{flex:none}
+.ld-url .ld-copy:disabled{opacity:.45;pointer-events:none}
+.ld-hide{display:none}
 /* "Producto que estoy montando": los 4 campos en una sola línea; el nombre, más ancho */
 #d-prod .ld-fields{grid-template-columns:minmax(0,2fr) repeat(3,minmax(0,1fr))}
 @media (max-width:900px){
   .ld-fields,#d-prod .ld-fields{grid-template-columns:1fr}
   .ld-val{flex-wrap:wrap}
+  .ld-url,.ld-slug,.ld-ask{flex-wrap:wrap}
+  .ld-ask .field{flex-basis:100%}
+  .ld-slug{flex-basis:100%}
+  .ld-base{padding-top:8px;font-size:13px;white-space:normal;word-break:break-all}
+  .field .ld-slug input,.field .ld-slug input:focus{flex-basis:100%;padding-left:13px}
 }
 @media (min-width:601px) and (max-width:900px){
   #d-prod .ld-fields{grid-template-columns:1fr 1fr}

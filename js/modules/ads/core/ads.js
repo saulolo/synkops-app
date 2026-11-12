@@ -17,7 +17,6 @@
     pixel: 'PIXEL VN',
     page: 'VidanovaStore',
     ig: 'VidanovaStoreOficial',
-    store: 'vidanovastore.com',
   };
 
   // Ciudades que excluyo en Audiencia → Lugares, por departamento y escritas tal como salen en Meta.
@@ -159,25 +158,11 @@
     return d + ' - ' + ((product || '').trim().split(/\s+/)[0].toUpperCase() || 'PRODUCTO');
   }
 
-  // Parte fija de la URL de la product page: solo cambia lo que va después (el identificador de URL de Shopify).
-  const URL_BASE = `https://${ADS.store}/products/`;
-
-  // Identificador limpio: sin tildes, en minúsculas y sin lo demás de la URL si pegaron la dirección completa.
-  function slugify(text) {
-    return String(text || '').trim()
-      .replace(/^.*\/products\//i, '').replace(/[?#/].*$/, '')
-      .normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
-      .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-  }
-
-  // Identificador por defecto: el primer nombre del producto ("Magnesium Complex" → magnesium).
-  const defaultSlug = (product) => slugify((product || '').trim().split(/\s+/)[0]);
-
   // Lo que se deriva para pintar: nombre, fecha, presupuesto total, elementos a publicar y la URL.
-  // st.slug = identificador escrito a mano; vacío → el primer nombre del producto.
+  // st = estado de la landing (app.state.landing): ahí vive el identificador de URL, compartido con su paso 2.
   function adsView(st, product, date = new Date()) {
     const name = (product || '').trim();
-    const auto = defaultSlug(name), slug = slugify(st.slug) || auto;
+    const auto = core.landing.defaultSlug(name), slug = core.landing.slugify(st.slug) || auto;
     return {
       product: name, name: campaignName(name, date),
       daily: ADS.daily, total: ADS.daily * ADS.sets, sets: ADS.sets, items: 1 + ADS.sets * 2,
@@ -197,5 +182,5 @@
   ];
   const strategy = (k) => AD_STRATEGIES.find((s) => s.k === k) || AD_STRATEGIES[0];
 
-  core.ads = { ADS, EXCLUDED, LEVELS, ABO_STEPS, AD_STRATEGIES, URL_BASE, strategy, campaignName, slugify, defaultSlug, adsView };
+  core.ads = { ADS, EXCLUDED, LEVELS, ABO_STEPS, AD_STRATEGIES, strategy, campaignName, adsView };
 })();

@@ -16,15 +16,15 @@
     part: PARTS.includes(saved.part) ? saved.part : 'shop', // sub-pestaña abierta
     strat: C.strategy(saved.strat).k,                       // estrategia abierta ('abo' | 'cbo')
     plans,                                                  // { abo: { active, done: { 'paso.casilla': true } } }
-    slug: saved.slug || '',                                 // identificador de URL escrito a mano; vacío = primer nombre del producto
-    slugFor: saved.slugFor || '',                           // producto para el que se escribió (otro producto → vuelve al automático)
   });
   const plan = () => (S.plans[S.strat] ??= { active: 0, done: {} });
 
   const persist = () => { if (!store.save(S)) toast('No pude guardar en el navegador.', 'error'); };
   const root = $('#ma-card');
-  const prod = () => (PYL.app.state.landing && PYL.app.state.landing.prod) || {};
-  const view = () => C.adsView(S, prod().name);
+  const land = () => PYL.app.state.landing || {};
+  const prod = () => land().prod || {};
+  // El identificador de URL vive en el estado de la landing (lo comparte con su paso 2).
+  const view = () => C.adsView(land(), prod().name);
   const refresh = () => U.outputs(root, view());
   // El botón muestra ✓ al copiar; solo el error va como mensaje.
   const copy = async (text) => { const ok = await PYL.ui.dom.copy(text); if (!ok) toast('No pude copiar: lo selecciono y copio a mano.', 'error'); return ok; };
@@ -55,7 +55,8 @@
     }, {
       toggle: (k) => { P.done[k] = !P.done[k]; persist(); render(); },
       clearStep: () => { s.items.forEach((it) => { delete P.done[L.key(s, it)]; }); persist(); render(); },
-      field: (k, val) => { S[k] = val; S.slugFor = prod().name || ''; persist(); refresh(); },
+      // El único campo de esta guía es el identificador de URL: lo guarda la landing (evento ads:slug).
+      field: (k, val) => { document.dispatchEvent(new CustomEvent('ads:slug', { detail: { slug: val } })); refresh(); },
       copy,
       prev: () => select(i - 1),
       next: () => select(i + 1),
@@ -82,11 +83,7 @@
   document.querySelectorAll('#d-parts [data-part]').forEach((b) => b.addEventListener('click', () => { showPart(b.dataset.part); persist(); }));
 
   // El nombre o el precio cambiaron en "Producto que estoy montando": cambian el nombre de la campaña, la URL y el prompt.
-  // Con otro producto, el identificador escrito a mano ya no aplica.
-  document.addEventListener('landing:prod', () => {
-    if (S.slug && S.slugFor !== (prod().name || '')) { S.slug = ''; persist(); }
-    render();
-  });
+  document.addEventListener('landing:prod', render);
 
   showPart(S.part);
   render();

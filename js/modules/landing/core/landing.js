@@ -2,7 +2,8 @@
 // La skill "Mi Página Vida Nova" (Claude) escribe el HTML de la descripción; aquí va solo lo que hago a mano:
 // imágenes, Shopify, Dropify, inventario, Releasit y reseñas. Contenido de los pasos, prompts y cálculos. Sin DOM.
 // Los textos son segmentos: string = texto plano, { b } = negrita.
-// En los prompts: {producto} = nombre, {precio} = precio de venta; [ASÍ] = lo completo yo.
+// En los prompts: {producto} = nombre, {dropi} = ID de Dropi, {precio} = precio de venta, {dosis} = dosis de la etiqueta; [ASÍ] = lo completo yo.
+// Un prompt con `ask` ({ k, label, ph }) pide ese dato en un campo y se arma con el botón "Generar prompt".
 (() => {
   const core = globalThis.PYL.core;
 
@@ -16,6 +17,7 @@
     imports: 10,      // TrustWill: número de importaciones
     ownReviews: 6,    // TrustWill: reseñas de 5 estrellas que edito con las de mis clientes
     aliSales: 1000, // TrustWill: producto de AliExpress con más de 1.000 ventas
+    store: 'vidanovastore.com', // dominio de la tienda (parte fija de la URL de la product page)
   };
 
 
@@ -37,7 +39,7 @@
         { k: 'msg', t: '3. Mensaje para la skill', text: '/mi-pagina-vidanova\nProducto: {producto} — usa la información del proveedor y las fotos que te pasé arriba en este chat\nPrecio de 1 unidad: {precio}\nRegalo: [qué es y cómo llega, o "sin regalo"]\nFin del flash sale: [fecha, o lo dejo vacío y usa el domingo siguiente]\nReseñas reales: [pégalas tal cual, o "no tengo"]' },
       ],
       ordered: true,
-      tool: ['title'],
+      tool: ['title', 'url'],
       items: [
         { k: 'feed', t: ['Le pasé a la IA el ', { b: 'producto' }, ' (nombre y fotos reales) y sus ', { b: 'especificaciones del proveedor' }, ' (prompt 1).'] },
         { k: 'add', t: ['Abrí ', { b: 'Shopify → Productos → Agregar producto' }, '.'] },
@@ -45,12 +47,13 @@
         { k: 'run', t: ['Lancé la skill en el mismo chat (prompt 3).'] },
         { k: 'html', t: ['Recibí el ', { b: 'archivo HTML' }, ' (un solo archivo).'] },
         { k: 'paste', t: ['Copié todo el HTML, lo pegué en el cuadro ', { b: 'Descripción' }, ' en el modo ', { b: 'Mostrar editor (</>)' }, ' y ', { b: 'guardé' }, '.'] },
+        { k: 'url', t: ['Tengo la ', { b: 'URL de la product page' }, ' (no la del home).'] },
       ],
       warn: ['La página ', { b: 'no lleva precios ni botones de compra' }, ': el pedido se hace en el formulario de Releasit.'],
       tip: ['Si quiero cambiar algo, le reenvío el código y le digo exactamente qué cambiar y "no cambies nada más".'] },
 
-    { k: 'galeria', t: 'Imágenes de la página', where: 'IA de imágenes · foto real del producto adjunta',
-      p: ['Genero las fotos de la página con la IA. En cada prompt ', { b: 'adjunto la foto real del producto' }, ' para que el empaque salga igual, y cambio lo que está entre [corchetes].'],
+    { k: 'galeria', t: 'Recursos de la página', where: 'IA de imágenes y Claude · foto real del producto adjunta',
+      p: ['Genero las fotos de la página con la IA. En cada prompt ', { b: 'adjunto la foto real del producto' }, ' para que el empaque salga igual, y cambio lo que está entre [corchetes]. Aquí también saco el ', { b: 'manual de regalo' }, ' en PDF.'],
       prompts: [
         { k: 'mujer', t: '⭐ Imagen 1 · principal: mujer con el producto', text: 'Fotografía publicitaria ultrarrealista, formato cuadrado 1:1. Una mujer latina de unos 30 años, hermosa y natural, con piel real (poros visibles, sin retoque plástico) y una sonrisa genuina de felicidad, sostiene con una mano {producto} a la altura de su rostro, con la etiqueta de frente y legible. El producto es exactamente el de la foto de referencia que adjunto: misma forma, tamaño, colores, textos y marca; no inventes letras. Fondo de estudio azul claro pastel liso, con profundidad de campo suave. Luz suave de ventana lateral con sombras naturales. Cámara full frame, lente de 85 mm, f/2.8, enfoque nítido en el rostro y el producto. Estilo de fotografía de belleza de alta gama. Manos naturales con cinco dedos. Sin texto, sin logos de otras marcas, sin aspecto de render ni de imagen generada por IA.' },
         { k: 'antes', t: 'Imagen 2 · antes (el problema)', text: 'Fotografía ultrarrealista, formato cuadrado 1:1, plano medio frontal y centrado, cámara a la altura del pecho. [Persona: edad, género, piel, peinado y ropa, ej. mujer latina de 30 años, cabello oscuro recogido en moño, suéter beige de punto] sentada en [lugar, ej. un escritorio de madera en un estudio en casa, repisas con libros y plantas al fondo, ventana a la derecha]. Muestra [el problema que resuelve {producto}, ej. agotada y distraída, con la mano en la frente frente al portátil], con expresión [ej. cansada y frustrada] y objetos que lo cuentan [ej. papeles regados, el celular encendido, una taza de café vacía]. Deja libre el lado derecho de la mesa. Luz fría y apagada de día nublado. Cámara full frame, lente de 35 mm, f/4, piel y texturas reales. Sin el producto, sin texto, sin logos, sin aspecto de IA.', tip: ['Las imágenes 2 y 3 son el ', { b: 'deslizador antes/después' }, '. Solo aplican si el beneficio se ve en el día a día.'] },
@@ -65,6 +68,7 @@
         { k: 'gif2foto', t: 'Imagen 11 · GIF del segundo beneficio (1. foto inicial)', text: 'Fotografía ultrarrealista, formato cuadrado 1:1. Escena del beneficio de la sección GIF de la página: "[título de la sección que escribió la skill, ej. Cabe donde no cabe un termo]". [El momento inicial de la acción, ej. una mano a punto de guardar {producto} en el bolsillo frontal de un morral gris sobre una mesa de madera, con un termo al lado para comparar el tamaño]. {producto} visible, de frente y con la etiqueta legible. El producto es exactamente el de la foto de referencia que adjunto: misma forma, tamaño real, colores, textos y marca; no inventes letras. Luz natural de ventana, plantas desenfocadas al fondo. Cámara full frame, lente de 35 mm, f/2.8. Deja libre la esquina superior izquierda (ahí la página pone el sello). Piel, manos y texturas reales. Sin texto, sin logos de otras marcas, sin aspecto de render ni de imagen generada por IA.', tip: ['Primero genero esta ', { b: 'foto inicial' }, '. El beneficio sale de la sección GIF de la skill (llevarlo a todas partes, lo fácil que se limpia…).'] },
         { k: 'gif2video', t: 'Imagen 11 · GIF del segundo beneficio (2. animarla en video)', text: 'Anima esta imagen en un video de 4 segundos, formato cuadrado 1:1, con la cámara fija: sin movimiento de cámara ni zoom. [La acción completa, ej. la mano guarda el frasco en el bolsillo del morral, cierra la cremallera y se retira]. Movimientos lentos, naturales y realistas. El producto conserva su forma y su etiqueta en todo momento; la persona, los objetos y el fondo no cambian. Que el último cuadro quede casi igual al primero para que el bucle no se note. Sin texto, sin cortes, sin efectos ni transiciones.', tip: ['Subo la foto a una ', { b: 'IA de video' }, ' con este prompt y paso el video por un convertidor a GIF: cuadrado y de menos de 3 MB.'] },
         { k: 'testimonio', t: 'Imagen 12 · testimonial «Lo que dicen» (skill /anuncio-estatico)', text: '/anuncio-estatico\nTe adjunto 2 imágenes, en este orden:\n1. La referencia: un anuncio tipo testimonial (el producto en una mano al centro, un titular arriba y tarjetas de reseña con 5 estrellas alrededor).\n2. La foto real de mi producto: {producto}.\nAnaliza las dos. Entiende muy bien el concepto de mi marca y extrae los colores exactos de mi envase para la paleta; no uses los colores de la referencia.\nDiséñame el prompt en inglés para replicar esta estructura visual con mi producto, en el mismo formato de la referencia.\nTitular: en español de Colombia, directo y agresivo al dolor principal de mi cliente ideal (el público al que le habla {producto}).\nTestimonios: usa SOLO estas reseñas reales de mis clientes, palabra por palabra. Puedes recortar a un fragmento literal, pero no cambies, mejores ni agregues palabras. Pon primero las que hablan del dolor más fuerte:\n- "[reseña real 1]" — [Nombre, ciudad]\n- "[reseña real 2]" — [Nombre, ciudad]\n- "[reseña real 3]" — [Nombre, ciudad]\n- "[reseña real 4]" — [Nombre, ciudad]\n- "[reseña real 5]" — [Nombre, ciudad]\nEn cada tarjeta, en lugar de una foto de cara, un círculo del color de mi marca con la inicial del nombre. Sin promesas de curar ni tratar enfermedades.', tip: ['Necesita la ', { b: 'foto del producto' }, ', no solo el nombre. Las reseñas me las mandan mis clientes y van ', { b: 'tal cual' }, '.'] },
+        { k: 'manual', t: 'Manual de regalo en PDF (skill /manual-producto-pdf)', text: '/manual-producto-pdf\nProducto: {producto} – ID Dropi {dropi}\nTienda: VidanovaStore\nDosis según la etiqueta: {dosis}\nEntrégamelo por partes: primero capítulos 01 a 04.', ask: { k: 'dose', label: 'Dosis según la etiqueta', ph: 'Ej. 20 gotas al día' }, tip: ['Escribo la ', { b: 'dosis de la etiqueta física' }, ', le doy a ', { b: 'Generar prompt' }, ' y adjunto una ', { b: 'foto de la etiqueta' }, ' (de ahí salen los colores y los ingredientes exactos). Si ya tengo mis capítulos, los pego debajo con la línea ', { b: '«Usa esta estructura:»' }, '.'] },
         { k: 'regalo', t: 'Imagen 13 · miniatura del regalo (si hay)', text: 'Portada vertical en formato 3:4 de [el regalo, ej. una guía digital en PDF] titulada "[título exacto del regalo]", vista de frente como la portada de un libro. Diseño limpio y moderno: fondo del color fuerte del empaque de {producto} [ej. verde #2E7D32], el título grande en tipografía sans-serif gruesa blanca y una ilustración simple [de qué trata el regalo]. Se va a ver en miniatura: pocos elementos, título legible y mucho contraste. Si el regalo es un objeto físico, en cambio: foto ultrarrealista del objeto de frente sobre fondo claro, luz suave de estudio. Texto en español con tildes correctas; ningún texto aparte del título; sin logos de otras marcas.', tip: ['Solo si el producto ', { b: 'trae regalo' }, '. Va en la tarjeta de regalo de arriba de la página. Si es digital, la página dice que llega por WhatsApp al confirmar (eso lo escribe la skill).'] },
       ],
       items: [
@@ -80,6 +84,7 @@
         { k: 'bloque3', t: [{ b: 'Imagen 10' }, ': escena del bloque 3, detalle de manos usando el producto.'] },
         { k: 'gif2', t: [{ b: 'Imagen 11' }, ': GIF del segundo beneficio (foto inicial → video de 3–5 s → convertido a GIF).'] },
         { k: 'testimonio', t: [{ b: 'Imagen 12' }, ': testimonial con reseñas reales, palabra por palabra (skill → prompt → generador).'] },
+        { k: 'manual', t: [{ b: 'Manual de regalo' }, ': guía en PDF de 20 a 30 páginas con la skill, pedida por partes (solo si el regalo es el manual).'] },
         { k: 'regalo', t: [{ b: 'Imagen 13' }, ': miniatura del regalo (solo si el producto trae regalo).'] },
       ],
       tip: ['En todas adjunto la ', { b: 'foto real del producto' }, '. Si la etiqueta sale con letras inventadas, pego encima la foto real sin fondo en Canva.'] },
@@ -155,12 +160,14 @@
   const num = (v) => (v === '' || v == null || !isFinite(Number(v)) || Number(v) <= 0 ? null : Number(v));
   const money = (v) => '$' + Number(v).toLocaleString('es-CO');
 
-  // Reemplaza {producto} y {precio} en un prompt; sin dato queda un texto genérico.
+  // Reemplaza {producto}, {dropi}, {precio} y {dosis} en un prompt; sin dato queda un texto genérico.
   const fill = (text, vars = {}) => {
-    const n = (vars.producto || '').trim(), p = num(vars.precio);
+    const n = (vars.producto || '').trim(), p = num(vars.precio), d = String(vars.dropi || '').trim(), ds = String(vars.dosis || '').trim();
     return text
       .replace(/el producto \{producto\}/g, n ? 'el producto ' + n : 'el producto')
       .replace(/\{producto\}/g, n || 'el producto')
+      .replace(/\{dropi\}/g, d || '[número]')
+      .replace(/\{dosis\}/g, ds || '[ej. 20 gotas al día]')
       .replace(/\{precio\}/g, p ? money(p) : '[precio de venta]');
   };
 
@@ -198,15 +205,31 @@
     }));
   }
 
+  // Parte fija de la URL de la product page: solo cambia lo que va después (el identificador de URL de Shopify).
+  const URL_BASE = `https://${LANDING.store}/products/`;
+
+  // Identificador limpio: sin tildes, en minúsculas y sin lo demás de la URL si pegaron la dirección completa.
+  function slugify(text) {
+    return String(text || '').trim()
+      .replace(/^.*\/products\//i, '').replace(/[?#/].*$/, '')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+      .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  }
+
+  // Identificador por defecto: el primer nombre del producto ("Magnesium Complex" → magnesium).
+  const defaultSlug = (product) => slugify((product || '').trim().split(/\s+/)[0]);
+
   // Todo lo que se deriva del estado de la pestaña (para pintar contadores, precios y vistas previas).
   function view(st) {
-    const p = st.prod || {}, title = fullTitle(p.name, st.sub);
+    const p = st.prod || {}, title = fullTitle(p.name, st.sub), slugAuto = defaultSlug(p.name);
     return {
       name: (p.name || '').trim(), dropi: (p.dropi || '').trim(), cost: num(p.cost),
       sub: { words: words(st.sub), max: LANDING.subWords, ok: words(st.sub) > 0 && words(st.sub) < LANDING.subWords },
       title, titleCount: count(title, LANDING.title),
       offers: offerTexts({ name: p.name, unit: st.unit, gift: st.gift, warranty: st.warranty }),
       prices: prices(p.price),
+      // st.slug = identificador escrito a mano; vacío → el primer nombre del producto.
+      slug: slugify(st.slug) || slugAuto, slugAuto,
     };
   }
 
@@ -217,5 +240,5 @@
     return { steps, done: steps.reduce((a, s) => a + s.done, 0), total: steps.reduce((a, s) => a + s.total, 0), stepsDone: steps.filter((s) => s.complete).length };
   }
 
-  core.landing = { LANDING, STEPS, key, fill, words, fullTitle, count, roundLike, prices, offerTexts, view, progress };
+  core.landing = { LANDING, STEPS, URL_BASE, key, fill, words, fullTitle, count, roundLike, prices, offerTexts, slugify, defaultSlug, view, progress };
 })();

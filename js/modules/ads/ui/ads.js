@@ -46,19 +46,8 @@
 
   // ---------- Herramientas de los pasos (se suman a las de ui.landing en stepDetail) ----------
   const TOOLS = {
-    // URL de la product page: la parte fija se muestra; solo se edita y se copia el identificador (primer nombre del producto).
-    url: (on, st, v) => {
-      const w = el('div', 'ld-tool');
-      w.append(el('h4', null, 'URL de la product page'));
-      w.append(seg('p', 'note ny ma-need', ['Pongo el ', { b: 'nombre del producto' }, ' arriba, en "Producto que estoy montando".']));
-      const f = input('slug', 'URL del producto', v.slug, on, { ph: v.slugAuto || 'magnesium', hint: 'Copiar trae solo esta última parte.' });
-      const x = f.querySelector('input'), r = el('div', 'ma-url'), g = el('div', 'ma-slug'), val = out('slug', 'ma-hide');
-      x.replaceWith(r);
-      g.append(el('span', 'ma-base', PYL.core.ads.URL_BASE), x);
-      r.append(g, L.copyBtn(val, 'URL de la product page', on.copy), val);
-      w.append(f);
-      return w;
-    },
+    // La misma herramienta del paso 2 de la landing (mismo identificador), con su propio id de campo.
+    url: (on, st, v) => L.urlTool(on, v, 'ma-t-slug'),
     name: (on) => {
       const w = el('div', 'ld-tool');
       w.append(el('h4', null, 'Nombre de la campaña'));
@@ -126,8 +115,8 @@
       const [t, raw] = O[n.dataset.o] || ['']; n.textContent = t;
       if (raw != null) n.dataset.raw = String(raw); else delete n.dataset.raw;
     });
-    root.querySelectorAll('.ma-url .ld-copy').forEach((b) => { b.disabled = !v.slug; });
-    root.querySelectorAll('.ma-need').forEach((n) => { n.hidden = !!v.product; });
+    root.querySelectorAll('.ld-url .ld-copy').forEach((b) => { b.disabled = !v.slug; });
+    root.querySelectorAll('.ma-need,.ld-need-name').forEach((n) => { n.hidden = !!v.product; });
   }
 
   // Estrategia sin paso a paso todavía (ej. CBO): qué es y volver a la que sí está lista.

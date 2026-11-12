@@ -46,15 +46,6 @@
 .ma-opt.on{opacity:1;border-color:rgba(34,197,94,.45);background:var(--g-bg)}
 .ma-opt small{display:block;margin-top:4px;color:var(--soft);font-size:12px}
 .ma-opt p{margin:6px 0 0;font-size:13px;color:var(--muted)}
-/* URL de la product page */
-.ma-slug{flex:1;min-width:0;display:flex;align-items:center;background:var(--bg-2);border:1px solid var(--line-2);border-radius:11px;transition:border-color .15s,box-shadow .15s}
-.ma-slug:focus-within{border-color:var(--b);box-shadow:0 0 0 3px var(--b-bg)}
-.ma-base{padding-left:13px;font-size:15.5px;font-weight:700;color:var(--soft);white-space:nowrap}
-.field .ma-slug input,.field .ma-slug input:focus{flex:1;min-width:0;background:none;border:0;box-shadow:none;padding-left:0}
-.ma-url{display:flex;align-items:center;gap:12px}
-.ma-url .ld-copy{flex:none}
-.ma-url .ld-copy:disabled{opacity:.45;pointer-events:none}
-.ma-hide{display:none}
 /* Duplicar y publicar */
 .ma-dupgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .ma-card{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 6px;border-radius:12px;border:1px dashed var(--line-2);font-size:12.5px;color:var(--muted);text-align:center}
@@ -76,8 +67,4 @@
   .ma-camp{padding:12px 12px 52px}
   .ma-camp-copy{top:auto;bottom:10px;right:50%;transform:translateX(50%)}
   .ma-sum,.ma-vs{grid-template-columns:1fr}
-  .ma-url,.ma-slug{flex-wrap:wrap}
-  .ma-slug{flex-basis:100%}
-  .ma-base{padding-top:8px;font-size:13px;white-space:normal;word-break:break-all}
-  .field .ma-slug input,.field .ma-slug input:focus{flex-basis:100%;padding-left:13px}
 }

@@ -40,7 +40,7 @@
 
   // Campo de texto de una herramienta: avisa cada cambio con on.field(k, valor).
   function input(k, label, value, on, opt = {}) {
-    const f = el('div', 'field'), id = 'd-t-' + k;
+    const f = el('div', 'field'), id = opt.id || 'd-t-' + k;
     const top = el('div', 'row between'), lb = el('label', null, label); lb.htmlFor = id;
     top.append(lb); if (opt.count) top.append(counter(opt.count));
     const x = el(opt.area ? 'textarea' : 'input'); x.id = id; x.value = value || '';
@@ -51,6 +51,21 @@
     f.append(top, x);
     if (opt.hint) f.append(el('span', 'hint', opt.hint));
     return f;
+  }
+
+  // URL de la product page: la parte fija se muestra; solo se edita y se copia el identificador (primer nombre del producto).
+  // La usan el paso 2 de la landing y el paso 1 de Meta Ads (cada uno con su `id` de campo: ambos están en la página).
+  function urlTool(on, v, id) {
+    const w = el('div', 'ld-tool');
+    w.append(el('h4', null, 'URL de la product page'));
+    w.append(seg('p', 'note ny ld-need-name', ['Pongo el ', { b: 'nombre del producto' }, ' arriba, en "Producto que estoy montando".']));
+    const f = input('slug', 'URL del producto', v.slug, on, { id, ph: v.slugAuto || 'magnesium', hint: 'Copiar trae solo esta última parte.' });
+    const x = f.querySelector('input'), r = el('div', 'ld-url'), g = el('div', 'ld-slug'), val = out('slug', 'ld-hide');
+    x.replaceWith(r);
+    g.append(el('span', 'ld-base', PYL.core.landing.URL_BASE), x);
+    r.append(g, copyBtn(val, 'URL de la product page', on.copy), val);
+    w.append(f);
+    return w;
   }
 
   // ---------- Lista de pasos ----------
@@ -104,6 +119,7 @@
       w.append(pv);
       return w;
     },
+    url: (on, st, v) => urlTool(on, v),
     prices: (on) => {
       const w = el('div', 'ld-tool');
       w.append(el('h4', null, 'Precios para Shopify'));
@@ -214,7 +230,14 @@
       s.prompts.forEach((p) => {
         const c = el('div', 'ld-prompt'), t = el('p', null, ctx.fill(p.text));
         const hd = el('div', 'row between'); hd.append(el('b', null, p.t), copyBtn(t, p.t, on.copy));
-        c.append(hd, t);
+        // p.ask: dato que pide el prompt. El campo lo guarda (on.field) y "Generar prompt" (o Enter) vuelve a armar el texto.
+        if (p.ask) {
+          const a = el('div', 'ld-ask'), f = input(p.ask.k, p.ask.label, ctx.st[p.ask.k], on, { ph: p.ask.ph });
+          const gen = () => { t.textContent = ctx.fill(p.text); };
+          f.querySelector('input').addEventListener('keydown', (e) => { if (e.key === 'Enter') gen(); });
+          a.append(f, button('btn sm', 'Generar prompt', gen));
+          c.append(hd, a, t);
+        } else c.append(hd, t);
         if (p.tip) c.append(seg('div', 'ld-prompt-tip', ['💡 ', ...p.tip]));
         ps.append(c);
       });
@@ -238,7 +261,7 @@
       name: [v.name || 'Falta'], dropi: [v.dropi || 'Falta'],
       cost: [v.cost ? fmt(v.cost) : 'Falta', v.cost], price: [p ? fmt(p.price) : 'Falta', p && p.price],
       compare: [p ? fmt(p.compare) : '—', p && p.compare],
-      title: [v.title || 'Nombre: subtítulo'],
+      title: [v.title || 'Nombre: subtítulo'], slug: [v.slug, v.slug],
     };
     v.offers.forEach((o, i) => { O['on' + i] = [o.title]; O['ol' + i] = [o.label]; });
     (p ? p.offers : []).forEach((o, i) => {
@@ -258,9 +281,11 @@
     const has = { name: !!v.name, dropi: !!v.dropi, cost: !!v.cost, price: !!p };
     root.querySelectorAll('[data-have]').forEach((n) => n.classList.toggle('ok', has[n.dataset.have]));
     root.querySelectorAll('.ld-need').forEach((n) => { n.hidden = !!p; });
+    root.querySelectorAll('.ld-need-name').forEach((n) => { n.hidden = !!v.name; });
+    root.querySelectorAll('.ld-url .ld-copy').forEach((b) => { b.disabled = !v.slug; });
     root.querySelectorAll('.ld-val').forEach((n) => { if (n.querySelector('[data-o="price"],[data-o="compare"]')) n.classList.toggle('off', !p); });
     root.querySelectorAll('.ld-price').forEach((n) => { n.hidden = !p; });
   }
 
-  PYL.ui.landing = { stepList, stepDetail, progress, outputs, valRow, input, copyBtn, copyFeedback, out, button, seg };
+  PYL.ui.landing = { stepList, stepDetail, progress, outputs, valRow, input, copyBtn, copyFeedback, out, button, seg, urlTool };
 })();
