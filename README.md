@@ -173,10 +173,13 @@ En **FastMoss** (enlace directo a [fastmoss.com/es](https://www.fastmoss.com/es)
 
 Módulo 5 de NovaSociety: lo que hago a mano para montar el producto en Shopify. La descripción en HTML la entrega la skill de Claude **"Mi Página Vida Nova"**; la pestaña guía el resto, paso a paso y con casillas que se guardan. Las sub-pestañas van numeradas (**1** Landing en Shopify, **2** Meta Ads, **3** TikTok Ads · pronto):
 
-- Prompts para el título y las imágenes; subir imágenes a *Contenido → Archivos* y pegar sus URL en el HTML.
-- Precios, identificador de URL, Dropify e inventario.
+- **Landing en Shopify** en 7 pasos: Antes de empezar → Generar la página → Recursos de la página → Vincular con Dropi → Formulario y ofertas → Reseñas → Revisión final (su botón lleva a Meta Ads).
+- **Generar la página:** prompts para alimentar la IA, el título y la skill; precios para Shopify (precio y precio de comparación), identificador de URL y la **URL de la product page** lista para copiar (la misma del paso 1 de Meta Ads: se edita en cualquiera de los dos).
+- **Recursos de la página:** prompts de las 13 imágenes y del **manual de regalo en PDF** (skill `/manual-producto-pdf`: escribo la dosis de la etiqueta, toco *Generar prompt* y sale con el nombre y el ID de Dropi del producto); al final, subir todo a *Contenido → Archivos* y pegar sus URL en el HTML.
+- Dropify e inventario.
 - **Releasit** con ofertas de 1, 2 y 3 unidades (descuentos de 0%, 20% y 30%).
-- Títulos y etiquetas con unidad, regalo y garantía; prompts de miniaturas; TrustWill.
+- Títulos y etiquetas con unidad, regalo y garantía; prompts de miniaturas.
+- **Reseñas** (TrustWill): primero reúno mínimo 6 imágenes reales del producto (Amazon o similares); si no existen, hay un prompt para generarlas con IA.
 - **Traer de mi candidato** llena nombre, ID de Dropi y precios desde Buscar producto.
 - **Meta Ads:** paso a paso según la estrategia que voy a montar (selector ABO / CBO; CBO aparece como "pronto"). ABO: campaña de testeo (1 campaña → 4 conjuntos → 1 anuncio con su video en cada uno, 30.000 al día por conjunto). Mapa informativo de la campaña, tabla "campo → valor" en cada paso, nombre de la campaña (día de mañana, mes y primer nombre del producto), fecha de inicio (mañana, 5:00 a. m.), URL de la product page con identificador editable, ciudades excluidas de Lugares y prompt de 3 copies, títulos y descripciones.
 - TikTok Ads aparece como "pronto".

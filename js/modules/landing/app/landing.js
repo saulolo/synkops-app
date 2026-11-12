@@ -22,6 +22,12 @@
     slugFor: saved.slugFor ?? old.slugFor ?? '', // producto para el que se escribió (otro producto → vuelve al automático)
   });
 
+  // El paso "crear" se repartió: precios e identificador de URL al paso 2 (skill), subir imágenes al 3 (galeria).
+  // Conservo lo marcado.
+  Object.entries({ price: 'skill', comp: 'skill', slug: 'skill', up: 'galeria', urls: 'galeria' }).forEach(([k, to]) => {
+    if (S.done['crear.' + k]) { S.done[to + '.' + k] = true; delete S.done['crear.' + k]; }
+  });
+
   // Avisa a la guía de Meta Ads (modules/ads/app/ads.js), que usa el nombre y el precio del producto.
   // Con otro producto, el identificador de URL escrito a mano ya no aplica.
   const persist = () => {

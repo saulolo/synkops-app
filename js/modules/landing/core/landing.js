@@ -32,14 +32,14 @@
       tool: ['prep'] },
 
     { k: 'skill', t: 'Generar la página', where: 'Claude + Shopify → Productos → Agregar producto',
-      p: ['Todo en el mismo chat de Claude, en este orden: primero le doy la información del proveedor, después saco el título y al final lanzo la skill, que escribe toda la descripción en HTML.'],
+      p: ['Todo en el mismo chat de Claude, en este orden: primero le doy la información del proveedor, después saco el título y al final lanzo la skill, que escribe toda la descripción en HTML. Con la descripción pegada, le pongo al producto los precios y la URL corta.'],
       prompts: [
         { k: 'feed', t: '1. Alimentar la IA con el producto', text: 'Te voy a pasar la información de un producto que voy a vender en mi tienda vidanovastore.com (Colombia, pago contra entrega): {producto}.\nEspecificaciones del proveedor: [pega la descripción, ingredientes o materiales, contenido y modo de uso]\nTe adjunto las fotos reales del producto.\nLéelo todo y respóndeme en 3 líneas: qué es, para quién es y cuál es su beneficio principal. Todavía no escribas nada más.' },
         { k: 'title', t: '2. Título del producto (5 opciones)', text: 'Con esa información, dame 5 opciones de subtítulo para el título de {producto}, de menos de 7 palabras, que resalten el beneficio principal y capten la atención de inmediato. Escríbelas como lo diría el cliente, con palabras simples, y sin prometer curar ni tratar enfermedades. Muéstralas así: "{producto}: subtítulo". Al final dime cuál recomiendas y por qué.' },
         { k: 'msg', t: '3. Mensaje para la skill', text: '/mi-pagina-vidanova\nProducto: {producto} — usa la información del proveedor y las fotos que te pasé arriba en este chat\nPrecio de 1 unidad: {precio}\nRegalo: [qué es y cómo llega, o "sin regalo"]\nFin del flash sale: [fecha, o lo dejo vacío y usa el domingo siguiente]\nReseñas reales: [pégalas tal cual, o "no tengo"]' },
       ],
       ordered: true,
-      tool: ['title', 'url'],
+      tool: ['title', 'prices', 'url'],
       items: [
         { k: 'feed', t: ['Le pasé a la IA el ', { b: 'producto' }, ' (nombre y fotos reales) y sus ', { b: 'especificaciones del proveedor' }, ' (prompt 1).'] },
         { k: 'add', t: ['Abrí ', { b: 'Shopify → Productos → Agregar producto' }, '.'] },
@@ -47,13 +47,16 @@
         { k: 'run', t: ['Lancé la skill en el mismo chat (prompt 3).'] },
         { k: 'html', t: ['Recibí el ', { b: 'archivo HTML' }, ' (un solo archivo).'] },
         { k: 'paste', t: ['Copié todo el HTML, lo pegué en el cuadro ', { b: 'Descripción' }, ' en el modo ', { b: 'Mostrar editor (</>)' }, ' y ', { b: 'guardé' }, '.'] },
+        { k: 'price', t: [{ b: 'Precio' }, ': mi precio de venta.'] },
+        { k: 'comp', t: [{ b: 'Precio de comparación' }, ': el doble, redondeado hacia arriba (sale tachado). ', { b: 'Ojo: desmarco "Cobrar impuestos sobre este producto".' }] },
+        { k: 'slug', t: ['En ', { b: 'Identificador de URL' }, ' recorto la URL del producto a ', { b: 'una sola palabra' }, ' concisa (ej. products/magnesium).'] },
         { k: 'url', t: ['Tengo la ', { b: 'URL de la product page' }, ' (no la del home).'] },
       ],
       warn: ['La página ', { b: 'no lleva precios ni botones de compra' }, ': el pedido se hace en el formulario de Releasit.'],
       tip: ['Si quiero cambiar algo, le reenvío el código y le digo exactamente qué cambiar y "no cambies nada más".'] },
 
-    { k: 'galeria', t: 'Recursos de la página', where: 'IA de imágenes y Claude · foto real del producto adjunta',
-      p: ['Genero las fotos de la página con la IA. En cada prompt ', { b: 'adjunto la foto real del producto' }, ' para que el empaque salga igual, y cambio lo que está entre [corchetes]. Aquí también saco el ', { b: 'manual de regalo' }, ' en PDF.'],
+    { k: 'galeria', t: 'Recursos de la página', where: 'IA de imágenes y Claude · Shopify → Contenido → Archivos',
+      p: ['Genero las fotos de la página con la IA. En cada prompt ', { b: 'adjunto la foto real del producto' }, ' para que el empaque salga igual, y cambio lo que está entre [corchetes]. Aquí también saco el ', { b: 'manual de regalo' }, ' en PDF. Al final subo todo a Shopify y pongo cada URL en su imagen del código HTML.'],
       prompts: [
         { k: 'mujer', t: '⭐ Imagen 1 · principal: mujer con el producto', text: 'Fotografía publicitaria ultrarrealista, formato cuadrado 1:1. Una mujer latina de unos 30 años, hermosa y natural, con piel real (poros visibles, sin retoque plástico) y una sonrisa genuina de felicidad, sostiene con una mano {producto} a la altura de su rostro, con la etiqueta de frente y legible. El producto es exactamente el de la foto de referencia que adjunto: misma forma, tamaño, colores, textos y marca; no inventes letras. Fondo de estudio azul claro pastel liso, con profundidad de campo suave. Luz suave de ventana lateral con sombras naturales. Cámara full frame, lente de 85 mm, f/2.8, enfoque nítido en el rostro y el producto. Estilo de fotografía de belleza de alta gama. Manos naturales con cinco dedos. Sin texto, sin logos de otras marcas, sin aspecto de render ni de imagen generada por IA.' },
         { k: 'antes', t: 'Imagen 2 · antes (el problema)', text: 'Fotografía ultrarrealista, formato cuadrado 1:1, plano medio frontal y centrado, cámara a la altura del pecho. [Persona: edad, género, piel, peinado y ropa, ej. mujer latina de 30 años, cabello oscuro recogido en moño, suéter beige de punto] sentada en [lugar, ej. un escritorio de madera en un estudio en casa, repisas con libros y plantas al fondo, ventana a la derecha]. Muestra [el problema que resuelve {producto}, ej. agotada y distraída, con la mano en la frente frente al portátil], con expresión [ej. cansada y frustrada] y objetos que lo cuentan [ej. papeles regados, el celular encendido, una taza de café vacía]. Deja libre el lado derecho de la mesa. Luz fría y apagada de día nublado. Cámara full frame, lente de 35 mm, f/4, piel y texturas reales. Sin el producto, sin texto, sin logos, sin aspecto de IA.', tip: ['Las imágenes 2 y 3 son el ', { b: 'deslizador antes/después' }, '. Solo aplican si el beneficio se ve en el día a día.'] },
@@ -86,21 +89,10 @@
         { k: 'testimonio', t: [{ b: 'Imagen 12' }, ': testimonial con reseñas reales, palabra por palabra (skill → prompt → generador).'] },
         { k: 'manual', t: [{ b: 'Manual de regalo' }, ': guía en PDF de 20 a 30 páginas con la skill, pedida por partes (solo si el regalo es el manual).'] },
         { k: 'regalo', t: [{ b: 'Imagen 13' }, ': miniatura del regalo (solo si el producto trae regalo).'] },
-      ],
-      tip: ['En todas adjunto la ', { b: 'foto real del producto' }, '. Si la etiqueta sale con letras inventadas, pego encima la foto real sin fondo en Canva.'] },
-
-    { k: 'crear', t: 'Completar el producto', where: 'Shopify → Contenido → Archivos y Productos → mi producto',
-      p: ['Subo las imágenes a Shopify, pongo cada URL en su imagen del código HTML y vuelvo al producto del paso 2 a ponerle los precios y la URL corta.'],
-      ordered: true,
-      items: [
         { k: 'up', t: ['Subí todas las fotos y GIF a ', { b: 'Contenido → Archivos' }, '.'] },
         { k: 'urls', t: ['En ', { b: 'Contenido → Archivos' }, ' copio la URL de cada imagen o GIF subido y la pego en el código HTML, en la imagen que le corresponde.'] },
-        { k: 'price', t: [{ b: 'Precio' }, ': mi precio de venta.'] },
-        { k: 'comp', t: [{ b: 'Precio de comparación' }, ': el doble, redondeado hacia arriba (sale tachado). ', { b: 'Ojo: desmarco "Cobrar impuestos sobre este producto".' }] },
-        { k: 'slug', t: ['En ', { b: 'Identificador de URL' }, ' recorto la URL del producto a ', { b: 'una sola palabra' }, ' concisa (ej. products/magnesium).'] },
       ],
-      tool: ['prices'],
-      tip: ['Si una foto o GIF viene del CDN de otra tienda, la descargo y la subo a mi Shopify: si no, se puede caer.'] },
+      tip: ['En todas adjunto la ', { b: 'foto real del producto' }, '. Si la etiqueta sale con letras inventadas, pego encima la foto real sin fondo en Canva. Si una foto o GIF viene del CDN de otra tienda, la descargo y la subo a mi Shopify: si no, se puede caer.'] },
 
     { k: 'dropify', t: 'Vincular con Dropi', where: 'Apps → Dropify → Productos y Productos → mi producto → Inventario',
       p: ['Conecto el producto de Shopify con el de Dropi para que mis órdenes se vinculen con Dropi. Ya vinculado, entro al producto y arreglo el inventario.'],
@@ -137,11 +129,16 @@
 
     { k: 'resenas', t: 'Reseñas', where: 'Apps → TrustWill → Importar reseñas y Q&A',
       items: [
+        { k: 'fotos', t: ['Busco mínimo ', { b: `${LANDING.ownReviews} imágenes reales del producto` }, ' en ', { b: 'Amazon' }, ' o sitios similares. Si no existen, las genero con la IA (prompt abajo).'] },
         { k: 'ali', t: ['En AliExpress busco el producto con ', { b: `ideal más de ${LANDING.aliSales.toLocaleString('es-CO')} ventas` }, ' y muy buenas calificaciones, y copio el enlace.'] },
         { k: 'imp', t: ['En TrustWill pego el enlace en ', { b: 'Enlace a AliExpress' }, '.'] },
         { k: 'num', t: [{ b: 'Número de importaciones' }, ': ', { b: String(LANDING.imports) }, '.'] },
         { k: 'mine', t: ['Edito ', { b: `${LANDING.ownReviews} reseñas de 5 estrellas` }, ' con las reseñas reales de mis clientes de este producto.'] },
         { k: 'alt', t: ['Si no encuentro mi producto en AliExpress, busco ', { b: 'imágenes del producto' }, ' en otro sitio, por ejemplo en ', { b: 'Amazon' }, '.'] },
+      ],
+      prompts: [
+        { k: 'fotos', t: `Fotos del producto para las reseñas (${LANDING.ownReviews} imágenes)`, text: `Te adjunto la foto real de {producto}. Genera ${LANDING.ownReviews} fotos distintas, una por una, con aspecto de foto casual tomada con celular por alguien que recibió el producto en su casa en Colombia (no de estudio ni publicitaria). El producto es exactamente el de la foto de referencia: misma forma, tamaño real, colores, textos y marca; no inventes letras.\nEscenas:\n1. Recién llegado: el producto junto a su caja o bolsa de envío abierta, sobre la mesa del comedor.\n2. En la mano: una mano lo sostiene de frente, con la sala desenfocada al fondo.\n3. En su lugar de uso: sobre [ej. la mesa de noche o el mesón de la cocina], junto a objetos cotidianos [ej. un vaso de agua y unas llaves].\n4. En uso: [la acción de uso, ej. una mano sirve las gotas en un vaso de agua], sin que se vea la cara.\n5. De cerca: la etiqueta de frente y legible, con el producto apoyado en una superficie de madera.\n6. La oferta: [2 o 3] unidades juntas sobre una cama o un sofá, como quien compró varias.\nEn todas: formato vertical 3:4, luz natural de casa o luz cálida de bombillo, encuadre un poco inclinado e imperfecto, enfoque de celular, sin filtros, fondos reales con algo de desorden natural y manos naturales con cinco dedos. Sin texto, sin logos de otras marcas, sin marcas de agua, sin aspecto de render ni de imagen generada por IA.`,
+          tip: ['Solo si no encontré ', { b: 'fotos reales' }, ' del producto. Adjunto la ', { b: 'foto real' }, ' y cambio lo que está entre [corchetes]. El texto de las reseñas sigue siendo el de mis clientes.'] },
       ] },
 
     { k: 'revision', t: 'Revisión final', where: 'Mi página desde el celular', src: 'Criterio NovaSociety',
