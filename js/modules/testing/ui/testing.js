@@ -67,7 +67,9 @@
       const row = el('div', 'ts-br ts-' + br.light + (lit === br.id ? ' ts-on' : ''));
       row.dataset.branch = br.id;
       row.append(el('span', 'ts-dot', DOT[br.light]), seg('span', 'ts-cond', br.cond), el('span', 'ts-arrow', '→'), seg('span', 'ts-t', br.t));
-      if (br.own) row.append(el('span', 'tag tn ts-own', 'Regla propia'));
+      const vd = el('span', 'ts-vd' + (br.own ? ' ts-own' : ''), (br.badgeIcon || ICON[br.verdict.action]) + ' ' + br.badge);
+      if (br.tip) PYL.ui.tooltip.attach(vd, br.tip.h, br.tip); // regla propia: la aclaración sale al pasar el mouse
+      row.append(vd);
       box.append(row);
     }
     return card;
@@ -77,19 +79,6 @@
   function cuts(lit) {
     const w = el('div', 'ts-cuts');
     for (const d of C.TEST_CUTS) w.append(cut(d, lit));
-    return w;
-  }
-
-  // Mini-ejemplo resuelto: lo califica testVerdict con el tope de la práctica.
-  function example(e) {
-    const r = C.testVerdict({ ...e, tope: C.TEST_PRACTICE.tope });
-    const w = el('div', 'ts-ex ts-' + r.light);
-    w.append(el('small', 'ts-ex-h', 'Así lo califica el Lab de NovaSociety'));
-    const nums = `Gasto ${money(e.spend)} · ${e.pi} pagos iniciados · ${e.sales} ventas`;
-    w.append(el('p', 'ts-ex-n', nums));
-    const v = el('p', 'ts-ex-v');
-    v.append(el('span', null, ICON[r.action] + ' '), el('b', null, r.toca), el('span', null, ' · ' + r.veredicto));
-    w.append(v, seg('p', 'small', r.detalle), seg('p', 'small muted', ['Los números que deciden: ', ...r.senales]));
     return w;
   }
 
@@ -112,15 +101,25 @@
     const H = C.TEST_CHAIN, w = el('div', 'ts-chain');
     const fl = el('div', 'ts-flow');
     H.flow.forEach((n, i) => { if (i) fl.append(el('span', 'ts-flow-a', '→')); fl.append(el('span', 'ts-flow-n', n)); });
-    w.append(fl, seg('p', 'small ts-ctr', H.ctr));
+    w.append(fl);
     const list = el('div', 'ts-reads');
     H.reads.forEach((r) => {
       const c = el('div', 'ts-read');
       c.dataset.read = r.k;
-      c.append(seg('p', 'ts-read-w', ['Si: ', ...r.when]), seg('p', 'ts-read-f', [{ b: 'Solución: ' }, ...r.fix]));
+      const w1 = seg('p', 'ts-read-w', r.when), f1 = seg('p', 'ts-read-f', r.fix);
+      w1.prepend(el('span', 'ts-pill si', 'Si'));
+      f1.prepend(el('span', 'ts-pill fix', 'Solución'));
+      c.append(w1, f1);
       list.append(c);
     });
-    w.append(list, seg('div', 'note ny mt-s', ['⚠️ ', ...H.note]));
+    const donts = el('div', 'ts-donts');
+    donts.append(el('h4', 'ts-donts-h', 'Lo que no hago'));
+    H.donts.forEach((d) => {
+      const c = el('div', 'ts-dont');
+      c.append(el('span', 'ts-dont-ic', d.icon), seg('p', null, [{ b: d.b }, ...d.p]));
+      donts.append(c);
+    });
+    w.append(list, donts);
     return w;
   }
 
@@ -192,6 +191,7 @@
     out.textContent = '';
     const r = v.verdict, st = el('div', 'ts-stats');
     if (v.err) out.append(el('div', 'note ny', '⚠️ ' + v.err));
+    else if (v.scaling) out.append(el('div', 'note ny', '🚀 ' + PYL.core.testing.TEST_SCALE_NOTE + ' Pasa a la pestaña Escalado.'));
     else {
       const card = el('div', 'ts-ex ts-' + (r.light || 'w'));
       card.append(el('small', 'ts-ex-h', r.cut ? 'Así lo califica el Lab de NovaSociety' : 'Todavía no hay corte'));
@@ -239,7 +239,8 @@
 
     const st = el('div', 'ts-stats');
     st.append(stat('Gasto', money(v.point.spend)), stat('Pagos iniciados', String(v.point.pi)), stat('Ventas', String(v.point.sales)),
-      stat('CPPI', v.point.cppi == null ? '—' : money(v.point.cppi)), stat('CPA', v.point.cpa == null ? '—' : money(v.point.cpa)));
+      stat('CPPI', v.point.cppi == null ? '—' : money(v.point.cppi)), stat('CPA', v.point.cpa == null ? '—' : money(v.point.cpa)),
+      stat('CPM', money(v.cpm)), stat('Tope', money(v.tope)));
     node.append(st, el('p', 'ts-pr-q', '¿Qué hago con este conjunto?'));
     const decs = el('div', 'ts-decs');
     for (const a of C.TEST_ACTIONS) {
@@ -264,6 +265,7 @@
     if (!L.ok) w.append(seg('p', 'small', ['Elegiste ', { b: L.chosen.icon + ' ' + L.chosen.t }, '; tocaba ', { b: L.correct.icon + ' ' + L.correct.t }, '.']));
     w.append(seg('p', null, ['Así lo califica el Lab de NovaSociety: ', { b: r.veredicto }, '. ', ...r.detalle]));
     w.append(seg('p', 'small muted', ['Los números que deciden: ', ...r.senales]));
+    if (v.note) w.append(seg('p', 'small', ['💡 ', ...v.note]));
     const row = el('div', 'row mt-s');
     const see = el('button', 'btn ghost sm', 'Ver el paso'); see.type = 'button'; see.id = 'ts-see';
     see.addEventListener('click', () => on.seeStep(r.step));
@@ -312,8 +314,7 @@
     },
     cut: (on, st) => {
       const w = el('div', 'ts-tool'), d = C.TEST_CUTS.find((x) => x.cut === st.step.cut);
-      const r = C.testVerdict({ ...st.step.example, tope: C.TEST_PRACTICE.tope });
-      w.append(cut(d, r.branch), example(st.step.example));
+      w.append(cut(d, null)); // sin fila iluminada: cada fila ya dice su veredicto
       return w;
     },
     tope: (on, st) => tope(st.step.tope.examples),
@@ -337,5 +338,5 @@
     },
   };
 
-  PYL.ui.testing = { parts, soon, progress, light, free, freeOut, practice, bar, cut, cuts, example, tope, chain, TOOLS };
+  PYL.ui.testing = { parts, soon, progress, light, free, freeOut, practice, bar, cut, cuts, tope, chain, TOOLS };
 })();

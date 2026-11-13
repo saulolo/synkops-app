@@ -228,13 +228,13 @@ Tiene tres sub-pestañas: **📂 Lectura real · pronto** (subir el reporte de m
 **Fase de testeo** es un paso a paso, como la guía de Meta Ads: lista de pasos a la izquierda, el detalle a la derecha y una barra de avance. Marco cada paso como hecho y se guarda en este navegador.
 
 1. **Arranque:** el testeo empieza con $ 100.000 al día y se mide por **gasto acumulado**, no por horas ni días. Una barra muestra los cortes de 20K, 30K y 40K, que caen el mismo día. Con la guía ABO (4 conjuntos × $ 30.000) el corte de 40K le llega a cada conjunto el día 2.
-2. **Corte 1 · 20.000:** miro los pagos iniciados. Con venta, maravilloso; 0 a 2 se apaga; 3 o 4, flojo; 5 o más, bien.
+2. **Corte 1 · 20.000:** miro los pagos iniciados. Con venta, maravilloso y sigo al siguiente corte sin tocar; 0 a 2 sin ventas se apaga y reviso la cadena; 3 o 4, flojo; 5 o más, bien. Cada fila del mapa trae al lado una etiqueta de color (como un botón) con la acción: ✅ MARAVILLOSO, 🛑 Apagar, ⚠️ Mantener vigilando o ✅ Seguir sin tocar. Los pasos 2 a 4 no iluminan ninguna fila.
 3. **Corte 2 · 30.000:** miro el CPPI (gasto ÷ pagos iniciados), sin ventas y con venta.
-4. **Corte 3 · 40.000:** miro ventas y CPA contra el tope. Con 2 ventas o más y CPA dentro del tope, se deja gastar el día. Con 1 venta, o 2 o más con CPA sobre el tope, mantengo vigilando: esa es una **regla propia**, el MCP no la da y la app lo marca. Una caja explica de dónde sale el tope (el CPA máximo del costeo) y sus zonas de escala y apaga.
-5. **Si se apagó: la cadena:** CPM → CPC → CPPI → CPA (no se mira el CTR) y qué revisar en cada caso.
+4. **Corte 3 · 40.000:** miro ventas y CPA contra el tope. Con 2 ventas o más y CPA dentro del tope, se deja gastar el día. Con 1 venta, o 2 o más con CPA sobre el tope, **apago** ("NO CUMPLE · APÁGALO", luz roja): con 1 venta a 40.000 el CPA ya es 40.000 o más y seguir es gastar con pérdida. Esa es una **regla propia**: el MCP no la da, queda por aclarar y la app la marca con la etiqueta **❓ Preguntar**, que explica el caso en un tooltip al pasar el mouse. Una caja explica de dónde sale el tope (el CPA máximo del costeo) y sus zonas de escala y apaga.
+5. **La cadena y qué no hacer:** CPM → CPC → CPPI → CPA y qué revisar en cada caso ("Si… / Solución…"), más **Lo que no hago**: no apagar antes de un corte, no tocar el anuncio mientras está en testeo y no decidir por el CTR.
 6. **Practica:** un simulacro con dos modos:
-   - **🎯 Práctica:** 8 casos inventados, en orden al azar. Con "Avanzar" la barra se llena hasta el siguiente corte y aparecen los números. Elijo entre Apagar, Mantener vigilando, Seguir sin tocar o Dejar gastar el día; la app dice si acerté, por qué y me lleva al paso que lo explica. Al final veo mis aciertos y mi mejor puntaje, que se guarda.
-   - **🎛️ Juega con los números:** cambio presupuesto, gasto, pagos iniciados, ventas y tope, y veo el corte, el día del testeo, el CPPI, el CPA y qué diría el Lab.
+   - **🎯 Práctica:** 11 casos inventados, en orden al azar. Con "Avanzar" la barra se llena hasta el siguiente corte y aparecen los números, incluidos el CPM (informativo) y el tope de cada caso. Elijo entre Apagar, Mantener vigilando, Seguir sin tocar o Dejar gastar el día; la app dice si acerté, por qué y me lleva al paso que lo explica. Algunos casos traen una nota que enseña por qué (por ejemplo, un CPM caro no apaga si la cadena funciona). Al final veo mis aciertos y mi mejor puntaje, que se guarda.
+   - **🎛️ Juega con los números:** cambio presupuesto, gasto, pagos iniciados, ventas y tope, y veo el corte, el día del testeo, el CPPI, el CPA y qué diría el Lab. Si ya gastó el presupuesto del día con 40.000 o más y el corte 3 da "Dejar gastar el día", la app avisa que dejó de ser testeo y pasa a Escalado, sin veredicto de testeo.
 
 ---
 
@@ -598,7 +598,7 @@ js/
       ui/metrics.js   Diagrama, flechas SVG, avisos, panel "i", botón Expandir y tabla de Métricas base
       app/metrics.js  Estado (app.state.hardMetrics), flechas, expandir, Métricas base y ruta
     testing/          Testeo (SPEC 05 y 06): módulo informativo, no lee campañas reales
-      core/testing.js Reglas del testeo (`testVerdict`, `cpaZones`), partes, pasos, mapa de cortes, cadena, banco de 8 casos, práctica y "Juega con los números"
+      core/testing.js Reglas del testeo (`testVerdict`, `cpaZones`), partes, pasos, mapa de cortes, cadena, banco de 11 casos, práctica y "Juega con los números"
       ui/testing.js   Sub-pestañas, tarjeta "Pronto", barra de gasto, tarjetas de corte, tope, cadena, práctica y simulacro
       app/testing.js  Estado (app.state.testing), avance del paso a paso y persistencia (pyl-testing; migra pyl-scaling)
     scaling/          Escalado (SPEC 06): solo anuncia Surfing Scaling

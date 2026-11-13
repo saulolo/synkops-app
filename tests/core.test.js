@@ -11,7 +11,7 @@ const caso = (nombre, fn) => casos.push([nombre, fn]);
 
 caso('exporta todas las funciones del núcleo aplanadas', () => {
   const claves = Object.keys(core).sort().join(',');
-  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,LADDER_BLOCKS,LANDING,LEVELS,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_STEPS,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,isDropi,isMetrics,key,kpis,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
+  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,LADDER_BLOCKS,LANDING,LEVELS,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,isDropi,isMetrics,key,kpis,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
 });
 
 caso('Costeo: proveedor 30.000 da precio $99.900 y tope $21.617', () => {
@@ -170,7 +170,8 @@ caso('Escalado: testVerdict cubre cada fila de la tabla de reglas y sus bordes',
   assert.strictEqual(vd(20000, 2, 1).veredicto, 'MARAVILLOSO');
   assert.deepStrictEqual(quien(vd(20000, 0, 0)), ['off', 'Apagar', 'c1-off', 'r']);
   assert.deepStrictEqual(quien(vd(20000, 2, 0)), ['off', 'Apagar', 'c1-off', 'r']);
-  assert.ok(txt(vd(20000, 2, 0)).startsWith('Apágalo, a nadie le interesa'));
+  assert.strictEqual(txt(vd(20000, 2, 0)), 'Apágalo y revisa la cadena: CPM y CPC.');
+  assert.strictEqual(txt(vd(20000, 2, 1)), 'Si ya hay venta, sigue al siguiente corte sin tocar.');
   assert.deepStrictEqual(quien(vd(20000, 3, 0)), ['weak', 'Mantener vigilando', 'c1-weak', 'y']);
   assert.deepStrictEqual(quien(vd(20000, 4, 0)), ['weak', 'Mantener vigilando', 'c1-weak', 'y']);
   assert.deepStrictEqual(quien(vd(20000, 5, 0)), ['good', 'Seguir sin tocar', 'c1-good', 'g']);
@@ -199,6 +200,14 @@ caso('Escalado: testVerdict cubre cada fila de la tabla de reglas y sus bordes',
   assert.strictEqual(vd(40000, 10, 2, 20000).branch, 'c3-spend');     // CPA = tope: pasa
   assert.strictEqual(vd(40000, 7, 1).branch, 'c3-own');
   assert.ok(txt(vd(40000, 7, 1)).includes('Regla propia'));
+  // SPEC 10: la regla propia apaga (luz roja)
+  for (const r of [vd(40000, 7, 1), vd(40000, 10, 2), vd(40000, 12, 3, 12000)]) {
+    assert.deepStrictEqual(quien(r), ['own', 'Apagar', 'c3-own', 'r']);
+    assert.strictEqual(r.action, 'off');
+    assert.strictEqual(r.veredicto, 'NO CUMPLE · APÁGALO');
+    assert.strictEqual(r.fase, 'apagado');
+  }
+  assert.ok(txt(vd(40000, 7, 1)).includes('lo apago en 40.000 y reviso la cadena') && txt(vd(40000, 7, 1)).includes('NovaSociety no define este caso') && txt(vd(40000, 7, 1)).includes('el CPA ya es 40.000 o más'));
   // Forma del veredicto del Lab
   const r = vd(30000, 5, 0);
   for (const k of ['fase', 'veredicto', 'toca', 'detalle', 'dura', 'senales', 'cut', 'v', 'action', 'light', 'branch', 'step', 'cppi', 'cpa']) assert.ok(k in r, k);
@@ -228,16 +237,21 @@ caso('Escalado: testCheck, testDay, testRange y zonas del tope', () => {
   assert.strictEqual(core.NS_TEST.budget, 100000);
   assert.deepStrictEqual(core.TEST_PRACTICE, { daily: core.NS_TEST.budget, tope: core.GENERIC_CPA.tope });
   assert.deepStrictEqual(core.TEST_ACTIONS.map((a) => a.k), ['off', 'watch', 'go', 'spend']);
+  assert.strictEqual(core.TEST_VERSION, 2);
 });
 
-caso('Escalado: los 8 casos del banco dan las respuestas de la spec', () => {
+caso('Escalado: los 11 casos del banco dan las respuestas de la spec', () => {
   const esperado = {
     c1: ['off'], c2: ['off'], c3: ['watch', 'off'], c4: ['go', 'watch', 'off'],
-    c5: ['go', 'go', 'spend'], c6: ['watch', 'watch', 'watch'], c7: ['go', 'watch', 'watch'], c8: ['go', 'watch', 'spend'],
+    c5: ['go', 'go', 'spend'], c6: ['watch', 'watch', 'off'], c7: ['go', 'watch', 'off'], c8: ['go', 'watch', 'spend'],
+    c9: ['go', 'go', 'spend'], c10: ['go', 'watch', 'off'], c11: ['go', 'go', 'spend'],
   };
-  assert.strictEqual(core.TEST_CASES.length, 8);
+  assert.strictEqual(core.TEST_CASES.length, 11);
+  const cpms = { c1: 18500, c2: 24000, c3: 16000, c4: 12500, c5: 11000, c6: 14000, c7: 15500, c8: 13000, c9: 12000, c10: 17000, c11: 26000 };
   for (const c of core.TEST_CASES) {
-    const res = c.at.map((p) => core.testVerdict({ ...p, tope: core.TEST_PRACTICE.tope }));
+    assert.strictEqual(c.cpm, cpms[c.id], c.id + ' cpm');
+    assert.ok(c.tope === undefined || c.id === 'c9', 'solo c9 trae tope');
+    const res = c.at.map((p) => core.testVerdict({ ...p, tope: c.tope ?? core.TEST_PRACTICE.tope }));
     assert.deepStrictEqual(res.map((r) => r.action), esperado[c.id], c.id);
     res.forEach((r, i) => assert.strictEqual(r.cut, i + 1, c.id + ' corte ' + (i + 1)));
     // Los números acumulados no bajan de un corte a otro
@@ -249,11 +263,32 @@ caso('Escalado: los 8 casos del banco dan las respuestas de la spec', () => {
   assert.strictEqual(rama('c6', 2), 'c3-own');
   assert.strictEqual(rama('c7', 2), 'c3-own');
   assert.strictEqual(rama('c5', 0), 'c1-sale');
+  // c9: CPA 20.000 = tope 20.000 (igual o menor) → Dejar gastar; con el tope fijo de 15.000 no cumpliría
+  const c9 = core.TEST_CASES.find((c) => c.id === 'c9');
+  assert.strictEqual(c9.tope, 20000);
+  assert.strictEqual(core.testVerdict({ ...c9.at[2], tope: c9.tope }).cpa, 20000);
+  assert.strictEqual(core.testVerdict({ ...c9.at[2], tope: 15000 }).branch, 'c3-own');
+  // c10: empieza maravilloso y a los 40.000 no cumple (regla propia)
+  assert.deepStrictEqual(['c10'].map((id) => [0, 1, 2].map((i) => rama(id, i))), [['c1-sale', 'c2-sale-hold', 'c3-own']]);
+  // c11: CPM 26.000 (caro) con cadena funcionando: nunca apaga y trae su nota
+  const c11 = core.TEST_CASES.find((c) => c.id === 'c11');
+  assert.ok(c11.cpm > 20000 && c11.note.join('').includes('la cadena sigue funcionando'));
+  assert.ok(core.TEST_CASES.filter((c) => c.id !== 'c11').every((c) => !c.note));
+  // practiceView trae cpm, tope y note del caso
+  let rv = core.practiceShow(core.practiceNew(['c9']));
+  assert.deepStrictEqual([core.practiceView(rv).cpm, core.practiceView(rv).tope, core.practiceView(rv).note], [12000, 20000, undefined]);
+  rv = core.practiceShow(core.practiceNew(['c1']));
+  assert.strictEqual(core.practiceView(rv).tope, core.TEST_PRACTICE.tope);
+  assert.deepStrictEqual(core.practiceView(core.practiceNew(['c11'])).note, c11.note);
+  // c9 con el tope propio: la respuesta correcta en el corte 3 es Dejar gastar
+  rv = core.practiceNew(['c9']); rv.cut = 2; rv = core.practiceDecide(core.practiceShow(rv), 'spend');
+  assert.strictEqual(rv.last.ok, true);
 });
 
 caso('Escalado: 6 pasos en orden, tarjetas de corte y ramas que testVerdict devuelve', () => {
   const S = core.TEST_STEPS, txt = (a) => a.map((s) => (typeof s === 'string' ? s : s.b)).join('');
-  assert.deepStrictEqual(S.map((s) => s.t), ['Arranque', 'Corte 1 · 20.000', 'Corte 2 · 30.000', 'Corte 3 · 40.000', 'Si se apagó: la cadena', 'Practica']);
+  const tc = (id) => core.TEST_CUTS.flatMap((c) => c.branches).find((b) => b.id === id);
+  assert.deepStrictEqual(S.map((s) => s.t), ['Arranque', 'Corte 1 · 20.000', 'Corte 2 · 30.000', 'Corte 3 · 40.000', 'La cadena y qué no hacer', 'Practica']);
   assert.deepStrictEqual(S.map((s) => s.k), ['arranque', 'corte1', 'corte2', 'corte3', 'cadena', 'practica']);
   for (const s of S) assert.ok(s.where && s.p && s.items.length === 1 && s.items[0].k === 'ok' && s.tool.length, s.k + ' con formato de paso');
   // Pasos 2–4: corte y mini-ejemplo que califica testVerdict (sin respuesta escrita).
@@ -281,16 +316,49 @@ caso('Escalado: 6 pasos en orden, tarjetas de corte y ramas que testVerdict devu
   for (const spend of [5000, 20000, 30000, 40000]) for (let pi = 0; pi <= 14; pi++) for (let sales = 0; sales <= Math.min(pi, 4); sales++) for (const tope of [12000, 15000]) alcanzadas.add(core.testVerdict({ spend, pi, sales, tope }).branch);
   alcanzadas.delete(null);
   assert.deepStrictEqual([...alcanzadas].sort(), ids, 'ramas del mapa = ramas de testVerdict');
+  // SPEC 10 · cada rama del mapa trae el veredicto que devuelve testVerdict para esa rama
+  const alcance = new Map();
+  for (const spend of [20000, 30000, 40000]) for (let pi = 0; pi <= 14; pi++) for (let sales = 0; sales <= Math.min(pi, 4); sales++) for (const tope of [12000, 15000]) { const r = core.testVerdict({ spend, pi, sales, tope }); alcance.set(r.branch, r); }
+  for (const b of core.TEST_CUTS.flatMap((c) => c.branches)) {
+    const r = alcance.get(b.id);
+    assert.deepStrictEqual(b.verdict, { action: r.action, toca: r.toca, veredicto: r.veredicto }, b.id + ' veredicto = testVerdict');
+    assert.strictEqual(b.v, r.v, b.id + ' v');
+  }
+  assert.deepStrictEqual(core.TEST_CUTS[0].branches.map((b) => b.verdict.veredicto), ['MARAVILLOSO', 'APÁGALO', 'FLOJO', 'BIEN']);
+  assert.deepStrictEqual(core.TEST_CUTS[0].branches.map((b) => txt(b.cond).endsWith('0 ventas')), [false, true, true, true]);
+  assert.deepStrictEqual(core.TEST_CUTS[0].branches.map((b) => b.badge), ['MARAVILLOSO', 'Apagar', 'Mantener vigilando', 'Seguir sin tocar']);
+  assert.ok(core.TEST_CUTS.flatMap((c) => c.branches).filter((b) => !b.own).every((b) => b.badge === (b.v === 'great' ? b.verdict.veredicto : b.verdict.toca)), 'badge = acción, salvo great y la regla propia');
+  assert.deepStrictEqual([tc('c3-own').badge, tc('c3-own').badgeIcon, tc('c3-own').verdict.action], ['Preguntar', '❓', 'off'], 'Regla propia: etiqueta Preguntar; la acción sigue siendo apagar');
+  assert.strictEqual(txt(core.TEST_CUTS[0].branches[2].cond), '3 o 4 pagos iniciados · 0 ventas');
   // Semáforo y marca de Regla propia.
   assert.deepStrictEqual(core.TEST_CUTS.flatMap((c) => c.branches).filter((b) => b.own).map((b) => b.id), ['c3-own']);
+  assert.strictEqual(tc('c3-own').light, 'r');
+  assert.deepStrictEqual(tc('c3-own').cond, ['1 venta, o 2+ con CPA > tope']);
+  assert.strictEqual(txt(tc('c3-own').t), 'No cumple: apago y reviso la cadena.');
+  assert.deepStrictEqual([tc('c3-spend').cond, txt(tc('c3-spend').t)], [['2 o más ventas y CPA ≤ tope'], 'Déjalo gastar: pasa a escalado.']);
   assert.deepStrictEqual(core.TEST_CUTS[1].branches.map((b) => b.group), ['Sin ventas', 'Sin ventas', 'Sin ventas', 'Con venta', 'Con venta', 'Con venta']);
   // Cadena: CPM → CPC → CPPI → CPA, "No se mira el CTR" y las 3 lecturas con el CPM de HARD_METRICS.
   assert.deepStrictEqual(core.TEST_CHAIN.flow, ['CPM', 'CPC', 'CPPI', 'CPA']);
-  assert.ok(txt(core.TEST_CHAIN.ctr).startsWith('No se mira el CTR'));
+  assert.ok(!('ctr' in core.TEST_CHAIN) && !('note' in core.TEST_CHAIN), 'ctr y note los absorben las reglas');
+  const D = core.TEST_CHAIN.donts;
+  assert.deepStrictEqual(D.map((d) => d.b), ['No apagues antes de un corte.', 'No toques el anuncio mientras está en testeo.', 'No decidas por el CTR.']);
+  assert.ok(txt(D[0].p).includes('Con $ 8.000 gastados') && txt(D[0].p).includes('todavía no dicen nada'));   // 8.000 = corte 1 × 0,4
+  assert.ok(txt(D[1].p).includes('el texto, el público o el presupuesto'));
+  assert.ok(txt(D[2].p).includes('CPM → CPC → CPPI → CPA'));
+  assert.ok(D.every((d) => d.icon === '⛔'));
+  assert.ok(core.TEST_CHAIN.reads.every((r) => !('icon' in r)), 'las lecturas no llevan emoji');
+  assert.strictEqual(S[4].where, 'Qué revisar y qué no hacer');
   assert.strictEqual(core.TEST_CHAIN.reads.length, 3);
   assert.ok(txt(core.TEST_CHAIN.reads[0].when).includes('$ 20.000') && txt(core.TEST_CHAIN.reads[0].when).includes('$ 6.000'));
   assert.ok(txt(core.TEST_CHAIN.reads[2].fix).includes('la página, la oferta o el formulario'));
-  assert.ok(txt(core.TEST_CHAIN.note).includes('No apago antes de cruzar un corte'));
+  // SPEC 10 · textos corregidos
+  assert.strictEqual(txt(tc('c1-sale').t), 'Si ya hay venta, sigue al siguiente corte sin tocar.');
+  assert.strictEqual(txt(tc('c1-off').t), 'Apágalo y revisa la cadena: CPM y CPC.');
+  assert.ok(!txt(S[1].p).includes('no hace falta mirar más'));
+  assert.ok(txt(S[1].p).includes('sigue al siguiente corte'));
+  const ESCALA = 'Si ya gastó el presupuesto del día con ventas, dejó de ser testeo y se decide como escalando. Las reglas de testeo nunca se aplican a campañas que ya llevan rato vendiendo.';
+  assert.ok(txt(S[0].p).endsWith(ESCALA) && txt(S[3].p).endsWith(ESCALA), 'frase de escalado en arranque y corte3');
+  assert.ok(!JSON.stringify(core.TEST_CHAIN).includes('zona de apagado'));
   assert.ok(core.TEST_HEAD.h === 'Fase de testeo' && core.TEST_HEAD.sub.includes('20.000, 30.000 y 40.000'));
 });
 
@@ -551,7 +619,7 @@ caso('Escalado: testFree (Juega con los números) y barra del simulacro', () => 
   // Gasto 25.000, 2 PI, 0 ventas → apagar en el corte 1, rama c1-off.
   let r = free({ spend: 25000, pi: 2 });
   assert.deepStrictEqual([r.verdict.action, r.verdict.cut, r.verdict.branch], ['off', 1, 'c1-off']);
-  assert.ok(frase(r).startsWith('Apágalo, a nadie le interesa'));
+  assert.ok(frase(r).startsWith('Apágalo y revisa la cadena'));
   // Gasto 30.000, 5 PI, 0 ventas → bastante flojo (CPPI 6.000).
   r = free({ spend: 30000, pi: 5 });
   assert.deepStrictEqual([r.verdict.veredicto, r.verdict.action, r.cppi], ['BASTANTE FLOJO', 'watch', 6000]);
@@ -563,7 +631,7 @@ caso('Escalado: testFree (Juega con los números) y barra del simulacro', () => 
   assert.deepStrictEqual([r.verdict.action, r.verdict.branch], ['spend', 'c3-spend']);
   assert.ok(Math.abs(r.cpa - 13333.33) < 0.01);
   r = free({ spend: 40000, pi: 12, sales: 3, tope: 12000 });
-  assert.deepStrictEqual([r.verdict.action, r.verdict.branch], ['watch', 'c3-own']);
+  assert.deepStrictEqual([r.verdict.action, r.verdict.branch], ['off', 'c3-own']);
   assert.ok(frase(r).includes('Regla propia'));
   // Antes del corte 1: deja correr.
   r = free({ spend: 15000 });
@@ -574,6 +642,21 @@ caso('Escalado: testFree (Juega con los números) y barra del simulacro', () => 
   assert.deepStrictEqual([r.err, r.verdict], ['Las ventas no pueden ser más que los pagos iniciados', null]);
   r = free({ spend: 10000 });
   assert.deepStrictEqual([r.cppi, r.cpa], [null, null]);
+  // SPEC 10: "dejó de ser testeo" (gasto >= presupuesto del día y >= 40.000, y el corte 3 da Dejar gastar el día)
+  r = free({ daily: 30000, spend: 40000, pi: 10, sales: 2, tope: 20000 });
+  assert.deepStrictEqual([r.scaling, r.verdict, r.err], [true, null, null]);
+  assert.strictEqual(r.day, 2); assert.strictEqual(r.cpa, 20000); assert.strictEqual(r.cppi, 4000); assert.ok(r.zones);
+  assert.ok(core.TEST_SCALE_NOTE.includes('dejó de ser testeo'));
+  r = free({ daily: 100000, spend: 40000, pi: 10, sales: 2, tope: 20000 });
+  assert.deepStrictEqual([r.scaling, r.verdict.action, r.verdict.branch], [false, 'spend', 'c3-spend']);   // aún no gastó el día
+  r = free({ daily: 30000, spend: 30000, pi: 6, sales: 1, tope: 20000 });
+  assert.deepStrictEqual([r.scaling, r.verdict.cut, r.verdict.branch], [false, 2, 'c2-sale-hold']);        // corte 2 sigue en testeo
+  r = free({ daily: 30000, spend: 40000, pi: 7, sales: 1, tope: 20000 });
+  assert.deepStrictEqual([r.scaling, r.verdict.branch], [false, 'c3-own']);
+  r = free({ daily: 30000, spend: 40000, pi: 12, sales: 3, tope: 12000 });
+  assert.deepStrictEqual([r.scaling, r.verdict.branch], [false, 'c3-own']);                                // CPA sobre el tope: no escala
+  r = free({ daily: 30000, spend: 40000, pi: 1, sales: 2, tope: 20000 });
+  assert.deepStrictEqual([r.scaling, r.verdict, !!r.err], [false, null, true]);
   // Zonas bajo el tope.
   assert.deepStrictEqual(free({ tope: 32617 }).zones, { escala: 26094, tope: 32617, apaga: 43489 });
   assert.deepStrictEqual(free({}).zones, core.GENERIC_CPA);
@@ -585,12 +668,12 @@ caso('Escalado: testFree (Juega con los números) y barra del simulacro', () => 
 
 caso('Escalado: la ronda de práctica (orden, decisiones, fin de caso y puntaje)', () => {
   const ids = core.TEST_CASES.map((c) => c.id);
-  // Orden al azar: siempre los 8 casos, cada uno una vez; con otro azar cambia.
+  // Orden al azar: siempre los 11 casos, cada uno una vez; con otro azar cambia.
   const o1 = core.practiceOrder(), o2 = core.practiceOrder(() => 0);
   assert.deepStrictEqual([...o1].sort(), [...ids].sort());
   assert.deepStrictEqual([...o2].sort(), [...ids].sort());
   assert.notDeepStrictEqual(o2, ids);
-  // Una ronda acertando todo: 19 decisiones (1+1+2+3+3+3+3+3), 100 %.
+  // Una ronda acertando todo: 28 decisiones (1+1+2+3+3+3+3+3+3+3+3), 100 %.
   const jugar = (order, elegir) => {
     let r = core.practiceNew(order), decisiones = [];
     while (r.i < r.order.length) {
@@ -603,7 +686,7 @@ caso('Escalado: la ronda de práctica (orden, decisiones, fin de caso y puntaje)
     return { r, decisiones };
   };
   let g = jugar(ids, (v) => v.verdict.action);
-  assert.deepStrictEqual([g.r.hits, g.r.total, core.practiceBest(null, g.r)], [19, 19, 100]);
+  assert.deepStrictEqual([g.r.hits, g.r.total, core.practiceBest(null, g.r)], [28, 28, 100]);
   // Cada caso termina en Apagar / Dejar gastar o en su último corte; los demás siguen al siguiente corte.
   const porCaso = {};
   for (const [n, cut, correcta] of g.decisiones) (porCaso[n] ??= []).push([cut, correcta]);
@@ -611,10 +694,10 @@ caso('Escalado: la ronda de práctica (orden, decisiones, fin de caso y puntaje)
   assert.deepStrictEqual(porCaso['Conjunto 3'], [[1, 'watch'], [2, 'off']]);
   assert.deepStrictEqual(porCaso['Conjunto 4'], [[1, 'go'], [2, 'watch'], [3, 'off']]);
   assert.deepStrictEqual(porCaso['Conjunto 5'], [[1, 'go'], [2, 'go'], [3, 'spend']]);
-  assert.deepStrictEqual(porCaso['Conjunto 6'], [[1, 'watch'], [2, 'watch'], [3, 'watch']]);
+  assert.deepStrictEqual(porCaso['Conjunto 6'], [[1, 'watch'], [2, 'watch'], [3, 'off']]);
   // Una decisión equivocada cuenta como fallo y guarda la correcta.
   g = jugar(ids, (v, i) => (i === 0 ? 'go' : v.verdict.action));
-  assert.deepStrictEqual([g.r.hits, g.r.total, core.practiceBest(null, g.r)], [18, 19, 95]);
+  assert.deepStrictEqual([g.r.hits, g.r.total, core.practiceBest(null, g.r)], [27, 28, 96]);
   let r = core.practiceShow(core.practiceNew(ids));
   r = core.practiceDecide(r, 'go');
   assert.deepStrictEqual(r.last, { chosen: 'go', correct: 'off', ok: false });
@@ -632,9 +715,9 @@ caso('Escalado: la ronda de práctica (orden, decisiones, fin de caso y puntaje)
   assert.deepStrictEqual([core.practiceView(r).from, core.practiceView(r).to, core.practiceView(r).cutN, core.practiceView(r).shown], [20000, 30000, 2, false]);
   // Fin de la ronda y mejor puntaje: solo sube.
   assert.strictEqual(core.practiceView(g.r).over, true);
-  assert.deepStrictEqual(core.practiceView(g.r).score, { hits: 18, total: 19, pct: 95 });
+  assert.deepStrictEqual(core.practiceView(g.r).score, { hits: 27, total: 28, pct: 96 });
   assert.strictEqual(core.practiceBest(100, g.r), 100);
-  assert.strictEqual(core.practiceBest(50, g.r), 95);
+  assert.strictEqual(core.practiceBest(50, g.r), 96);
   assert.strictEqual(core.practiceBest(null, core.practiceNew(ids)), null);
   assert.strictEqual(core.practiceView(core.practiceNew(ids)).lastCase, false);
 });

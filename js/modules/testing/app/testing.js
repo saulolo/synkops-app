@@ -1,6 +1,6 @@
 // Testeo: estado (app.state.testing), persistencia y conexión con la UI.
 // Módulo informativo: no lee campañas reales. Guarda en pyl-testing la sub-pestaña, el avance del paso a paso,
-// el modo del simulacro, el mejor puntaje y los números de "Juega con los números".
+// el modo del simulacro, el mejor puntaje (con la versión v: se reinicia si cambia la regla) y los números de "Juega con los números".
 // El paso a paso usa los mismos componentes de la guía de Meta Ads (ui.landing.stepList/stepDetail).
 (() => {
   const PYL = globalThis.PYL;
@@ -21,14 +21,16 @@
       done: Array.isArray(t0.done) ? KEYS.filter((k) => t0.done.includes(k)) : [],                       // pasos hechos (sus k)
     },
     mode: MODES.includes(saved.mode) ? saved.mode : 'practice',  // modo del simulacro
-    best: num(saved.best, null),                                  // mejor % de aciertos de una ronda (0–100)
+    best: saved.v === C.TEST_VERSION ? num(saved.best, null) : null, // mejor % de aciertos (0–100); sin v: 2 se calculó con la regla vieja y se reinicia
     free: Object.fromEntries(Object.keys(FREE0).map((k) => [k, num(f0[k], FREE0[k])])), // "Juega con los números"
     run: C.practiceNew(),                                         // ronda de práctica en curso (no se guarda)
   });
 
   const persist = () => {
-    if (!store.save({ part: S.part, test: S.test, mode: S.mode, best: S.best, free: S.free })) toast('No pude guardar en el navegador.', 'error');
+    if (!store.save({ v: C.TEST_VERSION, part: S.part, test: S.test, mode: S.mode, best: S.best, free: S.free })) toast('No pude guardar en el navegador.', 'error');
   };
+
+  if (Object.keys(saved).length && saved.v !== C.TEST_VERSION) persist(); // reinicio único del mejor puntaje: queda marcado con la versión
 
   // L.progress y stepDetail leen casillas { 'paso.ok': true }; cada paso tiene una sola.
   const doneMap = () => Object.fromEntries(S.test.done.map((k) => [k + '.ok', true]));
