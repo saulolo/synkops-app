@@ -391,25 +391,33 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   // 9. Escalado · Fase de testeo: 6 pasos, cada uno con su bloque, y el avance.
   const paso = (i) => document.querySelectorAll('#ts-steps .fl-node')[i].click();
   assert.strictEqual(document.querySelectorAll('#ts-steps .fl-item').length, 6, 'Seis pasos en la lista');
-  assert.deepStrictEqual([...document.querySelectorAll('#ts-steps .fl-tx b')].map((n) => n.textContent), ['Arranque', 'Corte 1 · 20.000', 'Corte 2 · 30.000', 'Corte 3 · 40.000', 'Si se apagó: la cadena', 'Practica']);
+  assert.deepStrictEqual([...document.querySelectorAll('#ts-steps .fl-tx b')].map((n) => n.textContent), ['Arranque', 'Corte 1 · 20.000', 'Corte 2 · 30.000', 'Corte 3 · 40.000', 'La cadena y qué no hacer', 'Practica']);
   assert.ok(text('#ts-step').includes('Paso 1 de 6') && text('#ts-step').includes('100.000 al día'), 'Abre en el paso 1');
   assert.deepStrictEqual([...document.querySelectorAll('#ts-step .ts-bar-mark small')].map((n) => n.textContent.replace('Fin del día', '')), ['20K', '30K', '40K', '100K'], 'Barra con las marcas');
   assert.ok(text('#ts-step').includes('el corte de 40.000 le llega el día 2'), 'Nota ABO');
   paso(1);
   assert.ok(text('#ts-step').includes('Paso 2 de 6') && document.querySelectorAll('#ts-step .ts-cut').length === 1, 'El paso 2 muestra solo su tarjeta');
-  assert.ok(text('#ts-step .ts-ex').includes('Así lo califica el Lab de NovaSociety') && text('#ts-step .ts-ex').includes('Flojo, se mantiene'), 'Mini-ejemplo resuelto');
-  assert.strictEqual(document.querySelector('#ts-step .ts-on').dataset.branch, 'c1-weak', 'Se ilumina la rama del ejemplo');
+  assert.ok(!document.querySelector('#ts-step .ts-ex') && !document.querySelector('#ts-step .ts-on'), 'Sin tarjeta de ejemplo ni fila iluminada en los pasos 2 a 4');
+  assert.deepStrictEqual([...document.querySelectorAll('#ts-step .ts-br .ts-vd')].map((n) => n.textContent), ['✅ MARAVILLOSO', '🛑 Apagar', '⚠️ Mantener vigilando', '✅ Seguir sin tocar'], 'Cada fila del corte 1 muestra su veredicto');
+  assert.ok(text('#ts-step').includes('3 o 4 pagos iniciados · 0 ventas'), 'Corte 1: 0 ventas');
   paso(2);
   assert.deepStrictEqual([...document.querySelectorAll('#ts-step .ts-grp-h')].map((n) => n.textContent), ['Sin ventas', 'Con venta']);
-  assert.strictEqual(document.querySelector('#ts-step .ts-on').dataset.branch, 'c2-nosale-weak');
+  assert.ok(!document.querySelector('#ts-step .ts-on') && document.querySelectorAll('#ts-step .ts-br .ts-vd').length === 6, 'Corte 2: veredicto en sus 6 filas y sin fila iluminada');
   paso(3);
-  assert.ok(text('#ts-step .ts-own') === 'Regla propia' && document.querySelectorAll('#ts-step .ts-cut .ts-br').length === 3, 'Corte 3 con Regla propia');
+  assert.ok(text('#ts-step .ts-own') === '❓ Preguntar' && !document.querySelector('#ts-step .tag.ts-own') && document.querySelectorAll('#ts-step .ts-cut .ts-br').length === 3, 'Corte 3 con Regla propia');
+  { // La aclaración de la regla propia sale como tooltip al pasar el mouse por "Preguntar".
+    const ow = document.querySelector('#ts-step .ts-own');
+    ow.dispatchEvent(new window.MouseEvent('mousemove', { bubbles: true }));
+    assert.ok(text('#tip').includes('Regla propia') && text('#tip').includes('NovaSociety no define este caso'), 'Tooltip de la regla propia');
+    ow.dispatchEvent(new window.MouseEvent('mouseleave', { bubbles: true }));
+  }
   const topeTxt = text('#ts-step .ts-tope');
   assert.ok(topeTxt.includes('El tope es el CPA máximo de tu costeo') && ['$ 12.000', '$ 20.000', '$ 16.494', '$ 27.489'].every((n) => topeTxt.includes(n)), 'Caja del tope');
   paso(4);
-  assert.ok(text('#ts-step .ts-flow').replace(/s/g, '') === 'CPM→CPC→CPPI→CPA' && text('#ts-step').includes('No se mira el CTR'), 'Cadena y CTR');
+  assert.ok(text('#ts-step .ts-flow').replace(/s/g, '') === 'CPM→CPC→CPPI→CPA' && text('#ts-step').includes('No decidas por el CTR'), 'Cadena y CTR');
   assert.strictEqual(document.querySelectorAll('#ts-step .ts-read').length, 3, 'Tres lecturas');
-  assert.ok(text('#ts-step').includes('No apago antes de cruzar un corte'));
+  assert.deepStrictEqual([...document.querySelectorAll('#ts-step .ts-dont')].map((n) => n.querySelector('b').textContent), ['No apagues antes de un corte.', 'No toques el anuncio mientras está en testeo.', 'No decidas por el CTR.'], 'Tres reglas de lo que no hago');
+  assert.strictEqual(document.querySelectorAll('#ts-step .ts-read .ts-pill').length, 6, 'Cada lectura trae sus etiquetas Si y Solución');
   paso(5);
   assert.strictEqual(document.querySelectorAll('#ts-step .ts-cuts .ts-cut').length, 3, 'El paso 6 muestra el mapa de los 3 cortes');
   assert.ok(document.querySelector('#ts-step #ts-sim'), 'y el lugar del simulacro');
@@ -440,7 +448,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   poner('spend', '15000');
   assert.ok(text('#ts-free-out').includes('Deja correr sin tocar') && !document.querySelector('#ts-step .ts-on'), 'Antes del corte 1');
   poner('spend', '25000'); poner('pi', '2');
-  assert.ok(text('#ts-free-out').includes('Apagar') && text('#ts-free-out').includes('Apágalo, a nadie le interesa'), 'Apagar en el corte 1');
+  assert.ok(text('#ts-free-out').includes('Apagar') && text('#ts-free-out').includes('Apágalo y revisa la cadena'), 'Apagar en el corte 1');
   assert.deepStrictEqual([...document.querySelectorAll('#ts-step .ts-on')].map((n) => n.dataset.branch), ['c1-off'], 'Se ilumina la rama c1-off');
   assert.ok(text('#ts-free-out').includes('Corte 1 · 20.000') && text('#ts-free-out').includes('Día del testeo'), 'Corte y día');
   poner('spend', '30000'); poner('pi', '5');
@@ -452,6 +460,11 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   assert.ok(text('#ts-free-out').includes('Regla propia') && document.querySelector('#ts-step .ts-on').dataset.branch === 'c3-own', 'Regla propia con tope 12.000');
   poner('daily', '30000');
   assert.ok(text('#ts-free-out').includes('Día del testeo2'), 'Gasto 40.000 con presupuesto 30.000 es el día 2');
+  poner('tope', '20000'); poner('pi', '10'); poner('sales', '2');
+  assert.ok(text('#ts-free-out').includes('dejó de ser testeo') && text('#ts-free-out').includes('pestaña Escalado'), 'Aviso dejó de ser testeo');
+  assert.ok(!text('#ts-free-out').includes('Dejar gastar el día') && !document.querySelector('#ts-step .ts-on'), 'Sin veredicto de testeo ni rama iluminada');
+  assert.ok(text('#ts-free-out').includes('CPA$ 20.000'), 'El CPA se sigue mostrando');
+  poner('sales', '3');
   poner('pi', '1');
   assert.ok(text('#ts-free-out').includes('Las ventas no pueden ser más que los pagos iniciados') && !document.querySelector('#ts-step .ts-on'), 'Aviso y sin veredicto');
   assert.ok(text('#ts-free-out').includes('CPPI$ 40.000'), 'El CPPI se sigue mostrando');
@@ -464,6 +477,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
 
   // 11. Escalado · Práctica (paso 6).
   paso(5);
+  assert.strictEqual(document.querySelectorAll('#ts-step .ts-cuts .ts-vd').length, 13, 'El mapa del paso 6 muestra el veredicto en las 13 ramas');
   const run = () => PYL.app.state.testing.run, vista = () => PYL.core.testing.practiceView(run());
   assert.strictEqual(PYL.app.state.testing.mode, 'practice');
   assert.ok(document.querySelector('#ts-adv') && text('#ts-adv').startsWith('Avanzar hasta el corte') && !document.querySelector('.ts-dec'), 'Antes de avanzar solo está "Avanzar"');
@@ -471,7 +485,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   document.querySelector('#ts-adv').click();
   assert.strictEqual(document.querySelectorAll('#ts-mode .ts-dec').length, 4, 'Cuatro botones de decisión');
   assert.deepStrictEqual([...document.querySelectorAll('#ts-mode .ts-dec b')].map((b) => b.textContent), ['Apagar', 'Mantener vigilando', 'Seguir sin tocar', 'Dejar gastar el día']);
-  assert.ok(['Gasto', 'Pagos iniciados', 'Ventas', 'CPPI', 'CPA'].every((n) => text('#ts-mode .ts-stats').includes(n)), 'Se ven los números del caso');
+  assert.ok(['Gasto', 'Pagos iniciados', 'Ventas', 'CPPI', 'CPA', 'CPM', 'Tope'].every((n) => text('#ts-mode .ts-stats').includes(n)), 'Se ven los números del caso');
   assert.strictEqual(document.querySelector('#ts-mode .ts-bar-fill').dataset.spend, String(vista().to), 'La barra llega al corte');
   assert.ok(!document.querySelector('#ts-fb') && !document.querySelector('#ts-step .ts-on'), 'Sin decisión no hay explicación ni rama iluminada');
   // Decisión equivocada: fallo, la correcta, explicación y rama iluminada; "Ver el paso" abre el paso del corte.
@@ -486,24 +500,30 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   assert.ok(text('#ts-step').includes('Paso ' + v0.verdict.step + ' de 6'), '"Ver el paso" abre el paso del corte');
   paso(5);
   assert.ok(document.querySelector('#ts-fb'), 'Al volver, la ronda sigue donde estaba');
-  // Resto de la ronda acertando: termina con 18 de 19 (95 %); el mejor puntaje queda guardado.
-  let guarda = 0;
+  // Resto de la ronda acertando: termina con 27 de 28 (96 %); el mejor puntaje queda guardado.
+  let guarda = 0, notaVista = false;
   while (!document.querySelector('#ts-end') && guarda++ < 100) {
     if (document.querySelector('#ts-adv')) document.querySelector('#ts-adv').click();
-    else if (document.querySelector('#ts-fb')) document.querySelector('#ts-next').click();
+    else if (document.querySelector('#ts-fb')) {
+      if (vista().note) { notaVista = true; assert.ok(text('#ts-fb').includes('la cadena sigue funcionando'), 'La nota del caso sale tras decidir'); }
+      else assert.ok(!text('#ts-fb').includes('la cadena sigue funcionando'), 'Sin nota en los demás casos');
+      document.querySelector('#ts-next').click();
+    }
     else document.querySelector('#ts-mode .ts-dec[data-action="' + vista().verdict.action + '"]').click();
   }
-  assert.ok(text('#ts-end').includes('18 de 19 decisiones acertadas') && text('#ts-end').includes('(95 %)') && text('#ts-end').includes('Mejor puntaje: 95 %'), 'Fin de la ronda');
-  assert.strictEqual(PYL.app.state.testing.best, 95, 'El mejor puntaje queda en el estado');
+  assert.ok(notaVista, 'La nota de c11 salió en algún momento');
+  assert.ok(text('#ts-end').includes('27 de 28 decisiones acertadas') && text('#ts-end').includes('(96 %)') && text('#ts-end').includes('Mejor puntaje: 96 %'), 'Fin de la ronda');
+  assert.strictEqual(PYL.app.state.testing.best, 96, 'El mejor puntaje queda en el estado');
   document.querySelector('#ts-again').click();
   assert.ok(document.querySelector('#ts-adv') && !document.querySelector('#ts-end') && run().total === 0, 'Otra ronda empieza de cero');
-  assert.strictEqual(PYL.app.state.testing.best, 95, 'El mejor puntaje se mantiene');
-  assert.deepStrictEqual([...run().order].sort(), [...PYL.core.testing.TEST_CASES.map((c) => c.id)].sort(), 'La ronda pasa por los 8 casos');
+  assert.strictEqual(PYL.app.state.testing.best, 96, 'El mejor puntaje se mantiene');
+  assert.deepStrictEqual([...run().order].sort(), [...PYL.core.testing.TEST_CASES.map((c) => c.id)].sort(), 'La ronda pasa por los 11 casos');
   paso(0);
 
   // 8. Rastros de la SPEC 08 (SPEC 09): Estrategias solo VDO y Por proveedor, 'auto' guardado cae en VDO y pyl-auto se borra.
   // En jsdom con file:// no hay localStorage: se arma otra página con uno simulado.
-  const store = { 'pyl-search': JSON.stringify({ strat: 'auto' }), 'pyl-auto': '{"hist":[]}' };
+  const store = { 'pyl-search': JSON.stringify({ strat: 'auto' }), 'pyl-auto': '{"hist":[]}',
+    'pyl-testing': JSON.stringify({ part: 'test', test: { active: 3, done: ['arranque', 'corte1'] }, mode: 'free', best: 80, free: { daily: 30000, spend: 25000, pi: 4, sales: 1, tope: 18000 } }) };
   const fresca = () => JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     runScripts: 'dangerously', resources: new Loader(), pretendToBeVisual: true, virtualConsole,
     beforeParse(w) {
@@ -655,6 +675,11 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.ok(!doc2.querySelector('#b-st-vdo').hidden && doc2.querySelector('#b-st-prov').hidden, "strat 'auto' guardado abre VDO");
     assert.ok(!('pyl-auto' in store), 'Se borra pyl-auto una sola vez al cargar');
     assert.ok('pyl-search' in store, 'No se toca pyl-search');
+    // SPEC 10: un pyl-testing sin v: 2 reinicia solo el mejor puntaje y se guarda con v: 2.
+    const T2 = d2.window.PYL.app.state.testing, g = JSON.parse(store['pyl-testing']);
+    assert.strictEqual(T2.best, null, 'El mejor puntaje viejo se reinicia');
+    assert.deepStrictEqual(JSON.parse(JSON.stringify([T2.test.active, T2.test.done, T2.mode, T2.free])), [3, ['arranque', 'corte1'], 'free', { daily: 30000, pi: 4, sales: 1, spend: 25000, tope: 18000 }], 'Pasos, modo y números se conservan');
+    assert.deepStrictEqual([g.v, g.best, g.test.done.length, g.mode], [d2.window.PYL.core.testing.TEST_VERSION, null, 2, 'free'], 'Se guarda con v: 2 y best null');
     d2.window.close();
   }).then(() => new Promise((ok) => setTimeout(ok, 200))).then(() => {
     assert.ok(ladder.classList.contains('grown'), 'La escalera debe terminar crecida');

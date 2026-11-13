@@ -22,7 +22,9 @@
 @media (prefers-reduced-motion:reduce){.ts-bar-fill{transition:none}}
 
 /* ---------- Tarjetas de corte (semáforo) ---------- */
-.ts-cuts{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.ts-cuts{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;grid-auto-flow:row dense}
+/* Corte 2 (el más alto) ocupa dos filas: el 1 y el 3 se apilan a su lado y las columnas terminan parejas. */
+.ts-cuts .ts-cut[data-cut="2"]{grid-row:span 2}
 .ts-cut{background:var(--card);border:1px solid var(--line);border-radius:var(--rad);padding:14px;display:grid;gap:8px;align-content:start}
 .ts-cut-h{margin:0;font-size:16px}
 .ts-cut-look{margin:0;color:var(--muted)}
@@ -35,7 +37,11 @@
 .ts-cond{font-weight:700}
 .ts-arrow{color:var(--soft)}
 .ts-br.ts-on{box-shadow:0 0 0 2px var(--b);background:var(--b-bg)}
-.ts-own{margin-left:auto}
+.ts-vd{font-weight:800;font-size:12.5px;padding:3px 12px;border-radius:999px;border:1px solid var(--line-2);background:var(--card);white-space:nowrap}
+.ts-br.ts-r .ts-vd{color:var(--r-ink);border-color:var(--r);background:var(--r-bg)}
+.ts-br.ts-y .ts-vd{color:var(--y-ink);border-color:var(--y);background:var(--y-bg)}
+.ts-br.ts-g .ts-vd{color:var(--g-ink);border-color:var(--g);background:var(--g-bg)}
+.ts-vd.ts-own{cursor:help}
 
 /* ---------- Mini-ejemplo ---------- */
 .ts-ex{margin-top:12px;padding:12px 14px;border-radius:var(--rad);border:1px solid var(--line);background:var(--card-2)}
@@ -53,10 +59,19 @@
 .ts-flow-a{color:var(--soft)}
 .ts-ctr{margin:8px 0 0}
 .ts-reads{display:grid;gap:10px;margin-top:12px}
-.ts-read{padding:12px 14px;border:1px solid var(--line);border-radius:var(--rad);background:var(--card-2)}
+.ts-read{padding:12px 14px;border:1px solid var(--line);border-left:4px solid var(--b);border-radius:var(--rad);background:linear-gradient(90deg,var(--b-bg),transparent 60%),var(--card-2)}
 .ts-read p{margin:0}
 .ts-read-w{font-weight:700}
-.ts-read-f{margin-top:4px!important;color:var(--muted)}
+.ts-read-f{color:var(--muted)}
+.ts-pill{display:inline-block;margin-right:8px;padding:1px 9px;border-radius:99px;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;vertical-align:1px}
+.ts-pill.si{background:var(--y-bg);color:var(--y-ink)}
+.ts-pill.fix{background:var(--g-bg);color:var(--g-ink)}
+.ts-donts{margin-top:18px;display:grid;gap:10px}
+.ts-donts-h{margin:0}
+.ts-dont{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1px solid var(--line);border-left:4px solid var(--r);border-radius:var(--rad);background:linear-gradient(90deg,var(--r-bg),transparent 60%),var(--card-2)}
+.ts-dont p{margin:0}
+.ts-dont b{color:var(--r-ink)}
+.ts-dont-ic{font-size:18px;line-height:1.2}
 
 /* ---------- Simulacro ---------- */
 #ts-modes{flex-wrap:wrap;max-width:100%}
