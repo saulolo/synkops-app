@@ -125,8 +125,10 @@
     { id: 'c11', name: 'Conjunto 11', cpm: 26000, at: [at(K1, 5, 1), at(K2, 9, 2), at(K3, 12, 3)],
       note: ['El CPM está caro, pero la cadena sigue funcionando: los pagos iniciados y las ventas mandan.'] },
   ];
-  // Versión de lo guardado en pyl-testing. Subió a 2 cuando cambió la regla de c3-own: el mejor puntaje de antes ya no vale.
-  const TEST_VERSION = 2;
+  // Versión de lo guardado en pyl-testing. v2: cambió la regla de c3-own y el mejor puntaje de antes ya no vale (TEST_BEST_SINCE).
+  // v3 (SPEC 11): se guardan las entradas del Simulador (sim) y se deja de guardar el modo del paso 6; el mejor puntaje se conserva.
+  const TEST_VERSION = 3;
+  const TEST_BEST_SINCE = 2; // el mejor puntaje solo se reinicia si lo guardado no trae v o trae una menor
   // Tope y presupuesto con que se corre la práctica.
   const TEST_PRACTICE = { daily: NS_TEST.budget, tope: GENERIC_CPA.tope };
 
@@ -144,14 +146,14 @@
       ],
     } },
     { k: 'test', t: '🧪 Fase de testeo' },
-  { k: 'sim', t: '⚠️ Simulador · revisar', disabled: true },
+    { k: 'sim', t: '🎛️ Simulador' },
   ];
   const testingPart = (k) => TESTING_PARTS.find((p) => p.k === k && !p.disabled) || TESTING_PARTS.find((p) => !p.disabled);
 
   // ---------- Paso a paso ----------
   const upTo = (n) => Array.from({ length: n }, (_, i) => i); // 0..n-1
   const R_ = TEST_RULES, ADS = core.ads.ADS;
-  const cpmMax = (plat) => core.metrics.HARD_METRICS.find((r) => r.k === 'cpm').view[plat].tip.li[0][1];
+  const cpmMax = (plat) => '$ ' + core.metrics.copText(core.metrics.HARD_METRICS.find((r) => r.k === 'cpm').view[plat].lim.max);
 
   const TEST_HEAD = { h: 'Fase de testeo', sub: 'Aprendo qué hacer en cada corte de gasto: ' + NS_TEST.cuts.map(copText).join(', ').replace(/, ([^,]*)$/, ' y $1') + '. Así lo califica el Lab de NovaSociety.' };
 
@@ -302,5 +304,5 @@
     };
   }
 
-  core.testing = { TEST_CHAIN, TEST_CUTS, TEST_HEAD, TEST_STEPS, TESTING_PARTS, testingPart, CPA_ZONES, TEST_ACTIONS, TEST_CASES, TEST_SCALE_NOTE, TEST_VERSION, TEST_PRACTICE, TEST_RULES, cpaZones, testCheck, testDay, practiceBest, practiceDecide, practiceNew, practiceNext, practiceOrder, practiceShow, practiceView, testBar, testFree, testRange, testVerdict };
+  core.testing = { TEST_CHAIN, TEST_CUTS, TEST_HEAD, TEST_STEPS, TESTING_PARTS, testingPart, CPA_ZONES, TEST_ACTIONS, TEST_BEST_SINCE, TEST_CASES, TEST_SCALE_NOTE, TEST_VERSION, TEST_PRACTICE, TEST_RULES, cpaZones, testCheck, testDay, practiceBest, practiceDecide, practiceNew, practiceNext, practiceOrder, practiceShow, practiceView, testBar, testFree, testRange, testVerdict };
 })();

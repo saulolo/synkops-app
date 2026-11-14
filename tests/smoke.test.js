@@ -217,16 +217,24 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   assert.deepStrictEqual(tabs.map((b) => b.dataset.v).slice(4, 6), ['metricas', 'testeo'], 'Testeo va justo después de Métricas');
   const partes = [...document.querySelectorAll('#ts-parts [data-part]')];
   assert.deepStrictEqual(partes.map((b) => b.dataset.part), ['real', 'test', 'sim'], 'Lectura real, Fase de testeo y Simulador');
-  assert.deepStrictEqual(partes.map((b) => b.textContent), ['📂 Lectura real · pronto', '🧪 Fase de testeo', '⚠️ Simulador · revisar'], 'Sin Surfing Scaling; Simulador con aviso');
+  assert.deepStrictEqual(partes.map((b) => b.textContent), ['📂 Lectura real · pronto', '🧪 Fase de testeo', '🎛️ Simulador'], 'Sin Surfing Scaling; Simulador habilitado');
   assert.ok(partes[0].disabled && !partes[1].disabled, 'Lectura real se ve pero no se puede abrir');
   assert.ok(partes[1].getAttribute('aria-pressed') === 'true' && !document.querySelector('#ts-test').hidden && document.querySelector('#ts-soon').hidden, 'Abre en Fase de testeo');
   partes[0].click();
   assert.ok(!document.querySelector('#ts-test').hidden && document.querySelector('#ts-soon').hidden && PYL.app.state.testing.part === 'test', 'Lectura real no se abre');
-  // Simulador: el módulo se eliminó; queda la sub-pestaña apagada con su aviso "revisar".
+  // Simulador (SPEC 11): el módulo viejo se eliminó; la sub-pestaña nueva abre su propia tarjeta.
   assert.ok(!document.querySelector('#v-sim') && !document.querySelector('#tabs [data-v="sim"]') && !document.querySelector('#s-eval, #ts-simulador, #hist, #t-verdict'), 'Ya no hay Simulador en la página');
-  assert.ok(partes[2].disabled, 'Simulador · revisar se ve pero no se puede abrir');
+  assert.ok(!partes[2].disabled, 'El Simulador se puede abrir');
   partes[2].click();
-  assert.ok(!document.querySelector('#ts-test').hidden && PYL.app.state.testing.part === 'test', 'Simulador no se abre');
+  assert.ok(PYL.app.state.testing.part === 'sim' && !document.querySelector('#ts-simu').hidden && document.querySelector('#ts-test').hidden && document.querySelector('#ts-soon').hidden, 'Simulador abre su tarjeta');
+  assert.strictEqual(document.querySelector('#ts-parts [aria-pressed="true"]').dataset.part, 'sim');
+  assert.strictEqual(text('#ts-simu h3'), 'Simulador de testeo');
+  assert.deepStrictEqual([...document.querySelectorAll('#ts-sx-modes [data-mode]')].map((b) => b.dataset.mode), ['chain', 'manual'], 'Dos modos');
+  assert.strictEqual(document.querySelector('#ts-sx-modes [data-mode="chain"]').getAttribute('aria-pressed'), 'true', 'Cadena abre por defecto');
+  assert.ok(!document.querySelector('#ts-simu .ts-cuts') && !document.querySelector('#ts-sx-cuts'), 'El Simulador no lleva el mapa de los 3 cortes');
+  assert.ok(!document.querySelector('#ts-step .ts-cut') && !document.querySelector('#ts-sim'), 'El paso a paso no se duplica en el DOM mientras se ve el Simulador');
+  document.querySelector('#ts-parts [data-part="test"]').click();
+  assert.ok(PYL.app.state.testing.part === 'test' && !document.querySelector('#ts-test').hidden && document.querySelector('#ts-simu').hidden && !document.querySelector('#ts-sx-modes'), 'Volver a la Fase de testeo');
   assert.strictEqual(text('#v-testeo h1'), 'Testeo');
   assert.ok(text('#v-testeo .lead').includes('primera prueba de un anuncio') && text('#v-testeo .eyebrow').includes('Después de pautar'), 'Encabezado de Testeo');
   assert.strictEqual(PYL.app.state.testing.part, 'test');
@@ -433,54 +441,219 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   assert.ok(!document.querySelector('#ts-prog button'), 'Sin pasos hechos no hay "Empezar de nuevo"');
   paso(0);
 
-  // 10. Escalado · Juega con los números (paso 6).
+  // 10. Paso 6 solo con la práctica (SPEC 11): sin selector de modos y con botón al Simulador.
   paso(5);
-  assert.deepStrictEqual([...document.querySelectorAll('#ts-modes [data-mode]')].map((b) => b.dataset.mode), ['practice', 'free'], 'Dos modos');
-  document.querySelector('#ts-modes [data-mode="free"]').click();
-  assert.strictEqual(document.querySelector('#ts-modes [data-mode="free"]').getAttribute('aria-pressed'), 'true');
-  assert.strictEqual(PYL.app.state.testing.mode, 'free', 'Se recuerda el modo');
+  assert.ok(!document.querySelector('#ts-modes') && !document.querySelector('#ts-free-out') && !document.querySelector('#ts-f-spend'), 'El paso 6 ya no tiene modos ni números a mano');
+  assert.ok(document.querySelector('#ts-sim #ts-mode') && document.querySelector('#ts-adv'), 'Muestra directo la práctica de 11 casos en #ts-mode');
+  assert.strictEqual(text('#ts-to-sim'), 'Simulador →');
+  document.querySelector('#ts-to-sim').click();
+  assert.ok(PYL.app.state.testing.part === 'sim' && !document.querySelector('#ts-simu').hidden && document.querySelector('#ts-test').hidden, '#ts-to-sim abre el Simulador');
+  document.querySelector('#ts-parts [data-part="test"]').click();
+  paso(0);
+
+  // 10a. Simulador · modo Cadena (SPEC 11): entradas, corrida, deslizador y salida.
+  {
+    const TS = PYL.app.state.testing, SCc = PYL.core.simulator;
+    TS.simRun.seed = 1; TS.simRun.run = null;   // semilla fija: con los defectos y azar libre, ~1 de cada 4 corridas se apaga sola
+    document.querySelector('#ts-parts [data-part="sim"]').click();
+    const campo = (k) => document.querySelector('#ts-sx-f-' + k);
+    const escribir = (k, v) => { const x = campo(k); x.value = v; x.dispatchEvent(new window.Event('input', { bubbles: true })); };
+    const luz = () => [...document.querySelectorAll('#ts-simu .ts-ex[data-branch]')].map((n) => n.dataset.branch);
+    assert.deepStrictEqual(['daily', 'tope', 'cpm', 'ctr', 'toPi', 'toSale'].map((k) => campo(k).value), ['100000', '15000', '12000', '2', '20', '30'], 'Entradas con sus defectos');
+    assert.strictEqual(document.querySelector('#ts-sx-f-plat [data-plat="meta"]').getAttribute('aria-pressed'), 'true', 'Meta por defecto');
+    assert.ok(text('#ts-sx-panel').includes('$ 12.000') && text('#ts-sx-panel').includes('$ 20.000'), 'Zonas del tope bajo el campo');
+    // No hay campos para CPC, PI, ventas, CPPI ni CPA: salen calculados.
+    assert.ok(!['cpc', 'pi', 'sales', 'cppi', 'cpa'].some((k) => document.querySelector('#ts-sx-f-' + k)), 'Los derivados no se escriben');
+    assert.ok(TS.simRun.run && TS.simRun.run.points.length === 101 && TS.simRun.spend === 0, 'La corrida se genera al abrir');
+    const derivado = (n) => [...document.querySelectorAll('#ts-sx-derived .ts-stat')].find((s) => s.querySelector('small').textContent === n).querySelector('b').textContent;
+    assert.strictEqual(derivado('CPC'), '$ 600', 'CPC = CPM ÷ (1.000 × CTR)');
+    // Deslizador: mueve el punto y muestra su estado.
+    const sl = document.querySelector('#ts-sx-spend');
+    assert.strictEqual(sl.max, '100000', 'El deslizador llega al fin del día');
+    sl.value = '40000'; sl.dispatchEvent(new window.Event('input', { bubbles: true }));
+    const p40 = SCc.simAt(TS.simRun.run, 40000, TS.sim);
+    assert.strictEqual(TS.simRun.spend, 40000);
+    assert.strictEqual(derivado('Pagos iniciados'), String(p40.point.pi));
+    assert.strictEqual(derivado('Ventas'), String(p40.point.sales));
+    assert.strictEqual(derivado('Impresiones'), PYL.core.metrics.copText(Math.floor(p40.point.impr)));
+    assert.ok(text('#ts-sx-out').includes(p40.verdict.veredicto) && text('#ts-sx-out').includes('Así lo califica el Lab'), 'Veredicto del punto');
+    assert.deepStrictEqual(luz(), [p40.verdict.branch], 'La tarjeta lleva la rama del veredicto del punto');
+    // Misma semilla = mismos números al volver a abrir el modo.
+    const antes = JSON.stringify(TS.simRun.run.points);
+    document.querySelector('#ts-sx-modes [data-mode="manual"]').click();
+    document.querySelector('#ts-sx-modes [data-mode="chain"]').click();
+    assert.strictEqual(JSON.stringify(TS.simRun.run.points), antes, 'La corrida no cambia al cambiar de modo');
+    // Entradas: CTR con coma, plataforma, errores por campo.
+    escribir('ctr', '1,5');
+    assert.strictEqual(TS.sim.ctr, 1.5, 'CTR con coma');
+    assert.ok(campo('ctr').getAttribute('aria-invalid') !== 'true' && text('#ts-sx-err-ctr') === '');
+    assert.strictEqual(derivado('CPC'), '$ 800', 'CPC con CTR 1,5 = 12.000 ÷ 15');
+    document.querySelector('#ts-sx-f-plat [data-plat="tiktok"]').click();
+    assert.strictEqual(TS.sim.plat, 'tiktok');
+    assert.strictEqual(document.querySelector('#ts-sx-f-plat [data-plat="tiktok"]').getAttribute('aria-pressed'), 'true');
+    escribir('ctr', '2');
+    escribir('ctr', '101');
+    assert.strictEqual(campo('ctr').getAttribute('aria-invalid'), 'true', 'CTR sobre 100 marca el campo');
+    assert.ok(text('#ts-sx-err-ctr') !== '' && !document.querySelector('#ts-sx-out .ts-ex') && !luz().length, 'Sin veredicto con un campo malo');
+    escribir('ctr', '2');
+    escribir('cpm', '0');
+    assert.strictEqual(campo('cpm').getAttribute('aria-invalid'), 'true', 'CPM en 0 marca el campo');
+    assert.ok(!document.querySelector('#ts-sx-out .ts-ex') && !luz().length);
+    escribir('cpm', '12000');
+    assert.ok(campo('cpm').getAttribute('aria-invalid') !== 'true' && !!document.querySelector('#ts-sx-out'), 'Corregir el campo quita la marca');
+    // Apagar: sin pagos iniciados, la corrida se detiene en el corte 1.
+    document.querySelector('#ts-sx-f-plat [data-plat="meta"]').click();
+    escribir('toPi', '0');
+    assert.strictEqual(document.querySelector('#ts-sx-spend').max, '20000', 'El deslizador no pasa del punto de apagado');
+    const sl2 = document.querySelector('#ts-sx-spend'); sl2.value = '90000'; sl2.dispatchEvent(new window.Event('input', { bubbles: true }));
+    assert.strictEqual(TS.simRun.spend, 20000, 'El gasto se queda en el apagado');
+    assert.ok(text('#ts-sx-out').includes('Apagado en el corte 1') && text('#ts-sx-out').includes('Apágalo y revisa la cadena'), 'Apagado en el corte 1');
+    assert.ok(!document.querySelector('#ts-sx-out .ts-read'), 'Con CPM y CPC sanos no hay eslabón roto que leer');
+    assert.deepStrictEqual(luz(), ['c1-off']);
+    escribir('cpm', '30000');
+    assert.ok(text('#ts-sx-out').includes('Apagado en el corte 1') && text('#ts-sx-out').includes('Creativos nuevos'), 'Con CPM caro sale qué revisar');
+    // Fin del día con c3-spend: aviso de escalado, sin rama iluminada.
+    escribir('toPi', '50'); escribir('ctr', '10'); escribir('toSale', '50'); escribir('cpm', '5000');
+    const sl3 = document.querySelector('#ts-sx-spend'); sl3.value = '100000'; sl3.dispatchEvent(new window.Event('input', { bubbles: true }));
+    assert.ok(text('#ts-sx-out').includes('dejó de ser testeo') && text('#ts-sx-out').includes('pestaña Escalado') && !luz().length, 'Aviso de escalado al fin del día');
+    // Escenarios, cadena con semáforo e historial (semilla fija vía Math.random: el escenario carga una corrida nueva).
+    const conSemilla = (s, fn) => { const real = window.Math.random; window.Math.random = () => (s + 0.5) / 2147483647; try { fn(); } finally { window.Math.random = real; } };
+    const mover = (n) => { const r = document.querySelector('#ts-sx-spend'); r.value = String(n); r.dispatchEvent(new window.Event('input', { bubbles: true })); };
+    const celdas = () => [...document.querySelectorAll('#ts-sx-hist [data-hist]')].map((c) => c.querySelector('.ts-h-t').textContent);
+    assert.deepStrictEqual([...document.querySelectorAll('#ts-sx-scen [data-scen]')].map((b) => b.dataset.scen), ['cpm', 'cpc', 'page', 'win'], 'Cuatro escenarios');
+    conSemilla(4, () => document.querySelector('#ts-sx-scen [data-scen="cpm"]').click());
+    assert.deepStrictEqual(['cpm', 'ctr', 'toPi', 'toSale'].map((k) => TS.sim[k]), [30000, 2, 20, 30], 'El escenario carga la cadena');
+    assert.deepStrictEqual(['daily', 'tope'].map((k) => TS.sim[k]), [100000, 15000], 'y no toca presupuesto ni tope');
+    assert.strictEqual(TS.simRun.seed, 4, 'Genera una corrida nueva');
+    assert.strictEqual(TS.simRun.spend, 0, 'que parte en 0');
+    assert.deepStrictEqual([...document.querySelectorAll('#ts-sx-chain [data-link]')].map((n) => n.dataset.link), ['cpm', 'ctr', 'cpc', 'cppi', 'cpa'], 'Cadena CPM → CTR → CPC → CPPI → CPA');
+    const eslabon = (k) => document.querySelector('#ts-sx-chain [data-link="' + k + '"]');
+    assert.ok(eslabon('cpm').classList.contains('ts-r'), 'El CPM caro sale en rojo');
+    assert.ok(text('#ts-sx-chain').includes('Creativos nuevos') && document.querySelectorAll('#ts-sx-chain .ts-read').length === 1, 'y su lectura Si… / Solución…');
+    assert.ok(text('#ts-sx-chain [data-link="ctr"]').includes('No decide') && !/ts-[gyr]\b/.test(eslabon('ctr').className), 'El CTR no decide y no tiene luz');
+    assert.deepStrictEqual(celdas(), ['—', '—', '—', '—'], 'Historial vacío al empezar');
+    mover(20000);
+    assert.ok(celdas()[0].includes('Apagar') && celdas()[1] === 'Apagado' && celdas()[2] === 'Apagado' && celdas()[3] === 'Apagado', 'Apagar en 20K y Apagado después');
+    assert.deepStrictEqual([...document.querySelectorAll('#ts-sx-hist [data-hist]')].map((c) => c.dataset.hist), ['20000', '30000', '40000', 'end'], 'Columnas 20K · 30K · 40K · Fin del día');
+    assert.ok(/\d+ PI/.test(celdas()[0]) && celdas()[0].includes('ventas'), 'La celda trae PI y ventas');
+    conSemilla(1, () => document.querySelector('#ts-sx-scen [data-scen="win"]').click());
+    assert.ok(!document.querySelector('#ts-sx-chain .ts-read'), 'En el escenario ganador no hay eslabón roto');
+    assert.ok(eslabon('cpm').classList.contains('ts-g') && eslabon('cpc').classList.contains('ts-g'), 'CPM y CPC en verde');
+    mover(100000);
+    assert.ok(celdas().every((t) => t !== '—' && t !== 'Apagado'), 'Todas las celdas alcanzadas');
+    assert.ok(celdas()[2].includes('Dejar gastar el día'), 'Corte 3 deja gastar el día');
+    // El mismo CPM en TikTok sale rojo.
+    document.querySelector('#ts-sx-f-plat [data-plat="tiktok"]').click();
+    assert.ok(eslabon('cpm').classList.contains('ts-r'), 'CPM de 12.000 en TikTok es rojo');
+    document.querySelector('#ts-sx-f-plat [data-plat="meta"]').click();
+    conSemilla(1, () => document.querySelector('#ts-sx-scen [data-scen="page"]').click());
+    mover(40000);
+    assert.ok(eslabon('cppi').classList.contains('ts-g') && document.querySelector('#ts-sx-chain .ts-read').dataset.read === 'cppi', 'La página no convierte: buen CPPI y la lectura de la página');
+    escribir('ctr', '101');
+    assert.ok(!document.querySelector('#ts-sx-chain [data-link]') && celdas().length === 0, 'Con un campo malo no hay cadena ni historial');
+    assert.ok(document.querySelector('#ts-sx-play').disabled, 'Sin números válidos no se puede correr');
+    escribir('ctr', '2');
+
+    // ▶ con tics de 120 ms (el temporizador se captura para llamarlo a mano).
+    const play = () => document.querySelector('#ts-sx-play');
+    const reales = { si: window.setInterval, ci: window.clearInterval, mm: window.matchMedia };
+    let tic = null, limpiados = 0, periodo = null;
+    window.setInterval = (f, ms) => { tic = f; periodo = ms; return 7; };
+    window.clearInterval = () => { limpiados++; tic = null; };
+    window.matchMedia = () => ({ matches: false });
+    conSemilla(1, () => document.querySelector('#ts-sx-scen [data-scen="win"]').click());
+    assert.strictEqual(play().textContent, '▶ Correr', 'Antes de correr dice Correr');
+    play().click();
+    assert.ok(TS.simRun.playing && periodo === 120 && play().textContent === '⏸ Pausa', 'Corre con tics de 120 ms y el botón pasa a Pausa');
+    tic(); tic();
+    assert.strictEqual(TS.simRun.spend, 2000, 'Cada tic suma 1.000');
+    play().click();
+    assert.ok(!TS.simRun.playing && limpiados === 1 && play().textContent === 'Continuar ▶', '⏸ pausa a mitad');
+    play().click();
+    for (let n = 0; n < 18; n++) tic();
+    assert.ok(TS.simRun.spend === 20000 && !TS.simRun.playing, 'Se pausa en el corte 1 (20.000)');
+    assert.ok(text('#ts-sx-out').includes('Así lo califica el Lab') && play().textContent === 'Continuar ▶' && celdas()[0] !== '—', 'y muestra el veredicto de ese punto');
+    play().click();
+    for (let n = 0; n < 10; n++) tic();
+    assert.ok(TS.simRun.spend === 30000 && !TS.simRun.playing, '"Continuar ▶" sigue hasta el corte 2 (30.000)');
+    // Cambiar de modo, de entrada o de parte detiene la corrida.
+    play().click();
+    assert.ok(TS.simRun.playing);
+    document.querySelector('#ts-sx-modes [data-mode="manual"]').click();
+    assert.ok(!TS.simRun.playing, 'Cambiar de modo detiene la corrida');
+    document.querySelector('#ts-sx-modes [data-mode="chain"]').click();
+    play().click();
+    escribir('cpm', '12000');
+    assert.ok(!TS.simRun.playing, 'Cambiar una entrada detiene la corrida');
+    play().click();
+    document.querySelector('#ts-parts [data-part="test"]').click();
+    assert.ok(!TS.simRun.playing, 'Cambiar de parte detiene la corrida');
+    document.querySelector('#ts-parts [data-part="sim"]').click();
+    play().click();
+    document.dispatchEvent(new window.CustomEvent('nav:vista', { detail: { v: 'metricas' } }));
+    assert.ok(!TS.simRun.playing, 'Salir de la pestaña detiene la corrida');
+    // ⏮ vuelve a 0 con la misma semilla; 🎲 otra semilla con las mismas entradas.
+    const semilla = TS.simRun.seed, entradas = JSON.stringify(TS.sim);
+    document.querySelector('#ts-sx-reset').click();
+    assert.ok(TS.simRun.spend === 0 && TS.simRun.seed === semilla && play().textContent === '▶ Correr', '⏮ vuelve a 0 con la misma semilla');
+    conSemilla(9, () => document.querySelector('#ts-sx-again').click());
+    assert.ok(TS.simRun.seed === 9 && TS.simRun.spend === 0 && JSON.stringify(TS.sim) === entradas, '🎲 cambia la semilla y deja las entradas');
+    // Con prefers-reduced-motion, ▶ salta de corte en corte sin tics.
+    window.matchMedia = () => ({ matches: true });
+    tic = null;
+    play().click();
+    assert.ok(!TS.simRun.playing && tic === null && TS.simRun.spend === 20000, 'Salta directo al corte 1 sin animar');
+    play().click(); assert.strictEqual(TS.simRun.spend, 30000);
+    play().click(); assert.strictEqual(TS.simRun.spend, 40000);
+    play().click(); assert.strictEqual(TS.simRun.spend, 100000, 'y al fin del día');
+    assert.ok(play().disabled, 'Al final no se puede seguir');
+    // Apagar: ▶ se detiene en el corte que apaga y no sigue.
+    window.matchMedia = () => ({ matches: false });
+    conSemilla(4, () => document.querySelector('#ts-sx-scen [data-scen="cpm"]').click());
+    play().click();
+    for (let n = 0; n < 20; n++) if (tic) tic();
+    assert.ok(TS.simRun.spend === 20000 && !TS.simRun.playing && play().disabled && text('#ts-sx-out').includes('Apagado en el corte 1'), 'Al apagar la corrida se detiene y no continúa');
+    Object.assign(window, { setInterval: reales.si, clearInterval: reales.ci, matchMedia: reales.mm });
+    document.querySelector('#ts-parts [data-part="test"]').click();
+    paso(0);
+  }
+
+  // 10b. Simulador · Números a mano (SPEC 11): lo mismo que "Juega con los números", ahora dentro del Simulador.
+  Object.assign(PYL.app.state.testing.free, { daily: 100000, spend: 0, pi: 0, sales: 0, tope: 15000 });
+  document.querySelector('#ts-parts [data-part="sim"]').click();
+  document.querySelector('#ts-sx-modes [data-mode="manual"]').click();
+  assert.strictEqual(document.querySelector('#ts-sx-modes [data-mode="manual"]').getAttribute('aria-pressed'), 'true');
+  assert.strictEqual(PYL.app.state.testing.sim.mode, 'manual', 'Se cambia de modo');
+  assert.strictEqual(document.querySelectorAll('#ts-simu #ts-f-spend-r, #ts-simu #ts-zones, #ts-simu #ts-free-bar, #ts-simu #ts-free-out').length, 4, 'Números a mano conserva sus ids dentro del Simulador');
   assert.deepStrictEqual(['daily', 'tope'].map((k) => document.querySelector('#ts-f-' + k).value), ['100000', '15000'], 'Arranca con 100.000 y tope 15.000');
   assert.ok(text('#ts-zones').includes('$ 12.000') && text('#ts-zones').includes('$ 20.000'), 'Zonas del tope genérico');
-  const poner = (id, v) => { const x = document.querySelector('#ts-f-' + id); x.value = v; x.dispatchEvent(new window.Event('input', { bubbles: true })); };
-  poner('tope', '32617');
-  assert.ok(text('#ts-zones').includes('$ 26.094') && text('#ts-zones').includes('$ 43.489'), 'Zonas con tope 32.617');
-  poner('tope', '15000');
-  poner('spend', '15000');
-  assert.ok(text('#ts-free-out').includes('Deja correr sin tocar') && !document.querySelector('#ts-step .ts-on'), 'Antes del corte 1');
-  poner('spend', '25000'); poner('pi', '2');
+  const ponerSx = (id, v) => { const x = document.querySelector('#ts-f-' + id); x.value = v; x.dispatchEvent(new window.Event('input', { bubbles: true })); };
+  const lit = () => [...document.querySelectorAll('#ts-simu .ts-ex[data-branch]')].map((n) => n.dataset.branch);
+  ponerSx('spend', '15000');
+  assert.ok(text('#ts-free-out').includes('Deja correr sin tocar') && !lit().length, 'Antes del corte 1');
+  ponerSx('spend', '25000'); ponerSx('pi', '2');
   assert.ok(text('#ts-free-out').includes('Apagar') && text('#ts-free-out').includes('Apágalo y revisa la cadena'), 'Apagar en el corte 1');
-  assert.deepStrictEqual([...document.querySelectorAll('#ts-step .ts-on')].map((n) => n.dataset.branch), ['c1-off'], 'Se ilumina la rama c1-off');
-  assert.ok(text('#ts-free-out').includes('Corte 1 · 20.000') && text('#ts-free-out').includes('Día del testeo'), 'Corte y día');
-  poner('spend', '30000'); poner('pi', '5');
-  assert.ok(text('#ts-free-out').includes('BASTANTE FLOJO') && text('#ts-free-out').includes('$ 6.000'), 'Bastante flojo con CPPI 6.000');
-  assert.strictEqual(document.querySelector('#ts-step .ts-on').dataset.branch, 'c2-nosale-weak');
-  poner('spend', '40000'); poner('pi', '12'); poner('sales', '3');
+  assert.deepStrictEqual(lit(), ['c1-off'], 'La tarjeta del veredicto lleva la rama');
+  ponerSx('spend', '30000'); ponerSx('pi', '5');
+  assert.deepStrictEqual(lit(), ['c2-nosale-weak'], 'Bastante flojo con CPPI 6.000');
+  ponerSx('spend', '40000'); ponerSx('pi', '12'); ponerSx('sales', '3');
   assert.ok(text('#ts-free-out').includes('Dejar gastar el día'), 'Dejar gastar con tope 15.000');
-  poner('tope', '12000');
-  assert.ok(text('#ts-free-out').includes('Regla propia') && document.querySelector('#ts-step .ts-on').dataset.branch === 'c3-own', 'Regla propia con tope 12.000');
-  poner('daily', '30000');
-  assert.ok(text('#ts-free-out').includes('Día del testeo2'), 'Gasto 40.000 con presupuesto 30.000 es el día 2');
-  poner('tope', '20000'); poner('pi', '10'); poner('sales', '2');
-  assert.ok(text('#ts-free-out').includes('dejó de ser testeo') && text('#ts-free-out').includes('pestaña Escalado'), 'Aviso dejó de ser testeo');
-  assert.ok(!text('#ts-free-out').includes('Dejar gastar el día') && !document.querySelector('#ts-step .ts-on'), 'Sin veredicto de testeo ni rama iluminada');
-  assert.ok(text('#ts-free-out').includes('CPA$ 20.000'), 'El CPA se sigue mostrando');
-  poner('sales', '3');
-  poner('pi', '1');
-  assert.ok(text('#ts-free-out').includes('Las ventas no pueden ser más que los pagos iniciados') && !document.querySelector('#ts-step .ts-on'), 'Aviso y sin veredicto');
-  assert.ok(text('#ts-free-out').includes('CPPI$ 40.000'), 'El CPPI se sigue mostrando');
-  assert.strictEqual(document.querySelector('#ts-free-bar .ts-bar-fill').style.width.slice(0, 4), '57.1', 'La barra sigue el gasto');
-  poner('sales', '0'); poner('pi', '0');
-  assert.ok(text('#ts-free-out').includes('CPPI—') && text('#ts-free-out').includes('CPA—'), 'Sin pagos iniciados ni ventas: —');
-  document.querySelector('#ts-modes [data-mode="practice"]').click();
-  assert.ok(!document.querySelector('#ts-free-out') && PYL.app.state.testing.mode === 'practice', 'Volver a Práctica');
+  ponerSx('tope', '12000');
+  assert.ok(text('#ts-free-out').includes('Regla propia') && lit()[0] === 'c3-own', 'Regla propia con tope 12.000');
+  ponerSx('tope', '20000'); ponerSx('pi', '10'); ponerSx('sales', '2'); ponerSx('daily', '30000');
+  assert.ok(text('#ts-free-out').includes('dejó de ser testeo') && text('#ts-free-out').includes('pestaña Escalado') && !lit().length, 'Aviso dejó de ser testeo, sin tarjeta de veredicto');
+  ponerSx('sales', '3'); ponerSx('pi', '1');
+  assert.ok(text('#ts-free-out').includes('Las ventas no pueden ser más que los pagos iniciados') && !lit().length, 'Aviso y sin veredicto');
+  document.querySelector('#ts-sx-modes [data-mode="chain"]').click();
+  assert.ok(!document.querySelector('#ts-free-out') && !!document.querySelector('#ts-sx-spend'), 'Volver a Cadena quita los campos de Números a mano y deja los de la cadena');
+  document.querySelector('#ts-parts [data-part="test"]').click();
   paso(0);
 
   // 11. Escalado · Práctica (paso 6).
   paso(5);
   assert.strictEqual(document.querySelectorAll('#ts-step .ts-cuts .ts-vd').length, 13, 'El mapa del paso 6 muestra el veredicto en las 13 ramas');
   const run = () => PYL.app.state.testing.run, vista = () => PYL.core.testing.practiceView(run());
-  assert.strictEqual(PYL.app.state.testing.mode, 'practice');
-  assert.ok(document.querySelector('#ts-adv') && text('#ts-adv').startsWith('Avanzar hasta el corte') && !document.querySelector('.ts-dec'), 'Antes de avanzar solo está "Avanzar"');
+  assert.ok(document.querySelector('#ts-adv') && text('#ts-adv') === 'Empecemos →' && document.querySelector('#ts-adv').classList.contains('ts-go') && !document.querySelector('#ts-to-sim').classList.contains('ghost') && !document.querySelector('.ts-dec'), 'Antes de avanzar solo está "Avanzar"');
   assert.strictEqual(document.querySelector('#ts-mode .ts-bar-fill').dataset.spend, '0', 'La barra parte en 0');
   document.querySelector('#ts-adv').click();
   assert.strictEqual(document.querySelectorAll('#ts-mode .ts-dec').length, 4, 'Cuatro botones de decisión');
@@ -678,9 +851,35 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     // SPEC 10: un pyl-testing sin v: 2 reinicia solo el mejor puntaje y se guarda con v: 2.
     const T2 = d2.window.PYL.app.state.testing, g = JSON.parse(store['pyl-testing']);
     assert.strictEqual(T2.best, null, 'El mejor puntaje viejo se reinicia');
-    assert.deepStrictEqual(JSON.parse(JSON.stringify([T2.test.active, T2.test.done, T2.mode, T2.free])), [3, ['arranque', 'corte1'], 'free', { daily: 30000, pi: 4, sales: 1, spend: 25000, tope: 18000 }], 'Pasos, modo y números se conservan');
-    assert.deepStrictEqual([g.v, g.best, g.test.done.length, g.mode], [d2.window.PYL.core.testing.TEST_VERSION, null, 2, 'free'], 'Se guarda con v: 2 y best null');
+    assert.deepStrictEqual(JSON.parse(JSON.stringify([T2.test.active, T2.test.done, T2.free])), [3, ['arranque', 'corte1'], { daily: 30000, pi: 4, sales: 1, spend: 25000, tope: 18000 }], 'Pasos y números se conservan; el modo guardado se ignora');
+    assert.deepStrictEqual([g.v, g.best, g.test.done.length, g.mode], [d2.window.PYL.core.testing.TEST_VERSION, null, 2, undefined], 'Se guarda con la versión actual (3) y best null, sin el modo');
+    assert.deepStrictEqual(g.sim, JSON.parse(JSON.stringify(d2.window.PYL.core.simulator.SIM_DEFAULTS)), 'Sin sim guardado se usan los defectos y se guardan');
+    assert.ok(!('simRun' in g) && !('run' in g), 'No se guarda la corrida');
     d2.window.close();
+  }).then(() => {
+    // SPEC 11: un pyl-testing v: 2 conserva el mejor puntaje, ignora el modo viejo, valida sim y se guarda con v: 3.
+    store['pyl-testing'] = JSON.stringify({ v: 2, part: 'sim', test: { active: 1, done: [] }, mode: 'free', best: 80,
+      free: { daily: 30000, spend: 0, pi: 0, sales: 0, tope: 18000 },
+      sim: { mode: 'manual', plat: 'tiktok', daily: 30000, tope: 18000, cpm: 9000, ctr: 1.5, toPi: 25, toSale: 'x' } });
+    return fresca();
+  }).then((d3) => {
+    const W = d3.window, T3 = W.PYL.app.state.testing, doc3 = W.document, g3 = () => JSON.parse(store['pyl-testing']);
+    assert.strictEqual(T3.best, 80, 'Con v: 2 el mejor puntaje se conserva');
+    assert.strictEqual(g3().v, 3, 'y se guarda con v: 3');
+    assert.strictEqual(g3().best, 80);
+    assert.strictEqual(T3.part, 'sim', 'Un part: sim guardado abre el Simulador');
+    assert.ok(!doc3.querySelector('#ts-simu').hidden && doc3.querySelector('#ts-test').hidden && doc3.querySelector('#ts-parts [aria-pressed=\"true\"]').dataset.part === 'sim', 'y se ve');
+    assert.deepStrictEqual(JSON.parse(JSON.stringify(T3.sim)), { mode: 'manual', plat: 'tiktok', daily: 30000, tope: 18000, cpm: 9000, ctr: 1.5, toPi: 25, toSale: W.PYL.core.simulator.SIM_DEFAULTS.toSale }, 'sim se carga y el campo inválido cae en su defecto');
+    assert.ok(doc3.querySelector('#ts-free-out') && !doc3.querySelector('#ts-sx-spend'), 'Abre en el modo guardado (Números a mano)');
+    // Cambiar de modo y de entrada se guarda; la corrida no.
+    doc3.querySelector('#ts-sx-modes [data-mode=\"chain\"]').click();
+    assert.strictEqual(g3().sim.mode, 'chain');
+    const cpm = doc3.querySelector('#ts-sx-f-cpm'); cpm.value = '15.000'; cpm.dispatchEvent(new W.Event('input', { bubbles: true }));
+    assert.strictEqual(g3().sim.cpm, 15000, 'Una entrada nueva se guarda');
+    doc3.querySelector('#ts-sx-f-plat [data-plat=\"meta\"]').click();
+    assert.strictEqual(g3().sim.plat, 'meta');
+    assert.deepStrictEqual(Object.keys(g3()).sort(), ['best', 'free', 'part', 'sim', 'test', 'v'], 'Solo se guardan v, part, test, best, free y sim');
+    W.close();
   }).then(() => new Promise((ok) => setTimeout(ok, 200))).then(() => {
     assert.ok(ladder.classList.contains('grown'), 'La escalera debe terminar crecida');
     // 7. Consola limpia salvo scrollTo.

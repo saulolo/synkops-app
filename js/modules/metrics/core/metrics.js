@@ -25,6 +25,12 @@
     if (warn) tip.warn = warn;
     return tip;
   }
+  // Vista de CPM y CPC por plataforma: el límite numérico `lim` { max, ideal, op } es la única fuente; el número
+  // grande y el aviso se arman de él (SPEC 11: el simulador lee `lim` en vez de leer el texto del aviso).
+  const OP_TXT = { '<=': '≤', '<': '<' };
+  function limView(plat, lim) {
+    return { main: OP_TXT[lim.op] + ' ' + money(lim.max), ref: null, tip: limitTip(plat, '$ ' + money(lim.max), '< $ ' + money(lim.ideal)), lim };
+  }
   // Advertencia de límite sin confirmar (una sola fuente: la usan el aviso de Meta y la "i" del CTR).
   // Cuando se confirme el número del CTR único, se borra y se actualiza el 2 %.
   const CTR_UNIQUE_WARN = 'Límite por confirmar: el 2 % viene del CTR clásico (clics ÷ impresiones). Falta investigar cuál es el límite para el CTR único.';
@@ -63,7 +69,7 @@
       question: '¿Tu producto interesa?',
       how: ['Buen creativo + ', { b: 'interés en el producto' }], group: 'curiosidad',
       dir: 'down', goal: 'buy',
-      view: { meta: { main: '< 800', ref: null, tip: limitTip('Meta', '$ 800', '< $ 600') }, tiktok: { main: '< 800', ref: null, tip: limitTip('TikTok', '$ 800', '< $ 600') } },
+      view: { meta: limView('Meta', { max: 800, ideal: 600, op: '<' }), tiktok: limView('TikTok', { max: 800, ideal: 600, op: '<' }) },
       diag: [
         [{ b: 'NovaSociety:' }, ' el producto no interesa; la gente no quiere ver más información ni comprarlo.'],
         'Creativo que no engancha o audiencia desalineada.',
@@ -80,7 +86,7 @@
       question: '¿El video retiene?',
       how: ['Creativo ', { b: 'entretenido' }, ' = ', { b: 'retención' }], group: null,
       dir: 'down', goal: 'buy',
-      view: { meta: { main: '≤ 20.000', ref: null, tip: limitTip('Meta', '$ 20.000', '< $ 5.000') }, tiktok: { main: '≤ 6.000', ref: null, tip: limitTip('TikTok', '$ 6.000', '< $ 5.000') } },
+      view: { meta: limView('Meta', { max: 20000, ideal: 5000, op: '<=' }), tiktok: limView('TikTok', { max: 6000, ideal: 5000, op: '<=' }) },
       diag: [
         [{ b: 'NovaSociety:' }, ' el creativo no engancha y el algoritmo penaliza el video.'],
         'Baja retención inicial: se van antes de los 3 segundos.',
@@ -228,7 +234,7 @@
   const NS_TEST = { budget: 100000, cuts: [20000, 30000, 40000], step: 0.2 };
 
   // Límite máximo del CPM por plataforma, tal como lo dice el aviso del diagrama ("$ 6.000").
-  const cpmMax = (plat) => HARD_METRICS.find((r) => r.k === 'cpm').view[plat].tip.li[0][1];
+  const cpmMax = (plat) => '$ ' + money(HARD_METRICS.find((r) => r.k === 'cpm').view[plat].lim.max);
   const stepPct = Math.round(NS_TEST.step * 100) + ' %';
   // Escalones del presupuesto: n valores desde el del testeo, cada uno +20 % sobre el anterior ([100000, 120000, 144000]).
   function budgetSteps(n) {

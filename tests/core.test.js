@@ -11,7 +11,7 @@ const caso = (nombre, fn) => casos.push([nombre, fn]);
 
 caso('exporta todas las funciones del núcleo aplanadas', () => {
   const claves = Object.keys(core).sort().join(',');
-  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,LADDER_BLOCKS,LANDING,LEVELS,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,isDropi,isMetrics,key,kpis,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
+  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,LADDER_BLOCKS,LANDING,LEVELS,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,isDropi,isMetrics,key,kpis,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
 });
 
 caso('Costeo: proveedor 30.000 da precio $99.900 y tope $21.617', () => {
@@ -93,6 +93,19 @@ caso('Hard Metrics: 5 filas en orden, dirección, destino y números del diagram
   assert.deepStrictEqual([vista('cpa', 'tiktok'), vista('cpa', 'meta')], [['≤ 15.000', null], ['≤ 15.000', null]]);
   assert.strictEqual(core.GOALS.buy, 'Mayor probabilidad de compra');
   assert.strictEqual(core.GOALS.profit, 'Mayor rentabilidad');
+});
+
+caso('Hard Metrics: límites numéricos lim en CPM y CPC (SPEC 11)', () => {
+  const H = core.HARD_METRICS;
+  const lim = (k, p) => H.find((r) => r.k === k).view[p].lim;
+  assert.deepStrictEqual(lim('cpm', 'meta'), { max: 20000, ideal: 5000, op: '<=' });
+  assert.deepStrictEqual(lim('cpm', 'tiktok'), { max: 6000, ideal: 5000, op: '<=' });
+  assert.deepStrictEqual(lim('cpc', 'meta'), { max: 800, ideal: 600, op: '<' });
+  assert.deepStrictEqual(lim('cpc', 'tiktok'), { max: 800, ideal: 600, op: '<' });
+  // Los textos que se ven salen de lim y no cambian.
+  assert.deepStrictEqual(H.find((r) => r.k === 'cpc').view.meta.tip.li.map((l) => l[1]), ['$ 800', '< $ 600']);
+  assert.strictEqual(H.find((r) => r.k === 'cpm').view.meta.main, '≤ 20.000');
+  assert.strictEqual(H.find((r) => r.k === 'cpc').view.tiktok.main, '< 800');
 });
 
 caso('Hard Metrics: CPA genérico', () => {
@@ -237,7 +250,8 @@ caso('Escalado: testCheck, testDay, testRange y zonas del tope', () => {
   assert.strictEqual(core.NS_TEST.budget, 100000);
   assert.deepStrictEqual(core.TEST_PRACTICE, { daily: core.NS_TEST.budget, tope: core.GENERIC_CPA.tope });
   assert.deepStrictEqual(core.TEST_ACTIONS.map((a) => a.k), ['off', 'watch', 'go', 'spend']);
-  assert.strictEqual(core.TEST_VERSION, 2);
+  assert.strictEqual(core.TEST_VERSION, 3);
+  assert.strictEqual(core.TEST_BEST_SINCE, 2, 'El mejor puntaje solo se reinicia si lo guardado es anterior a v: 2');
 });
 
 caso('Escalado: los 11 casos del banco dan las respuestas de la spec', () => {
@@ -364,8 +378,9 @@ caso('Escalado: 6 pasos en orden, tarjetas de corte y ramas que testVerdict devu
 
 caso('Testeo: partes en orden, Lectura real deshabilitada con su tarjeta Pronto y frase del paso 4', () => {
   assert.deepStrictEqual(core.TESTING_PARTS.map((p) => p.k), ['real', 'test', 'sim']);
-  assert.ok(core.TESTING_PARTS[2].t.includes('revisar') && core.TESTING_PARTS[2].disabled, 'Simulador deshabilitado y con aviso de revisar');
-  assert.strictEqual(core.testingPart('sim').k, 'test', 'Una parte deshabilitada cae en test');
+  assert.strictEqual(core.TESTING_PARTS[2].t, '🎛️ Simulador');
+  assert.ok(!core.TESTING_PARTS[2].disabled && core.TESTING_PARTS[0].disabled, 'Simulador habilitado; Lectura real sigue pronto');
+  assert.strictEqual(core.testingPart('sim').k, 'sim', 'Un sim guardado abre el Simulador');
   assert.ok(core.TESTING_PARTS[0].disabled && core.TESTING_PARTS[0].soon && !core.TESTING_PARTS[1].disabled, 'Solo Lectura real está deshabilitada');
   assert.strictEqual(core.testingPart('surf').k, 'test', 'Un valor viejo cae en test');
   assert.strictEqual(core.testingPart('real').k, 'test', 'Una parte deshabilitada cae en la primera abierta');
@@ -793,6 +808,207 @@ caso('Prompt buscar anuncios: validación e importar de Mi candidato', () => {
   assert.strictEqual(core.apImport({ name: '  ', photo: 'data:x' }), null);
   assert.deepStrictEqual(core.apImport({ name: ' Faja ', photo: 'data:x', dropi: '1' }), { name: 'Faja', photo: 'data:x' });
   assert.deepStrictEqual(core.apImport({ name: 'Faja' }), { name: 'Faja', photo: '' });
+});
+
+caso('Simulador: azar con semilla, simNum, simCheck, simEnd y simExpect (SPEC 11)', () => {
+  const near = (a, b) => assert.ok(Math.abs(a - b) < 0.01, a + ' ≈ ' + b);
+  // Misma semilla = misma secuencia; otra semilla, otra.
+  const seq = (s) => { const r = core.simRng(s); return [r(), r(), r(), r()]; };
+  assert.deepStrictEqual(seq(7), seq(7));
+  assert.notDeepStrictEqual(seq(7), seq(8));
+  assert.ok(seq(7).every((x) => x >= 0 && x < 1));
+  // Números es-CO.
+  assert.strictEqual(core.simNum('1,5'), 1.5);
+  assert.strictEqual(core.simNum('20.000'), 20000);
+  assert.strictEqual(core.simNum('$ 15.000'), 15000);
+  assert.strictEqual(core.simNum('2'), 2);
+  assert.ok(Number.isNaN(core.simNum('')) && Number.isNaN(core.simNum('abc')) && Number.isNaN(core.simNum('1,2,3')));
+  // Validación.
+  const D = core.SIM_DEFAULTS;
+  assert.strictEqual(core.simCheck(D), null);
+  assert.deepStrictEqual(Object.keys(core.simCheck({ ...D, cpm: 0 })), ['cpm']);
+  assert.deepStrictEqual(Object.keys(core.simCheck({ ...D, ctr: 101 })), ['ctr']);
+  assert.deepStrictEqual(Object.keys(core.simCheck({ ...D, ctr: 0 })), ['ctr']);
+  assert.strictEqual(core.simCheck({ ...D, toSale: 0, toPi: 100, ctr: 100 }), null);
+  assert.deepStrictEqual(Object.keys(core.simCheck({ ...D, daily: NaN, tope: -1, toPi: 120 })).sort(), ['daily', 'toPi', 'tope']);
+  // Defectos: salen de NovaSociety.
+  assert.strictEqual(D.daily, core.NS_TEST.budget);
+  assert.strictEqual(D.tope, core.GENERIC_CPA.tope);
+  // Fin de la corrida: fin del día en que cae el corte 3.
+  assert.strictEqual(core.simEnd(100000), 100000);
+  assert.strictEqual(core.simEnd(30000), 60000);
+  // Valores esperados del escenario "win" (cpm 12.000, ctr 2, 20 %, 30 %).
+  const win = { ...D, ...core.SIM_SCENARIOS.find((s) => s.k === 'win').v };
+  const e = core.simExpect(win, 40000);
+  near(e.pi, 13.33); near(e.sales, 4); near(e.cpc, 600);
+  near(core.simExpect(win, 20000).pi, 6.67);
+  // Escenarios: CPC y PI a 20K de la tabla de la spec.
+  const sc = (k) => ({ ...D, ...core.SIM_SCENARIOS.find((s) => s.k === k).v });
+  near(core.simExpect(sc('cpm'), 20000).cpc, 1500); near(core.simExpect(sc('cpm'), 20000).pi, 2.67);
+  near(core.simExpect(sc('cpc'), 20000).cpc, 2000); near(core.simExpect(sc('cpc'), 20000).pi, 2);
+  near(core.simExpect(sc('page'), 20000).cpc, 600); near(core.simExpect(sc('page'), 20000).pi, 6.67);
+  assert.deepStrictEqual(core.SIM_SCENARIOS.map((s) => s.k), ['cpm', 'cpc', 'page', 'win']);
+});
+
+caso('Simulador: simLoad valida lo guardado y cae en SIM_DEFAULTS (SPEC 11)', () => {
+  const D = core.SIM_DEFAULTS;
+  assert.deepStrictEqual(core.simLoad(undefined), D);
+  assert.deepStrictEqual(core.simLoad(null), D);
+  assert.deepStrictEqual(core.simLoad('x'), D);
+  assert.deepStrictEqual(core.simLoad({}), D);
+  const ok = { mode: 'manual', plat: 'tiktok', daily: 30000, tope: 18000, cpm: 9000, ctr: 1.5, toPi: 25, toSale: 0 };
+  assert.deepStrictEqual(core.simLoad(ok), ok, 'Lo válido se conserva (toSale 0 es válido)');
+  // Inválido o faltante: ese campo cae en su defecto; los demás se conservan.
+  const l = core.simLoad({ mode: 'otro', plat: 'x', daily: 0, tope: '15000', cpm: null, ctr: 101, toPi: -1, toSale: NaN });
+  assert.deepStrictEqual(l, D);
+  assert.deepStrictEqual(core.simLoad({ ...ok, ctr: 0, cpm: 'x' }), { ...ok, ctr: D.ctr, cpm: D.cpm });
+  assert.strictEqual(core.simCheck(core.simLoad({ daily: -5, ctr: 500 })), null, 'Lo cargado siempre pasa simCheck');
+});
+
+caso('Simulador: simRun (puntos, azar con semilla, apagado y cortes) y simAt (SPEC 11)', () => {
+  const D = core.SIM_DEFAULTS;
+  const rico = { ...D, cpm: 5000, ctr: 10, toPi: 50, toSale: 50 };   // sobra de todo: pasa los 3 cortes
+  const last = (r) => r.points[r.points.length - 1];
+  // Misma semilla = misma corrida; otra semilla, otra.
+  assert.deepStrictEqual(core.simRun(D, 11), core.simRun(D, 11));
+  assert.notDeepStrictEqual(core.simRun(D, 11).points, core.simRun(D, 12).points);
+  // Puntos cada 1.000 de 0 a end; los contadores nunca bajan.
+  const r = core.simRun(rico, 3);
+  assert.strictEqual(r.seed, 3);
+  assert.strictEqual(r.end, 100000);
+  assert.strictEqual(r.offAt, null);
+  assert.deepStrictEqual(r.points.map((p) => p.spend), Array.from({ length: 101 }, (_, k) => k * 1000));
+  assert.deepStrictEqual(r.points[0], { spend: 0, impr: 0, clicks: 0, pi: 0, sales: 0 });
+  for (let k = 1; k < r.points.length; k++) {
+    const a = r.points[k - 1], b = r.points[k];
+    assert.ok(b.impr > a.impr && b.clicks >= a.clicks && b.pi >= a.pi && b.sales >= a.sales);
+    assert.ok(b.clicks <= Math.floor(b.impr) && b.pi <= b.clicks && b.sales <= b.pi);
+  }
+  // Impresiones: spend ÷ CPM × 1.000, sin redondear.
+  assert.ok(Math.abs(r.points[40].impr - 40000 / 5000 * 1000) < 1e-6);
+  // Presupuesto 30.000 (ABO): la corrida llega a 60.000.
+  assert.strictEqual(core.simRun({ ...rico, daily: 30000 }, 3).end, 60000);
+  // Cortes: 20K, 30K, 40K y fin del día; cada uno es el testVerdict de ese punto.
+  assert.deepStrictEqual(r.cuts.map((c) => c.at), [20000, 30000, 40000, 100000]);
+  assert.deepStrictEqual(r.cuts.map((c) => !!c.end), [false, false, false, true]);
+  for (const c of r.cuts) {
+    const p = r.points.find((q) => q.spend === c.at);
+    assert.deepStrictEqual(c.verdict, core.testVerdict({ spend: c.at, pi: p.pi, sales: p.sales, tope: rico.tope }));
+  }
+  assert.strictEqual(r.cuts[2].verdict.branch, 'c3-spend');
+  // Sin ventas posibles: nunca hay ventas y apaga en el corte 3 (el CPPI es bueno).
+  const sinVentas = core.simRun({ ...rico, toSale: 0 }, 5);
+  assert.ok(sinVentas.points.every((p) => p.sales === 0));
+  assert.strictEqual(sinVentas.offAt, 40000);
+  assert.strictEqual(last(sinVentas).spend, 40000);
+  assert.strictEqual(sinVentas.cuts[2].verdict.branch, 'c3-off');
+  // Sin pagos iniciados: apaga en el corte 1 y no hay puntos ni cortes después.
+  const off1 = core.simRun({ ...rico, toPi: 0 }, 5);
+  assert.strictEqual(off1.offAt, 20000);
+  assert.strictEqual(last(off1).spend, 20000);
+  assert.strictEqual(off1.cuts.length, 1);
+  assert.strictEqual(off1.cuts[0].verdict.branch, 'c1-off');
+
+  // simAt: punto, veredicto, aviso de escalado e historial.
+  const a40 = core.simAt(r, 40000, rico);
+  assert.strictEqual(a40.point.spend, 40000);
+  assert.strictEqual(a40.verdict.branch, 'c3-spend');
+  assert.strictEqual(a40.scaling, false);                       // todavía no gastó el día
+  const aEnd = core.simAt(r, 100000, rico);
+  assert.strictEqual(aEnd.scaling, true);
+  assert.strictEqual(core.simAt(r, 0, rico).verdict.branch, null);
+  assert.strictEqual(core.simAt(r, 15500, rico).point.spend, 15000);   // cae en el punto de abajo
+  assert.strictEqual(core.simAt(r, 999999, rico).point.spend, 100000); // no pasa del final
+  assert.strictEqual(core.simAt(off1, 90000, { ...rico, toPi: 0 }).point.spend, 20000); // ni del apagado
+  // Historial: 20K · 30K · 40K · Fin del día.
+  const h = (run, spend, i) => core.simAt(run, spend, i).hist;
+  assert.deepStrictEqual(h(r, 25000, rico).map((x) => x.label), ['20K', '30K', '40K', 'Fin del día']);
+  assert.deepStrictEqual(h(r, 25000, rico).map((x) => x.state), ['done', 'pending', 'pending', 'pending']);
+  assert.strictEqual(h(r, 25000, rico)[0].verdict.branch, r.cuts[0].verdict.branch);
+  assert.deepStrictEqual(h(r, 100000, rico).map((x) => x.state), ['done', 'done', 'done', 'done']);
+  // Cada celda alcanzada trae los pagos iniciados y las ventas del punto donde se calificó.
+  h(r, 100000, rico).forEach((x) => { const q = r.points.find((p) => p.spend === x.at); assert.deepStrictEqual([x.pi, x.sales], [q.pi, q.sales]); });
+  assert.ok(h(r, 25000, rico)[1].pi === undefined, 'Las celdas pendientes no traen números');
+  const o = { ...rico, toPi: 0 };
+  assert.deepStrictEqual(h(off1, 10000, o).map((x) => x.state), ['pending', 'pending', 'pending', 'pending']);
+  assert.deepStrictEqual(h(off1, 20000, o).map((x) => x.state), ['done', 'stopped', 'stopped', 'stopped']);
+});
+
+caso('Simulador: cadena con semáforo, eslabón roto y escenarios (SPEC 11)', () => {
+  const D = core.SIM_DEFAULTS;
+  const pt = (spend, pi, sales) => ({ spend, impr: 1, clicks: 1, pi, sales });
+  const luz = (chain, k) => chain.find((c) => c.k === k).light;
+  const cad = (over, p) => core.simChain(p || pt(40000, 10, 3), { ...D, ...over });
+  assert.deepStrictEqual(cad({}).map((c) => c.k), ['cpm', 'ctr', 'cpc', 'cppi', 'cpa']);
+  // CPM: Meta ≤ 20.000 verde, 20.001 rojo; TikTok ≤ 6.000, 7.000 rojo; la plataforma solo cambia la luz.
+  assert.strictEqual(luz(cad({ cpm: 20000 }), 'cpm'), 'g');
+  assert.strictEqual(luz(cad({ cpm: 20001 }), 'cpm'), 'r');
+  assert.strictEqual(luz(cad({ cpm: 12000 }), 'cpm'), 'g');
+  assert.strictEqual(luz(cad({ cpm: 12000, plat: 'tiktok' }), 'cpm'), 'r');
+  assert.strictEqual(luz(cad({ cpm: 7000, plat: 'tiktok' }), 'cpm'), 'r');
+  assert.strictEqual(luz(cad({ cpm: 6000, plat: 'tiktok' }), 'cpm'), 'g');
+  // "ideal" bajo el rango ideal.
+  assert.strictEqual(cad({ cpm: 4999 }).find((c) => c.k === 'cpm').ideal, true);
+  assert.ok(!cad({ cpm: 5000 }).find((c) => c.k === 'cpm').ideal);
+  // CPC = CPM ÷ (10 × CTR): 800 rojo (< 800), 799 verde.
+  assert.strictEqual(cad({ cpm: 16000, ctr: 2 }).find((c) => c.k === 'cpc').value, 800);
+  assert.strictEqual(luz(cad({ cpm: 16000, ctr: 2 }), 'cpc'), 'r');
+  assert.strictEqual(luz(cad({ cpm: 15980, ctr: 2 }), 'cpc'), 'g');
+  assert.strictEqual(cad({ cpm: 11980, ctr: 2 }).find((c) => c.k === 'cpc').ideal, true);
+  assert.strictEqual(cad({ cpm: 12000, ctr: 2 }).find((c) => c.k === 'cpc').ideal, false);   // 600 no es < 600
+  // CTR: sin luz y "No decide".
+  const ctr = cad({ ctr: 1.5 }).find((c) => c.k === 'ctr');
+  assert.strictEqual(ctr.value, 1.5); assert.strictEqual(ctr.light, null); assert.strictEqual(ctr.note, 'No decide');
+  // CPPI: TEST_RULES (4.000 / 6.000); sin pagos iniciados, sin valor ni luz.
+  const R = core.TEST_RULES;
+  assert.strictEqual(luz(cad({}, pt(R.cppiBueno * 5, 5, 0)), 'cppi'), 'y');       // = cppiBueno: ya no es verde
+  assert.strictEqual(luz(cad({}, pt(R.cppiBueno * 5 - 5, 5, 0)), 'cppi'), 'g');
+  assert.strictEqual(luz(cad({}, pt(R.cppiApaga * 5, 5, 0)), 'cppi'), 'y');        // = cppiApaga: amarillo
+  assert.strictEqual(luz(cad({}, pt(R.cppiApaga * 5 + 5, 5, 0)), 'cppi'), 'r');
+  const sinPi = cad({}, pt(20000, 0, 0)).find((c) => c.k === 'cppi');
+  assert.strictEqual(sinPi.value, null); assert.strictEqual(sinPi.light, null);
+  // CPA: ≤ tope verde, ≤ apaga amarillo, sobre apaga rojo; sin ventas, sin luz.
+  const z = core.cpaZones(D.tope);
+  assert.strictEqual(luz(cad({}, pt(D.tope * 2, 10, 2)), 'cpa'), 'g');
+  assert.strictEqual(luz(cad({}, pt(z.apaga * 2, 10, 2)), 'cpa'), 'y');
+  assert.strictEqual(luz(cad({}, pt(z.apaga * 2 + 2, 10, 2)), 'cpa'), 'r');
+  const sinVta = cad({}, pt(40000, 10, 0)).find((c) => c.k === 'cpa');
+  assert.strictEqual(sinVta.value, null); assert.strictEqual(sinVta.light, null);
+
+  // Escenarios: los valores esperados (sin azar) caen en su rama.
+  const sc = (k) => ({ ...D, ...core.SIM_SCENARIOS.find((s) => s.k === k).v });
+  const esperado = (k, spend) => {
+    const i = sc(k), e = core.simExpect(i, spend);
+    return { i, p: { spend, impr: e.impr, clicks: e.clicks, pi: e.pi, sales: e.sales } };
+  };
+  const rama = (k, spend, round) => {
+    const { i, p } = esperado(k, spend);
+    const q = round ? { ...p, pi: Math.floor(p.pi), sales: Math.floor(p.sales) } : p;
+    return core.testVerdict({ spend, pi: q.pi, sales: q.sales, tope: i.tope }).branch;
+  };
+  assert.strictEqual(rama('cpm', 20000, true), 'c1-off');
+  assert.strictEqual(rama('cpc', 20000, true), 'c1-off');
+  assert.strictEqual(rama('page', 40000, true), 'c3-off');
+  assert.strictEqual(rama('win', 40000, true), 'c3-spend');
+  // Eslabón roto: cpm, cpc y cppi (la página); ninguno en "win".
+  const roto = (k, spend) => { const { i, p } = esperado(k, spend); return core.simBroken(core.simChain(p, i), p); };
+  assert.strictEqual(roto('cpm', 20000), 'cpm');
+  assert.strictEqual(roto('cpc', 20000), 'cpc');
+  assert.strictEqual(roto('page', 40000), 'cppi');
+  assert.strictEqual(roto('win', 40000), null);
+  // La página solo se acusa pasado el corte 3 y con pagos iniciados; antes no hay eslabón.
+  assert.strictEqual(roto('page', 30000), null);
+  const sinPagos = core.simChain(pt(40000, 0, 0), D);
+  assert.strictEqual(core.simBroken(sinPagos, pt(40000, 0, 0)), null);
+  // Cada eslabón roto tiene su lectura en TEST_CHAIN.reads.
+  for (const k of ['cpm', 'cpc', 'cppi']) assert.ok(core.TEST_CHAIN.reads.some((r) => r.k === k));
+  // simAt trae cadena y eslabón.
+  const run = core.simRun({ ...D, cpm: 30000 }, 4), a = core.simAt(run, 20000, { ...D, cpm: 30000 });
+  assert.deepStrictEqual(a.chain.map((c) => c.k), ['cpm', 'ctr', 'cpc', 'cppi', 'cpa']);
+  assert.strictEqual(a.broken, 'cpm');
+  // Los límites no están escritos a mano en el simulador.
+  const src = require('fs').readFileSync(require('path').join(__dirname, '../js/modules/testing/core/simulator.js'), 'utf8');
+  for (const n of ['20000', '6000', '800', '4000', '5000', '15000']) assert.ok(!new RegExp('\\b' + n + '\\b').test(src.replace(/\/\/.*$/gm, '')), 'sin ' + n + ' a mano');
 });
 
 let fallos = 0;

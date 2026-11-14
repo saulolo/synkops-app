@@ -61,7 +61,7 @@ Todo vive en una sola página (`index.html`). Las pestañas de la barra superior
 | 🧮 **Costeo** | Cuánto cobrar, cuánto me queda por pedido entregado y mi CPA máximo. |
 | 🛍️ **Desarrollo** | Montar la landing del producto en Shopify y crear su campaña en Meta Ads, paso a paso. |
 | 📏 **Métricas** | Guía de consulta de las métricas duras (CTR, CPC, CPM, CPPI, CPA) para Meta y TikTok: qué significa cada una, su fórmula, sus rangos, qué falla y cómo se arregla; y un glosario de las métricas base del Administrador de anuncios con las que se calculan. |
-| 🧪 **Testeo** | Aprendo el testeo de NovaSociety: un paso a paso con los cortes de 20K / 30K / 40K, la cadena que reviso si apago, y un simulacro para practicar. Es para aprender: no lee mis campañas reales. |
+| 🧪 **Testeo** | Aprendo el testeo de NovaSociety: un paso a paso con los cortes de 20K / 30K / 40K, la cadena que reviso si apago, una práctica de 11 casos y un simulador de un conjunto. Es para aprender: no lee mis campañas reales. |
 | 📈 **Escalado** | Pronto: aquí aprenderé a escalar un conjunto que ya pasó el testeo (Surfing Scaling). |
 | 🪜 **Escalera** | Los 15 escalones para escalar (+20% de presupuesto cada uno). |
 | 🎬 **Creativos** | Pipeline y cadencia de creativos, y cuándo el problema es el creativo. |
@@ -221,7 +221,7 @@ Las pestañas Inicio, Costeo, Métricas, Escalera y Creativos siguen el método 
 
 **Testeo** es una pestaña para **aprender** cómo se decide en el testeo, la primera prueba de un anuncio. No lee mis campañas ni mis datos: los casos son inventados. Las reglas son las de NovaSociety (las del MCP de NovaSociety), y las frases de cada veredicto son las del Lab.
 
-Tiene tres sub-pestañas: **📂 Lectura real · pronto** (subir el reporte de mis campañas y que la app diga qué hacer con cada conjunto), **🧪 Fase de testeo** (la única abierta) y **⚠️ Simulador · revisar**. Las dos que dicen "pronto" o "revisar" se ven apagadas y todavía no se pueden abrir.
+Tiene tres sub-pestañas: **📂 Lectura real · pronto** (subir el reporte de mis campañas y que la app diga qué hacer con cada conjunto; se ve apagada y todavía no se puede abrir), **🧪 Fase de testeo** (el paso a paso con su práctica) y **🎛️ Simulador** (configuro una cadena y veo qué decide el Lab en cada corte).
 
 **Escalado** es la pestaña que sigue a Testeo. Hoy solo anuncia **🏄 Surfing Scaling** (escalado vertical +20 %, niveles de presupuesto y refresco de campañas) con una tarjeta "Pronto".
 
@@ -232,9 +232,18 @@ Tiene tres sub-pestañas: **📂 Lectura real · pronto** (subir el reporte de m
 3. **Corte 2 · 30.000:** miro el CPPI (gasto ÷ pagos iniciados), sin ventas y con venta.
 4. **Corte 3 · 40.000:** miro ventas y CPA contra el tope. Con 2 ventas o más y CPA dentro del tope, se deja gastar el día. Con 1 venta, o 2 o más con CPA sobre el tope, **apago** ("NO CUMPLE · APÁGALO", luz roja): con 1 venta a 40.000 el CPA ya es 40.000 o más y seguir es gastar con pérdida. Esa es una **regla propia**: el MCP no la da, queda por aclarar y la app la marca con la etiqueta **❓ Preguntar**, que explica el caso en un tooltip al pasar el mouse. Una caja explica de dónde sale el tope (el CPA máximo del costeo) y sus zonas de escala y apaga.
 5. **La cadena y qué no hacer:** CPM → CPC → CPPI → CPA y qué revisar en cada caso ("Si… / Solución…"), más **Lo que no hago**: no apagar antes de un corte, no tocar el anuncio mientras está en testeo y no decidir por el CTR.
-6. **Practica:** un simulacro con dos modos:
-   - **🎯 Práctica:** 11 casos inventados, en orden al azar. Con "Avanzar" la barra se llena hasta el siguiente corte y aparecen los números, incluidos el CPM (informativo) y el tope de cada caso. Elijo entre Apagar, Mantener vigilando, Seguir sin tocar o Dejar gastar el día; la app dice si acerté, por qué y me lleva al paso que lo explica. Algunos casos traen una nota que enseña por qué (por ejemplo, un CPM caro no apaga si la cadena funciona). Al final veo mis aciertos y mi mejor puntaje, que se guarda.
-   - **🎛️ Juega con los números:** cambio presupuesto, gasto, pagos iniciados, ventas y tope, y veo el corte, el día del testeo, el CPPI, el CPA y qué diría el Lab. Si ya gastó el presupuesto del día con 40.000 o más y el corte 3 da "Dejar gastar el día", la app avisa que dejó de ser testeo y pasa a Escalado, sin veredicto de testeo.
+6. **Practica:** 11 casos inventados, en orden al azar. El botón verde **Empecemos →** (después, **Avanzar hasta el corte N →**) llena la barra hasta el siguiente corte y aparecen los números, incluidos el CPM (informativo) y el tope de cada caso. Elijo entre Apagar, Mantener vigilando, Seguir sin tocar o Dejar gastar el día; la app dice si acerté, por qué y me lleva al paso que lo explica. Algunos casos traen una nota que enseña por qué (por ejemplo, un CPM caro no apaga si la cadena funciona). Al final veo mis aciertos y mi mejor puntaje, que se guarda. Debajo, el botón **Simulador →** abre la sub-pestaña del simulador. Las tarjetas de los tres cortes van una debajo de la otra.
+
+**🎛️ Simulador** es una sub-pestaña aparte: configuro un conjunto y la app corre el gasto con un poco de azar (como en Meta: dos corridas iguales pueden dar cortes distintos) y me dice qué decide el Lab en cada corte. Tiene dos modos:
+
+- **🔗 Cadena** (abre por defecto): elijo plataforma (Meta o TikTok, solo cambia las luces del semáforo), presupuesto diario, CPA tope, **CPM**, **CTR** (acepta coma: `1,5`), **% de clics que inician pago** y **% de pagos iniciados que compran**. El CPC, las impresiones, los clics, los pagos iniciados, las ventas, el CPPI y el CPA salen calculados: no se escriben.
+  - **▶ Correr** llena el gasto de a $ 1.000 cada 120 ms y se **pausa en cada corte** (20K, 30K, 40K) y al fin del día, con el veredicto del Lab. **Continuar ▶** sigue. También hay ⏸ pausa, ⏮ volver a 0, 🎲 otra corrida (mismas entradas, otro azar) y un deslizador para mover el punto a mano. Con movimiento reducido en el sistema, ▶ salta de corte en corte sin animar.
+  - Si un corte da **Apagar**, la corrida se detiene ahí y sale «Apagado en el corte N» con qué revisar.
+  - **Cadena con semáforo:** CPM → CTR → CPC → CPPI → CPA, cada uno con su luz. El CTR va sin luz y dice «No decide» (NovaSociety no lo mira). Si un eslabón se rompe, debajo sale su lectura «Si… / Solución…».
+  - **Historial de cortes:** 20K · 30K · 40K · Fin del día, con lo que dio la corrida en cada uno (— si aún no llega; «Apagado» si ya se apagó).
+  - **Escenarios:** 💸 CPM caro, 😐 Producto no interesa, 🧱 Página no convierte y 🏆 Ganador cargan una cadena de ejemplo y arman una corrida nueva. Como hay azar, a veces no caen donde se espera: pruebo otra corrida.
+  - Al fin del día, si el corte 3 dio «Dejar gastar el día», la app avisa que dejó de ser testeo y pasa a Escalado.
+- **🎛️ Números a mano:** cambio presupuesto, gasto, pagos iniciados, ventas y tope, y veo el corte, el día del testeo, el CPPI, el CPA y qué diría el Lab (antes se llamaba «Juega con los números» y vivía en el paso 6).
 
 ---
 
@@ -469,7 +478,7 @@ Pulsa **📄 Descargar informe PDF** (el botón morado arriba a la derecha, o *I
 ## 🔒 Privacidad
 
 - 🖥️ Todo se procesa **dentro de tu navegador**. Tus reportes no se suben a ningún servidor.
-- 💾 Lo que la app guarda en tu navegador: asignaciones campaña → producto, acceso a tu archivo consolidado, la bitácora de candidatos (con sus fotos), el guardado rápido de productos y los pasos marcados de Buscar producto, Desarrollo y Testeo (con tu mejor puntaje de práctica), lo que escribes en el entrenador y el tema elegido. Si borras los datos del navegador, eso se pierde.
+- 💾 Lo que la app guarda en tu navegador: asignaciones campaña → producto, acceso a tu archivo consolidado, la bitácora de candidatos (con sus fotos), el guardado rápido de productos y los pasos marcados de Buscar producto, Desarrollo y Testeo (con tu mejor puntaje de práctica y las entradas del Simulador), lo que escribes en el entrenador y el tema elegido. Si borras los datos del navegador, eso se pierde.
 - 🌐 Solo usa internet para descargar la librería de Excel y las tipografías, y cuando abres un enlace externo (por ejemplo, FastMoss).
 
 ---
@@ -548,14 +557,14 @@ css/
     ads.css           Desarrollo → Meta Ads
     adprompt.css      Prompt buscar anuncios: botón verde (reutiliza .dk-* y .qk-photo*)
     metrics.css       Métricas: ruta, diagrama de métricas duras, avisos, panel "i", botón Expandir y tabla de Métricas base
-    testing.css       Testeo: barra de gasto, tarjetas de corte, simulacro y práctica
+    testing.css       Testeo: barra de gasto, tarjetas de corte, práctica y Simulador
   themes.css          Selector de tema, modo claro, temas oscuros y SVG con colores fijos
   modules/pnl.css     Solo lo propio del Tablero P&L (acotado a #v-pyl)
   report.css          Informe PDF: documento claro en A4, visible solo al imprimir
 
 tests/
-  core.test.js        Núcleo en Node puro (costeo, guardado rápido, prompt DropKiller, prompt buscar anuncios, P&L)
-  smoke.test.js       jsdom: claves de PYL.*, 10 pestañas, navegación, paneles Prompt DropKiller y Prompt buscar anuncios y consola limpia
+  core.test.js        Núcleo en Node puro (costeo, guardado rápido, prompt DropKiller, prompt buscar anuncios, simulador de testeo, P&L)
+  smoke.test.js       jsdom: claves de PYL.*, 10 pestañas, navegación, paneles Prompt DropKiller y Prompt buscar anuncios, Simulador de testeo y consola limpia
   fixtures/           CSV de prueba de Dropi (datos inventados) y claves de PYL.*
 
 js/
@@ -598,9 +607,11 @@ js/
       ui/metrics.js   Diagrama, flechas SVG, avisos, panel "i", botón Expandir y tabla de Métricas base
       app/metrics.js  Estado (app.state.hardMetrics), flechas, expandir, Métricas base y ruta
     testing/          Testeo (SPEC 05 y 06): módulo informativo, no lee campañas reales
-      core/testing.js Reglas del testeo (`testVerdict`, `cpaZones`), partes, pasos, mapa de cortes, cadena, banco de 11 casos, práctica y "Juega con los números"
-      ui/testing.js   Sub-pestañas, tarjeta "Pronto", barra de gasto, tarjetas de corte, tope, cadena, práctica y simulacro
-      app/testing.js  Estado (app.state.testing), avance del paso a paso y persistencia (pyl-testing; migra pyl-scaling)
+      core/testing.js Reglas del testeo (`testVerdict`, `cpaZones`), partes, pasos, mapa de cortes, cadena, banco de 11 casos, práctica y "Números a mano" (`testFree`)
+      core/simulator.js Simulador de un conjunto (SPEC 11): azar con semilla, corrida, cadena con semáforo, eslabón roto, escenarios y entradas guardadas
+      ui/testing.js   Sub-pestañas, tarjeta "Pronto", barra de gasto, tarjetas de corte, tope, cadena y práctica
+      ui/simulator.js Simulador: modos, entradas, cadena con semáforo, historial y "Números a mano" (se suma a `PYL.ui.simulator` sin pisar el del tablero)
+      app/testing.js  Estado (app.state.testing), avance del paso a paso, corrida del Simulador y persistencia (pyl-testing v3; migra pyl-scaling)
     scaling/          Escalado (SPEC 06): solo anuncia Surfing Scaling
       core/scaling.js Tarjeta "Pronto" de Surfing Scaling (`SCALING_SOON`)
       app/scaling.js  Pinta la tarjeta con `ui.testing.soon`; sin estado ni guardado
