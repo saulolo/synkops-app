@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="css/modules/adprompt.css">
 <link rel="stylesheet" href="css/modules/metrics.css">
 <link rel="stylesheet" href="css/modules/testing.css">
+<link rel="stylesheet" href="css/modules/cheat.css">
 <link rel="stylesheet" href="css/modules/scaling.css">
 <link rel="stylesheet" href="css/themes.css">
 <link rel="stylesheet" href="css/modules/pnl.css">
@@ -646,6 +647,9 @@
 
   <div class="card mt" id="ts-simu" hidden></div>
   <div class="card mt" id="ts-soon" hidden></div>
+
+  <!-- Atajos flotantes: Cadena que decide y Métricas duras (los arma js/modules/cheat/ui/cheat.js) -->
+  <div class="ch" id="ch-root"></div>
 </section>
 
 <!-- ================= ESCALADO ================= -->
@@ -1100,6 +1104,7 @@
 <script src="js/modules/testing/core/testing.js"></script>
 <script src="js/modules/testing/core/simulator.js"></script>
 <script src="js/modules/scaling/core/scaling.js"></script>
+<script src="js/modules/cheat/core/cheat.js"></script>
 <!-- Services: archivos y almacenamiento del navegador -->
 <script src="js/shared/services/storage.js"></script>
 <script src="js/shared/services/files.js"></script>
@@ -1131,6 +1136,7 @@
 <script src="js/modules/metrics/ui/metrics.js"></script>
 <script src="js/modules/testing/ui/testing.js"></script>
 <script src="js/modules/testing/ui/simulator.js"></script>
+<script src="js/modules/cheat/ui/cheat.js"></script>
 <script src="js/modules/scaling/ui/scaling.js"></script>
 <!-- App: estado, casos de uso y arranque (main.js va al final) -->
 <script src="js/app/state.js"></script>
@@ -1146,6 +1152,7 @@
 <script src="js/modules/ads/app/ads.js"></script>
 <script src="js/modules/metrics/app/metrics.js"></script>
 <script src="js/modules/testing/app/testing.js"></script>
+<script src="js/modules/cheat/app/cheat.js"></script>
 <script src="js/modules/scaling/app/scaling.js"></script>
 <script src="js/modules/trainer/app/trainer.js"></script>
 <script src="js/app/nav.js"></script>

@@ -840,7 +840,196 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.ok($('#ap-panel').hidden && PYL.app.state.adprompt.open === false, '✕ cierra');
   };
 
-  return dkTest().then(apTest).then(fresca).then((d2) => {
+  // 11. SPEC 12: atajos flotantes de Testeo (Cadena que decide y Métricas duras).
+  const chTest = async () => {
+    const $ = (q) => document.querySelector(q);
+    const esc = () => document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    const abierto = (id) => !$(id).hidden;
+    assert.ok($('#v-testeo #ch-root #ch-c-btn') && $('#v-testeo #ch-root #ch-d-btn'), 'Los dos botones van dentro de #v-testeo');
+    assert.ok(!$('#v-buscar #ch-c-btn') && !$('#v-desarrollo #ch-d-btn') && !$('#v-metricas #ch-root') && !$('#v-escalado #ch-root'), 'Solo en Testeo');
+    for (const id of ['ch-root', 'ch-c-btn', 'ch-c-panel', 'ch-c-x', 'ch-d-btn', 'ch-d-panel', 'ch-d-x']) assert.strictEqual(document.querySelectorAll('[id="' + id + '"]').length, 1, '#' + id + ' único');
+    assert.ok($('#ch-c-btn svg') && $('#ch-d-btn svg'), 'Los botones llevan ícono SVG');
+    const ids = [...document.querySelectorAll('[id^="ch-"]')].map((n) => n.id);
+    assert.ok(ids.length >= 14 && new Set(ids).size === ids.length, 'Todos los ids #ch- son únicos: ' + ids.join(', '));
+    assert.ok(![...document.querySelectorAll('[id]')].some((n, i, all) => all.filter((m) => m.id === n.id).length > 1), 'Ningún id repetido en la página');
+    assert.deepStrictEqual([$('#ch-c-btn').title, $('#ch-d-btn').title], ['Cadena que decide', 'Métricas duras'], 'Títulos');
+    assert.ok($('#ch-c-panel').hidden && $('#ch-d-panel').hidden, 'Los paneles empiezan cerrados');
+    assert.strictEqual(PYL.app.state.cheat.open, null);
+    // Cada botón abre su panel y cierra el otro.
+    $('#ch-c-btn').click();
+    assert.ok(abierto('#ch-c-panel') && !abierto('#ch-d-panel') && $('#ch-c-btn').getAttribute('aria-expanded') === 'true' && PYL.app.state.cheat.open === 'chain', 'Cadena abre');
+    $('#ch-d-btn').click();
+    assert.ok(abierto('#ch-d-panel') && !abierto('#ch-c-panel') && $('#ch-c-btn').getAttribute('aria-expanded') === 'false' && $('#ch-d-btn').getAttribute('aria-expanded') === 'true' && PYL.app.state.cheat.open === 'hard', 'Métricas duras abre y cierra Cadena');
+    // Volver a tocar el botón, ✕ y Esc cierran.
+    $('#ch-d-btn').click();
+    assert.ok(!abierto('#ch-d-panel') && PYL.app.state.cheat.open === null, 'El botón cierra');
+    $('#ch-c-btn').click(); $('#ch-c-x').click();
+    assert.ok(!abierto('#ch-c-panel'), '✕ cierra Cadena');
+    $('#ch-d-btn').click(); $('#ch-d-x').click();
+    assert.ok(!abierto('#ch-d-panel'), '✕ cierra Métricas duras');
+    $('#ch-c-btn').click(); esc();
+    assert.ok(!abierto('#ch-c-panel'), 'Esc cierra');
+    // Esc no cierra si hay un diálogo encima.
+    $('#ch-d-btn').click(); $('#modal').classList.add('show'); esc();
+    assert.ok(abierto('#ch-d-panel'), 'Esc no cierra con un diálogo encima');
+    $('#modal').classList.remove('show'); esc();
+    assert.ok(!abierto('#ch-d-panel'));
+    // Abrir uno cierra dk, qk y ap; abrir esos cierra el de Testeo.
+    for (const [btn, panel] of [['#dk-btn', '#dk-panel'], ['#qk-btn', '#qk-panel'], ['#ap-btn', '#ap-panel']]) {
+      $(btn).click();
+      assert.ok(abierto(panel), panel + ' abre');
+      $('#ch-c-btn').click();
+      assert.ok(!abierto(panel) && abierto('#ch-c-panel'), 'Cadena cierra ' + panel);
+      $('#ch-d-btn').click(); $(btn).click();
+      assert.ok(abierto(panel) && !abierto('#ch-d-panel') && PYL.app.state.cheat.open === null, panel + ' cierra el panel de Testeo');
+      $(btn).click();
+    }
+    // Salir de la pestaña cierra el panel abierto.
+    $('#ch-d-btn').click();
+    document.dispatchEvent(new window.CustomEvent('nav:vista', { detail: { v: 'testeo' } }));
+    assert.ok(abierto('#ch-d-panel'), 'nav:vista a testeo no cierra');
+    document.dispatchEvent(new window.CustomEvent('nav:vista', { detail: { v: 'metricas' } }));
+    assert.ok(!abierto('#ch-d-panel') && PYL.app.state.cheat.open === null, 'nav:vista a otra pestaña cierra');
+  };
+
+  // 12. SPEC 12, panel Cadena que decide.
+  const chCadenaTest = () => {
+    const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
+    const C = PYL.core.cheat, M = PYL.core.metrics, T = PYL.core.testing;
+    const disparar = (q, tipo) => $(q).dispatchEvent(new window.Event(tipo, { bubbles: false }));
+    const marcado = () => $$('#ch-c-chain [data-k]').filter((b) => b.classList.contains('on')).map((b) => b.dataset.k);
+    $('#ch-c-btn').click();
+    // Estructura: 2 grupos con rótulo y 4 eslabones "Paso N".
+    assert.deepStrictEqual($$('#ch-c-chain [data-k]').map((b) => b.dataset.k), ['cpm', 'cpc', 'cppi', 'cpa'], 'Cuatro eslabones en orden');
+    assert.ok($$('#ch-c-chain [data-k]').every((b) => b.tagName === 'BUTTON'), 'Los eslabones son botones');
+    assert.deepStrictEqual($$('#ch-c-chain [data-k]').map((b) => b.textContent.slice(0, 6)), ['Paso 1', 'Paso 2', 'Paso 3', 'Paso 4'], 'Paso 1 a Paso 4');
+    const lados = $$('#ch-c-chain .ch-side');
+    assert.deepStrictEqual(lados.map((s) => s.querySelector('.ch-side-t').textContent), ['Métricas antes del clic', 'Métricas después del clic'], 'Rótulos de los grupos');
+    assert.deepStrictEqual(lados.map((s) => [...s.querySelectorAll('[data-k]')].map((b) => b.dataset.k)), [['cpm', 'cpc'], ['cppi', 'cpa']], 'CPM y CPC antes; CPPI y CPA después');
+    assert.ok(/El primero que se rompe es mi problema/.test($('#ch-c-panel').textContent), 'Línea de cabecera');
+    // Al abrir: CPM marcado y su resumen en la zona.
+    assert.deepStrictEqual(marcado(), ['cpm'], 'Al abrir está marcado CPM');
+    assert.strictEqual($('#ch-c-chain [data-k="cpm"]').getAttribute('aria-pressed'), 'true');
+    assert.strictEqual($('#ch-c-chain [data-k="cpc"]').getAttribute('aria-pressed'), 'false');
+    const zona = () => $('#ch-c-zone').textContent;
+    const cpm = C.chChain().find((e) => e.k === 'cpm');
+    assert.ok(zona().includes(cpm.full) && zona().includes(cpm.simple) && zona().includes(cpm.lim.meta) && zona().includes(cpm.lim.tiktok), 'Resumen de CPM: nombre, qué mide y límites');
+    assert.ok(zona().includes('Si falla') && zona().includes('Creativos nuevos'), 'CPM trae Si falla → Solución');
+    // "¿Qué falla y cómo lo arreglo?" condensado, de cada eslabón (viene de chChain().help).
+    const causas = () => $$('#ch-c-zone .ch-cause').map((c) => c.querySelector('b').textContent);
+    assert.ok(zona().includes('¿Qué falla y cómo lo arreglo?') && zona().includes('Mientras el CPM esté roto'), 'CPM trae la tabla y su pie');
+    assert.deepStrictEqual(causas(), [...cpm.help.rows].map((r) => r.cause), 'Causas de CPM');
+    assert.ok(zona().includes('Gancho débil') && zona().includes('Se nota') && zona().includes('Solución'), 'Cada causa dice cómo se nota y la solución');
+    for (const e of C.chChain()) {
+      $('#ch-c-chain [data-k="' + e.k + '"]').click();
+      assert.deepStrictEqual(causas(), [...e.help.rows].map((r) => r.cause), 'Causas de ' + e.k);
+      assert.strictEqual($$('#ch-c-zone .ch-cause').length, { cpm: 4, cpc: 2, cppi: 4, cpa: 6 }[e.k], 'Cantidad de causas de ' + e.k);
+      assert.ok($('#ch-c-zone .ch-z-foot').textContent.length > 0, 'Pie de ' + e.k);
+    }
+    assert.ok(zona().includes('Día sin nada') && zona().includes('$ ' + M.copText(2 * M.GENERIC_CPA.apaga)), 'CPA: día sin nada con el doble de apaga');
+    $('#ch-c-chain [data-k="cpm"]').click();
+    // Pasar el mouse o enfocar no cambia nada; solo el click marca y cambia la zona.
+    const antes = zona();
+    disparar('#ch-c-chain [data-k="cppi"]', 'mouseenter'); disparar('#ch-c-chain [data-k="cppi"]', 'focus');
+    assert.deepStrictEqual(marcado(), ['cpm'], 'mouseenter y focus no marcan');
+    assert.strictEqual(zona(), antes, 'La zona no cambia');
+    $('#ch-c-chain [data-k="cppi"]').click();
+    assert.deepStrictEqual(marcado(), ['cppi'], 'click marca CPPI');
+    assert.ok(zona().includes('Buen CPPI y sin ventas') && zona().includes(M.HARD_METRICS.find((r) => r.k === 'cppi').means.full), 'Zona de CPPI');
+    $('#ch-c-chain [data-k="cpc"]').click();
+    assert.deepStrictEqual(marcado(), ['cpc'], 'click marca CPC');
+    assert.ok(zona().includes('CPM sano y CPC caro'));
+    $('#ch-c-chain [data-k="cpa"]').click();
+    assert.deepStrictEqual(marcado(), ['cpa'], 'click marca CPA');
+    assert.ok(zona().includes(C.CH_CPA_READ.fix[0]) && zona().includes('$ ' + M.copText(M.GENERIC_CPA.tope)), 'CPA muestra su lectura propia con el tope genérico');
+    // Las lecturas de CPM, CPC y CPPI son las de TEST_CHAIN.reads.
+    for (const r of T.TEST_CHAIN.reads) {
+      $('#ch-c-chain [data-k="' + r.k + '"]').click();
+      assert.ok(zona().includes(r.fix[0]) && r.when.filter((s) => typeof s === 'string').every((s) => zona().includes(s)), 'Lectura de ' + r.k);
+    }
+    // El mouse encima no cambia lo marcado; el botón no se rehace al marcar.
+    const btn = $('#ch-c-chain [data-k="cpc"]');
+    disparar('#ch-c-chain [data-k="cpc"]', 'mouseenter'); disparar('#ch-c-chain [data-k="cpc"]', 'mouseleave');
+    assert.deepStrictEqual(marcado(), ['cppi'], 'El mouse encima no cambia lo marcado');
+    assert.strictEqual($('#ch-c-chain [data-k="cpc"]'), btn, 'No se rehacen los botones');
+    // Al volver a abrir, vuelve a CPM.
+    $('#ch-c-x').click(); $('#ch-c-btn').click();
+    assert.deepStrictEqual(marcado(), ['cpm'], 'Al reabrir vuelve a CPM');
+    assert.strictEqual(PYL.app.state.cheat.chainSel, 'cpm');
+    $('#ch-c-x').click();
+  };
+
+  // 13. SPEC 12, panel Métricas duras.
+  const chDurasTest = () => {
+    const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
+    const C = PYL.core.cheat, M = PYL.core.metrics, ST = PYL.app.state;
+    const disparar = (q, tipo) => $(q).dispatchEvent(new window.Event(tipo, { bubbles: false }));
+    const marcado = () => $$('#ch-d-rows [data-k]').filter((b) => b.classList.contains('on')).map((b) => b.dataset.k);
+    const fila = (k) => $('#ch-d-rows [data-k="' + k + '"]').textContent;
+    const zona = () => $('#ch-d-zone').textContent;
+    const cambiar = (p) => { const r = $('#ch-d-plat-' + p); r.checked = true; r.dispatchEvent(new window.Event('change', { bubbles: true })); };
+    const simPlat = ST.testing.sim.plat;
+    // Con el Simulador en TikTok, el panel abre en TikTok.
+    ST.testing.sim.plat = 'tiktok';
+    $('#ch-d-btn').click();
+    assert.ok($('#ch-d-plat-tiktok').checked && !$('#ch-d-plat-meta').checked, 'Abre con la plataforma del Simulador (TikTok)');
+    assert.deepStrictEqual($$('#ch-d-plat input').map((r) => r.name), ['ch-plat', 'ch-plat'], 'Radios con name ch-plat');
+    // 5 filas en el orden de HARD_METRICS, con nombre, límite y pregunta.
+    assert.deepStrictEqual($$('#ch-d-rows [data-k]').map((b) => b.dataset.k), ['ctr', 'cpc', 'cpm', 'cppi', 'cpa'], 'Cinco filas en orden');
+    assert.ok($$('#ch-d-rows [data-k]').every((b) => b.tagName === 'BUTTON'), 'Las filas son botones');
+    for (const h of M.HARD_METRICS) assert.ok(fila(h.k).includes(h.name) && fila(h.k).includes(h.view.tiktok.main) && fila(h.k).includes(h.question), 'Fila ' + h.k + ' en TikTok');
+    assert.ok(fila('cpm').includes('≤ 6.000') && fila('ctr').includes('> 0,5 %'), 'Límites de TikTok');
+    // Cambiar a Meta repinta, no toca el Simulador.
+    const btnCpm = $('#ch-d-rows [data-k="cpm"]');
+    cambiar('meta');
+    assert.ok(fila('cpm').includes('≤ 20.000') && fila('ctr').includes('> 2 %'), 'Límites de Meta');
+    assert.strictEqual(ST.testing.sim.plat, 'tiktok', 'Cambiar la plataforma del panel no cambia el Simulador');
+    assert.strictEqual(ST.cheat.plat, 'meta');
+    assert.strictEqual($('#ch-d-rows [data-k="cpm"]'), btnCpm, 'No se rehacen las filas');
+    // Al abrir, marcada la primera fila (CTR).
+    $('#ch-d-x').click(); $('#ch-d-btn').click();
+    assert.ok($('#ch-d-plat-tiktok').checked, 'Al reabrir vuelve a tomar la del Simulador');
+    assert.deepStrictEqual(marcado(), ['ctr'], 'Al abrir está marcada la primera fila');
+    assert.strictEqual($('#ch-d-rows [data-k="ctr"]').getAttribute('aria-pressed'), 'true');
+    // CTR: sin advertencia en TikTok, con ⚠ en amarillo en Meta.
+    assert.ok(zona().includes('Límite máximo permitido') && zona().includes('0,5 %') && zona().includes('No se mira'), 'Zona del CTR en TikTok: límite y nota');
+    assert.ok(!$('#ch-d-zone .hm-warn'), 'El CTR de TikTok no trae advertencia');
+    cambiar('meta');
+    assert.ok($('#ch-d-zone .hm-warn') && $('#ch-d-zone .hm-warn').textContent.includes('⚠') && $('#ch-d-zone .hm-warn').textContent.includes(M.CTR_UNIQUE_WARN), 'El CTR de Meta trae ⚠ CTR_UNIQUE_WARN');
+    // Rango ideal en CPM (Meta).
+    disparar('#ch-d-rows [data-k="cpm"]', 'mouseenter'); disparar('#ch-d-rows [data-k="cpm"]', 'focus');
+    assert.deepStrictEqual(marcado(), ['ctr'], 'mouseenter y focus no marcan');
+    $('#ch-d-rows [data-k="cpm"]').click();
+    assert.deepStrictEqual(marcado(), ['cpm'], 'click marca CPM');
+    assert.ok(zona().includes('Límite máximo permitido') && zona().includes('$ 20.000') && zona().includes('Rango ideal') && zona().includes('$ 5.000') && !$('#ch-d-zone .hm-warn'), 'Zona de CPM: límite y rango ideal');
+    // Diagnóstico y palanca con sus rótulos, de la fila.
+    const cpm = M.HARD_METRICS.find((r) => r.k === 'cpm');
+    assert.ok(zona().includes(M.FAIL_HEAD[0]) && zona().includes(M.FAIL_HEAD[1]) && zona().includes('Diagnóstico si falla') && zona().includes('Palanca de solución'), 'Rótulos de diagnóstico y palanca');
+    assert.strictEqual($$('#ch-d-zone .ch-z-diag li').length, cpm.diag.length, 'Todos los diagnósticos');
+    assert.strictEqual($$('#ch-d-zone .ch-z-lever li').length, cpm.lever.length, 'Todas las palancas');
+    assert.ok(zona().includes('creativos nuevos') && $('#ch-d-zone .ch-z-diag b'), 'Los segmentos { b } van en negrita');
+    // focus y click.
+    disparar('#ch-d-rows [data-k="cppi"]', 'focus');
+    assert.deepStrictEqual(marcado(), ['cpm'], 'focus no cambia lo marcado');
+    $('#ch-d-rows [data-k="cppi"]').click();
+    assert.deepStrictEqual(marcado(), ['cppi'], 'click marca CPPI');
+    $('#ch-d-rows [data-k="cpc"]').click();
+    assert.deepStrictEqual(marcado(), ['cpc'], 'click marca CPC');
+    // CPA: zonas genéricas (escala, tope, apaga).
+    $('#ch-d-rows [data-k="cpa"]').click();
+    const z = M.GENERIC_CPA;
+    assert.ok(['12.000', '15.000', '20.000'].every((n) => zona().includes(n)) && zona().includes(M.copText(z.escala)) && /Escala/.test(zona()) && /Tope/.test(zona()) && /Apaga/.test(zona()), 'CPA: escala 12.000, tope 15.000 y apaga 20.000');
+    // La plataforma del panel no se guarda ni cambia el Simulador.
+    assert.strictEqual(ST.testing.sim.plat, 'tiktok');
+    ST.testing.sim.plat = simPlat;
+    $('#ch-d-x').click();
+    // Un valor raro del Simulador cae en Meta.
+    ST.testing.sim.plat = 'otra'; $('#ch-d-btn').click();
+    assert.ok($('#ch-d-plat-meta').checked, 'Una plataforma desconocida cae en Meta');
+    ST.testing.sim.plat = simPlat; $('#ch-d-x').click();
+  };
+
+  return dkTest().then(apTest).then(chTest).then(chCadenaTest).then(chDurasTest).then(fresca).then((d2) => {
     const doc2 = d2.window.document;
     assert.deepStrictEqual([...doc2.querySelectorAll('#b-strats .st-tab')].map((b) => b.textContent.length > 0), [true, true], 'Estrategias muestra solo 2 tarjetas');
     assert.deepStrictEqual([...d2.window.PYL.core.search.STRATEGIES.map((x) => x.k)], ['vdo', 'prov'], 'STRATEGIES = vdo y prov');

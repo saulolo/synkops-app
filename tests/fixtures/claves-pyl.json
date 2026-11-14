@@ -2,6 +2,7 @@
   "core": [
     "adprompt",
     "ads",
+    "cheat",
     "dates",
     "diagnostics",
     "dkprompt",
@@ -31,6 +32,7 @@
     "campaignsTable",
     "candidate",
     "cascade",
+    "cheat",
     "diagnosisPanel",
     "dkprompt",
     "dom",
