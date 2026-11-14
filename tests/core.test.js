@@ -11,7 +11,7 @@ const caso = (nombre, fn) => casos.push([nombre, fn]);
 
 caso('exporta todas las funciones del núcleo aplanadas', () => {
   const claves = Object.keys(core).sort().join(',');
-  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,LADDER_BLOCKS,LANDING,LEVELS,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,isDropi,isMetrics,key,kpis,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
+  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CH_CPA_READ,CH_HELP,CH_SIDES,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,LADDER_BLOCKS,LANDING,LEVELS,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,chChain,chHard,chPlat,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,isDropi,isMetrics,key,kpis,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
 });
 
 caso('Costeo: proveedor 30.000 da precio $99.900 y tope $21.617', () => {
@@ -1009,6 +1009,105 @@ caso('Simulador: cadena con semáforo, eslabón roto y escenarios (SPEC 11)', ()
   // Los límites no están escritos a mano en el simulador.
   const src = require('fs').readFileSync(require('path').join(__dirname, '../js/modules/testing/core/simulator.js'), 'utf8');
   for (const n of ['20000', '6000', '800', '4000', '5000', '15000']) assert.ok(!new RegExp('\\b' + n + '\\b').test(src.replace(/\/\/.*$/gm, '')), 'sin ' + n + ' a mano');
+});
+
+// ---- SPEC 12: atajos flotantes de Testeo (core/cheat.js) ----
+caso('cheat: chChain da 4 eslabones en orden con paso y grupo', () => {
+  const c = core.chChain();
+  assert.deepStrictEqual(c.map((x) => x.k), ['cpm', 'cpc', 'cppi', 'cpa']);
+  assert.deepStrictEqual(c.map((x) => x.step), [1, 2, 3, 4]);
+  assert.deepStrictEqual(c.map((x) => x.side), ['antes', 'antes', 'despues', 'despues']);
+  assert.deepStrictEqual(core.CH_SIDES.map((s) => s.k), ['antes', 'despues']);
+});
+
+caso('cheat: chChain toma textos y límites de HARD_METRICS y TEST_CHAIN', () => {
+  for (const e of core.chChain()) {
+    const h = core.HARD_METRICS.find((r) => r.k === e.k);
+    assert.strictEqual(e.name, h.name);
+    assert.strictEqual(e.full, h.means.full);
+    assert.strictEqual(e.simple, h.means.simple);
+    assert.strictEqual(e.lim.meta, h.view.meta.main);
+    assert.strictEqual(e.lim.tiktok, h.view.tiktok.main);
+    if (e.k !== 'cpa') {
+      const r = core.TEST_CHAIN.reads.find((x) => x.k === e.k);
+      assert.deepStrictEqual(e.read, { when: r.when, fix: r.fix });
+    }
+  }
+});
+
+caso('cheat: la lectura del CPA dice el tope de GENERIC_CPA', () => {
+  const cpa = core.chChain().find((e) => e.k === 'cpa');
+  assert.deepStrictEqual(cpa.read.when[1], { b: '$ ' + core.copText(core.GENERIC_CPA.tope) });
+  assert.deepStrictEqual(cpa.read, { when: core.CH_CPA_READ.when, fix: core.CH_CPA_READ.fix });
+});
+
+caso('cheat: cada eslabón trae su tabla "¿Qué falla y cómo lo arreglo?" condensada', () => {
+  const txt = (segs) => segs.map((s) => (typeof s === 'string' ? s : s.b)).join('');
+  const c = core.chChain(), money = (v) => '$ ' + core.copText(v);
+  assert.deepStrictEqual(c.map((e) => e.help.rows.length), [4, 2, 4, 6], 'Filas de CPM, CPC, CPPI y CPA');
+  for (const e of c) {
+    assert.ok(txt(e.help.foot).length > 0, 'Pie de ' + e.k);
+    for (const r of e.help.rows) assert.ok(typeof r.cause === 'string' && r.cause && txt(r.how) && txt(r.fix), 'Fila completa de ' + e.k + ': ' + r.cause);
+  }
+  const rows = (k) => c.find((e) => e.k === k).help.rows;
+  assert.ok(txt(c[0].help.foot).includes('Mientras el CPM esté roto'));
+  assert.ok(rows('cpm').some((r) => r.cause === 'Gancho débil'));
+  // Los números salen de las fuentes: cortes, límites del CPPI, zonas del CPA, escalón y ventana.
+  assert.ok(txt(rows('cpc')[0].fix).includes(core.NS_TEST.cuts.map((n) => n / 1000 + 'K').join(' / ')));
+  assert.ok(txt(c.find((e) => e.k === 'cppi').help.foot).includes(money(core.TEST_RULES.cppiApaga)) && txt(c.find((e) => e.k === 'cppi').help.foot).includes(core.NS_TEST.cuts[1] / 1000 + 'K'));
+  const z = core.GENERIC_CPA, cpa = rows('cpa');
+  assert.ok(txt(cpa[0].how).includes(money(z.escala)) && txt(cpa[0].fix).includes('+' + core.NS_TEST.step * 100 + ' %'));
+  assert.ok(txt(cpa[1].how).includes(money(z.escala)) && txt(cpa[1].how).includes(money(z.tope)));
+  assert.ok(txt(cpa[2].how).includes(money(z.tope)) && txt(cpa[2].fix).includes('−' + core.NS_TEST.step * 100 + ' %'));
+  assert.ok(txt(cpa[3].fix).includes(Math.round((core.SCALE_RULES.salto - 1) * 100) + ' %'));
+  assert.ok(txt(cpa[4].how).includes(money(z.apaga)) && txt(cpa[4].how).includes(String(core.SCALE_RULES.offDays)));
+  assert.ok(txt(cpa[5].how).includes(money(core.SCALE_RULES.offDouble * z.apaga)));
+});
+
+caso('cheat: chHard da 5 filas en el orden de HARD_METRICS', () => {
+  for (const p of ['meta', 'tiktok']) {
+    const rows = core.chHard(p);
+    assert.deepStrictEqual(rows.map((r) => r.k), core.HARD_METRICS.map((r) => r.k));
+    assert.deepStrictEqual(rows.map((r) => r.k), ['ctr', 'cpc', 'cpm', 'cppi', 'cpa']);
+    rows.forEach((r) => {
+      const h = core.HARD_METRICS.find((x) => x.k === r.k);
+      assert.strictEqual(r.main, h.view[p].main);
+      assert.strictEqual(r.question, h.question);
+      assert.strictEqual(r.diag, h.diag);
+      assert.strictEqual(r.lever, h.lever);
+    });
+  }
+});
+
+caso('cheat: chHard cambia el límite según la plataforma', () => {
+  const lim = (p, k) => core.chHard(p).find((r) => r.k === k).main;
+  assert.strictEqual(lim('meta', 'cpm'), '≤ 20.000');
+  assert.strictEqual(lim('tiktok', 'cpm'), '≤ 6.000');
+  assert.strictEqual(lim('meta', 'ctr'), '> 2 %');
+  assert.strictEqual(lim('tiktok', 'ctr'), '> 0,5 %');
+});
+
+caso('cheat: warn solo en el CTR de Meta y zones solo en el CPA', () => {
+  const meta = core.chHard('meta'), tik = core.chHard('tiktok');
+  assert.strictEqual(meta.find((r) => r.k === 'ctr').warn, core.CTR_UNIQUE_WARN);
+  assert.strictEqual(tik.find((r) => r.k === 'ctr').warn, null);
+  assert.deepStrictEqual(meta.filter((r) => r.warn).map((r) => r.k), ['ctr']);
+  assert.deepStrictEqual(meta.filter((r) => r.zones).map((r) => r.k), ['cpa']);
+  assert.deepStrictEqual(meta.find((r) => r.k === 'cpa').zones, core.GENERIC_CPA);
+  assert.strictEqual(meta.find((r) => r.k === 'cpa').tip, null);
+  assert.strictEqual(meta.find((r) => r.k === 'cpm').tip, core.HARD_METRICS.find((r) => r.k === 'cpm').view.meta.tip);
+});
+
+caso('cheat: chPlat solo acepta meta o tiktok', () => {
+  assert.strictEqual(chPlatOf('tiktok'), 'tiktok');
+  assert.strictEqual(chPlatOf('meta'), 'meta');
+  for (const x of ['x', '', null, undefined, 'TikTok']) assert.strictEqual(chPlatOf(x), 'meta');
+  function chPlatOf(v) { return core.chPlat(v); }
+});
+
+caso('cheat: el núcleo no escribe números de métricas a mano', () => {
+  const src = require('fs').readFileSync(require('path').join(__dirname, '../js/modules/cheat/core/cheat.js'), 'utf8');
+  for (const n of ['20000', '6000', '800', '4000', '5000', '12000', '15000']) assert.ok(!new RegExp('\\b' + n + '\\b').test(src.replace(/\/\/.*$/gm, '')), 'sin ' + n + ' a mano');
 });
 
 let fallos = 0;
