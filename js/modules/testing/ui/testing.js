@@ -124,91 +124,13 @@
   }
 
   // ---------- Simulacro ----------
-  const MODES = [{ k: 'practice', t: '🎯 Práctica' }, { k: 'free', t: '🎛️ Juega con los números' }];
 
   // Ilumina en el mapa de los 3 cortes la rama indicada (id de testVerdict) y apaga las demás.
   function light(root, branch) {
     root.querySelectorAll('.ts-cuts [data-branch]').forEach((n) => n.classList.toggle('ts-on', n.dataset.branch === branch));
   }
 
-  const FIELDS = [
-    ['daily', 'Presupuesto diario', 'Lo que gasta el testeo en un día.'],
-    ['pi', 'Pagos iniciados', 'Acumulados hasta ahora.'],
-    ['sales', 'Ventas', 'Acumuladas hasta ahora.'],
-    ['tope', 'CPA tope', 'El CPA máximo de tu costeo.'],
-  ];
-
-  // "Juega con los números": campos editables. Cada cambio avisa con on.free(campo, texto) y la app repinta
-  // lo derivado con freeOut (sin rehacer los campos, para no perder el foco).
-  function free(node, st, on) {
-    node.textContent = '';
-    node.append(el('p', 'small muted', 'Cambio los números y veo qué decide el Lab en cada corte. Es para aprender: no es una campaña real.'));
-    const input = (k, id) => {
-      const x = el('input'); x.id = id; x.type = 'text'; x.inputMode = 'numeric'; x.value = String(st[k]);
-      return x;
-    };
-    const field = (k, label, hint, extra) => {
-      const f = el('div', 'field'), lb = el('label', null, label), x = input(k, 'ts-f-' + k);
-      lb.htmlFor = x.id;
-      x.addEventListener('input', () => on.free(k, x.value));
-      f.append(lb, x);
-      if (extra) f.append(extra);
-      f.append(el('span', 'hint', hint));
-      return f;
-    };
-    const grid = el('div', 'ts-free-grid');
-    grid.append(field('daily', ...FIELDS[0].slice(1)));
-
-    // Gasto acumulado: deslizador y número, siempre iguales.
-    const sf = el('div', 'field ts-spend'), sl = el('label', null, 'Gasto acumulado'), sx = input('spend', 'ts-f-spend'), sr = el('input');
-    sl.htmlFor = sx.id;
-    sr.type = 'range'; sr.id = 'ts-f-spend-r'; sr.min = '0'; sr.step = '1000'; sr.value = String(st.spend); sr.setAttribute('aria-label', 'Gasto acumulado');
-    sx.addEventListener('input', () => { sr.value = sx.value.replace(/\D/g, '') || '0'; on.free('spend', sx.value); });
-    sr.addEventListener('input', () => { sx.value = sr.value; on.free('spend', sr.value); });
-    sf.append(sl, sx, sr, el('span', 'hint', 'Lo que lleva gastado el conjunto.'));
-    grid.append(sf, field('pi', ...FIELDS[1].slice(1)), field('sales', ...FIELDS[2].slice(1)));
-    const zones = el('div', 'ts-zones small muted'); zones.id = 'ts-zones';
-    grid.append(field('tope', FIELDS[3][1], FIELDS[3][2], zones));
-    const bar = el('div', 'ts-free-bar'); bar.id = 'ts-free-bar';
-    const out = el('div', 'ts-free-out'); out.id = 'ts-free-out'; out.setAttribute('aria-live', 'polite');
-    node.append(grid, bar, out);
-  }
-
   const stat = (label, value) => { const s = el('div', 'ts-stat'); s.append(el('small', null, label), el('b', null, value)); return s; };
-
-  // Pinta lo que se deriva de los números (v = core.testing.testFree): zonas, barra, veredicto o aviso, día, CPPI y CPA.
-  function freeOut(node, v, spend) {
-    const z = node.querySelector('#ts-zones');
-    z.textContent = '';
-    if (v.zones) rich(z, ['Zonas: escala ', { b: money(v.zones.escala) }, ' · apaga ', { b: money(v.zones.apaga) }]);
-    const sr = node.querySelector('#ts-f-spend-r');
-    if (v.bar) sr.max = String(v.bar.max);
-    const bx = node.querySelector('#ts-free-bar');
-    bx.textContent = '';
-    if (v.bar) bx.append(bar(v.bar, spend));
-
-    const out = node.querySelector('#ts-free-out');
-    out.textContent = '';
-    const r = v.verdict, st = el('div', 'ts-stats');
-    if (v.err) out.append(el('div', 'note ny', '⚠️ ' + v.err));
-    else if (v.scaling) out.append(el('div', 'note ny', '🚀 ' + PYL.core.testing.TEST_SCALE_NOTE + ' Pasa a la pestaña Escalado.'));
-    else {
-      const card = el('div', 'ts-ex ts-' + (r.light || 'w'));
-      card.append(el('small', 'ts-ex-h', r.cut ? 'Así lo califica el Lab de NovaSociety' : 'Todavía no hay corte'));
-      const vr = el('p', 'ts-ex-v');
-      vr.append(el('span', null, (r.action ? ICON[r.action] : '⏳') + ' '), el('b', null, r.toca), el('span', null, ' · ' + r.veredicto));
-      card.append(vr, seg('p', 'small', r.detalle));
-      if (r.cut) card.append(seg('p', 'small muted', ['Los números que deciden: ', ...r.senales]));
-      out.append(card);
-      st.append(stat('Corte alcanzado', r.cut ? 'Corte ' + r.cut + ' · ' + copText(PYL.core.metrics.NS_TEST.cuts[r.cut - 1]) : 'Antes del corte 1'));
-    }
-    st.append(
-      stat('Día del testeo', v.day == null ? '—' : String(v.day)),
-      stat('CPPI', v.cppi == null ? '—' : money(v.cppi)),
-      stat('CPA', v.cpa == null ? '—' : money(v.cpa)),
-    );
-    out.append(st);
-  }
 
   // ---------- Práctica ----------
   // v = core.testing.practiceView(run) (+ best); on = { advance, decide(k), next, again, seeStep(n) }.
@@ -230,7 +152,8 @@
 
     if (!v.shown) {
       const row = el('div', 'row mt-s');
-      const btn = el('button', 'btn sm', 'Avanzar hasta el corte ' + v.cutN + ' →'); btn.type = 'button'; btn.id = 'ts-adv';
+      // Verde; el primer corte de un caso invita a empezar.
+      const btn = el('button', 'btn ghost sm ts-go', v.from === 0 ? 'Empecemos →' : 'Avanzar hasta el corte ' + v.cutN + ' →'); btn.type = 'button'; btn.id = 'ts-adv';
       btn.addEventListener('click', on.advance);
       row.append(btn, el('span', 'small muted', 'Dejo correr el conjunto sin tocarlo.'));
       node.append(row);
@@ -320,23 +243,19 @@
     tope: (on, st) => tope(st.step.tope.examples),
     chain,
     cuts: () => cuts(null),
-    // Simulacro con dos modos. st = { step, mode, free }; on.mode(k) cambia de modo y on.free(k, texto) edita un número.
-    sim: (on, st) => {
+    // Práctica de 11 casos (paso 6). El panel #ts-mode lo pinta la app con ui.testing.practice (cada decisión lo repinta sin rehacer
+    // el paso). Al final, un botón al Simulador: on.toSim().
+    sim: (on) => {
       const w = el('div', 'ts-tool'); w.id = 'ts-sim';
-      w.append(el('h4', null, 'Simulacro'));
-      const seg2 = el('div', 'seg'); seg2.id = 'ts-modes'; seg2.setAttribute('role', 'group'); seg2.setAttribute('aria-label', 'Modo del simulacro');
-      for (const m of MODES) {
-        const b = el('button', null, m.t); b.type = 'button'; b.dataset.mode = m.k; b.setAttribute('aria-pressed', String(m.k === st.mode));
-        b.addEventListener('click', () => on.mode(m.k));
-        seg2.append(b);
-      }
+      w.append(el('h4', null, 'Práctica'));
       const panel = el('div', 'ts-mode mt-s'); panel.id = 'ts-mode';
-      if (st.mode === 'free') free(panel, st.free, on);
-      // En Práctica el panel lo pinta la app con ui.testing.practice (cada decisión lo repinta sin rehacer el paso).
-      w.append(seg2, panel);
+      // Botón primario (el amarillo del tema).
+      const go = el('button', 'btn sm mt-s', 'Simulador →'); go.type = 'button'; go.id = 'ts-to-sim';
+      go.addEventListener('click', on.toSim);
+      w.append(panel, go);
       return w;
     },
   };
 
-  PYL.ui.testing = { parts, soon, progress, light, free, freeOut, practice, bar, cut, cuts, tope, chain, TOOLS };
+  PYL.ui.testing = { parts, soon, progress, light, practice, bar, cut, cuts, tope, chain, seg, stat, money, ICON, TOOLS };
 })();

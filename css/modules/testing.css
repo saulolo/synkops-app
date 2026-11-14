@@ -22,9 +22,8 @@
 @media (prefers-reduced-motion:reduce){.ts-bar-fill{transition:none}}
 
 /* ---------- Tarjetas de corte (semáforo) ---------- */
-.ts-cuts{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;grid-auto-flow:row dense}
-/* Corte 2 (el más alto) ocupa dos filas: el 1 y el 3 se apilan a su lado y las columnas terminan parejas. */
-.ts-cuts .ts-cut[data-cut="2"]{grid-row:span 2}
+/* Los tres cortes, uno debajo del otro, cada tarjeta al ancho completo del contenedor. */
+.ts-cuts{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
 .ts-cut{background:var(--card);border:1px solid var(--line);border-radius:var(--rad);padding:14px;display:grid;gap:8px;align-content:start}
 .ts-cut-h{margin:0;font-size:16px}
 .ts-cut-look{margin:0;color:var(--muted)}
@@ -92,6 +91,10 @@
 .ts-decs{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
 .ts-dec{justify-content:center;white-space:normal;text-align:center}
 .ts-dec:disabled{opacity:1;cursor:default}
+/* "Empecemos" / "Avanzar": verde, para distinguirlo del botón primario del Simulador. */
+.btn.ghost.ts-go{background:var(--g-bg);border-color:var(--g);color:var(--g-ink)}
+.btn.ghost.ts-go:hover{background:var(--g-bg);filter:brightness(1.2)}
+#ts-to-sim{margin-top:22px}
 .ts-dec.ts-right{background:var(--g-bg);border-color:var(--g);color:var(--g-ink)}
 .ts-dec.ts-wrong{background:var(--r-bg);border-color:var(--r);color:var(--r-ink)}
 .ts-fb{margin-top:12px;padding:12px 14px;border-radius:var(--rad);border:1px solid var(--line);background:var(--card-2)}
@@ -102,3 +105,41 @@
 
 /* Sub-pestaña que todavía no se puede abrir (Lectura real): se ve apagada, como TikTok Ads en Desarrollo. */
 #v-testeo .seg button:disabled{cursor:not-allowed;opacity:.5}
+
+/* ---------- Simulador (SPEC 11) ---------- */
+#ts-sx-modes,#ts-sx-f-plat{flex-wrap:wrap;max-width:100%}
+#ts-sx-panel{margin-top:14px}
+.ts-scen{display:grid;gap:8px;margin-top:4px}
+.ts-scen .row{flex-wrap:wrap;gap:8px}
+.ts-sx-ctl{flex-wrap:wrap;gap:8px;margin-top:14px}
+.ts-sx-ctl .btn{white-space:normal}
+#ts-simu input[aria-invalid="true"]{border-color:var(--r)}
+.ts-err{color:var(--r-ink);font-weight:700}
+.ts-err:empty{display:none}
+.ts-sx-chain{margin-top:14px}
+.ts-sx-chain .ts-flow{gap:8px 6px;align-items:stretch}
+.ts-sx-chain .ts-flow-a{align-self:center}
+.ts-link{position:relative;flex:1 1 104px;min-width:0;display:flex;flex-direction:column;gap:2px;padding:9px 12px;border-radius:12px;border:1px solid var(--line);border-left:4px solid var(--line-2);background:var(--card-2);color:var(--ink)}
+.ts-link small{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.ts-link b{font-size:16px;overflow-wrap:anywhere}
+.ts-link .ts-dot{position:absolute;top:8px;right:10px;font-size:11px}
+.ts-link em{font-style:normal;font-size:11px;font-weight:700;color:var(--muted)}
+.ts-link .ts-ideal{color:var(--g-ink)}
+.ts-link.ts-g{border-color:var(--g);background:var(--g-bg)}
+.ts-link.ts-y{border-color:var(--y);background:var(--y-bg)}
+.ts-link.ts-r{border-color:var(--r);background:var(--r-bg)}
+.ts-sx-chain .ts-read{margin-top:10px}
+.ts-sx-hist{margin-top:14px}
+.ts-hist{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.ts-h-c{padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--card-2)}
+.ts-h-c small{display:block;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.ts-h-t{display:block;margin-top:2px;font-weight:700;overflow-wrap:anywhere}
+.ts-h-c.ts-pending .ts-h-t{color:var(--soft);font-weight:400}
+.ts-h-c.ts-stopped{border-style:dashed;background:transparent}
+.ts-h-c.ts-stopped .ts-h-t{color:var(--r-ink)}
+.ts-ex .ts-read{margin-top:8px}
+@media (max-width:560px){
+  .ts-sx-chain .ts-flow-a{display:none}
+  .ts-link{flex:1 1 calc(50% - 6px)}
+  .ts-hist{grid-template-columns:repeat(2,minmax(0,1fr))}
+}

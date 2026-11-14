@@ -6,7 +6,7 @@
   'modules/pnl/core/dropi', 'modules/pnl/core/meta', 'modules/pnl/core/pnl', 'modules/pnl/core/diagnostics',
   'modules/pnl/core/insights', 'modules/pnl/core/excel',
   'modules/search/core/search', 'modules/landing/core/landing', 'modules/ads/core/ads', 'modules/quick/core/quick', 'modules/dkprompt/core/dkprompt', 'modules/adprompt/core/adprompt',
-  'modules/metrics/core/metrics', 'modules/testing/core/testing', 'modules/scaling/core/scaling',
+  'modules/metrics/core/metrics', 'modules/testing/core/testing', 'modules/testing/core/simulator', 'modules/scaling/core/scaling',
 ].forEach((f) => require(`./${f}.js`));
 
 module.exports = Object.assign({}, ...Object.values(globalThis.PYL.core));
