@@ -11,7 +11,7 @@ const caso = (nombre, fn) => casos.push([nombre, fn]);
 
 caso('exporta todas las funciones del núcleo aplanadas', () => {
   const claves = Object.keys(core).sort().join(',');
-  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CH_CPA_READ,CH_HELP,CH_SIDES,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,LADDER_BLOCKS,LANDING,LEVELS,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,chChain,chHard,chPlat,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,isDropi,isMetrics,key,kpis,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
+  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CH_CPA_READ,CH_HELP,CH_SIDES,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,LADDER_BLOCKS,LANDING,LEVELS,LG_DAYS,LG_PARTS,LG_STORE,LG_TEMPLATES,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,chChain,chHard,chPlat,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,isDropi,isMetrics,key,kpis,lgMessage,lgMoney,lgMoneyText,lgPrefill,lgTemplate,lgValues,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
 });
 
 caso('Costeo: proveedor 30.000 da precio $99.900 y tope $21.617', () => {
@@ -1108,6 +1108,74 @@ caso('cheat: chPlat solo acepta meta o tiktok', () => {
 caso('cheat: el núcleo no escribe números de métricas a mano', () => {
   const src = require('fs').readFileSync(require('path').join(__dirname, '../js/modules/cheat/core/cheat.js'), 'utf8');
   for (const n of ['20000', '6000', '800', '4000', '5000', '12000', '15000']) assert.ok(!new RegExp('\\b' + n + '\\b').test(src.replace(/\/\/.*$/gm, '')), 'sin ' + n + ' a mano');
+});
+
+caso('logistics: lgTemplate cae en guia con una clave desconocida', () => {
+  assert.strictEqual(core.lgTemplate('guia').k, 'guia');
+  assert.strictEqual(core.lgTemplate('x').k, 'guia');
+  assert.strictEqual(core.lgTemplate().k, 'guia');
+  assert.deepStrictEqual(core.lgTemplate('guia').fields.map((f) => f.k), ['name', 'product', 'guide', 'price', 'address']);
+  assert.strictEqual(core.LG_DAYS, '2 a 4', 'El tiempo de entrega es fijo');
+  assert.deepStrictEqual(core.lgTemplate('guia').fields.map((f) => f.ph), ['Ej: Pablo', 'Ej: Omegaxl joint support', 'Ej: 074102602224', 'Ej: $ 97.400', 'Ej: Cra 67 # 25 - 34 Itagui - Calatrava'], 'Cada campo trae su ejemplo');
+  assert.deepStrictEqual(core.LG_PARTS.map((p) => [p.k, !!p.disabled]), [['msgs', false], ['track', true]]);
+});
+
+caso('logistics: lgMoney lee pesos o devuelve null', () => {
+  for (const t of ['97.400', '$ 97.400', '97400', ' $97.400 ']) assert.strictEqual(core.lgMoney(t), 97400, t);
+  for (const t of ['', '0', 'abc', null, undefined, '-5']) assert.strictEqual(core.lgMoney(t), null, String(t));
+});
+
+caso('logistics: lgMoneyText formatea el precio del campo', () => {
+  assert.strictEqual(core.lgMoneyText(97400), '$ 97.400');
+  assert.strictEqual(core.lgMoneyText(1234567), '$ 1.234.567');
+  assert.strictEqual(core.lgMoney(core.lgMoneyText(97400)), 97400);
+});
+
+caso('logistics: lgValues marca cada campo vacío y el precio inválido', () => {
+  const tpl = core.lgTemplate('guia');
+  const vacio = core.lgValues(tpl, {});
+  assert.strictEqual(vacio.ok, false);
+  assert.deepStrictEqual(Object.keys(vacio.errors).sort(), ['address', 'guide', 'name', 'price', 'product']);
+  assert.ok(/^Escribe /.test(vacio.errors.name));
+  const base = { name: ' Pablo ', product: 'Omegaxl joint support', guide: ' 074102602224 ', price: '$ 97.400', address: 'Cra 67 # 25 - 34 Itagui - Calatrava' };
+  const ok = core.lgValues(tpl, base);
+  assert.strictEqual(ok.ok, true);
+  assert.deepStrictEqual(ok.errors, {});
+  assert.strictEqual(ok.values.name, 'Pablo');
+  assert.strictEqual(ok.values.guide, '074102602224');
+  assert.strictEqual(ok.values.price, 97400);
+  const malo = core.lgValues(tpl, { ...base, price: 'abc' });
+  assert.strictEqual(malo.ok, false);
+  assert.strictEqual(malo.errors.price, 'Precio mayor a 0');
+  assert.deepStrictEqual(Object.keys(core.lgValues(tpl, { ...base, price: '0' }).errors), ['price']);
+});
+
+caso('logistics: lgPrefill toma nombre y precio de landing.prod', () => {
+  assert.deepStrictEqual(core.lgPrefill({ name: 'Omegaxl joint support', price: 97400 }), { product: 'Omegaxl joint support', price: 97400 });
+  assert.deepStrictEqual(core.lgPrefill({}), { product: '', price: null });
+  assert.deepStrictEqual(core.lgPrefill(null), { product: '', price: null });
+});
+
+caso('logistics: lgMessage es idéntico al texto de la spec', () => {
+  const esperado = [
+    '*CONFIRMACIÓN GUIA*',
+    '¡Hola, Pablo! 👋 Te saludamos nuevamente de 🍃*VidanovaStore*.',
+    '',
+    'Te confirmamos que tu pedido de la Omegaxl joint support ya fue empacado y entregado a la transportadora. 📦✨',
+    '',
+    '🚚 *Número de Guía*: 074102602224',
+    '🔗 *Rastreo*: Puedes consultar el estado de tu paquete directamente en la página web de la transportadora con ese número de guía.',
+    '',
+    'El tiempo estimado de entrega es de *2 a 4 días hábiles*.',
+    '💵 Recuerda tener listos los *$97.400* en efectivo para cuando el repartidor llegue a tu dirección (Cra 67 # 25 - 34 Itagui - Calatrava).',
+    '',
+    '¡Cualquier duda que tengas durante el camino, nos puedes escribir por aquí! Que tengas un excelente día. 😊',
+  ].join('\n');
+  const v = { name: 'Pablo', product: 'Omegaxl joint support', guide: '074102602224', price: 97400, address: 'Cra 67 # 25 - 34 Itagui - Calatrava', days: '9 a 9' };
+  assert.strictEqual(core.lgMessage('guia', v), esperado, 'Aunque llegue otro days, el mensaje usa el fijo');
+  assert.strictEqual(core.lgMessage('x', v), esperado);
+  assert.ok(core.lgMessage('guia', { ...v, price: 1234567 }).includes('*$1.234.567*'));
+  assert.ok(core.LG_STORE.includes('VidanovaStore'));
 });
 
 let fallos = 0;

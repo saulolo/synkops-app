@@ -20,6 +20,7 @@
 <link rel="stylesheet" href="css/modules/testing.css">
 <link rel="stylesheet" href="css/modules/cheat.css">
 <link rel="stylesheet" href="css/modules/scaling.css">
+<link rel="stylesheet" href="css/modules/logistics.css">
 <link rel="stylesheet" href="css/themes.css">
 <link rel="stylesheet" href="css/modules/pnl.css">
 <link rel="stylesheet" href="css/report.css">
@@ -54,6 +55,7 @@
       <button data-v="metricas">Métricas</button>
       <button data-v="testeo">Testeo</button>
       <button data-v="escalado">Escalado</button>
+      <button data-v="logistica">Logística</button>
       <button data-v="escalera">Escalera</button>
       <button data-v="creativos">Creativos</button>
       <button data-v="pyl">Tablero P&amp;L</button>
@@ -685,6 +687,38 @@
   <div class="card mt" id="es-real-soon" hidden></div>
 </section>
 
+<!-- ================= LOGÍSTICA ================= -->
+<section class="view" id="v-logistica">
+  <div class="head">
+    <div>
+      <div class="eyebrow">Después de la venta · hablo con mis clientes</div>
+      <h1>Logística</h1>
+      <p class="lead">Aquí irá el seguimiento de pedidos, clientes y entregas. Hoy arma los mensajes a clientes: lleno los datos del pedido, genero el mensaje y lo copio para WhatsApp.</p>
+    </div>
+  </div>
+
+  <div class="seg" id="lg-parts" role="group" aria-label="Parte de logística"></div>
+
+  <div class="card mt" id="lg-msgs">
+    <div class="lg-head">
+      <h2>Confirmación de Guia</h2>
+      <button class="btn ghost sm lg-import" id="lg-import" type="button" title="Traer de Desarrollo: pone el nombre y el precio de «Producto que estoy montando»" aria-label="Traer de Desarrollo" data-ic="import"></button>
+    </div>
+    <p class="muted b-sub">Armo el mensaje con los datos del pedido y lo copio para pegarlo en WhatsApp.</p>
+    <div class="seg mt" id="lg-tpls" role="group" aria-label="Plantilla del mensaje"></div>
+    <div class="lg-form" id="lg-form"></div>
+    <div class="lg-out">
+      <label for="lg-out">Mensaje</label>
+      <textarea id="lg-out" readonly rows="14" placeholder="Toca «Generar mensaje» para armarlo con estos datos."></textarea>
+      <div class="lg-acts">
+        <button class="btn ghost sm" id="lg-clear" type="button" title="Vacía nombre, guía, dirección y mensaje; deja producto y precio" data-ic="clear">Limpiar</button>
+        <button class="btn ghost sm" id="lg-copy" type="button" data-ic="copy">Copiar mensaje</button>
+        <button class="btn sm" id="lg-gen" type="button" data-ic="gen">Generar mensaje</button>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ================= MÓDULO 3 ================= -->
 <section class="view" id="v-escalera">
   <div class="head">
@@ -1105,6 +1139,7 @@
 <script src="js/modules/testing/core/simulator.js"></script>
 <script src="js/modules/scaling/core/scaling.js"></script>
 <script src="js/modules/cheat/core/cheat.js"></script>
+<script src="js/modules/logistics/core/logistics.js"></script>
 <!-- Services: archivos y almacenamiento del navegador -->
 <script src="js/shared/services/storage.js"></script>
 <script src="js/shared/services/files.js"></script>
@@ -1138,6 +1173,7 @@
 <script src="js/modules/testing/ui/simulator.js"></script>
 <script src="js/modules/cheat/ui/cheat.js"></script>
 <script src="js/modules/scaling/ui/scaling.js"></script>
+<script src="js/modules/logistics/ui/logistics.js"></script>
 <!-- App: estado, casos de uso y arranque (main.js va al final) -->
 <script src="js/app/state.js"></script>
 <script src="js/modules/pnl/app/filters.js"></script>
@@ -1154,6 +1190,7 @@
 <script src="js/modules/testing/app/testing.js"></script>
 <script src="js/modules/cheat/app/cheat.js"></script>
 <script src="js/modules/scaling/app/scaling.js"></script>
+<script src="js/modules/logistics/app/logistics.js"></script>
 <script src="js/modules/trainer/app/trainer.js"></script>
 <script src="js/app/nav.js"></script>
 <script src="js/app/main.js"></script>

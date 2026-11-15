@@ -43,9 +43,9 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.deepStrictEqual(actual[capa], BASE_KEYS[capa], `Claves de PYL.${capa} distintas de la línea base`);
   }
 
-  // 2. Las 10 pestañas abren su vista y marcan aria-current.
+  // 2. Las 11 pestañas abren su vista y marcan aria-current.
   const tabs = [...document.querySelectorAll('#tabs button')];
-  assert.strictEqual(tabs.length, 10, 'Debe haber 10 pestañas');
+  assert.strictEqual(tabs.length, 11, 'Debe haber 11 pestañas');
   for (const b of tabs) {
     b.click();
     const on = [...document.querySelectorAll('.view.on')].map((v) => v.id);
@@ -396,6 +396,76 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   const ids = [...document.querySelectorAll('[id]')].map((n) => n.id), repetidos = ids.filter((id, i) => ids.indexOf(id) !== i);
   assert.deepStrictEqual(repetidos, [], 'Ids repetidos: ' + repetidos.join(', '));
 
+  // 8c. Logística (SPEC 13): pestaña después de Escalado, encabezado y sub-pestañas.
+  assert.deepStrictEqual(tabs.map((b) => b.dataset.v).slice(6, 9), ['escalado', 'logistica', 'escalera'], 'Logística va justo después de Escalado');
+  assert.strictEqual(tabs.find((b) => b.dataset.v === 'logistica').textContent, 'Logística');
+  assert.strictEqual(text('#v-logistica h1'), 'Logística');
+  assert.strictEqual(text('#lg-msgs h2'), 'Confirmación de Guia', 'Título de la tarjeta');
+  assert.ok(text('#v-logistica .eyebrow').includes('Después de la venta · hablo con mis clientes'), 'Eyebrow de Logística');
+  assert.ok(text('#v-logistica .lead').includes('seguimiento') && text('#v-logistica .lead').includes('mensajes a clientes'), 'Lead de Logística');
+  const lgPartes = [...document.querySelectorAll('#lg-parts [data-part]')];
+  assert.deepStrictEqual(lgPartes.map((b) => b.dataset.part), ['msgs', 'track']);
+  assert.deepStrictEqual(lgPartes.map((b) => b.textContent), ['💬 Mensajes a clientes', '📦 Seguimiento de pedidos · pronto']);
+  assert.deepStrictEqual(lgPartes.map((b) => b.disabled), [false, true], 'Seguimiento está deshabilitado');
+  assert.strictEqual(lgPartes[0].getAttribute('aria-pressed'), 'true');
+  assert.ok(!document.querySelector('#lg-msgs').hidden, 'Mensajes abre al cargar');
+  lgPartes[1].click();
+  assert.strictEqual(PYL.app.state.logistics.part, 'msgs', 'Un clic en Seguimiento no lo abre');
+  assert.ok(!document.querySelector('#lg-msgs').hidden && document.querySelector('#lg-parts [aria-pressed="true"]').dataset.part === 'msgs');
+
+  // 8d. Logística · formulario y prellenado desde Desarrollo (SPEC 13, paso 3).
+  {
+    const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
+    const lgS = PYL.app.state.logistics, landing = PYL.app.state.landing;
+    const tpls = $$('#lg-tpls [data-tpl]');
+    assert.deepStrictEqual(tpls.map((b) => [b.dataset.tpl, b.textContent, b.getAttribute('aria-pressed')]), [['guia', '🚚 Confirmación guía', 'true']], 'Selector con una plantilla elegida');
+    assert.ok($('#lg-tpls').hidden, 'Con una sola plantilla el selector se oculta');
+    const campos = ['name', 'product', 'guide', 'price', 'address'];
+    assert.deepStrictEqual($$('#lg-form input').map((i) => i.id), campos.map((k) => 'lg-f-' + k), '5 campos en orden (el tiempo de entrega es fijo)');
+    assert.deepStrictEqual($$('#lg-form label').map((l) => l.textContent), ['Nombre del destinatario', 'Producto', 'Número de guía', 'Precio', 'Dirección de entrega']);
+    assert.ok(!$('#lg-f-days'), 'No hay campo de tiempo de entrega');
+    assert.deepStrictEqual($$('#lg-form input').map((i) => i.placeholder), ['Ej: Pablo', 'Ej: Omegaxl joint support', 'Ej: 074102602224', 'Ej: $ 97.400', 'Ej: Cra 67 # 25 - 34 Itagui - Calatrava'], 'Cada campo muestra un ejemplo');
+    assert.ok(campos.every((k) => $('#lg-err-' + k)), 'Cada campo trae su aviso');
+    assert.ok(['name', 'product', 'guide', 'price', 'address'].every((k) => $('#lg-f-' + k).value === ''), 'El resto arranca vacío');
+    const escribe = (k, v) => { const i = $('#lg-f-' + k); i.value = v; i.dispatchEvent(new window.Event('input', { bubbles: true })); };
+    const abre = () => { tab('dash').click(); tab('logistica').click(); };
+    // Abrir la pestaña llena Producto y Precio vacíos con los de Desarrollo.
+    landing.prod = { name: 'Omegaxl joint support', price: 97400 };
+    abre();
+    assert.strictEqual($('#lg-f-product').value, 'Omegaxl joint support');
+    assert.strictEqual($('#lg-f-price').value, '$ 97.400');
+    assert.ok(lgS.form.product === 'Omegaxl joint support' && lgS.form.price === '$ 97.400', 'El estado también lo trae');
+    // No pisa lo que ya escribí.
+    escribe('product', 'Mi producto'); escribe('price', '50000');
+    landing.prod = { name: 'Otro de Desarrollo', price: 12000 };
+    abre();
+    assert.strictEqual($('#lg-f-product').value, 'Mi producto', 'Producto escrito no se pisa');
+    assert.strictEqual($('#lg-f-price').value, '50000', 'Precio escrito no se pisa');
+    // El precio acepta 97400, 97.400 y $ 97.400, y se formatea al salir del campo.
+    for (const t of ['97400', '97.400', '$ 97.400']) {
+      escribe('price', t); $('#lg-f-price').dispatchEvent(new window.Event('blur'));
+      assert.strictEqual($('#lg-f-price').value, '$ 97.400', 'Formatea ' + t);
+    }
+    escribe('price', 'abc'); $('#lg-f-price').dispatchEvent(new window.Event('blur'));
+    assert.strictEqual($('#lg-f-price').value, 'abc', 'Un precio inválido no se reescribe');
+    // Traer de Desarrollo sí los pisa.
+    $('#lg-import').click();
+    assert.strictEqual($('#lg-f-product').value, 'Otro de Desarrollo');
+    assert.strictEqual($('#lg-f-price').value, '$ 12.000');
+    // Sin nombre en Desarrollo: avisa y no cambia nada.
+    landing.prod = {};
+    escribe('product', 'Lo mío');
+    $('#toast').textContent = '';
+    $('#lg-import').click();
+    assert.ok(/Desarrollo/.test($('#toast').textContent) && $('#lg-f-product').value === 'Lo mío' && $('#lg-f-price').value === '$ 12.000', 'Sin producto en Desarrollo avisa y no cambia');
+    // Todos editables.
+    assert.ok($$('#lg-form input').every((i) => !i.readOnly && !i.disabled), 'Todos los campos se editan');
+    // Nada se guarda: no hay almacenamiento propio.
+    assert.ok(!PYL.services.storage.logistics, 'Sin persistencia');
+    // Dejar el formulario como estaba para el resto de las pruebas.
+    for (const k of ['name', 'product', 'guide', 'price', 'address']) escribe(k, '');
+  }
+
   // 9. Escalado · Fase de testeo: 6 pasos, cada uno con su bloque, y el avance.
   const paso = (i) => document.querySelectorAll('#ts-steps .fl-node')[i].click();
   assert.strictEqual(document.querySelectorAll('#ts-steps .fl-item').length, 6, 'Seis pasos en la lista');
@@ -705,6 +775,80 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
       } });
     },
   }).then((d) => new Promise((ok) => { if (d.window.document.readyState === 'complete') ok(d); else d.window.addEventListener('load', () => ok(d)); }));
+
+  // 8e. Logística · Generar, Copiar y Limpiar (SPEC 13, paso 4). Async: espera al portapapeles.
+  const lgTest = async () => {
+    const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
+    const escribe = (k, v) => { const i = $('#lg-f-' + k); i.value = v; i.dispatchEvent(new window.Event('input', { bubbles: true })); };
+    let copiado = null;
+    Object.defineProperty(window.navigator, 'clipboard', { configurable: true, value: { writeText: async (t) => { copiado = t; } } });
+    tab('logistica').click();
+    assert.ok($('#lg-out').readOnly && $('#lg-out').value === '', 'Mensaje de solo lectura y vacío al cargar');
+    assert.deepStrictEqual($$('#lg-msgs .lg-acts button').map((b) => b.id), ['lg-clear', 'lg-copy', 'lg-gen'], 'Botones en .lg-acts');
+    assert.ok($('#lg-head, .lg-head #lg-import'), 'Traer de Desarrollo es un ícono junto al título');
+    assert.deepStrictEqual($$('#lg-clear, #lg-copy, #lg-gen').map((b) => b.textContent).sort(), ['Generar mensaje', 'Copiar mensaje', 'Limpiar'].sort());
+    assert.ok($$('#lg-import, #lg-clear, #lg-copy, #lg-gen').every((b) => b.querySelector('.lg-ic svg') && b.querySelectorAll('.lg-ic').length === 1), 'Cada botón trae su ícono dibujado (SVG), sin emojis');
+    assert.strictEqual($('#lg-import').textContent, '', 'Traer de Desarrollo es solo ícono');
+    // Copiar sin mensaje avisa y no copia.
+    $('#toast').textContent = '';
+    $('#lg-copy').click();
+    await new Promise((ok) => setTimeout(ok, 20));
+    assert.ok(/Primero toca/.test($('#toast').textContent) && copiado === null, 'Copiar sin mensaje avisa y no copia');
+    // Generar con campos vacíos los marca, avisa y no arma nada.
+    $('#toast').textContent = '';
+    $('#lg-gen').click();
+    for (const k of ['name', 'product', 'guide', 'price', 'address']) {
+      assert.ok($('#lg-f-' + k).classList.contains('lg-bad') && $('#lg-f-' + k).getAttribute('aria-invalid') === 'true', k + ' marcado');
+      assert.ok(/^Escribe /.test($('#lg-err-' + k).textContent), 'aviso de ' + k);
+    }
+    assert.ok(/Corrige/.test($('#toast').textContent) && $('#lg-out').value === '', 'Avisa y no genera');
+    // Precio inválido.
+    escribe('price', 'abc'); $('#lg-gen').click();
+    assert.strictEqual($('#lg-err-price').textContent, 'Precio mayor a 0');
+    // Con todo lleno: el mensaje es el de la plantilla.
+    escribe('name', 'Pablo'); escribe('product', 'Omegaxl joint support'); escribe('guide', '074102602224');
+    escribe('price', '97400'); $('#lg-f-price').dispatchEvent(new window.Event('blur')); // sale formateado: $ 97.400
+    escribe('address', 'Cra 67 # 25 - 34 Itagui - Calatrava');
+    $('#lg-gen').click();
+    const L = PYL.core.logistics;
+    const esperado = L.lgMessage('guia', { name: 'Pablo', product: 'Omegaxl joint support', guide: '074102602224', price: 97400, address: 'Cra 67 # 25 - 34 Itagui - Calatrava' });
+    assert.strictEqual($('#lg-out').value, esperado, 'Mensaje generado');
+    assert.ok($('#lg-out').value.includes('*2 a 4 días hábiles*'), 'Tiempo de entrega fijo');
+    assert.ok($('#lg-out').value.includes('🍃*VidanovaStore*') && $('#lg-out').value.includes('*$97.400*'), 'Tienda y precio sin espacio');
+    assert.ok($$('#lg-form .lg-bad').length === 0 && $$('.lg-err').every((e) => e.textContent === ''), 'Sin errores tras generar');
+    assert.strictEqual(PYL.app.state.logistics.last, esperado);
+    // Editar después no cambia el mensaje hasta volver a generar.
+    escribe('name', 'Ana');
+    assert.strictEqual($('#lg-out').value, esperado, 'No se actualiza en vivo');
+    $('#lg-gen').click();
+    assert.ok($('#lg-out').value.startsWith('*CONFIRMACIÓN GUIA*\n¡Hola, Ana!'), 'Al volver a generar sí cambia');
+    // Un intento inválido deja el mensaje anterior.
+    const previo = $('#lg-out').value;
+    escribe('guide', ''); $('#lg-gen').click();
+    assert.strictEqual($('#lg-out').value, previo, 'El mensaje anterior se queda');
+    assert.ok($('#lg-f-guide').classList.contains('lg-bad'));
+    escribe('guide', '074102602224');
+    // Copiar copia el mensaje y avisa.
+    $('#toast').textContent = '';
+    $('#lg-copy').click();
+    await new Promise((ok) => setTimeout(ok, 20));
+    assert.strictEqual(copiado, previo, 'Copia el mensaje');
+    assert.ok($('#toast').classList.contains('show') && /copiado/i.test($('#toast').textContent), 'Avisa en #toast');
+    // Limpiar: vacía nombre, guía, dirección y mensaje; deja producto, precio y tiempo.
+    $('#lg-gen').click();
+    $('#lg-clear').click();
+    assert.ok(['name', 'guide', 'address'].every((k) => $('#lg-f-' + k).value === ''), 'Vacía nombre, guía y dirección');
+    assert.deepStrictEqual([$('#lg-f-product').value, $('#lg-f-price').value], ['Omegaxl joint support', '$ 97.400'], 'Deja producto y precio');
+    assert.ok($('#lg-out').value === '' && PYL.app.state.logistics.last === '' && $$('#lg-form .lg-bad').length === 0, 'Vacía el mensaje y los errores');
+    assert.strictEqual(PYL.app.state.logistics.form.name, '', 'El estado también');
+    // El precio formateado también genera.
+    escribe('name', 'Pablo'); escribe('guide', 'G1'); escribe('address', 'Calle 1');
+    $('#lg-gen').click();
+    assert.ok($('#lg-out').value.includes('*$97.400*'), 'El precio "$ 97.400" del campo genera bien');
+    // Dejar el formulario vacío para el resto de las pruebas.
+    for (const k of ['name', 'product', 'guide', 'price', 'address']) escribe(k, '');
+    $('#lg-clear').click();
+  };
 
   // 9. Prompt DropKiller (SPEC 09): botón flotante y panel en Buscar producto.
   const dkTest = async () => {
@@ -1029,7 +1173,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     ST.testing.sim.plat = simPlat; $('#ch-d-x').click();
   };
 
-  return dkTest().then(apTest).then(chTest).then(chCadenaTest).then(chDurasTest).then(fresca).then((d2) => {
+  return lgTest().then(dkTest).then(apTest).then(chTest).then(chCadenaTest).then(chDurasTest).then(fresca).then((d2) => {
     const doc2 = d2.window.document;
     assert.deepStrictEqual([...doc2.querySelectorAll('#b-strats .st-tab')].map((b) => b.textContent.length > 0), [true, true], 'Estrategias muestra solo 2 tarjetas');
     assert.deepStrictEqual([...d2.window.PYL.core.search.STRATEGIES.map((x) => x.k)], ['vdo', 'prov'], 'STRATEGIES = vdo y prov');
