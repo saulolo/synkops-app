@@ -13,14 +13,28 @@
 
   // Una plantilla = clave, rótulo y campos. `ph` = ejemplo que se ve en el campo vacío. `from` = dato de landing.prod que lo prellena; `def` = valor por defecto.
   // Plantilla nueva: sumar su entrada aquí y su texto en `TEXT`.
+  // Una plantilla = una tarjeta aparte en la pestaña: clave, título de la tarjeta y campos. El orden es el de las tarjetas, de izquierda
+  // a derecha; la primera es también la de respaldo en lgTemplate. `ph` = ejemplo que se ve en el campo vacío. `from` = dato de
+  // landing.prod que lo prellena; `def` = valor por defecto; `errMoney` = aviso de un campo de dinero inválido.
+  // Plantilla nueva: sumar su entrada aquí y su texto en `TEXT`; la tarjeta aparece sola.
   const LG_TEMPLATES = [
-    { k: 'guia', label: '🚚 Confirmación guía',
+    { k: 'guia', title: 'Confirmación de Guia',
       fields: [
         { k: 'name', label: 'Nombre del destinatario', type: 'text', ph: 'Ej: Pablo' },
         { k: 'product', label: 'Producto', type: 'text', from: 'name', ph: 'Ej: Omegaxl joint support' },
         { k: 'guide', label: 'Número de guía', type: 'text', ph: 'Ej: 074102602224' },
         { k: 'price', label: 'Precio', type: 'money', from: 'price', ph: 'Ej: $ 97.400' },
         { k: 'address', label: 'Dirección de entrega', type: 'text', ph: 'Ej: Cra 67 # 25 - 34 Itagui - Calatrava' },
+      ] },
+    { k: 'pedido', title: 'Confirmación de Pedidos',
+      fields: [
+        { k: 'name', label: 'Nombre de cliente', type: 'text', ph: 'Ej: Eugenia' },
+        { k: 'product', label: 'Producto', type: 'text', from: 'name', ph: 'Ej: Omegaxl joint support' },
+        { k: 'address', label: 'Dirección de entrega', type: 'text', ph: 'Ej: Colombia 20# 19 .30 - barrio Capri' },
+        { k: 'city', label: 'Ciudad / Municipio', type: 'text', ph: 'Ej: PASTO' },
+        { k: 'dept', label: 'Departamento', type: 'text', ph: 'Ej: NARIÑO' },
+        { k: 'phone', label: 'Teléfono de contacto', type: 'text', ph: 'Ej: 3214566677' },
+        { k: 'total', label: 'Total a pagar (COD - contraentrega)', type: 'money', ph: 'Ej: $ 97.400', errMoney: 'Total mayor a 0' },
       ] },
   ];
 
@@ -48,7 +62,7 @@
       const t = clean(f[fl.k]);
       if (fl.type === 'money') {
         const n = lgMoney(t);
-        if (n != null) values[fl.k] = n; else errors[fl.k] = t ? ERR_MONEY : `Escribe ${fl.label.toLowerCase()}`;
+        if (n != null) values[fl.k] = n; else errors[fl.k] = t ? (fl.errMoney || ERR_MONEY) : `Escribe ${fl.label.toLowerCase()}`;
         continue;
       }
       if (!t) errors[fl.k] = `Escribe ${fl.label.toLowerCase()}`; else values[fl.k] = t;
@@ -66,6 +80,22 @@
 
   // Texto de cada plantilla: recibe los valores ya validados (price = número).
   const TEXT = {
+    pedido: (v) => `¡Hola ${v.name}! 🌟
+
+Acabamos de recibir tu compra del producto -- ${v.product} -- en nuestra tienda ${STORE_BOLD}
+
+El cual será entregado en:
+
+*Dirección:* ${v.address}
+*Ciudad:* ${v.city}
+*Departamento:* ${String(v.dept).toUpperCase()}
+*Teléfono:* ${v.phone}
+*Total a Pagar:* ${peso(v.total)}
+
+El *envío* es totalmente *Gratis* y el pago es *Contra Entrega* para tu seguridad 🛍️🤍
+
+🚚 Por favor *confírmanos* si tus datos son correctos para despachar tu pedido *ahora* 🤍`,
+
     guia: (v) => `*CONFIRMACIÓN GUIA*
 ¡Hola, ${v.name}! 👋 Te saludamos nuevamente de ${STORE_BOLD}.
 

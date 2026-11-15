@@ -25,9 +25,9 @@ Logística va a reunir todo lo del pedido después de la venta: seguimiento, cli
 
 **Parte 2 · Mensajes a clientes**
 
-- Tarjeta `#lg-msgs` con título "Confirmación de Guia" (cambio del usuario tras el paso 4; primero se llamó "Confirmación Pedido"; la tarjeta lleva el nombre de la plantilla, y cada plantilla nueva tendrá la suya) y angosta: `max-width: 400px`, parecida al panel de Prompt buscar anuncios, porque van a sumarse más mensajes y se quiere proporcional. El formulario va en una columna.
-- Selector de plantilla `#lg-tpls` (`data-tpl`, botones tipo `.seg`). Hoy trae una sola plantilla: "🚚 Confirmación guía" (`guia`), elegida al cargar. Agregar otra plantilla = sumar una entrada en `LG_TEMPLATES` y aparece sola en el selector.
-- Formulario de la plantilla elegida (`#lg-form`), con un campo por cada `field` de la plantilla (`#lg-f-<k>`, aviso `#lg-err-<k>`). Para "Confirmación guía":
+- **Una tarjeta por plantilla, lado a lado** (`#lg-cards`; cada una `.lg-card` con id `#lg-card-<k>`), de izquierda a derecha en el orden de `LG_TEMPLATES`: "Confirmación de Guia" (`guia`) y, a su derecha, "Confirmación de Pedidos" (`pedido`). Cada tarjeta es **independiente**: su propio formulario, mensaje, errores y botones; lo escrito en una no pasa a la otra. Son angostas (`max-width: 420px`, parecidas al panel de Prompt buscar anuncios, porque van a sumarse más mensajes y se quiere proporcional) y, si no caben, bajan de fila. Las tarjetas de una misma fila miden lo mismo de alto: el cuadro Mensaje de la que tiene menos campos se alarga y el de la que tiene más queda en su mínimo (230 px). (Cambios del usuario tras el paso 4: el título pasó de "Mensajes a clientes" a "Confirmación de Guia", y la plantilla `pedido` se sumó como tarjeta aparte; antes hubo un selector de plantillas dentro de una sola tarjeta y se quitó.)
+- No hay selector de plantillas. Agregar otra plantilla = sumar una entrada en `LG_TEMPLATES` y su texto en `lgMessage`; su tarjeta aparece sola, a la derecha de las demás.
+- Formulario de cada tarjeta (`#lg-<k>-form`), con un campo por cada `field` de su plantilla (`#lg-<k>-f-<campo>`, aviso `#lg-<k>-err-<campo>`). Para "Confirmación de Guia" (`guia`):
   - Nombre del destinatario (`name`): texto, obligatorio.
   - Producto (`product`): texto, obligatorio. Se prellena con `app.state.landing.prod.name`.
   - Número de guía (`guide`): texto, obligatorio (se acepta cualquier carácter; se recortan espacios).
@@ -37,17 +37,16 @@ Logística va a reunir todo lo del pedido después de la venta: seguimiento, cli
 - Cada campo muestra un ejemplo en gris cuando está vacío (`ph`, formato `Ej: Pablo`), tomado de los datos del mensaje de ejemplo (cambio del usuario tras el paso 4).
 - **Todos los campos son editables**, también los que vienen de Desarrollo.
 - **Prellenado desde Desarrollo:**
-  - Al abrir la pestaña (evento `nav:vista` con `v = 'logistica'`), Producto y Precio se llenan con los de Desarrollo **solo si están vacíos**: no pisan lo que ya escribí.
-  - Botón `#lg-import` "Traer de Desarrollo": sobrescribe Producto y Precio con los de Desarrollo. Si Desarrollo no tiene nombre, avisa en `#toast` y no cambia nada.
-- **Botones** (fila `.lg-acts`):
-  - `#lg-gen` "Generar mensaje": valida; si todo está bien arma el mensaje en `#lg-out` (textarea de solo lectura). Si falta algo, marca los campos (`.lg-bad`, `aria-invalid`, texto en `#lg-err-<k>`), avisa en `#toast` y deja el mensaje anterior.
-  - `#lg-copy` "Copiar mensaje": copia `#lg-out` (`ui.dom.copy`) y avisa en `#toast`. Sin mensaje generado, avisa y no copia.
-  - `#lg-clear` "🧹 Limpiar": vacía Nombre, Número de guía, Dirección y el mensaje; deja Producto y Precio (para el siguiente pedido del mismo producto). No pregunta.
+  - Al abrir la pestaña (evento `nav:vista` con `v = 'logistica'`), los campos que vienen de Desarrollo (`from`) de cada tarjeta se llenan con los de Desarrollo **solo si están vacíos**: no pisan lo que ya escribí (en `guia`, Producto y Precio; en `pedido`, solo Producto).
+  - Botón `#lg-<k>-import` "Traer de Desarrollo" (ícono junto al título de cada tarjeta): sobrescribe los campos `from` de **esa** tarjeta con los de Desarrollo. Si Desarrollo no tiene nombre, avisa en `#toast` y no cambia nada.
+- **Botones** de cada tarjeta (fila `.lg-acts`):
+  - `#lg-<k>-gen` "Generar mensaje": valida; si todo está bien arma el mensaje en `#lg-<k>-out` (textarea de solo lectura). Si falta algo, marca los campos (`.lg-bad`, `aria-invalid`, texto en `#lg-<k>-err-<campo>`), avisa en `#toast` y deja el mensaje anterior.
+  - `#lg-<k>-copy` "Copiar mensaje": copia `#lg-<k>-out` (`ui.dom.copy`) y avisa en `#toast`. Sin mensaje generado, avisa y no copia.
+  - `#lg-<k>-clear` "Limpiar": vacía los datos propios del pedido de esa tarjeta (los campos sin `from`; en `guia`: Nombre, Número de guía y Dirección) y su mensaje; deja el Producto y el Precio (para el siguiente pedido del mismo producto). No pregunta.
 - **El mensaje no se actualiza en vivo**: solo cambia al tocar "Generar mensaje".
-- Cambiar de plantilla vacía el mensaje generado y los errores.
 - Nada se guarda entre sesiones: al recargar los campos arrancan vacíos y Producto/Precio se vuelven a traer al abrir la pestaña.
 
-**Parte 3 · Texto de "Confirmación guía"**
+**Parte 3 · Texto de "Confirmación guía" (`guia`)**
 
 Se respeta tal cual el texto del usuario, incluidos los `*` de negrita de WhatsApp, los emojis y los saltos de línea. Con los datos del ejemplo debe salir exactamente:
 
@@ -69,22 +68,54 @@ El tiempo estimado de entrega es de *2 a 4 días hábiles*.
 - La tienda (`🍃VidanovaStore`) es una constante (`LG_STORE`), no un campo.
 - El precio va en el mensaje sin espacio tras el signo: `$97.400` (miles con punto, sin decimales).
 
+**Parte 3b · Confirmación de Pedidos (`pedido`)**
+
+Campos (`#lg-pedido-f-<k>`), todos obligatorios y editables:
+
+- Nombre de cliente (`name`), texto. Ej: `Eugenia`.
+- Producto (`product`), texto, prellenado desde Desarrollo como en `guia` (su «Traer de Desarrollo» solo toca el Producto). Ej: `Omegaxl joint support`.
+- Dirección de entrega (`address`), texto. Ej: `Colombia 20# 19 .30 - barrio Capri`.
+- Ciudad / Municipio (`city`), texto. Ej: `PASTO`.
+- Departamento (`dept`), texto. Ej: `NARIÑO`. En el mensaje siempre sale en **mayúsculas**, aunque se escriba en minúscula (el campo se deja como se escribió).
+- Teléfono de contacto (`phone`), texto. Ej: `3214566677`.
+- Total a pagar (COD - contraentrega) (`total`), dinero > 0 (aviso «Total mayor a 0»), con el mismo formato que Precio. **No** se trae de Desarrollo (no lo pidió el usuario).
+
+Los datos se ponen tal como se escriben, salvo el Departamento, que va siempre en mayúsculas. Con los datos del ejemplo debe salir exactamente:
+
+```text
+¡Hola Eugenia! 🌟
+
+Acabamos de recibir tu compra del producto -- Omegaxl joint support -- en nuestra tienda 🍃*VidanovaStore*
+
+El cual será entregado en:
+
+*Dirección:* Colombia 20# 19 .30 - barrio Capri
+*Ciudad:* PASTO
+*Departamento:* NARIÑO
+*Teléfono:* 3214566677
+*Total a Pagar:* $97.400
+
+El *envío* es totalmente *Gratis* y el pago es *Contra Entrega* para tu seguridad 🛍️🤍
+
+🚚 Por favor *confírmanos* si tus datos son correctos para despachar tu pedido *ahora* 🤍
+```
+
 **Pruebas y documentación**
 
 - `tests/core.test.js`: plantilla, validación y texto del mensaje (ver Criterios).
-- `tests/smoke.test.js`: 11 pestañas, sub-pestañas, selector de plantilla, prellenado, Generar, Copiar, Limpiar, errores.
+- `tests/smoke.test.js`: 11 pestañas, sub-pestañas, tarjetas por plantilla, prellenado, Generar, Copiar, Limpiar, errores.
 - Agregar `core/logistics.js` a `js/index.js` y regenerar `tests/fixtures/claves-pyl.json`.
 - Después del merge, actualizar `CLAUDE.md` y `README.md`.
 
 **Fuera (otras specs):**
 
-- Más plantillas (confirmación de pedido, novedad, en reparto, etc.): se agregan después, una por una, en `LG_TEMPLATES`.
+- Más plantillas aparte de `pedido` y `guia` (novedad, en reparto, etc.): se agregan después, una por una, en `LG_TEMPLATES`.
 - Editor de plantillas en la app (crear, editar o borrar plantillas propias).
 - Seguimiento de pedidos, clientes y entregas (la sub-pestaña `track` solo se anuncia).
 - Abrir WhatsApp (`wa.me`) o pedir el teléfono del cliente.
 - Calcular el precio por unidades (ofertas 1/2/3 de Releasit).
 - Traer datos del pedido desde el reporte de Dropi o desde el MCP de Dropi.
-- Guardar los campos, la plantilla elegida o un historial de mensajes enviados.
+- Guardar los campos o un historial de mensajes enviados.
 - Separar dirección y ciudad.
 
 ## Modelo de datos
@@ -105,8 +136,8 @@ const LG_PARTS = [
   { k: 'msgs',  label: '💬 Mensajes a clientes' },
   { k: 'track', label: '📦 Seguimiento de pedidos · pronto', disabled: true },
 ];
-const LG_TEMPLATES = [
-  { k: 'guia', label: '🚚 Confirmación guía',
+const LG_TEMPLATES = [ // una tarjeta por plantilla, de izquierda a derecha; la primera es también la de respaldo en lgTemplate
+  { k: 'guia', title: 'Confirmación de Guia',
     fields: [
       { k: 'name',    label: 'Nombre del destinatario', type: 'text', ph: 'Ej: Pablo' },
       { k: 'product', label: 'Producto',                type: 'text',  from: 'name', ph: 'Ej: Omegaxl joint support' },  // landing.prod.name
@@ -114,6 +145,8 @@ const LG_TEMPLATES = [
       { k: 'price',   label: 'Precio',                  type: 'money', from: 'price', ph: 'Ej: $ 97.400' }, // landing.prod.price
       { k: 'address', label: 'Dirección de entrega',    type: 'text', ph: 'Ej: Cra 67 # 25 - 34 Itagui - Calatrava' },
     ] },
+  { k: 'pedido', title: 'Confirmación de Pedidos',
+    fields: [/* Parte 3b: name, product (from: 'name'), address, city, dept, phone, total (money, errMoney: 'Total mayor a 0') */] },
 ];
 ```
 
@@ -121,22 +154,23 @@ Funciones (puras):
 
 - `lgTemplate(k)` → la plantilla con esa clave; una clave desconocida cae en la primera.
 - `lgMoney(text)` → número en pesos o `null` (`'97.400'`, `'$ 97.400'`, `'97400'` → `97400`; vacío o `0` → `null`).
-- `lgValues(tpl, form)` → `{ ok, values, errors }`. Recorta espacios; vacío = error «Escribe …»; `money` inválido o ≤ 0 = error «Precio mayor a 0».
+- `lgValues(tpl, form)` → `{ ok, values, errors }`. Recorta espacios; vacío = error «Escribe …»; `money` inválido o ≤ 0 = error «Precio mayor a 0» (o el `errMoney` del campo, p. ej. «Total mayor a 0»).
 - `lgPrefill(prod)` → `{ product, price }` desde `landing.prod` (`name`, `price`); faltantes = `''`/`null`.
-- `lgMessage(k, values)` → el texto de la Parte 3 con los valores puestos (`price` formateado `$97.400`).
+- `lgMessage(k, values)` → el texto de la plantilla `k` (Parte 3 o 3b) con los valores puestos (el dinero formateado `$97.400`).
 
 ### Estado (`app.state.logistics`, no se guarda)
 
 ```js
 { part: 'msgs',   // sub-pestaña abierta
-  tpl: 'guia',    // plantilla elegida
-  form: { name: '', product: '', guide: '', price: '', address: '' },
-  last: '' }      // último mensaje generado
+  cards: {        // una entrada por plantilla (clave = `k` de LG_TEMPLATES)
+    guia:   { form: { name: '', product: '', guide: '', price: '', address: '' }, last: '' },
+    pedido: { form: { name: '', product: '', address: '', city: '', dept: '', phone: '', total: '' }, last: '' },
+  } }             // form = lo escrito; last = último mensaje generado
 ```
 
 ### Ids y clases (prefijo `#lg-`/`.lg-`)
 
-`#lg-parts`, `#lg-msgs`, `#lg-tpls`, `#lg-form`, `#lg-f-<k>`, `#lg-err-<k>`, `#lg-import`, `#lg-gen`, `#lg-copy`, `#lg-clear`, `#lg-out`, `.lg-acts`, `.lg-bad`, `#lg-soon` (si la sub-pestaña `track` necesita tarjeta: no se muestra porque está deshabilitada).
+`#lg-parts`, `#lg-cards`, `.lg-card`, `#lg-card-<k>`, y por tarjeta (con `<k>` = `guia` o `pedido`): `#lg-<k>-form`, `#lg-<k>-f-<campo>`, `#lg-<k>-err-<campo>`, `#lg-<k>-import`, `#lg-<k>-gen`, `#lg-<k>-copy`, `#lg-<k>-clear`, `#lg-<k>-out`; clases `.lg-acts`, `.lg-bad`. Cada tarjeta lleva su clave en el id para que dos tarjetas no repitan ids. `#lg-soon` (si la sub-pestaña `track` necesita tarjeta: no se muestra porque está deshabilitada).
 
 ### Dependencias
 
@@ -146,10 +180,10 @@ Funciones (puras):
 
 Pruebas primero en cada paso: se escriben, fallan y luego se hace el código.
 
-1. **Núcleo.** Pruebas en Node: `lgTemplate('x')` cae en `guia`; `lgMoney` con `'97.400'`, `'$ 97.400'`, `'97400'`, `''`, `'0'`, `'abc'`; `lgValues` marca cada campo vacío y el precio inválido, y con todo bien da `ok: true`; `lgPrefill({ name: 'Omegaxl joint support', price: 97400 })`; `lgMessage('guia', ejemplo)` es idéntico al texto de la Parte 3. Luego `core/logistics.js`, su `<script>` y su línea en `js/index.js`.
+1. **Núcleo.** Pruebas en Node: `lgTemplate('x')` cae en la primera (`pedido`); `lgMoney` con `'97.400'`, `'$ 97.400'`, `'97400'`, `''`, `'0'`, `'abc'`; `lgValues` marca cada campo vacío y el precio inválido, y con todo bien da `ok: true`; `lgPrefill({ name: 'Omegaxl joint support', price: 97400 })`; `lgMessage('guia', ejemplo)` es idéntico al texto de la Parte 3 y `lgMessage('pedido', ejemplo)` al de la Parte 3b. Luego `core/logistics.js`, su `<script>` y su línea en `js/index.js`.
 2. **Pestaña y sub-pestañas.** Humo: 11 pestañas y "Logística" justo después de "Escalado"; `#v-logistica` con encabezado; `#lg-parts` con `msgs` abierta y `track` deshabilitada (un clic no la abre). Luego el botón y la vista en `index.html`, `ui/logistics.js` (`parts`), `app/logistics.js`, `logistics.css`.
-3. **Formulario y prellenado.** Humo: selector con "Confirmación guía" elegido; 5 campos (sin tiempo de entrega); con `landing.prod` lleno, abrir la pestaña llena Producto y Precio; si ya escribí Producto no lo pisa; `#lg-import` sí lo pisa; sin producto en Desarrollo avisa. Luego `ui.logistics.form` y su lógica en `app`.
-4. **Generar, copiar y limpiar.** Humo: Generar con campos vacíos marca `.lg-bad` y no cambia `#lg-out`; con todo lleno `#lg-out` = `lgMessage`; escribir después no cambia `#lg-out`; Copiar sin mensaje avisa; Limpiar vacía nombre, guía, dirección y mensaje, y deja producto, precio y días. Luego botones en `ui` y `app`, y estilos.
+3. **Formulario y prellenado.** Humo: dos tarjetas, Guia a la izquierda y Pedidos a su derecha; 5 campos (sin tiempo de entrega); con `landing.prod` lleno, abrir la pestaña llena Producto y Precio; si ya escribí Producto no lo pisa; `#lg-import` sí lo pisa; sin producto en Desarrollo avisa. Luego `ui.logistics.card` y su lógica en `app`.
+4. **Generar, copiar y limpiar.** Humo: Generar con campos vacíos marca `.lg-bad` y no cambia `#lg-<k>-out`; con todo lleno `#lg-<k>-out` = `lgMessage`; escribir después no cambia el mensaje; Copiar sin mensaje avisa; Limpiar vacía los datos del pedido y el mensaje, y deja el producto (y el precio). Luego botones en `ui` y `app`, y estilos.
 5. **Revisión visual.** En el navegador: 7 temas, pantalla angosta, copiar y pegar en WhatsApp Web (negritas y emojis bien).
 6. **Documentación.** Después del merge, `CLAUDE.md` y `README.md`: pestaña Logística, módulo `logistics`, ids `#lg-`, dependencias, orden de `<script>` y `<link>`.
 
@@ -160,7 +194,9 @@ Pruebas primero en cada paso: se escriben, fallan y luego se hace el código.
 - [ ] Muestra las sub-pestañas "💬 Mensajes a clientes" (abierta) y "📦 Seguimiento de pedidos · pronto" (deshabilitada, no se puede abrir).
 
 **Mensajes a clientes**
-- [ ] El selector de plantillas muestra "🚚 Confirmación guía", elegida al cargar.
+- [ ] La pestaña muestra dos tarjetas separadas, lado a lado: "Confirmación de Guia" y, justo a su derecha, "Confirmación de Pedidos". No hay selector de plantillas.
+- [ ] Las tarjetas son independientes: lo escrito, los errores y el mensaje de una no cambian la otra, y cada una tiene sus propios botones.
+- [ ] "Confirmación de Pedidos" pide los 7 campos de la Parte 3b, trae el Producto de Desarrollo (el Total no) y, con los datos del ejemplo, genera el texto de la Parte 3b.
 - [ ] El formulario pide Nombre del destinatario, Producto, Número de guía, Precio y Dirección de entrega (el tiempo de entrega, `2 a 4`, va fijo en el mensaje).
 - [ ] Al abrir la pestaña, Producto y Precio vacíos se llenan con el nombre y el precio de "Producto que estoy montando" (Desarrollo).
 - [ ] Si ya escribí Producto o Precio, abrir la pestaña no los cambia; "Traer de Desarrollo" sí.
@@ -170,13 +206,13 @@ Pruebas primero en cada paso: se escriben, fallan y luego se hace el código.
 - [ ] Con los datos del ejemplo, el mensaje generado es idéntico al de la Parte 3 (tienda, `*`, emojis, saltos de línea y `$97.400`).
 - [ ] Editar un campo después de generar no cambia el mensaje hasta volver a tocar "Generar mensaje".
 - [ ] "Copiar mensaje" lo copia y avisa; sin mensaje avisa y no copia.
-- [ ] "🧹 Limpiar" vacía nombre, guía, dirección y mensaje, y deja producto y precio.
+- [ ] "Limpiar" vacía los datos del pedido y el mensaje de su tarjeta (en Guia: nombre, guía y dirección), y deja producto y precio.
 - [ ] Al recargar no queda nada guardado de esta pestaña.
 - [ ] Pegado en WhatsApp Web, las partes con `*` salen en negrita y los emojis se ven.
 
 **Calidad**
 - [ ] El texto de la plantilla vive solo en `core/logistics.js`; la UI no escribe partes del mensaje.
-- [ ] Agregar una plantilla nueva solo exige una entrada en `LG_TEMPLATES` y su texto en `lgMessage`.
+- [ ] Agregar una plantilla nueva solo exige una entrada en `LG_TEMPLATES` y su texto en `lgMessage`; su tarjeta aparece sola.
 - [ ] Ids `#lg-` únicos en la página; ningún nombre `lg*`/`LG_*` choca al aplanar `js/index.js`.
 - [ ] Ningún módulo existente cambia de comportamiento (Desarrollo solo se lee).
 - [ ] Pasan `node tests/core.test.js`, `tests/smoke.test.js` y `node --check` de cada archivo tocado; consola limpia; `claves-pyl.json` coincide con `--claves`.
@@ -187,7 +223,8 @@ Pruebas primero en cada paso: se escriben, fallan y luego se hace el código.
 - **Sí:** pestaña propia "Logística" después de "Escalado" (decisión del usuario, por ahora). Ahí crecerán seguimiento, clientes y entregas.
 - **Sí:** bloque "Mensajes a clientes" como sub-pestaña, con "Seguimiento de pedidos · pronto" deshabilitada (decisión del usuario). Mismo patrón que Testeo.
 - **Sí:** plantillas fijas en código (decisión del usuario). **No:** editor de plantillas en la app: más grande y hoy no hace falta.
-- **Sí:** solo "Confirmación guía" en esta spec (decisión del usuario); el selector queda listo para las siguientes. **No:** las demás plantillas ahora.
+- **Sí:** "Confirmación guía" y, a pedido del usuario tras el paso 4, "Confirmación de Pedidos" (otros campos y otro texto), cada una en su **propia tarjeta**, una al lado de la otra (la de Pedidos a la derecha). **No:** un selector de plantillas dentro de una sola tarjeta (se probó y el usuario pidió tarjetas aparte); las demás plantillas ahora.
+- **Sí:** el total de "Confirmación de Pedidos" es un campo propio (`total`), sin prellenar: el usuario solo pidió traer el Producto de la app.
 - **Sí:** producto y precio de "Producto que estoy montando" en Desarrollo (`landing.prod`) (decisión del usuario). **No:** Mi candidato: es un producto aún en evaluación.
 - **Sí:** prellenar solo campos vacíos al abrir y botón "Traer de Desarrollo" para pisar. **No:** pisar siempre: borraría un precio que cambié a mano.
 - **Sí:** tienda fija en `LG_STORE` y tiempo de entrega fijo `LG_DAYS` = `2 a 4` (decisión del usuario, revisada tras el paso 4: no varía, así que no es un campo; antes era un campo editable).
@@ -212,7 +249,7 @@ Pruebas primero en cada paso: se escriben, fallan y luego se hace el código.
 
 ## Lo que **no** está en esta spec
 
-- Más plantillas y editor de plantillas.
+- Más plantillas (aparte de `pedido` y `guia`) y editor de plantillas.
 - Seguimiento de pedidos, clientes y entregas.
 - WhatsApp directo (`wa.me`) o teléfono del cliente.
 - Precio por unidades (ofertas de Releasit).

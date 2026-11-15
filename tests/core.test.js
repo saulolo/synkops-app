@@ -1110,8 +1110,10 @@ caso('cheat: el núcleo no escribe números de métricas a mano', () => {
   for (const n of ['20000', '6000', '800', '4000', '5000', '12000', '15000']) assert.ok(!new RegExp('\\b' + n + '\\b').test(src.replace(/\/\/.*$/gm, '')), 'sin ' + n + ' a mano');
 });
 
-caso('logistics: lgTemplate cae en guia con una clave desconocida', () => {
-  assert.strictEqual(core.lgTemplate('guia').k, 'guia');
+caso('logistics: lgTemplate cae en la primera con una clave desconocida', () => {
+  assert.deepStrictEqual(core.LG_TEMPLATES.map((t) => t.k), ['guia', 'pedido'], 'Una tarjeta por plantilla: Guia a la izquierda y Pedidos a su derecha');
+  assert.deepStrictEqual(core.LG_TEMPLATES.map((t) => t.title), ['Confirmación de Guia', 'Confirmación de Pedidos']);
+  assert.strictEqual(core.lgTemplate('pedido').k, 'pedido');
   assert.strictEqual(core.lgTemplate('x').k, 'guia');
   assert.strictEqual(core.lgTemplate().k, 'guia');
   assert.deepStrictEqual(core.lgTemplate('guia').fields.map((f) => f.k), ['name', 'product', 'guide', 'price', 'address']);
@@ -1156,6 +1158,55 @@ caso('logistics: lgPrefill toma nombre y precio de landing.prod', () => {
   assert.deepStrictEqual(core.lgPrefill(null), { product: '', price: null });
 });
 
+const PEDIDO = { name: 'Eugenia', product: 'Omegaxl joint support', address: 'Colombia 20# 19 .30 - barrio Capri', city: 'PASTO', dept: 'NARIÑO', phone: '3214566677', total: 97400 };
+
+caso('logistics: Confirmación de Pedidos pide sus 7 campos con ejemplo', () => {
+  const f = core.lgTemplate('pedido').fields;
+  assert.deepStrictEqual(f.map((x) => x.k), ['name', 'product', 'address', 'city', 'dept', 'phone', 'total']);
+  assert.deepStrictEqual(f.map((x) => x.label), ['Nombre de cliente', 'Producto', 'Dirección de entrega', 'Ciudad / Municipio', 'Departamento', 'Teléfono de contacto', 'Total a pagar (COD - contraentrega)']);
+  assert.deepStrictEqual(f.map((x) => x.ph), ['Ej: Eugenia', 'Ej: Omegaxl joint support', 'Ej: Colombia 20# 19 .30 - barrio Capri', 'Ej: PASTO', 'Ej: NARIÑO', 'Ej: 3214566677', 'Ej: $ 97.400']);
+  assert.deepStrictEqual(f.filter((x) => x.from).map((x) => [x.k, x.from]), [['product', 'name']], 'Solo el producto viene de Desarrollo');
+  assert.strictEqual(f.find((x) => x.k === 'total').type, 'money');
+});
+
+caso('logistics: lgValues de Confirmación de Pedidos', () => {
+  const tpl = core.lgTemplate('pedido');
+  const vacio = core.lgValues(tpl, {});
+  assert.deepStrictEqual(Object.keys(vacio.errors).sort(), ['address', 'city', 'dept', 'name', 'phone', 'product', 'total']);
+  const base = { name: ' Eugenia ', product: 'Omegaxl joint support', address: 'Colombia 20# 19 .30 - barrio Capri', city: 'PASTO', dept: 'NARIÑO', phone: ' 3214566677 ', total: '$ 97.400' };
+  const ok = core.lgValues(tpl, base);
+  assert.strictEqual(ok.ok, true);
+  assert.deepStrictEqual(ok.values, PEDIDO, 'Recorta espacios y lee el total en pesos');
+  assert.strictEqual(core.lgValues(tpl, { ...base, total: 'abc' }).errors.total, 'Total mayor a 0');
+  assert.strictEqual(core.lgValues(tpl, { ...base, total: '0' }).errors.total, 'Total mayor a 0');
+  assert.strictEqual(core.lgValues(core.lgTemplate('guia'), { price: 'abc' }).errors.price, 'Precio mayor a 0', 'Confirmación guía sigue con su aviso');
+});
+
+caso('logistics: lgMessage de Confirmación de Pedidos es el de la spec', () => {
+  const esperado = [
+    '¡Hola Eugenia! 🌟',
+    '',
+    'Acabamos de recibir tu compra del producto -- Omegaxl joint support -- en nuestra tienda 🍃*VidanovaStore*',
+    '',
+    'El cual será entregado en:',
+    '',
+    '*Dirección:* Colombia 20# 19 .30 - barrio Capri',
+    '*Ciudad:* PASTO',
+    '*Departamento:* NARIÑO',
+    '*Teléfono:* 3214566677',
+    '*Total a Pagar:* $97.400',
+    '',
+    'El *envío* es totalmente *Gratis* y el pago es *Contra Entrega* para tu seguridad 🛍️🤍',
+    '',
+    '🚚 Por favor *confírmanos* si tus datos son correctos para despachar tu pedido *ahora* 🤍',
+  ].join('\n');
+  assert.strictEqual(core.lgMessage('pedido', PEDIDO), esperado);
+  assert.ok(core.lgMessage('pedido', { ...PEDIDO, total: 1234567 }).includes('*Total a Pagar:* $1.234.567'));
+  for (const d of ['nariño', 'Nariño', 'narino', 'NARIÑO']) assert.ok(core.lgMessage('pedido', { ...PEDIDO, dept: d }).includes('*Departamento:* ' + d.toUpperCase()), 'El departamento siempre en mayúsculas: ' + d);
+  assert.ok(core.lgMessage('pedido', { ...PEDIDO, city: 'cali' }).includes('*Ciudad:* cali'), 'La ciudad se deja como se escribe');
+  assert.notStrictEqual(core.lgMessage('pedido', PEDIDO), core.lgMessage('guia', PEDIDO), 'No es la misma plantilla que Confirmación guía');
+});
+
 caso('logistics: lgMessage es idéntico al texto de la spec', () => {
   const esperado = [
     '*CONFIRMACIÓN GUIA*',
@@ -1173,7 +1224,7 @@ caso('logistics: lgMessage es idéntico al texto de la spec', () => {
   ].join('\n');
   const v = { name: 'Pablo', product: 'Omegaxl joint support', guide: '074102602224', price: 97400, address: 'Cra 67 # 25 - 34 Itagui - Calatrava', days: '9 a 9' };
   assert.strictEqual(core.lgMessage('guia', v), esperado, 'Aunque llegue otro days, el mensaje usa el fijo');
-  assert.strictEqual(core.lgMessage('x', v), esperado);
+  assert.strictEqual(core.lgMessage('x', v), esperado, 'Una clave desconocida cae en la primera plantilla');
   assert.ok(core.lgMessage('guia', { ...v, price: 1234567 }).includes('*$1.234.567*'));
   assert.ok(core.LG_STORE.includes('VidanovaStore'));
 });

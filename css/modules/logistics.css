@@ -9,9 +9,11 @@
 .lg-acts{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
 .lg-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 .lg-import{flex:none;padding:7px 9px}
-/* Tarjeta angosta, del tamaño del panel de Prompt buscar anuncios: habrá más plantillas y se quiere proporcional. */
-#lg-msgs{max-width:420px}
-#lg-tpls{flex-wrap:wrap;max-width:100%}
+/* Una tarjeta por plantilla, lado a lado. Cada una es angosta, del tamaño del panel de Prompt buscar anuncios; si no caben, bajan de fila. */
+/* Las dos tarjetas miden lo mismo de alto (align-items:stretch): la que tiene menos campos reparte lo que le sobra al cuadro Mensaje (flex:1), que en la de más campos queda en su mínimo. */
+.lg-cards{display:flex;flex-wrap:wrap;gap:18px;align-items:stretch;margin-top:16px}
+.lg-cards[hidden]{display:none}
+.lg-card{flex:1 1 340px;max-width:420px;min-width:0;display:flex;flex-direction:column}
 .lg-form{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin-top:12px}
 .lg-cell{display:flex;flex-direction:column;gap:4px;min-width:0}
 .lg-lab{font-size:12.5px;font-weight:600;color:var(--muted)}
@@ -23,17 +25,15 @@
 .lg-err:empty{display:none}
 
 /* ---------- Mensaje generado ---------- */
-.lg-out{display:flex;flex-direction:column;gap:6px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.lg-out{display:flex;flex-direction:column;flex:1;gap:6px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
 .lg-out label{font-size:12.5px;font-weight:600;color:var(--muted)}
-.lg-out textarea{width:100%;box-sizing:border-box;min-height:240px;resize:vertical;background:var(--bg-2);border:1px solid var(--line-2);border-radius:10px;padding:10px 12px;font:inherit;font-size:13.5px;line-height:1.5;color:var(--ink);white-space:pre-wrap}
+.lg-out textarea{width:100%;box-sizing:border-box;flex:1 1 0;min-height:230px;resize:none;background:var(--bg-2);border:1px solid var(--line-2);border-radius:10px;padding:10px 12px;font:inherit;font-size:13.5px;line-height:1.5;color:var(--ink);white-space:pre-wrap}
 .lg-out textarea::placeholder{color:var(--soft)}
 .lg-out textarea:focus{outline:none;border-color:var(--b);box-shadow:0 0 0 3px var(--b-bg)}
 
 /* Los tres botones del mensaje van en una sola fila. */
 .lg-out .lg-acts{flex-wrap:nowrap;gap:6px}
 .lg-out .lg-acts .btn{flex:1 1 auto;padding:8px 8px;gap:6px;white-space:nowrap}
-/* Con una sola plantilla el selector no aporta: se oculta y aparece solo cuando haya dos o más. */
-#lg-tpls[hidden]{display:none}
 
 /* ---------- Íconos de los botones: dos tonos y animación al pasar el mouse ---------- */
 .lg-ic{display:inline-flex;flex:none}
@@ -49,12 +49,12 @@
 @keyframes lg-twinkle{0%{transform:scale(.55);opacity:.5}100%{transform:scale(1.25);opacity:1}}
 @keyframes lg-dust{0%{transform:translate(0,0);opacity:0}40%{opacity:1}100%{transform:translate(-2px,2px);opacity:0}}
 .lg-import:hover .lg-i-a{animation:lg-bob .7s ease-in-out infinite}
-#lg-clear:hover .lg-i-a{animation:lg-sweep .55s ease-in-out infinite}
-#lg-clear:hover .lg-i-d{animation:lg-dust .55s ease-out infinite}
-#lg-copy:hover .lg-i-a{transform:translate(1.6px,1.6px)}
-#lg-copy:hover .lg-i-b{transform:translate(-1.4px,-1.4px)}
-#lg-gen:hover .lg-i-a{animation:lg-pulse .9s ease-in-out infinite}
-#lg-gen:hover .lg-i-b{animation:lg-twinkle .6s ease-in-out infinite alternate}
-#lg-gen:hover .lg-i-d{opacity:1;animation:lg-twinkle .6s .2s ease-in-out infinite alternate}
-.lg-import:active .lg-ic,#lg-clear:active .lg-ic,#lg-copy:active .lg-ic,#lg-gen:active .lg-ic{transform:scale(.88)}
+.lg-clear:hover .lg-i-a{animation:lg-sweep .55s ease-in-out infinite}
+.lg-clear:hover .lg-i-d{animation:lg-dust .55s ease-out infinite}
+.lg-copy:hover .lg-i-a{transform:translate(1.6px,1.6px)}
+.lg-copy:hover .lg-i-b{transform:translate(-1.4px,-1.4px)}
+.lg-gen:hover .lg-i-a{animation:lg-pulse .9s ease-in-out infinite}
+.lg-gen:hover .lg-i-b{animation:lg-twinkle .6s ease-in-out infinite alternate}
+.lg-gen:hover .lg-i-d{opacity:1;animation:lg-twinkle .6s .2s ease-in-out infinite alternate}
+.lg-import:active .lg-ic,.lg-clear:active .lg-ic,.lg-copy:active .lg-ic,.lg-gen:active .lg-ic{transform:scale(.88)}
 @media (prefers-reduced-motion:reduce){.lg-ic *{animation:none!important;transition:none!important}}

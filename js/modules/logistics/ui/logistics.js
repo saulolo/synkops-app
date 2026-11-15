@@ -1,4 +1,4 @@
-// Logística (SPEC 13): pintado de las sub-pestañas, el selector de plantilla y el formulario del mensaje.
+// Logística (SPEC 13): pintado de las sub-pestañas y de una tarjeta por plantilla (formulario, mensaje y botones).
 // Recibe datos y callbacks; no toca el estado de la app.
 (() => {
   const PYL = globalThis.PYL;
@@ -15,37 +15,6 @@
       b.setAttribute('aria-pressed', String(p.k === current));
       b.addEventListener('click', () => onPick(p.k));
       node.append(b);
-    }
-  }
-
-  // Selector de plantilla (.seg): un botón por plantilla, la elegida con aria-pressed.
-  function templates(node, list, current, onPick) {
-    node.textContent = '';
-    for (const t of list) {
-      const b = el('button', null, t.label);
-      b.type = 'button';
-      b.dataset.tpl = t.k;
-      b.setAttribute('aria-pressed', String(t.k === current));
-      b.addEventListener('click', () => onPick(t.k));
-      node.append(b);
-    }
-  }
-
-  // Formulario de la plantilla: un campo por `field` (#lg-f-<k>) con su aviso (#lg-err-<k>).
-  // values = textos actuales; on = { change(k, text), blur(k) }.
-  function form(node, tpl, values, on) {
-    node.textContent = '';
-    for (const f of tpl.fields) {
-      const cell = el('div', 'lg-cell');
-      const lab = el('label', 'lg-lab', f.label); lab.htmlFor = 'lg-f-' + f.k;
-      const x = el('input'); x.type = 'text'; x.id = 'lg-f-' + f.k; x.autocomplete = 'off'; x.placeholder = f.ph || '';
-      if (f.type === 'money') x.inputMode = 'numeric';
-      x.value = values[f.k] || '';
-      x.addEventListener('input', () => on.change(f.k, x.value));
-      x.addEventListener('blur', () => on.blur(f.k));
-      const err = el('small', 'lg-err'); err.id = 'lg-err-' + f.k; err.setAttribute('role', 'alert');
-      cell.append(lab, x, err);
-      node.append(cell);
     }
   }
 
@@ -74,25 +43,76 @@
     }
   }
 
+  // Una tarjeta por plantilla: título con el botón «Traer de Desarrollo», un campo por `field`, el mensaje y los botones.
+  // Los ids llevan la clave de la plantilla (#lg-<k>-f-<campo>, #lg-<k>-err-<campo>, #lg-<k>-out, #lg-<k>-gen…) para que
+  // dos tarjetas no repitan ids. values = textos actuales del formulario.
+  // on = { change(k, text), blur(k), importar(), generate(), copy(), clear() }.
+  function card(tpl, values, on) {
+    const id = (s) => 'lg-' + tpl.k + '-' + s;
+    const c = el('section', 'card lg-card');
+    c.id = 'lg-card-' + tpl.k;
+    c.dataset.tpl = tpl.k;
+
+    const head = el('div', 'lg-head');
+    const imp = el('button', 'btn ghost sm lg-import'); imp.type = 'button'; imp.id = id('import'); imp.dataset.ic = 'import';
+    imp.title = 'Traer de Desarrollo: pone el producto de «Producto que estoy montando»'; imp.setAttribute('aria-label', 'Traer de Desarrollo');
+    imp.addEventListener('click', on.importar);
+    head.append(el('h2', null, tpl.title), imp);
+
+    const form = el('div', 'lg-form'); form.id = id('form');
+    for (const f of tpl.fields) {
+      const cell = el('div', 'lg-cell');
+      const lab = el('label', 'lg-lab', f.label); lab.htmlFor = id('f-' + f.k);
+      const x = el('input'); x.type = 'text'; x.id = id('f-' + f.k); x.dataset.k = f.k; x.autocomplete = 'off'; x.placeholder = f.ph || '';
+      if (f.type === 'money') x.inputMode = 'numeric';
+      x.value = values[f.k] || '';
+      x.addEventListener('input', () => on.change(f.k, x.value));
+      x.addEventListener('blur', () => on.blur(f.k));
+      const err = el('small', 'lg-err'); err.id = id('err-' + f.k); err.dataset.err = f.k; err.setAttribute('role', 'alert');
+      cell.append(lab, x, err);
+      form.append(cell);
+    }
+
+    const out = el('div', 'lg-out');
+    const lab = el('label', null, 'Mensaje'); lab.htmlFor = id('out');
+    const ta = el('textarea'); ta.id = id('out'); ta.readOnly = true; ta.rows = 14;
+    ta.placeholder = 'Toca «Generar mensaje» para armarlo con estos datos.';
+    const acts = el('div', 'lg-acts');
+    const btn = (cls, k, text, fn, title) => {
+      const b = el('button', 'btn sm ' + cls, text); b.type = 'button'; b.id = id(k); b.dataset.ic = k;
+      if (title) b.title = title;
+      b.addEventListener('click', fn);
+      return b;
+    };
+    acts.append(
+      btn('ghost lg-clear', 'clear', 'Limpiar', on.clear, 'Vacía los datos de este pedido y el mensaje; deja el producto'),
+      btn('ghost lg-copy', 'copy', 'Copiar mensaje', on.copy),
+      btn('lg-gen', 'gen', 'Generar mensaje', on.generate));
+    out.append(lab, ta, acts);
+
+    c.append(head, el('p', 'muted b-sub', 'Armo el mensaje con los datos del pedido y lo copio para pegarlo en WhatsApp.'), form, out);
+    icons(c);
+    return c;
+  }
+
   // Escribe un valor en su campo (al prellenar, importar o dar formato).
   function setField(node, k, text) {
-    const x = node.querySelector('#lg-f-' + k);
+    const x = node.querySelector('input[data-k="' + k + '"]');
     if (x) x.value = text;
   }
 
   // Marca los campos con error ({ campo: mensaje }) y limpia el resto.
   function errors(node, errs) {
-    for (const x of node.querySelectorAll('input')) {
-      const k = x.id.replace('lg-f-', ''), bad = !!errs[k];
+    for (const x of node.querySelectorAll('input[data-k]')) {
+      const bad = !!errs[x.dataset.k];
       x.classList.toggle('lg-bad', bad);
       if (bad) x.setAttribute('aria-invalid', 'true'); else x.removeAttribute('aria-invalid');
-      const e = node.querySelector('#lg-err-' + k);
-      if (e) e.textContent = errs[k] || '';
     }
+    for (const e of node.querySelectorAll('[data-err]')) e.textContent = errs[e.dataset.err] || '';
   }
 
-  // Muestra el mensaje generado ('' = vacío) en el cuadro de solo lectura.
-  function message(node, text) { node.value = text; }
+  // Muestra el mensaje generado ('' = vacío) en el cuadro de solo lectura de la tarjeta.
+  function message(node, text) { node.querySelector('textarea').value = text; }
 
-  PYL.ui.logistics = { parts, templates, form, setField, errors, message, icons };
+  PYL.ui.logistics = { parts, card, setField, errors, message, icons };
 })();

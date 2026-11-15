@@ -400,7 +400,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   assert.deepStrictEqual(tabs.map((b) => b.dataset.v).slice(6, 9), ['escalado', 'logistica', 'escalera'], 'Logística va justo después de Escalado');
   assert.strictEqual(tabs.find((b) => b.dataset.v === 'logistica').textContent, 'Logística');
   assert.strictEqual(text('#v-logistica h1'), 'Logística');
-  assert.strictEqual(text('#lg-msgs h2'), 'Confirmación de Guia', 'Título de la tarjeta');
+  assert.strictEqual(text('#lg-card-guia h2'), 'Confirmación de Guia', 'Título de la tarjeta');
   assert.ok(text('#v-logistica .eyebrow').includes('Después de la venta · hablo con mis clientes'), 'Eyebrow de Logística');
   assert.ok(text('#v-logistica .lead').includes('seguimiento') && text('#v-logistica .lead').includes('mensajes a clientes'), 'Lead de Logística');
   const lgPartes = [...document.querySelectorAll('#lg-parts [data-part]')];
@@ -408,62 +408,134 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   assert.deepStrictEqual(lgPartes.map((b) => b.textContent), ['💬 Mensajes a clientes', '📦 Seguimiento de pedidos · pronto']);
   assert.deepStrictEqual(lgPartes.map((b) => b.disabled), [false, true], 'Seguimiento está deshabilitado');
   assert.strictEqual(lgPartes[0].getAttribute('aria-pressed'), 'true');
-  assert.ok(!document.querySelector('#lg-msgs').hidden, 'Mensajes abre al cargar');
+  assert.ok(!document.querySelector('#lg-cards').hidden, 'Mensajes abre al cargar');
   lgPartes[1].click();
   assert.strictEqual(PYL.app.state.logistics.part, 'msgs', 'Un clic en Seguimiento no lo abre');
-  assert.ok(!document.querySelector('#lg-msgs').hidden && document.querySelector('#lg-parts [aria-pressed="true"]').dataset.part === 'msgs');
+  assert.ok(!document.querySelector('#lg-cards').hidden && document.querySelector('#lg-parts [aria-pressed="true"]').dataset.part === 'msgs');
 
   // 8d. Logística · formulario y prellenado desde Desarrollo (SPEC 13, paso 3).
   {
     const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
     const lgS = PYL.app.state.logistics, landing = PYL.app.state.landing;
-    const tpls = $$('#lg-tpls [data-tpl]');
-    assert.deepStrictEqual(tpls.map((b) => [b.dataset.tpl, b.textContent, b.getAttribute('aria-pressed')]), [['guia', '🚚 Confirmación guía', 'true']], 'Selector con una plantilla elegida');
-    assert.ok($('#lg-tpls').hidden, 'Con una sola plantilla el selector se oculta');
+    assert.deepStrictEqual($$('#lg-cards .lg-card').map((c) => [c.id, c.querySelector('h2').textContent]), [['lg-card-guia', 'Confirmación de Guia'], ['lg-card-pedido', 'Confirmación de Pedidos']], 'Dos tarjetas separadas: Guia a la izquierda y Pedidos a su derecha');
+    assert.ok(!$('#lg-tpls') && !$$('#lg-cards [data-tpl]').some((n) => n.tagName === 'BUTTON'), 'Ya no hay selector de plantilla: cada plantilla es su tarjeta');
+    const ids = $$('#lg-cards [id]').map((n) => n.id);
+    assert.strictEqual(new Set(ids).size, ids.length, 'Ids únicos entre las dos tarjetas');
     const campos = ['name', 'product', 'guide', 'price', 'address'];
-    assert.deepStrictEqual($$('#lg-form input').map((i) => i.id), campos.map((k) => 'lg-f-' + k), '5 campos en orden (el tiempo de entrega es fijo)');
-    assert.deepStrictEqual($$('#lg-form label').map((l) => l.textContent), ['Nombre del destinatario', 'Producto', 'Número de guía', 'Precio', 'Dirección de entrega']);
-    assert.ok(!$('#lg-f-days'), 'No hay campo de tiempo de entrega');
-    assert.deepStrictEqual($$('#lg-form input').map((i) => i.placeholder), ['Ej: Pablo', 'Ej: Omegaxl joint support', 'Ej: 074102602224', 'Ej: $ 97.400', 'Ej: Cra 67 # 25 - 34 Itagui - Calatrava'], 'Cada campo muestra un ejemplo');
-    assert.ok(campos.every((k) => $('#lg-err-' + k)), 'Cada campo trae su aviso');
-    assert.ok(['name', 'product', 'guide', 'price', 'address'].every((k) => $('#lg-f-' + k).value === ''), 'El resto arranca vacío');
-    const escribe = (k, v) => { const i = $('#lg-f-' + k); i.value = v; i.dispatchEvent(new window.Event('input', { bubbles: true })); };
+    assert.deepStrictEqual($$('#lg-guia-form input').map((i) => i.id), campos.map((k) => 'lg-guia-f-' + k), '5 campos en orden (el tiempo de entrega es fijo)');
+    assert.deepStrictEqual($$('#lg-guia-form label').map((l) => l.textContent), ['Nombre del destinatario', 'Producto', 'Número de guía', 'Precio', 'Dirección de entrega']);
+    assert.ok(!$('#lg-guia-f-days'), 'No hay campo de tiempo de entrega');
+    assert.deepStrictEqual($$('#lg-guia-form input').map((i) => i.placeholder), ['Ej: Pablo', 'Ej: Omegaxl joint support', 'Ej: 074102602224', 'Ej: $ 97.400', 'Ej: Cra 67 # 25 - 34 Itagui - Calatrava'], 'Cada campo muestra un ejemplo');
+    assert.ok(campos.every((k) => $('#lg-guia-err-' + k)), 'Cada campo trae su aviso');
+    assert.ok(['name', 'product', 'guide', 'price', 'address'].every((k) => $('#lg-guia-f-' + k).value === ''), 'El resto arranca vacío');
+    const escribe = (k, v) => { const i = $('#lg-guia-f-' + k); i.value = v; i.dispatchEvent(new window.Event('input', { bubbles: true })); };
     const abre = () => { tab('dash').click(); tab('logistica').click(); };
     // Abrir la pestaña llena Producto y Precio vacíos con los de Desarrollo.
     landing.prod = { name: 'Omegaxl joint support', price: 97400 };
     abre();
-    assert.strictEqual($('#lg-f-product').value, 'Omegaxl joint support');
-    assert.strictEqual($('#lg-f-price').value, '$ 97.400');
-    assert.ok(lgS.form.product === 'Omegaxl joint support' && lgS.form.price === '$ 97.400', 'El estado también lo trae');
+    assert.strictEqual($('#lg-guia-f-product').value, 'Omegaxl joint support');
+    assert.strictEqual($('#lg-guia-f-price').value, '$ 97.400');
+    assert.ok(lgS.cards.guia.form.product === 'Omegaxl joint support' && lgS.cards.guia.form.price === '$ 97.400', 'El estado también lo trae');
     // No pisa lo que ya escribí.
     escribe('product', 'Mi producto'); escribe('price', '50000');
     landing.prod = { name: 'Otro de Desarrollo', price: 12000 };
     abre();
-    assert.strictEqual($('#lg-f-product').value, 'Mi producto', 'Producto escrito no se pisa');
-    assert.strictEqual($('#lg-f-price').value, '50000', 'Precio escrito no se pisa');
+    assert.strictEqual($('#lg-guia-f-product').value, 'Mi producto', 'Producto escrito no se pisa');
+    assert.strictEqual($('#lg-guia-f-price').value, '50000', 'Precio escrito no se pisa');
     // El precio acepta 97400, 97.400 y $ 97.400, y se formatea al salir del campo.
     for (const t of ['97400', '97.400', '$ 97.400']) {
-      escribe('price', t); $('#lg-f-price').dispatchEvent(new window.Event('blur'));
-      assert.strictEqual($('#lg-f-price').value, '$ 97.400', 'Formatea ' + t);
+      escribe('price', t); $('#lg-guia-f-price').dispatchEvent(new window.Event('blur'));
+      assert.strictEqual($('#lg-guia-f-price').value, '$ 97.400', 'Formatea ' + t);
     }
-    escribe('price', 'abc'); $('#lg-f-price').dispatchEvent(new window.Event('blur'));
-    assert.strictEqual($('#lg-f-price').value, 'abc', 'Un precio inválido no se reescribe');
+    escribe('price', 'abc'); $('#lg-guia-f-price').dispatchEvent(new window.Event('blur'));
+    assert.strictEqual($('#lg-guia-f-price').value, 'abc', 'Un precio inválido no se reescribe');
     // Traer de Desarrollo sí los pisa.
-    $('#lg-import').click();
-    assert.strictEqual($('#lg-f-product').value, 'Otro de Desarrollo');
-    assert.strictEqual($('#lg-f-price').value, '$ 12.000');
+    $('#lg-guia-import').click();
+    assert.strictEqual($('#lg-guia-f-product').value, 'Otro de Desarrollo');
+    assert.strictEqual($('#lg-guia-f-price').value, '$ 12.000');
     // Sin nombre en Desarrollo: avisa y no cambia nada.
     landing.prod = {};
     escribe('product', 'Lo mío');
     $('#toast').textContent = '';
-    $('#lg-import').click();
-    assert.ok(/Desarrollo/.test($('#toast').textContent) && $('#lg-f-product').value === 'Lo mío' && $('#lg-f-price').value === '$ 12.000', 'Sin producto en Desarrollo avisa y no cambia');
+    $('#lg-guia-import').click();
+    assert.ok(/Desarrollo/.test($('#toast').textContent) && $('#lg-guia-f-product').value === 'Lo mío' && $('#lg-guia-f-price').value === '$ 12.000', 'Sin producto en Desarrollo avisa y no cambia');
     // Todos editables.
-    assert.ok($$('#lg-form input').every((i) => !i.readOnly && !i.disabled), 'Todos los campos se editan');
+    assert.ok($$('#lg-guia-form input').every((i) => !i.readOnly && !i.disabled), 'Todos los campos se editan');
     // Nada se guarda: no hay almacenamiento propio.
     assert.ok(!PYL.services.storage.logistics, 'Sin persistencia');
     // Dejar el formulario como estaba para el resto de las pruebas.
     for (const k of ['name', 'product', 'guide', 'price', 'address']) escribe(k, '');
+  }
+
+  // 8f. Logística · Confirmación de Pedidos (SPEC 13): su propia tarjeta, a la derecha de Guia, con 7 campos y su mensaje.
+  {
+    const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
+    const L = PYL.core.logistics, lgS = PYL.app.state.logistics, landing = PYL.app.state.landing;
+    const P = (s) => '#lg-pedido-' + s, G = (s) => '#lg-guia-' + s;
+    const escribe = (sel, v) => { const i = $(sel); i.value = v; i.dispatchEvent(new window.Event('input', { bubbles: true })); };
+    const abre = () => { tab('dash').click(); tab('logistica').click(); };
+    const card = $('#lg-card-pedido');
+    assert.ok(card && card.previousElementSibling === $('#lg-card-guia'), 'La tarjeta de Pedidos va justo a la derecha de la de Guia');
+    assert.strictEqual($('#lg-card-pedido h2').textContent, 'Confirmación de Pedidos');
+    const campos = ['name', 'product', 'address', 'city', 'dept', 'phone', 'total'];
+    assert.deepStrictEqual($$('#lg-pedido-form input').map((i) => i.id), campos.map((k) => 'lg-pedido-f-' + k), '7 campos en orden');
+    assert.deepStrictEqual($$('#lg-pedido-form label').map((l) => l.textContent), ['Nombre de cliente', 'Producto', 'Dirección de entrega', 'Ciudad / Municipio', 'Departamento', 'Teléfono de contacto', 'Total a pagar (COD - contraentrega)']);
+    assert.deepStrictEqual($$('#lg-pedido-form input').map((i) => i.placeholder), ['Ej: Eugenia', 'Ej: Omegaxl joint support', 'Ej: Colombia 20# 19 .30 - barrio Capri', 'Ej: PASTO', 'Ej: NARIÑO', 'Ej: 3214566677', 'Ej: $ 97.400']);
+    assert.ok(campos.every((k) => $(P('err-' + k))), 'Cada campo trae su aviso');
+    assert.deepStrictEqual($$('#lg-card-pedido .lg-acts button').map((b) => b.id), ['lg-pedido-clear', 'lg-pedido-copy', 'lg-pedido-gen'], 'Sus propios botones');
+    assert.ok($$('#lg-card-pedido [data-ic]').every((b) => b.querySelector('.lg-ic svg')), 'Con sus íconos');
+    // Producto viene de Desarrollo; el total no.
+    escribe(P('f-product'), '');
+    landing.prod = { name: 'Omegaxl joint support', price: 97400 };
+    abre();
+    assert.strictEqual($(P('f-product')).value, 'Omegaxl joint support');
+    assert.strictEqual($(P('f-total')).value, '', 'El total no se trae de Desarrollo');
+    // Generar con campos vacíos marca los que faltan, solo en su tarjeta.
+    $(P('gen')).click();
+    for (const k of ['name', 'address', 'city', 'dept', 'phone', 'total']) assert.ok($(P('f-' + k)).classList.contains('lg-bad') && /^Escribe /.test($(P('err-' + k)).textContent), k + ' marcado');
+    assert.ok(!$(P('f-product')).classList.contains('lg-bad') && $(P('out')).value === '', 'Producto no se marca y no hay mensaje');
+    assert.strictEqual($$('#lg-guia-form .lg-bad').length, 0, 'La tarjeta de Guia no se toca');
+    escribe(P('f-total'), 'abc'); $(P('gen')).click();
+    assert.strictEqual($(P('err-total')).textContent, 'Total mayor a 0');
+    // Con todo lleno: el mensaje de la plantilla.
+    escribe(P('f-name'), 'Eugenia'); escribe(P('f-address'), 'Colombia 20# 19 .30 - barrio Capri'); escribe(P('f-city'), 'PASTO'); escribe(P('f-dept'), 'nariño'); escribe(P('f-phone'), '3214566677'); // el departamento va en minúscula: el mensaje lo pone en mayúsculas
+    escribe(P('f-total'), '97400'); $(P('f-total')).dispatchEvent(new window.Event('blur'));
+    assert.strictEqual($(P('f-total')).value, '$ 97.400', 'El total se formatea al salir del campo');
+    $(P('gen')).click();
+    const esperado = L.lgMessage('pedido', { name: 'Eugenia', product: 'Omegaxl joint support', address: 'Colombia 20# 19 .30 - barrio Capri', city: 'PASTO', dept: 'NARIÑO', phone: '3214566677', total: 97400 });
+    assert.strictEqual($(P('out')).value, esperado, 'Mensaje generado');
+    assert.ok($(P('out')).value.includes('*Departamento:* NARIÑO') && $(P('f-dept')).value === 'nariño', 'El departamento sale en mayúsculas en el mensaje y el campo no se toca');
+    assert.ok($(P('out')).value.includes('🛍️🤍\n\n🚚 Por favor'), 'Línea en blanco antes del último párrafo');
+    assert.ok($(P('out')).value.startsWith('¡Hola Eugenia! 🌟') && $(P('out')).value.includes('*Total a Pagar:* $97.400') && $(P('out')).value.includes('🍃*VidanovaStore*'), 'Saludo, total y tienda');
+    assert.strictEqual(lgS.cards.pedido.last, esperado);
+    assert.strictEqual($(G('out')).value, '', 'El mensaje de Guia no cambia');
+    // Editar después no cambia el mensaje hasta volver a generar.
+    escribe(P('f-city'), 'CALI');
+    assert.strictEqual($(P('out')).value, esperado, 'No se actualiza en vivo');
+    // Las dos tarjetas son independientes: lo escrito en una no pasa a la otra.
+    escribe(G('f-name'), 'Pablo');
+    assert.strictEqual($(P('f-name')).value, 'Eugenia', 'El nombre de Guia no toca el de Pedidos');
+    assert.deepStrictEqual([lgS.cards.guia.form.name, lgS.cards.pedido.form.name], ['Pablo', 'Eugenia']);
+    escribe(G('f-name'), '');
+    // «Traer de Desarrollo» de esta tarjeta solo toca su producto.
+    escribe(P('f-product'), 'Lo mío');
+    landing.prod = { name: 'Otro de Desarrollo', price: 12000 };
+    $(P('import')).click();
+    assert.strictEqual($(P('f-product')).value, 'Otro de Desarrollo');
+    assert.strictEqual($(P('f-total')).value, '$ 97.400', 'El total no se toca');
+    landing.prod = {};
+    $('#toast').textContent = '';
+    escribe(P('f-product'), 'Lo mío'); $(P('import')).click();
+    assert.ok(/Desarrollo/.test($('#toast').textContent) && $(P('f-product')).value === 'Lo mío', 'Sin producto en Desarrollo avisa y no cambia');
+    // Limpiar: vacía los datos del cliente y el mensaje, y deja el producto.
+    $(P('clear')).click();
+    assert.ok(['name', 'address', 'city', 'dept', 'phone', 'total'].every((k) => $(P('f-' + k)).value === ''), 'Vacía los datos del cliente');
+    assert.strictEqual($(P('f-product')).value, 'Lo mío', 'Deja el producto');
+    assert.ok($(P('out')).value === '' && lgS.cards.pedido.last === '' && $$('#lg-pedido-form .lg-bad').length === 0, 'Vacía el mensaje y los errores');
+    // Dejar todo como estaba para lo siguiente: las dos tarjetas con el formulario vacío.
+    landing.prod = {};
+    for (const k of campos) escribe(P('f-' + k), '');
+    for (const k of ['name', 'product', 'guide', 'price', 'address']) escribe(G('f-' + k), '');
   }
 
   // 9. Escalado · Fase de testeo: 6 pasos, cada uno con su bloque, y el avance.
@@ -779,75 +851,89 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   // 8e. Logística · Generar, Copiar y Limpiar (SPEC 13, paso 4). Async: espera al portapapeles.
   const lgTest = async () => {
     const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
-    const escribe = (k, v) => { const i = $('#lg-f-' + k); i.value = v; i.dispatchEvent(new window.Event('input', { bubbles: true })); };
+    const escribe = (k, v) => { const i = $('#lg-guia-f-' + k); i.value = v; i.dispatchEvent(new window.Event('input', { bubbles: true })); };
     let copiado = null;
     Object.defineProperty(window.navigator, 'clipboard', { configurable: true, value: { writeText: async (t) => { copiado = t; } } });
     tab('logistica').click();
-    assert.ok($('#lg-out').readOnly && $('#lg-out').value === '', 'Mensaje de solo lectura y vacío al cargar');
-    assert.deepStrictEqual($$('#lg-msgs .lg-acts button').map((b) => b.id), ['lg-clear', 'lg-copy', 'lg-gen'], 'Botones en .lg-acts');
-    assert.ok($('#lg-head, .lg-head #lg-import'), 'Traer de Desarrollo es un ícono junto al título');
-    assert.deepStrictEqual($$('#lg-clear, #lg-copy, #lg-gen').map((b) => b.textContent).sort(), ['Generar mensaje', 'Copiar mensaje', 'Limpiar'].sort());
-    assert.ok($$('#lg-import, #lg-clear, #lg-copy, #lg-gen').every((b) => b.querySelector('.lg-ic svg') && b.querySelectorAll('.lg-ic').length === 1), 'Cada botón trae su ícono dibujado (SVG), sin emojis');
-    assert.strictEqual($('#lg-import').textContent, '', 'Traer de Desarrollo es solo ícono');
+    assert.ok($('#lg-guia-out').readOnly && $('#lg-guia-out').value === '', 'Mensaje de solo lectura y vacío al cargar');
+    assert.deepStrictEqual($$('#lg-card-guia .lg-acts button').map((b) => b.id), ['lg-guia-clear', 'lg-guia-copy', 'lg-guia-gen'], 'Botones en .lg-acts');
+    assert.ok($('#lg-head, .lg-head #lg-guia-import'), 'Traer de Desarrollo es un ícono junto al título');
+    assert.deepStrictEqual($$('#lg-guia-clear, #lg-guia-copy, #lg-guia-gen').map((b) => b.textContent).sort(), ['Generar mensaje', 'Copiar mensaje', 'Limpiar'].sort());
+    assert.ok($$('#lg-guia-import, #lg-guia-clear, #lg-guia-copy, #lg-guia-gen').every((b) => b.querySelector('.lg-ic svg') && b.querySelectorAll('.lg-ic').length === 1), 'Cada botón trae su ícono dibujado (SVG), sin emojis');
+    assert.strictEqual($('#lg-guia-import').textContent, '', 'Traer de Desarrollo es solo ícono');
     // Copiar sin mensaje avisa y no copia.
     $('#toast').textContent = '';
-    $('#lg-copy').click();
+    $('#lg-guia-copy').click();
     await new Promise((ok) => setTimeout(ok, 20));
     assert.ok(/Primero toca/.test($('#toast').textContent) && copiado === null, 'Copiar sin mensaje avisa y no copia');
     // Generar con campos vacíos los marca, avisa y no arma nada.
     $('#toast').textContent = '';
-    $('#lg-gen').click();
+    $('#lg-guia-gen').click();
     for (const k of ['name', 'product', 'guide', 'price', 'address']) {
-      assert.ok($('#lg-f-' + k).classList.contains('lg-bad') && $('#lg-f-' + k).getAttribute('aria-invalid') === 'true', k + ' marcado');
-      assert.ok(/^Escribe /.test($('#lg-err-' + k).textContent), 'aviso de ' + k);
+      assert.ok($('#lg-guia-f-' + k).classList.contains('lg-bad') && $('#lg-guia-f-' + k).getAttribute('aria-invalid') === 'true', k + ' marcado');
+      assert.ok(/^Escribe /.test($('#lg-guia-err-' + k).textContent), 'aviso de ' + k);
     }
-    assert.ok(/Corrige/.test($('#toast').textContent) && $('#lg-out').value === '', 'Avisa y no genera');
+    assert.ok(/Corrige/.test($('#toast').textContent) && $('#lg-guia-out').value === '', 'Avisa y no genera');
     // Precio inválido.
-    escribe('price', 'abc'); $('#lg-gen').click();
-    assert.strictEqual($('#lg-err-price').textContent, 'Precio mayor a 0');
+    escribe('price', 'abc'); $('#lg-guia-gen').click();
+    assert.strictEqual($('#lg-guia-err-price').textContent, 'Precio mayor a 0');
     // Con todo lleno: el mensaje es el de la plantilla.
     escribe('name', 'Pablo'); escribe('product', 'Omegaxl joint support'); escribe('guide', '074102602224');
-    escribe('price', '97400'); $('#lg-f-price').dispatchEvent(new window.Event('blur')); // sale formateado: $ 97.400
+    escribe('price', '97400'); $('#lg-guia-f-price').dispatchEvent(new window.Event('blur')); // sale formateado: $ 97.400
     escribe('address', 'Cra 67 # 25 - 34 Itagui - Calatrava');
-    $('#lg-gen').click();
+    $('#lg-guia-gen').click();
     const L = PYL.core.logistics;
     const esperado = L.lgMessage('guia', { name: 'Pablo', product: 'Omegaxl joint support', guide: '074102602224', price: 97400, address: 'Cra 67 # 25 - 34 Itagui - Calatrava' });
-    assert.strictEqual($('#lg-out').value, esperado, 'Mensaje generado');
-    assert.ok($('#lg-out').value.includes('*2 a 4 días hábiles*'), 'Tiempo de entrega fijo');
-    assert.ok($('#lg-out').value.includes('🍃*VidanovaStore*') && $('#lg-out').value.includes('*$97.400*'), 'Tienda y precio sin espacio');
-    assert.ok($$('#lg-form .lg-bad').length === 0 && $$('.lg-err').every((e) => e.textContent === ''), 'Sin errores tras generar');
-    assert.strictEqual(PYL.app.state.logistics.last, esperado);
+    assert.strictEqual($('#lg-guia-out').value, esperado, 'Mensaje generado');
+    assert.ok($('#lg-guia-out').value.includes('*2 a 4 días hábiles*'), 'Tiempo de entrega fijo');
+    assert.ok($('#lg-guia-out').value.includes('🍃*VidanovaStore*') && $('#lg-guia-out').value.includes('*$97.400*'), 'Tienda y precio sin espacio');
+    assert.ok($$('#lg-guia-form .lg-bad').length === 0 && $$('.lg-err').every((e) => e.textContent === ''), 'Sin errores tras generar');
+    assert.strictEqual(PYL.app.state.logistics.cards.guia.last, esperado);
     // Editar después no cambia el mensaje hasta volver a generar.
     escribe('name', 'Ana');
-    assert.strictEqual($('#lg-out').value, esperado, 'No se actualiza en vivo');
-    $('#lg-gen').click();
-    assert.ok($('#lg-out').value.startsWith('*CONFIRMACIÓN GUIA*\n¡Hola, Ana!'), 'Al volver a generar sí cambia');
+    assert.strictEqual($('#lg-guia-out').value, esperado, 'No se actualiza en vivo');
+    $('#lg-guia-gen').click();
+    assert.ok($('#lg-guia-out').value.startsWith('*CONFIRMACIÓN GUIA*\n¡Hola, Ana!'), 'Al volver a generar sí cambia');
     // Un intento inválido deja el mensaje anterior.
-    const previo = $('#lg-out').value;
-    escribe('guide', ''); $('#lg-gen').click();
-    assert.strictEqual($('#lg-out').value, previo, 'El mensaje anterior se queda');
-    assert.ok($('#lg-f-guide').classList.contains('lg-bad'));
+    const previo = $('#lg-guia-out').value;
+    escribe('guide', ''); $('#lg-guia-gen').click();
+    assert.strictEqual($('#lg-guia-out').value, previo, 'El mensaje anterior se queda');
+    assert.ok($('#lg-guia-f-guide').classList.contains('lg-bad'));
     escribe('guide', '074102602224');
     // Copiar copia el mensaje y avisa.
     $('#toast').textContent = '';
-    $('#lg-copy').click();
+    $('#lg-guia-copy').click();
     await new Promise((ok) => setTimeout(ok, 20));
     assert.strictEqual(copiado, previo, 'Copia el mensaje');
     assert.ok($('#toast').classList.contains('show') && /copiado/i.test($('#toast').textContent), 'Avisa en #toast');
     // Limpiar: vacía nombre, guía, dirección y mensaje; deja producto, precio y tiempo.
-    $('#lg-gen').click();
-    $('#lg-clear').click();
-    assert.ok(['name', 'guide', 'address'].every((k) => $('#lg-f-' + k).value === ''), 'Vacía nombre, guía y dirección');
-    assert.deepStrictEqual([$('#lg-f-product').value, $('#lg-f-price').value], ['Omegaxl joint support', '$ 97.400'], 'Deja producto y precio');
-    assert.ok($('#lg-out').value === '' && PYL.app.state.logistics.last === '' && $$('#lg-form .lg-bad').length === 0, 'Vacía el mensaje y los errores');
-    assert.strictEqual(PYL.app.state.logistics.form.name, '', 'El estado también');
+    $('#lg-guia-gen').click();
+    $('#lg-guia-clear').click();
+    assert.ok(['name', 'guide', 'address'].every((k) => $('#lg-guia-f-' + k).value === ''), 'Vacía nombre, guía y dirección');
+    assert.deepStrictEqual([$('#lg-guia-f-product').value, $('#lg-guia-f-price').value], ['Omegaxl joint support', '$ 97.400'], 'Deja producto y precio');
+    assert.ok($('#lg-guia-out').value === '' && PYL.app.state.logistics.cards.guia.last === '' && $$('#lg-guia-form .lg-bad').length === 0, 'Vacía el mensaje y los errores');
+    assert.strictEqual(PYL.app.state.logistics.cards.guia.form.name, '', 'El estado también');
     // El precio formateado también genera.
     escribe('name', 'Pablo'); escribe('guide', 'G1'); escribe('address', 'Calle 1');
-    $('#lg-gen').click();
-    assert.ok($('#lg-out').value.includes('*$97.400*'), 'El precio "$ 97.400" del campo genera bien');
+    $('#lg-guia-gen').click();
+    assert.ok($('#lg-guia-out').value.includes('*$97.400*'), 'El precio "$ 97.400" del campo genera bien');
+    // La tarjeta de Pedidos copia su propio mensaje (no el de Guia).
+    const escribeP = (k, v) => { const i = $('#lg-pedido-f-' + k); i.value = v; i.dispatchEvent(new window.Event('input', { bubbles: true })); };
+    $('#toast').textContent = '';
+    $('#lg-pedido-copy').click();
+    await new Promise((ok) => setTimeout(ok, 20));
+    assert.ok(/Primero toca/.test($('#toast').textContent), 'Copiar sin mensaje en Pedidos avisa');
+    for (const [k, v] of Object.entries({ name: 'Eugenia', product: 'Omegaxl joint support', address: 'Calle 1', city: 'PASTO', dept: 'NARIÑO', phone: '3214566677', total: '97400' })) escribeP(k, v);
+    $('#lg-pedido-gen').click();
+    $('#lg-pedido-copy').click();
+    await new Promise((ok) => setTimeout(ok, 20));
+    assert.strictEqual(copiado, $('#lg-pedido-out').value, 'Copia el mensaje de Pedidos');
+    assert.ok(copiado.startsWith('¡Hola Eugenia! 🌟') && copiado !== $('#lg-guia-out').value, 'No es el de Guia');
+    for (const k of ['name', 'product', 'address', 'city', 'dept', 'phone', 'total']) escribeP(k, '');
+    $('#lg-pedido-clear').click();
     // Dejar el formulario vacío para el resto de las pruebas.
     for (const k of ['name', 'product', 'guide', 'price', 'address']) escribe(k, '');
-    $('#lg-clear').click();
+    $('#lg-guia-clear').click();
   };
 
   // 9. Prompt DropKiller (SPEC 09): botón flotante y panel en Buscar producto.

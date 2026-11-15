@@ -699,24 +699,8 @@
 
   <div class="seg" id="lg-parts" role="group" aria-label="Parte de logística"></div>
 
-  <div class="card mt" id="lg-msgs">
-    <div class="lg-head">
-      <h2>Confirmación de Guia</h2>
-      <button class="btn ghost sm lg-import" id="lg-import" type="button" title="Traer de Desarrollo: pone el nombre y el precio de «Producto que estoy montando»" aria-label="Traer de Desarrollo" data-ic="import"></button>
-    </div>
-    <p class="muted b-sub">Armo el mensaje con los datos del pedido y lo copio para pegarlo en WhatsApp.</p>
-    <div class="seg mt" id="lg-tpls" role="group" aria-label="Plantilla del mensaje"></div>
-    <div class="lg-form" id="lg-form"></div>
-    <div class="lg-out">
-      <label for="lg-out">Mensaje</label>
-      <textarea id="lg-out" readonly rows="14" placeholder="Toca «Generar mensaje» para armarlo con estos datos."></textarea>
-      <div class="lg-acts">
-        <button class="btn ghost sm" id="lg-clear" type="button" title="Vacía nombre, guía, dirección y mensaje; deja producto y precio" data-ic="clear">Limpiar</button>
-        <button class="btn ghost sm" id="lg-copy" type="button" data-ic="copy">Copiar mensaje</button>
-        <button class="btn sm" id="lg-gen" type="button" data-ic="gen">Generar mensaje</button>
-      </div>
-    </div>
-  </div>
+  <!-- Una tarjeta por plantilla, lado a lado (las arma js/modules/logistics/ui/logistics.js) -->
+  <div class="lg-cards" id="lg-cards"></div>
 </section>
 
 <!-- ================= MÓDULO 3 ================= -->
