@@ -43,24 +43,52 @@
     }
   }
 
+  const CHEVRON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+
+  // Abre o contrae una tarjeta (solo pinta; el estado lo lleva app).
+  function open(node, isOpen) {
+    node.classList.toggle('open', !!isOpen);
+    node.querySelector('.lg-toggle').setAttribute('aria-expanded', String(!!isOpen));
+    node.querySelector('.lg-body').hidden = !isOpen;
+  }
+
   // Una tarjeta por plantilla: título con el botón «Traer de Desarrollo», un campo por `field`, el mensaje y los botones.
   // Los ids llevan la clave de la plantilla (#lg-<k>-f-<campo>, #lg-<k>-err-<campo>, #lg-<k>-out, #lg-<k>-gen…) para que
   // dos tarjetas no repitan ids. values = textos actuales del formulario.
-  // on = { change(k, text), blur(k), importar(), generate(), copy(), clear() }.
+  // on = { toggle(), change(k, text), blur(k), importar(), generate(), copy(), clear() }. Nace contraída (ver `open`).
   function card(tpl, values, on) {
     const id = (s) => 'lg-' + tpl.k + '-' + s;
     const c = el('section', 'card lg-card');
     c.id = 'lg-card-' + tpl.k;
     c.dataset.tpl = tpl.k;
 
+    // El nombre es el botón que abre y cierra la tarjeta; el resto (subtítulo, formulario y mensaje) va en el cuerpo.
     const head = el('div', 'lg-head');
-    const imp = el('button', 'btn ghost sm lg-import'); imp.type = 'button'; imp.id = id('import'); imp.dataset.ic = 'import';
-    imp.title = 'Traer de Desarrollo: pone el producto de «Producto que estoy montando»'; imp.setAttribute('aria-label', 'Traer de Desarrollo');
-    imp.addEventListener('click', on.importar);
-    head.append(el('h2', null, tpl.title), imp);
+    const h = el('h2');
+    const tg = el('button', 'lg-toggle'); tg.type = 'button'; tg.id = id('toggle');
+    tg.setAttribute('aria-expanded', 'false'); tg.setAttribute('aria-controls', id('body'));
+    const chev = el('span', 'lg-chev'); chev.innerHTML = CHEVRON;
+    tg.append(el('span', 'lg-name', tpl.title), chev);
+    tg.addEventListener('click', on.toggle);
+    h.append(tg);
+    head.append(h);
+    if (tpl.fields.some((f) => f.from)) { // «Traer de Desarrollo» solo si la plantilla trae algo de Desarrollo
+      const imp = el('button', 'btn ghost sm lg-import'); imp.type = 'button'; imp.id = id('import'); imp.dataset.ic = 'import';
+      imp.title = 'Traer de Desarrollo: pone el producto de «Producto que estoy montando»'; imp.setAttribute('aria-label', 'Traer de Desarrollo');
+      imp.addEventListener('click', on.importar);
+      head.append(imp);
+    }
 
     const form = el('div', 'lg-form'); form.id = id('form');
     for (const f of tpl.fields) {
+      if (f.type === 'check') { // casilla: una sola línea, sin etiqueta aparte ni aviso
+        const lab = el('label', 'lg-check');
+        const x = el('input'); x.type = 'checkbox'; x.id = id('f-' + f.k); x.dataset.k = f.k; x.checked = !!values[f.k];
+        x.addEventListener('change', () => on.change(f.k, x.checked));
+        lab.append(x, el('span', null, f.label));
+        form.append(lab);
+        continue;
+      }
       const cell = el('div', 'lg-cell');
       const lab = el('label', 'lg-lab', f.label); lab.htmlFor = id('f-' + f.k);
       const x = el('input'); x.type = 'text'; x.id = id('f-' + f.k); x.dataset.k = f.k; x.autocomplete = 'off'; x.placeholder = f.ph || '';
@@ -90,15 +118,32 @@
       btn('lg-gen', 'gen', 'Generar mensaje', on.generate));
     out.append(lab, ta, acts);
 
-    c.append(head, el('p', 'muted b-sub', 'Armo el mensaje con los datos del pedido y lo copio para pegarlo en WhatsApp.'), form, out);
+    const body = el('div', 'lg-body'); body.id = id('body'); body.hidden = true;
+    body.append(el('p', 'muted b-sub', tpl.sub || 'Armo el mensaje con los datos del pedido y lo copio para pegarlo en WhatsApp.'), form, out);
+    c.append(head, body);
     icons(c);
     return c;
+  }
+
+  // Salto de línea entre filas de tarjetas.
+  function rowBreak() { return el('div', 'lg-break'); }
+
+  // Pone `node` justo debajo de `above`, en su misma columna (la crea la primera vez, en el lugar de `above`).
+  function stack(above, node) {
+    let col = above.parentElement;
+    if (!col.classList.contains('lg-col')) {
+      col = el('div', 'lg-col');
+      above.replaceWith(col);
+      col.append(above);
+    }
+    col.append(node);
   }
 
   // Escribe un valor en su campo (al prellenar, importar o dar formato).
   function setField(node, k, text) {
     const x = node.querySelector('input[data-k="' + k + '"]');
-    if (x) x.value = text;
+    if (!x) return;
+    if (x.type === 'checkbox') x.checked = !!text; else x.value = text;
   }
 
   // Marca los campos con error ({ campo: mensaje }) y limpia el resto.
@@ -114,5 +159,5 @@
   // Muestra el mensaje generado ('' = vacío) en el cuadro de solo lectura de la tarjeta.
   function message(node, text) { node.querySelector('textarea').value = text; }
 
-  PYL.ui.logistics = { parts, card, setField, errors, message, icons };
+  PYL.ui.logistics = { parts, card, open, stack, rowBreak, setField, errors, message, icons };
 })();

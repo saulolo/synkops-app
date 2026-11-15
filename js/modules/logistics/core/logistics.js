@@ -15,17 +15,9 @@
   // Plantilla nueva: sumar su entrada aquí y su texto en `TEXT`.
   // Una plantilla = una tarjeta aparte en la pestaña: clave, título de la tarjeta y campos. El orden es el de las tarjetas, de izquierda
   // a derecha; la primera es también la de respaldo en lgTemplate. `ph` = ejemplo que se ve en el campo vacío. `from` = dato de
-  // landing.prod que lo prellena; `def` = valor por defecto; `errMoney` = aviso de un campo de dinero inválido.
+  // landing.prod que lo prellena; `def` = valor por defecto; `type: 'check'` = casilla (true/false); `errMoney` = aviso de un campo de dinero inválido.
   // Plantilla nueva: sumar su entrada aquí y su texto en `TEXT`; la tarjeta aparece sola.
   const LG_TEMPLATES = [
-    { k: 'guia', title: 'Confirmación de Guia',
-      fields: [
-        { k: 'name', label: 'Nombre del destinatario', type: 'text', ph: 'Ej: Pablo' },
-        { k: 'product', label: 'Producto', type: 'text', from: 'name', ph: 'Ej: Omegaxl joint support' },
-        { k: 'guide', label: 'Número de guía', type: 'text', ph: 'Ej: 074102602224' },
-        { k: 'price', label: 'Precio', type: 'money', from: 'price', ph: 'Ej: $ 97.400' },
-        { k: 'address', label: 'Dirección de entrega', type: 'text', ph: 'Ej: Cra 67 # 25 - 34 Itagui - Calatrava' },
-      ] },
     { k: 'pedido', title: 'Confirmación de Pedidos',
       fields: [
         { k: 'name', label: 'Nombre de cliente', type: 'text', ph: 'Ej: Eugenia' },
@@ -35,6 +27,39 @@
         { k: 'dept', label: 'Departamento', type: 'text', ph: 'Ej: NARIÑO' },
         { k: 'phone', label: 'Teléfono de contacto', type: 'text', ph: 'Ej: 3214566677' },
         { k: 'total', label: 'Total a pagar (COD - contraentrega)', type: 'money', ph: 'Ej: $ 97.400', errMoney: 'Total mayor a 0' },
+      ] },
+    // Mensaje fijo: no pide datos, solo si el pedido lleva obsequio (casilla `check`). `sub` = texto bajo el título.
+    { k: 'confirmado', title: 'Pedido Confirmado', sub: 'Mensaje fijo para cuando el cliente confirma el pedido. Marco si lleva obsequio.',
+      fields: [
+        { k: 'gift', label: 'Incluye obsequio', type: 'check', def: true },
+      ] },
+    { k: 'guia', title: 'Confirmación de Guia',
+      fields: [
+        { k: 'name', label: 'Nombre del destinatario', type: 'text', ph: 'Ej: Pablo' },
+        { k: 'product', label: 'Producto', type: 'text', from: 'name', ph: 'Ej: Omegaxl joint support' },
+        { k: 'guide', label: 'Número de guía', type: 'text', ph: 'Ej: 074102602224' },
+        { k: 'price', label: 'Precio', type: 'money', from: 'price', ph: 'Ej: $ 97.400' },
+        { k: 'address', label: 'Dirección de entrega', type: 'text', ph: 'Ej: Cra 67 # 25 - 34 Itagui - Calatrava' },
+      ] },
+    // Segundo intento, si el cliente no contesta la confirmación del pedido. `newRow` = empieza una fila nueva.
+    { k: 'recordatorio', title: 'Segundo Intento', newRow: true, sub: 'Para cuando el cliente no contesta la confirmación del pedido.',
+      fields: [
+        { k: 'name', label: 'Nombre de cliente', type: 'text', ph: 'Ej: Eugenia' },
+      ] },
+    // Tercer intento: llamada sin respuesta; avisa que el sistema cancelará la orden. Va a la derecha de Segundo Intento.
+    { k: 'tercero', title: 'Tercer Intento', sub: 'Para cuando no contesta ni la llamada ni el mensaje: avisa que la orden se cancelará.',
+      fields: [
+        { k: 'name', label: 'Nombre de cliente', type: 'text', ph: 'Ej: Eugenia' },
+        { k: 'product', label: 'Producto', type: 'text', from: 'name', ph: 'Ej: Crema Despigmentante' },
+        { k: 'city', label: 'Ciudad / Municipio', type: 'text', ph: 'Ej: Pasto' },
+      ] },
+    // Anticipo: cuando la huella digital del cliente muestra muchas devoluciones (más del 70 %). El mensaje explica el motivo (historial de
+    // devoluciones en la red logística) y recuerda adjuntar la gráfica oficial.
+    { k: 'anticipo', title: 'Solicitud de Anticipo', sub: 'Para clientes con historial alto de devoluciones: pido un anticipo (adjunto la gráfica oficial).',
+      fields: [
+        { k: 'name', label: 'Nombre de cliente', type: 'text', ph: 'Ej: Eugenia' },
+        { k: 'product', label: 'Producto', type: 'text', from: 'name', ph: 'Ej: Crema Despigmentante' },
+        { k: 'advance', label: 'Valor del anticipo', type: 'money', ph: 'Ej: $ 20.000', errMoney: 'Anticipo mayor a 0' },
       ] },
   ];
 
@@ -59,6 +84,7 @@
   const lgValues = (tpl, form) => {
     const f = form || {}, values = {}, errors = {};
     for (const fl of tpl.fields) {
+      if (fl.type === 'check') { values[fl.k] = !!f[fl.k]; continue; } // casilla: nunca da error
       const t = clean(f[fl.k]);
       if (fl.type === 'money') {
         const n = lgMoney(t);
@@ -71,6 +97,9 @@
   };
 
   // Producto y precio de "Producto que estoy montando" (landing.prod). Faltantes: '' / null.
+  // Valores iniciales del formulario de una plantilla: el `def` de cada campo; sin él, '' (o false en una casilla).
+  const lgForm = (tpl) => Object.fromEntries(tpl.fields.map((f) => [f.k, f.def != null ? f.def : (f.type === 'check' ? false : '')]));
+
   const lgPrefill = (prod) => {
     const p = prod || {};
     return { product: clean(p.name), price: Number(p.price) > 0 ? Number(p.price) : null };
@@ -80,6 +109,40 @@
 
   // Texto de cada plantilla: recibe los valores ya validados (price = número).
   const TEXT = {
+    anticipo: (v) => `Hola, ${v.name} 👋
+
+Recibimos tu pedido de ${v.product} en ${STORE_BOLD} y queremos que te llegue sin contratiempos 📦
+
+Debido a nuestras políticas de seguridad y a un historial de altas devoluciones registradas con tu número en la red logística nacional (te compartimos la gráfica oficial adjunta), por protocolo de la bodega no podemos arriesgar el despacho sin un pequeño anticipo de *${peso(v.advance)}* 🔒
+
+Ese valor *se descuenta del total* que pagarás contra entrega: no es un costo adicional, solo la garantía de que tu pedido salga hoy mismo 🚚
+
+Puedes realizar el abono a nuestro Nequi/Daviplata:
+📱 *Nequi/Daviplata*: 3182110955
+
+O a nuestra cuenta de Ahorros - Bancolombia
+23015881151
+
+Apenas nos envíes el comprobante por este chat, programamos tu despacho 🤍`,
+
+    tercero: (v) => `Hola, ${v.name}. Intentamos comunicarnos contigo por llamada para autorizar el despacho de tu ${v.product} con Envío Gratis. 📦
+
+Por políticas de seguridad y alta demanda, si no recibimos tu confirmación el sistema cancelará tu orden automáticamente y cederemos la unidad a otro cliente.
+
+Si aún deseas recibirla en ${v.city} y pagar contra entrega, por favor respóndenos a este mensaje con un 'CONFIRMO'. Quedamos atentos.`,
+
+    recordatorio: (v) => `¡Hola de nuevo, ${v.name}! 👋
+
+Te escribimos otra vez por tu pedido en ${STORE_BOLD}.
+
+Por favor *confírmanos* si tus datos son correctos para pasar tu pedido a despacho 🚚
+
+Si algo no está bien, cuéntanos por aquí y lo corregimos 🤍`,
+
+    confirmado: (v) => `Gracias por confirmar. Tu paquete ya va rumbo a empaque. 📦
+
+${v.gift ? 'Como agradecimiento, en cuanto recibas tu producto, avísanos por aquí para enviarte el *obsequio* adjunto ✨\n\n' : ''}¡Quedamos muy atentos a tu entrega!`,
+
     pedido: (v) => `¡Hola ${v.name}! 🌟
 
 Acabamos de recibir tu compra del producto -- ${v.product} -- en nuestra tienda ${STORE_BOLD}
@@ -112,5 +175,5 @@ El tiempo estimado de entrega es de *${LG_DAYS} días hábiles*.
 
   const lgMessage = (k, values) => TEXT[lgTemplate(k).k](values || {});
 
-  core.logistics = { LG_STORE, LG_DAYS, LG_PARTS, LG_TEMPLATES, lgTemplate, lgMoney, lgMoneyText, lgValues, lgPrefill, lgMessage };
+  core.logistics = { LG_STORE, LG_DAYS, LG_PARTS, LG_TEMPLATES, lgTemplate, lgMoney, lgMoneyText, lgForm, lgValues, lgPrefill, lgMessage };
 })();

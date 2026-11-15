@@ -7,8 +7,8 @@
 
   const S = (PYL.app.state.logistics = {
     part: C.LG_PARTS[0].k, // sub-pestaña abierta (siempre arranca en 'msgs')
-    // Una entrada por plantilla: lo escrito en su formulario y el último mensaje que generó.
-    cards: Object.fromEntries(C.LG_TEMPLATES.map((t) => [t.k, { form: Object.fromEntries(t.fields.map((f) => [f.k, f.def || ''])), last: '' }])),
+    // Una entrada por plantilla: lo escrito en su formulario, el último mensaje que generó y si la tarjeta está abierta (nacen contraídas).
+    cards: Object.fromEntries(C.LG_TEMPLATES.map((t) => [t.k, { form: C.lgForm(t), last: '', open: false }])),
   });
 
   const nodes = {}; // tarjeta pintada de cada plantilla
@@ -70,6 +70,7 @@
   }
 
   const handlers = (tpl) => ({
+    toggle: () => { const st = S.cards[tpl.k]; st.open = !st.open; U.open(nodes[tpl.k], st.open); },
     change: (k, text) => { S.cards[tpl.k].form[k] = text; },
     // Al salir del campo de dinero se muestra formateado ($ 97.400); un texto inválido se deja para que se corrija.
     blur: (k) => {
@@ -96,6 +97,7 @@
   root.textContent = '';
   for (const tpl of C.LG_TEMPLATES) {
     nodes[tpl.k] = U.card(tpl, S.cards[tpl.k].form, handlers(tpl));
+    if (tpl.newRow) root.append(U.rowBreak()); // salto de línea: la tarjeta empieza una fila nueva
     root.append(nodes[tpl.k]);
   }
 

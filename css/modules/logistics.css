@@ -7,15 +7,40 @@
 
 /* ---------- Formulario del mensaje ---------- */
 .lg-acts{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
-.lg-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.lg-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.lg-head h2{flex:1;min-width:0}
 .lg-import{flex:none;padding:7px 9px}
-/* Una tarjeta por plantilla, lado a lado. Cada una es angosta, del tamaño del panel de Prompt buscar anuncios; si no caben, bajan de fila. */
-/* Las dos tarjetas miden lo mismo de alto (align-items:stretch): la que tiene menos campos reparte lo que le sobra al cuadro Mensaje (flex:1), que en la de más campos queda en su mínimo. */
-.lg-cards{display:flex;flex-wrap:wrap;gap:18px;align-items:stretch;margin-top:16px}
+/* Una tarjeta por plantilla, lado a lado. Nacen contraídas (solo el nombre) y se abren al tocarlo. Cada una es angosta, del tamaño del
+   panel de Prompt buscar anuncios; si no caben, bajan de fila. Las abiertas de una misma fila miden lo mismo de alto (la que tiene menos
+   campos reparte lo que le sobra al cuadro Mensaje); las contraídas no se estiran. */
+.lg-cards{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start;margin-top:16px}
 .lg-cards[hidden]{display:none}
-.lg-card{flex:1 1 340px;max-width:420px;min-width:0;display:flex;flex-direction:column}
+.lg-card{flex:0 1 385px;max-width:385px;min-width:0;display:flex;flex-direction:column}
+.lg-break{flex-basis:100%;height:0;margin:-18px 0 0}
+.lg-card.open{align-self:stretch}
+.lg-body{display:flex;flex-direction:column;flex:1;min-height:0}
+.lg-body[hidden]{display:none}
+/* Columna con dos tarjetas apiladas (Pedido Confirmado y Segundo Intento): abiertas, juntas miden lo que una tarjeta de la fila; el cuadro Mensaje de cada una es más bajo. */
+.lg-col{flex:1 1 340px;max-width:420px;min-width:0;display:flex;flex-direction:column;gap:18px}
+.lg-col:has(.lg-card.open){align-self:stretch}
+.lg-col>.lg-card{flex:none;max-width:none}
+.lg-col>.lg-card.open{flex:1 1 auto}
+.lg-col .lg-out{margin-top:12px;padding-top:10px}
+.lg-col .lg-out textarea{min-height:120px}
+/* Nombre de la tarjeta = botón que la abre y la cierra, con una flecha que gira. */
+.lg-toggle{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;flex:1;min-width:0;border-radius:8px}
+.lg-toggle:hover .lg-name{color:var(--b)}
+.lg-toggle:focus-visible{outline:2px solid var(--b);outline-offset:4px}
+.lg-chev{margin-left:auto;display:inline-flex;color:var(--muted);transition:transform .2s}
+.lg-card.open .lg-chev{transform:rotate(180deg)}
+.lg-card:not(.open) .lg-head h2{margin-bottom:0}
+.lg-card:not(.open) .lg-import{display:none}
+@media (prefers-reduced-motion:reduce){.lg-chev{transition:none}}
+.lg-body>.b-sub{margin-top:0}
 .lg-form{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin-top:12px}
 .lg-cell{display:flex;flex-direction:column;gap:4px;min-width:0}
+.lg-check{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;font-weight:700;color:var(--ink)}
+.lg-check input{width:18px;height:18px;margin:0;accent-color:var(--b);cursor:pointer;flex:none}
 .lg-lab{font-size:12.5px;font-weight:600;color:var(--muted)}
 .lg-cell input[type=text]{background:var(--bg-2);border:1px solid var(--line-2);border-radius:10px;padding:6px 10px;height:38px;font-size:14px;font-weight:700;width:100%;box-sizing:border-box;transition:border-color .15s,box-shadow .15s}
 .lg-cell input[type=text]:focus{outline:none;border-color:var(--b);box-shadow:0 0 0 3px var(--b-bg)}
@@ -31,9 +56,9 @@
 .lg-out textarea::placeholder{color:var(--soft)}
 .lg-out textarea:focus{outline:none;border-color:var(--b);box-shadow:0 0 0 3px var(--b-bg)}
 
-/* Los tres botones del mensaje van en una sola fila. */
-.lg-out .lg-acts{flex-wrap:nowrap;gap:6px}
-.lg-out .lg-acts .btn{flex:1 1 auto;padding:8px 8px;gap:6px;white-space:nowrap}
+/* Los tres botones del mensaje se reparten el ancho de la tarjeta y nunca se salen de ella: en una sola fila si caben y, si no, Generar baja a una segunda fila a todo el ancho. */
+.lg-out .lg-acts{flex-wrap:wrap;gap:6px;justify-content:stretch}
+.lg-out .lg-acts .btn{flex:1 1 auto;min-width:0;padding:8px 8px;gap:6px;white-space:nowrap}
 
 /* ---------- Íconos de los botones: dos tonos y animación al pasar el mouse ---------- */
 .lg-ic{display:inline-flex;flex:none}

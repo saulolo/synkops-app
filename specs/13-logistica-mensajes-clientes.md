@@ -25,8 +25,8 @@ Logística va a reunir todo lo del pedido después de la venta: seguimiento, cli
 
 **Parte 2 · Mensajes a clientes**
 
-- **Una tarjeta por plantilla, lado a lado** (`#lg-cards`; cada una `.lg-card` con id `#lg-card-<k>`), de izquierda a derecha en el orden de `LG_TEMPLATES`: "Confirmación de Guia" (`guia`) y, a su derecha, "Confirmación de Pedidos" (`pedido`). Cada tarjeta es **independiente**: su propio formulario, mensaje, errores y botones; lo escrito en una no pasa a la otra. Son angostas (`max-width: 420px`, parecidas al panel de Prompt buscar anuncios, porque van a sumarse más mensajes y se quiere proporcional) y, si no caben, bajan de fila. Las tarjetas de una misma fila miden lo mismo de alto: el cuadro Mensaje de la que tiene menos campos se alarga y el de la que tiene más queda en su mínimo (230 px). (Cambios del usuario tras el paso 4: el título pasó de "Mensajes a clientes" a "Confirmación de Guia", y la plantilla `pedido` se sumó como tarjeta aparte; antes hubo un selector de plantillas dentro de una sola tarjeta y se quitó.)
-- No hay selector de plantillas. Agregar otra plantilla = sumar una entrada en `LG_TEMPLATES` y su texto en `lgMessage`; su tarjeta aparece sola, a la derecha de las demás.
+- **Una tarjeta por plantilla, lado a lado** (`#lg-cards`; cada una `.lg-card` con id `#lg-card-<k>`), de izquierda a derecha en el orden de `LG_TEMPLATES`: "Confirmación de Pedidos" (`pedido`), a su derecha "Confirmación de Guia" (`guia`) y, en la tercera columna, "Pedido Confirmado" (`confirmado`) con "Segundo Intento" (`recordatorio`) **apilada justo debajo** (`below: 'pedido'`): las dos juntas miden lo que una tarjeta de las otras columnas (`.lg-col`; el cuadro Mensaje de cada una es más bajo, mínimo 120 px). Cada tarjeta es **independiente**: su propio formulario, mensaje, errores y botones; lo escrito en una no pasa a la otra. Son angostas (`max-width: 420px`, parecidas al panel de Prompt buscar anuncios, porque van a sumarse más mensajes y se quiere proporcional) y, si no caben, bajan de fila. Las tarjetas de una misma fila miden lo mismo de alto: el cuadro Mensaje de la que tiene menos campos se alarga y el de la que tiene más queda en su mínimo (230 px). (Cambios del usuario tras el paso 4: el título pasó de "Mensajes a clientes" a "Confirmación de Guia", y las plantillas `pedido`, `confirmado` y `recordatorio` se sumaron como tarjetas aparte; antes hubo un selector de plantillas dentro de una sola tarjeta y se quitó.)
+- No hay selector de plantillas. Agregar otra plantilla = sumar una entrada en `LG_TEMPLATES` y su texto en `lgMessage`; su tarjeta aparece sola, a la derecha de las demás (cambiar el orden es mover su entrada en `LG_TEMPLATES`).
 - Formulario de cada tarjeta (`#lg-<k>-form`), con un campo por cada `field` de su plantilla (`#lg-<k>-f-<campo>`, aviso `#lg-<k>-err-<campo>`). Para "Confirmación de Guia" (`guia`):
   - Nombre del destinatario (`name`): texto, obligatorio.
   - Producto (`product`): texto, obligatorio. Se prellena con `app.state.landing.prod.name`.
@@ -100,6 +100,88 @@ El *envío* es totalmente *Gratis* y el pago es *Contra Entrega* para tu segurid
 🚚 Por favor *confírmanos* si tus datos son correctos para despachar tu pedido *ahora* 🤍
 ```
 
+**Parte 3c · Pedido Confirmado (`confirmado`)**
+
+Mensaje **fijo** para cuando el cliente responde que confirma el pedido. No pide datos: su único control es una casilla `Incluye obsequio` (`#lg-confirmado-f-gift`), **marcada por defecto**. No tiene «Traer de Desarrollo» (no usa nada de Desarrollo). Con el botón «Generar mensaje» (como las otras tarjetas) sale:
+
+Con obsequio:
+
+```text
+Gracias por confirmar. Tu paquete ya va rumbo a empaque. 📦
+
+Como agradecimiento, en cuanto recibas tu producto, avísanos por aquí para enviarte el *obsequio* adjunto ✨
+
+¡Quedamos muy atentos a tu entrega!
+```
+
+Sin obsequio (casilla desmarcada) se omite el párrafo del obsequio:
+
+```text
+Gracias por confirmar. Tu paquete ya va rumbo a empaque. 📦
+
+¡Quedamos muy atentos a tu entrega!
+```
+
+El título "Pedido Confirmado" lo puso el asistente (el usuario no lo nombró) y se cambia en `LG_TEMPLATES`. «Limpiar» vacía el mensaje y deja la casilla como está.
+
+**Parte 3d · Segundo Intento (`recordatorio`)**
+
+Mensaje para cuando el cliente **no contesta** la confirmación del pedido (un segundo intento). Va en una tarjeta apilada justo debajo de "Confirmación de Pedidos". Campo único: Nombre de cliente (`name`, texto obligatorio, ej. `Eugenia`). Sin «Traer de Desarrollo». Con el nombre de ejemplo sale:
+
+```text
+¡Hola de nuevo, Eugenia! 👋
+
+Te escribimos otra vez por tu pedido en 🍃*VidanovaStore*.
+
+Por favor *confírmanos* si tus datos son correctos para pasar tu pedido a despacho 🚚
+
+Si algo no está bien, cuéntanos por aquí y lo corregimos 🤍
+```
+
+La redacción y el título "Segundo Intento" los propuso el asistente a partir de «algo como: por favor confirmarnos si los datos son los correctos para pasar a despacho, antes saludando "Hola de nuevo"»; el usuario los ajusta en `LG_TEMPLATES` y `TEXT`. Se agregó el nombre como campo para saludar igual que en la confirmación del pedido (suposición: si se prefiere estático, se quita el campo).
+
+**Parte 3e · Tarjetas contraídas**
+
+Como habrá más mensajes, todas las tarjetas **nacen contraídas**: solo se ve su nombre con una flecha. Al tocar el nombre se abre (la flecha gira) y al volver a tocarlo se cierra. Son independientes: puede haber varias abiertas a la vez. Contraer no borra lo escrito ni el mensaje generado. Qué tarjetas están abiertas **no se guarda** (al recargar vuelven a contraídas). Estructura: el título `h2` lleva un botón `#lg-<k>-toggle` (`aria-expanded`, `aria-controls="lg-<k>-body"`; su texto es exactamente el nombre) y el subtítulo, el formulario y el mensaje van en `div.lg-body#lg-<k>-body` (`hidden` al contraer). «Traer de Desarrollo» solo se ve con la tarjeta abierta. La regla de igual altura aplica solo a las tarjetas abiertas de una fila; una contraída no se estira. Estado `S.cards.<k>.open` (`false` al inicio); `ui.logistics.open(node, bool)` solo pinta.
+
+**Parte 3f · Tercer Intento (`tercero`)**
+
+Mensaje para cuando el cliente no contestó la llamada ni el mensaje: avisa que la orden se cancelará sin confirmación. Tarjeta propia, **a la derecha de la pila Pedidos + Segundo Intento** y a la izquierda de Guia. Campos (todos obligatorios): Nombre de cliente (`name`, ej. `Eugenia`), Producto (`product`, se prellena con el producto de Desarrollo y trae «Traer de Desarrollo», ej. `Crema Despigmentante`) y Ciudad / Municipio (`city`, ej. `Pasto`). Con esos ejemplos sale:
+
+```text
+Hola, Eugenia. Intentamos comunicarnos contigo por llamada para autorizar el despacho de tu Crema Despigmentante con Envío Gratis. 📦
+
+Por políticas de seguridad y alta demanda, si no recibimos tu confirmación el sistema cancelará tu orden automáticamente y cederemos la unidad a otro cliente.
+
+Si aún deseas recibirla en Pasto y pagar contra entrega, por favor respóndenos a este mensaje con un 'CONFIRMO'. Quedamos atentos.
+```
+
+Orden final de tarjetas: [Pedidos + Segundo Intento] · Tercer Intento · Guia · Pedido Confirmado. El título "Tercer Intento" y su subtítulo los propuso el asistente. «Con Envío Gratis» va fijo en el texto.
+
+**Parte 3g · Solicitud de Anticipo (`anticipo`)**
+
+Para cuando la huella digital del cliente (historial de devoluciones) marca **más del 70 %** y hay que pedir un anticipo para asegurar la entrega. Tarjeta a la derecha de Tercer Intento (segunda fila). Campos obligatorios: Nombre de cliente (`name`), Producto (`product`, se prellena de Desarrollo) y Valor del anticipo (`advance`, dinero, ej. `$ 20.000`). El mensaje **explica el motivo** (historial de altas devoluciones registradas con su número en la red logística nacional), remite a la **gráfica oficial adjunta** (la imagen se envía aparte en WhatsApp; la app no la adjunta) pide el anticipo con tono amable pero firme y trae al final las cuentas para el abono (Nequi/Daviplata y Bancolombia, fijas en el texto) y pide el comprobante por el chat:
+
+```text
+Hola, Eugenia 👋
+
+Recibimos tu pedido de Crema Despigmentante en 🍃*VidanovaStore* y queremos que te llegue sin contratiempos 📦
+
+Debido a nuestras políticas de seguridad y a un historial de altas devoluciones registradas con tu número en la red logística nacional (te compartimos la gráfica oficial adjunta), por protocolo de la bodega no podemos arriesgar el despacho sin un pequeño anticipo de *$20.000* 🔒
+
+Ese valor *se descuenta del total* que pagarás contra entrega: no es un costo adicional, solo la garantía de que tu pedido salga hoy mismo 🚚
+
+Puedes realizar el abono a nuestro Nequi/Daviplata:
+📱 *Nequi/Daviplata*: 3182110955
+
+O a nuestra cuenta de Ahorros - Bancolombia
+23015881151
+
+Apenas nos envíes el comprobante por este chat, programamos tu despacho 🤍
+```
+
+Redacción construida con el asistente a partir de la frase del usuario; se ajusta en `TEXT.anticipo`. El 70 % es criterio del usuario y no se calcula en la app. «Sale hoy mismo» es una suposición del asistente: se cambia si el despacho no es el mismo día.
+
 **Pruebas y documentación**
 
 - `tests/core.test.js`: plantilla, validación y texto del mensaje (ver Criterios).
@@ -137,6 +219,8 @@ const LG_PARTS = [
   { k: 'track', label: '📦 Seguimiento de pedidos · pronto', disabled: true },
 ];
 const LG_TEMPLATES = [ // una tarjeta por plantilla, de izquierda a derecha; la primera es también la de respaldo en lgTemplate
+  { k: 'pedido', title: 'Confirmación de Pedidos',
+    fields: [/* Parte 3b: name, product (from: 'name'), address, city, dept, phone, total (money, errMoney: 'Total mayor a 0') */] },
   { k: 'guia', title: 'Confirmación de Guia',
     fields: [
       { k: 'name',    label: 'Nombre del destinatario', type: 'text', ph: 'Ej: Pablo' },
@@ -145,8 +229,10 @@ const LG_TEMPLATES = [ // una tarjeta por plantilla, de izquierda a derecha; la 
       { k: 'price',   label: 'Precio',                  type: 'money', from: 'price', ph: 'Ej: $ 97.400' }, // landing.prod.price
       { k: 'address', label: 'Dirección de entrega',    type: 'text', ph: 'Ej: Cra 67 # 25 - 34 Itagui - Calatrava' },
     ] },
-  { k: 'pedido', title: 'Confirmación de Pedidos',
-    fields: [/* Parte 3b: name, product (from: 'name'), address, city, dept, phone, total (money, errMoney: 'Total mayor a 0') */] },
+  { k: 'confirmado', title: 'Pedido Confirmado', sub: '…', // al final: mensaje fijo
+    fields: [{ k: 'gift', label: 'Incluye obsequio', type: 'check', def: true }] }, // `check` = casilla (true/false), nunca da error
+  { k: 'recordatorio', title: 'Segundo Intento', below: 'pedido', // apilada debajo de `pedido`
+    fields: [{ k: 'name', label: 'Nombre de cliente', type: 'text', ph: 'Ej: Eugenia' }] },
 ];
 ```
 
@@ -155,6 +241,7 @@ Funciones (puras):
 - `lgTemplate(k)` → la plantilla con esa clave; una clave desconocida cae en la primera.
 - `lgMoney(text)` → número en pesos o `null` (`'97.400'`, `'$ 97.400'`, `'97400'` → `97400`; vacío o `0` → `null`).
 - `lgValues(tpl, form)` → `{ ok, values, errors }`. Recorta espacios; vacío = error «Escribe …»; `money` inválido o ≤ 0 = error «Precio mayor a 0» (o el `errMoney` del campo, p. ej. «Total mayor a 0»).
+- `lgForm(tpl)` → valores iniciales del formulario: el `def` de cada campo; sin él `''` (o `false` en una casilla).
 - `lgPrefill(prod)` → `{ product, price }` desde `landing.prod` (`name`, `price`); faltantes = `''`/`null`.
 - `lgMessage(k, values)` → el texto de la plantilla `k` (Parte 3 o 3b) con los valores puestos (el dinero formateado `$97.400`).
 
@@ -165,12 +252,14 @@ Funciones (puras):
   cards: {        // una entrada por plantilla (clave = `k` de LG_TEMPLATES)
     guia:   { form: { name: '', product: '', guide: '', price: '', address: '' }, last: '' },
     pedido: { form: { name: '', product: '', address: '', city: '', dept: '', phone: '', total: '' }, last: '' },
+    confirmado: { form: { gift: true }, last: '' },
+    recordatorio: { form: { name: '' }, last: '' },
   } }             // form = lo escrito; last = último mensaje generado
 ```
 
 ### Ids y clases (prefijo `#lg-`/`.lg-`)
 
-`#lg-parts`, `#lg-cards`, `.lg-card`, `#lg-card-<k>`, y por tarjeta (con `<k>` = `guia` o `pedido`): `#lg-<k>-form`, `#lg-<k>-f-<campo>`, `#lg-<k>-err-<campo>`, `#lg-<k>-import`, `#lg-<k>-gen`, `#lg-<k>-copy`, `#lg-<k>-clear`, `#lg-<k>-out`; clases `.lg-acts`, `.lg-bad`. Cada tarjeta lleva su clave en el id para que dos tarjetas no repitan ids. `#lg-soon` (si la sub-pestaña `track` necesita tarjeta: no se muestra porque está deshabilitada).
+`#lg-parts`, `#lg-cards`, `.lg-card`, `#lg-card-<k>`, y por tarjeta (con `<k>` = `pedido`, `guia`, `confirmado` o `recordatorio`): `#lg-<k>-form`, `#lg-<k>-f-<campo>`, `#lg-<k>-err-<campo>`, `#lg-<k>-import`, `#lg-<k>-gen`, `#lg-<k>-copy`, `#lg-<k>-clear`, `#lg-<k>-out`; clases `.lg-acts`, `.lg-bad`. Cada tarjeta lleva su clave en el id para que dos tarjetas no repitan ids. `#lg-soon` (si la sub-pestaña `track` necesita tarjeta: no se muestra porque está deshabilitada).
 
 ### Dependencias
 
@@ -182,7 +271,7 @@ Pruebas primero en cada paso: se escriben, fallan y luego se hace el código.
 
 1. **Núcleo.** Pruebas en Node: `lgTemplate('x')` cae en la primera (`pedido`); `lgMoney` con `'97.400'`, `'$ 97.400'`, `'97400'`, `''`, `'0'`, `'abc'`; `lgValues` marca cada campo vacío y el precio inválido, y con todo bien da `ok: true`; `lgPrefill({ name: 'Omegaxl joint support', price: 97400 })`; `lgMessage('guia', ejemplo)` es idéntico al texto de la Parte 3 y `lgMessage('pedido', ejemplo)` al de la Parte 3b. Luego `core/logistics.js`, su `<script>` y su línea en `js/index.js`.
 2. **Pestaña y sub-pestañas.** Humo: 11 pestañas y "Logística" justo después de "Escalado"; `#v-logistica` con encabezado; `#lg-parts` con `msgs` abierta y `track` deshabilitada (un clic no la abre). Luego el botón y la vista en `index.html`, `ui/logistics.js` (`parts`), `app/logistics.js`, `logistics.css`.
-3. **Formulario y prellenado.** Humo: dos tarjetas, Guia a la izquierda y Pedidos a su derecha; 5 campos (sin tiempo de entrega); con `landing.prod` lleno, abrir la pestaña llena Producto y Precio; si ya escribí Producto no lo pisa; `#lg-import` sí lo pisa; sin producto en Desarrollo avisa. Luego `ui.logistics.card` y su lógica en `app`.
+3. **Formulario y prellenado.** Humo: dos tarjetas, Pedidos a la izquierda y Guia a su derecha; 5 campos (sin tiempo de entrega); con `landing.prod` lleno, abrir la pestaña llena Producto y Precio; si ya escribí Producto no lo pisa; `#lg-import` sí lo pisa; sin producto en Desarrollo avisa. Luego `ui.logistics.card` y su lógica en `app`.
 4. **Generar, copiar y limpiar.** Humo: Generar con campos vacíos marca `.lg-bad` y no cambia `#lg-<k>-out`; con todo lleno `#lg-<k>-out` = `lgMessage`; escribir después no cambia el mensaje; Copiar sin mensaje avisa; Limpiar vacía los datos del pedido y el mensaje, y deja el producto (y el precio). Luego botones en `ui` y `app`, y estilos.
 5. **Revisión visual.** En el navegador: 7 temas, pantalla angosta, copiar y pegar en WhatsApp Web (negritas y emojis bien).
 6. **Documentación.** Después del merge, `CLAUDE.md` y `README.md`: pestaña Logística, módulo `logistics`, ids `#lg-`, dependencias, orden de `<script>` y `<link>`.
@@ -194,7 +283,7 @@ Pruebas primero en cada paso: se escriben, fallan y luego se hace el código.
 - [ ] Muestra las sub-pestañas "💬 Mensajes a clientes" (abierta) y "📦 Seguimiento de pedidos · pronto" (deshabilitada, no se puede abrir).
 
 **Mensajes a clientes**
-- [ ] La pestaña muestra dos tarjetas separadas, lado a lado: "Confirmación de Guia" y, justo a su derecha, "Confirmación de Pedidos". No hay selector de plantillas.
+- [ ] La pestaña muestra dos tarjetas separadas, lado a lado: "Confirmación de Pedidos" y, justo a su derecha, "Confirmación de Guia" y, en la tercera columna, "Pedido Confirmado" con "Segundo Intento" debajo. No hay selector de plantillas.
 - [ ] Las tarjetas son independientes: lo escrito, los errores y el mensaje de una no cambian la otra, y cada una tiene sus propios botones.
 - [ ] "Confirmación de Pedidos" pide los 7 campos de la Parte 3b, trae el Producto de Desarrollo (el Total no) y, con los datos del ejemplo, genera el texto de la Parte 3b.
 - [ ] El formulario pide Nombre del destinatario, Producto, Número de guía, Precio y Dirección de entrega (el tiempo de entrega, `2 a 4`, va fijo en el mensaje).
@@ -206,6 +295,11 @@ Pruebas primero en cada paso: se escriben, fallan y luego se hace el código.
 - [ ] Con los datos del ejemplo, el mensaje generado es idéntico al de la Parte 3 (tienda, `*`, emojis, saltos de línea y `$97.400`).
 - [ ] Editar un campo después de generar no cambia el mensaje hasta volver a tocar "Generar mensaje".
 - [ ] "Copiar mensaje" lo copia y avisa; sin mensaje avisa y no copia.
+- [ ] "Pedido Confirmado" (tercera tarjeta, a la derecha de Guia) no pide datos: solo la casilla "Incluye obsequio", marcada por defecto. Con la casilla marcada genera el texto de la Parte 3c con el párrafo del obsequio; desmarcada, sin ese párrafo. Su mensaje solo cambia al tocar "Generar mensaje".
+- [ ] "Segundo Intento" está justo debajo de "Confirmación de Pedidos", en su misma columna (las dos juntas miden lo que la tarjeta de Guia); "Pedido Confirmado" va solo a la derecha de Guia. Pide solo el nombre y genera el texto de la Parte 3d.
+- [ ] Todas las tarjetas empiezan contraídas (solo el nombre y la flecha); tocar el nombre abre/cierra esa tarjeta, se pueden tener varias abiertas y cerrar no borra lo escrito (Parte 3e).
+- [ ] "Tercer Intento" está a la derecha de Segundo Intento (su columna) y pide nombre, producto y ciudad; genera el texto de la Parte 3f. Con ids `#lg-tercero-*`.
+- [ ] "Solicitud de Anticipo" está a la derecha de Tercer Intento; pide nombre, producto y valor del anticipo y genera el texto de la Parte 3g (con el motivo y la mención a la gráfica adjunta). Ids `#lg-anticipo-*`.
 - [ ] "Limpiar" vacía los datos del pedido y el mensaje de su tarjeta (en Guia: nombre, guía y dirección), y deja producto y precio.
 - [ ] Al recargar no queda nada guardado de esta pestaña.
 - [ ] Pegado en WhatsApp Web, las partes con `*` salen en negrita y los emojis se ven.
@@ -223,7 +317,7 @@ Pruebas primero en cada paso: se escriben, fallan y luego se hace el código.
 - **Sí:** pestaña propia "Logística" después de "Escalado" (decisión del usuario, por ahora). Ahí crecerán seguimiento, clientes y entregas.
 - **Sí:** bloque "Mensajes a clientes" como sub-pestaña, con "Seguimiento de pedidos · pronto" deshabilitada (decisión del usuario). Mismo patrón que Testeo.
 - **Sí:** plantillas fijas en código (decisión del usuario). **No:** editor de plantillas en la app: más grande y hoy no hace falta.
-- **Sí:** "Confirmación guía" y, a pedido del usuario tras el paso 4, "Confirmación de Pedidos" (otros campos y otro texto), cada una en su **propia tarjeta**, una al lado de la otra (la de Pedidos a la derecha). **No:** un selector de plantillas dentro de una sola tarjeta (se probó y el usuario pidió tarjetas aparte); las demás plantillas ahora.
+- **Sí:** "Confirmación guía" y, a pedido del usuario tras el paso 4, "Confirmación de Pedidos" (otros campos y otro texto) "Pedido Confirmado" (mensaje fijo con casilla de obsequio) y "Segundo Intento" (recordatorio apilado debajo de la anterior), cada una en su **propia tarjeta**, una al lado de la otra (la de Pedidos primero, a la izquierda, y la de Guia a su derecha). **No:** un selector de plantillas dentro de una sola tarjeta (se probó y el usuario pidió tarjetas aparte); las demás plantillas ahora.
 - **Sí:** el total de "Confirmación de Pedidos" es un campo propio (`total`), sin prellenar: el usuario solo pidió traer el Producto de la app.
 - **Sí:** producto y precio de "Producto que estoy montando" en Desarrollo (`landing.prod`) (decisión del usuario). **No:** Mi candidato: es un producto aún en evaluación.
 - **Sí:** prellenar solo campos vacíos al abrir y botón "Traer de Desarrollo" para pisar. **No:** pisar siempre: borraría un precio que cambié a mano.
@@ -257,3 +351,9 @@ Pruebas primero en cada paso: se escriben, fallan y luego se hace el código.
 - Guardar campos, plantilla o historial.
 
 Cada una de esas, si llega, va en su propia spec.
+
+> Cambio posterior: "Segundo Intento" pasó a apilarse debajo de "Confirmación de Pedidos" (`below: 'pedido'`). Orden en pantalla: columna [Pedidos + Segundo Intento] · Guia · Pedido Confirmado. Donde arriba se lea "debajo de Pedido Confirmado" o "tercera columna", rige esta nota.
+
+> Orden final (rige sobre las notas anteriores de apilado): fila 1 = Confirmación de Pedidos · Pedido Confirmado · Confirmación de Guia; fila 2 (salto de línea, `newRow: true` en Segundo Intento) = Segundo Intento · Tercer Intento. Ya no hay tarjetas apiladas (`below`) en las plantillas.
+
+> Orden final actualizado: fila 2 = Segundo Intento · Tercer Intento · Solicitud de Anticipo.

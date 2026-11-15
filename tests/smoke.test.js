@@ -417,10 +417,10 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   {
     const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
     const lgS = PYL.app.state.logistics, landing = PYL.app.state.landing;
-    assert.deepStrictEqual($$('#lg-cards .lg-card').map((c) => [c.id, c.querySelector('h2').textContent]), [['lg-card-guia', 'Confirmación de Guia'], ['lg-card-pedido', 'Confirmación de Pedidos']], 'Dos tarjetas separadas: Guia a la izquierda y Pedidos a su derecha');
+    assert.deepStrictEqual($$('#lg-cards .lg-card').map((c) => [c.id, c.querySelector('h2').textContent]), [['lg-card-pedido', 'Confirmación de Pedidos'], ['lg-card-confirmado', 'Pedido Confirmado'], ['lg-card-guia', 'Confirmación de Guia'], ['lg-card-recordatorio', 'Segundo Intento'], ['lg-card-tercero', 'Tercer Intento'], ['lg-card-anticipo', 'Solicitud de Anticipo']], 'Tarjetas separadas: Pedidos, Pedido Confirmado y Guia; en la segunda fila, Segundo, Tercer Intento y Solicitud de Anticipo');
     assert.ok(!$('#lg-tpls') && !$$('#lg-cards [data-tpl]').some((n) => n.tagName === 'BUTTON'), 'Ya no hay selector de plantilla: cada plantilla es su tarjeta');
     const ids = $$('#lg-cards [id]').map((n) => n.id);
-    assert.strictEqual(new Set(ids).size, ids.length, 'Ids únicos entre las dos tarjetas');
+    assert.strictEqual(new Set(ids).size, ids.length, 'Ids únicos entre las tarjetas');
     const campos = ['name', 'product', 'guide', 'price', 'address'];
     assert.deepStrictEqual($$('#lg-guia-form input').map((i) => i.id), campos.map((k) => 'lg-guia-f-' + k), '5 campos en orden (el tiempo de entrega es fijo)');
     assert.deepStrictEqual($$('#lg-guia-form label').map((l) => l.textContent), ['Nombre del destinatario', 'Producto', 'Número de guía', 'Precio', 'Dirección de entrega']);
@@ -467,7 +467,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     for (const k of ['name', 'product', 'guide', 'price', 'address']) escribe(k, '');
   }
 
-  // 8f. Logística · Confirmación de Pedidos (SPEC 13): su propia tarjeta, a la derecha de Guia, con 7 campos y su mensaje.
+  // 8f. Logística · Confirmación de Pedidos (SPEC 13): su propia tarjeta, a la izquierda de Guia, con 7 campos y su mensaje.
   {
     const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
     const L = PYL.core.logistics, lgS = PYL.app.state.logistics, landing = PYL.app.state.landing;
@@ -475,7 +475,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     const escribe = (sel, v) => { const i = $(sel); i.value = v; i.dispatchEvent(new window.Event('input', { bubbles: true })); };
     const abre = () => { tab('dash').click(); tab('logistica').click(); };
     const card = $('#lg-card-pedido');
-    assert.ok(card && card.previousElementSibling === $('#lg-card-guia'), 'La tarjeta de Pedidos va justo a la derecha de la de Guia');
+    assert.ok(card && card === $('#lg-cards').firstElementChild && card.nextElementSibling === $('#lg-card-confirmado'), 'La tarjeta de Pedidos va primero, a la izquierda de Pedido Confirmado');
     assert.strictEqual($('#lg-card-pedido h2').textContent, 'Confirmación de Pedidos');
     const campos = ['name', 'product', 'address', 'city', 'dept', 'phone', 'total'];
     assert.deepStrictEqual($$('#lg-pedido-form input').map((i) => i.id), campos.map((k) => 'lg-pedido-f-' + k), '7 campos en orden');
@@ -536,6 +536,142 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     landing.prod = {};
     for (const k of campos) escribe(P('f-' + k), '');
     for (const k of ['name', 'product', 'guide', 'price', 'address']) escribe(G('f-' + k), '');
+  }
+
+  // 8g. Logística · Pedido Confirmado (SPEC 13): mensaje fijo con un check de obsequio.
+  {
+    const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
+    const L = PYL.core.logistics, lgS = PYL.app.state.logistics;
+    const P = (s) => '#lg-confirmado-' + s;
+    const card = $('#lg-card-confirmado');
+    assert.ok(card && card.previousElementSibling === $('#lg-card-pedido') && card.nextElementSibling === $('#lg-card-guia'), 'Va entre Pedidos y Guia');
+    assert.strictEqual(card.querySelector('h2').textContent, 'Pedido Confirmado');
+    assert.deepStrictEqual($$('#lg-confirmado-form input').map((i) => [i.id, i.type]), [['lg-confirmado-f-gift', 'checkbox']], 'Solo el check, sin campos de ingreso');
+    assert.ok($(P('f-gift')).checked && /Incluye obsequio/.test($(P('form')).textContent), 'Check "Incluye obsequio" marcado por defecto');
+    assert.ok(!$(P('import')), 'Sin «Traer de Desarrollo»: no trae nada de Desarrollo');
+    assert.deepStrictEqual($$('#lg-card-confirmado .lg-acts button').map((b) => b.id), ['lg-confirmado-clear', 'lg-confirmado-copy', 'lg-confirmado-gen']);
+    // Con obsequio.
+    $(P('gen')).click();
+    assert.strictEqual($(P('out')).value, L.lgMessage('confirmado', { gift: true }));
+    assert.ok($(P('out')).value.startsWith('Gracias por confirmar. Tu paquete ya va rumbo a empaque. 📦') && $(P('out')).value.includes('*obsequio* adjunto ✨'), 'Trae el párrafo del obsequio');
+    assert.strictEqual($$('#lg-confirmado-form .lg-bad').length, 0);
+    // Desmarcar no cambia el mensaje hasta volver a generar; sin obsequio no va esa parte.
+    $(P('f-gift')).checked = false; $(P('f-gift')).dispatchEvent(new window.Event('change', { bubbles: true }));
+    assert.strictEqual(lgS.cards.confirmado.form.gift, false);
+    assert.ok($(P('out')).value.includes('obsequio'), 'No se actualiza en vivo');
+    $(P('gen')).click();
+    assert.strictEqual($(P('out')).value, L.lgMessage('confirmado', { gift: false }));
+    assert.ok(!$(P('out')).value.includes('obsequio') && $(P('out')).value.endsWith('¡Quedamos muy atentos a tu entrega!'), 'Sin obsequio');
+    // Es independiente de las otras tarjetas.
+    assert.ok($('#lg-pedido-out').value === '' && $('#lg-guia-out').value === '', 'No toca los otros mensajes');
+    // Limpiar vacía el mensaje; el check queda como estaba.
+    $(P('clear')).click();
+    assert.ok($(P('out')).value === '' && lgS.cards.confirmado.last === '' && $(P('f-gift')).checked === false, 'Limpiar vacía el mensaje y deja el check');
+    // Dejar como estaba: obsequio marcado y sin mensaje.
+    $(P('f-gift')).checked = true; $(P('f-gift')).dispatchEvent(new window.Event('change', { bubbles: true }));
+    assert.strictEqual(lgS.cards.confirmado.form.gift, true);
+  }
+
+  // 8h. Logística · Segundo Intento (SPEC 13): tarjeta apilada justo debajo de Pedido Confirmado.
+  {
+    const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
+    const L = PYL.core.logistics, lgS = PYL.app.state.logistics;
+    const P = (s) => '#lg-recordatorio-' + s;
+    const escribe = (v) => { const i = $(P('f-name')); i.value = v; i.dispatchEvent(new window.Event('input', { bubbles: true })); };
+    const card = $('#lg-card-recordatorio');
+    assert.ok(card.previousElementSibling.classList.contains('lg-break') && card.previousElementSibling.previousElementSibling === $('#lg-card-guia'), 'Abre la segunda fila (tras un salto de línea), debajo de la primera');
+    assert.deepStrictEqual($$('#lg-cards > *').length, 7, 'Seis tarjetas y un salto de línea');
+    assert.deepStrictEqual([...$('#lg-cards').children].map((c) => c.id || c.className), ['lg-card-pedido', 'lg-card-confirmado', 'lg-card-guia', 'lg-break', 'lg-card-recordatorio', 'lg-card-tercero', 'lg-card-anticipo'], 'Fila 1: Pedidos, Pedido Confirmado, Guia; fila 2: Segundo y Tercer Intento');
+    assert.strictEqual(card.querySelector('h2').textContent, 'Segundo Intento');
+    assert.deepStrictEqual($$('#lg-recordatorio-form input').map((i) => [i.id, i.placeholder]), [['lg-recordatorio-f-name', 'Ej: Eugenia']], 'Solo el nombre');
+    assert.ok(!$(P('import')), 'Sin «Traer de Desarrollo»');
+    assert.deepStrictEqual($$('#lg-card-recordatorio .lg-acts button').map((b) => b.id), ['lg-recordatorio-clear', 'lg-recordatorio-copy', 'lg-recordatorio-gen']);
+    // Generar sin nombre lo marca; con nombre arma el mensaje.
+    $(P('gen')).click();
+    assert.ok($(P('f-name')).classList.contains('lg-bad') && /^Escribe /.test($(P('err-name')).textContent) && $(P('out')).value === '', 'Sin nombre no genera');
+    escribe('Eugenia'); $(P('gen')).click();
+    assert.strictEqual($(P('out')).value, L.lgMessage('recordatorio', { name: 'Eugenia' }));
+    assert.ok($(P('out')).value.startsWith('¡Hola de nuevo, Eugenia! 👋') && $(P('out')).value.includes('*confírmanos*'), 'Saludo y pedido de confirmación');
+    escribe('Ana');
+    assert.ok($(P('out')).value.includes('Eugenia'), 'No se actualiza en vivo');
+    assert.strictEqual(lgS.cards.recordatorio.form.name, 'Ana');
+    assert.ok($('#lg-confirmado-out').value === '' && $('#lg-pedido-out').value === '', 'No toca los otros mensajes');
+    $(P('clear')).click();
+    assert.ok($(P('f-name')).value === '' && $(P('out')).value === '' && lgS.cards.recordatorio.last === '', 'Limpiar vacía el nombre y el mensaje');
+  }
+
+  // 8j. Logística · Tercer Intento (SPEC 13): tarjeta propia a la derecha de la pila Pedidos + Segundo Intento.
+  {
+    const $ = (q) => document.querySelector(q);
+    const L = PYL.core.logistics, lgS = PYL.app.state.logistics;
+    const P = (s) => '#lg-tercero-' + s;
+    const card = $('#lg-card-tercero');
+    assert.ok(card.previousElementSibling === $('#lg-card-recordatorio') && card.nextElementSibling === $('#lg-card-anticipo'), 'A la derecha de Segundo Intento');
+    assert.strictEqual(card.querySelector('h2').textContent, 'Tercer Intento');
+    const escribe = (k, v) => { const i = $(P('f-' + k)); i.value = v; i.dispatchEvent(new window.Event('input', { bubbles: true })); };
+    $(P('f-product')).value = ''; $(P('f-product')).dispatchEvent(new window.Event('input', { bubbles: true })); // Desarrollo pudo prellenarlo
+    $(P('gen')).click();
+    assert.ok(['name', 'product', 'city'].every((k) => $(P('f-' + k)).classList.contains('lg-bad')) && $(P('out')).value === '', 'Sin datos no genera');
+    escribe('name', 'Eugenia'); escribe('product', 'Crema Despigmentante'); escribe('city', 'Pasto'); $(P('gen')).click();
+    assert.strictEqual($(P('out')).value, L.lgMessage('tercero', { name: 'Eugenia', product: 'Crema Despigmentante', city: 'Pasto' }));
+    assert.ok($(P('out')).value.includes("'CONFIRMO'") && $(P('out')).value.includes('en Pasto'));
+    $(P('clear')).click();
+    assert.ok($(P('f-name')).value === '' && $(P('out')).value === '' && lgS.cards.tercero.last === '', 'Limpiar vacía');
+  }
+
+  // 8k. Logística · Solicitud de Anticipo (SPEC 13): a la derecha de Tercer Intento.
+  {
+    const $ = (q) => document.querySelector(q);
+    const L = PYL.core.logistics;
+    const P = (s) => '#lg-anticipo-' + s;
+    const card = $('#lg-card-anticipo');
+    assert.ok(card.previousElementSibling === $('#lg-card-tercero') && !card.nextElementSibling && card.querySelector('h2').textContent === 'Solicitud de Anticipo', 'Última, a la derecha de Tercer Intento');
+    const escribe = (k, v) => { const i = $(P('f-' + k)); i.value = v; i.dispatchEvent(new window.Event('input', { bubbles: true })); };
+    escribe('name', ''); escribe('product', ''); escribe('advance', '');
+    $(P('gen')).click();
+    assert.ok(['name', 'product', 'advance'].every((k) => $(P('f-' + k)).classList.contains('lg-bad')) && $(P('out')).value === '', 'Sin datos no genera');
+    escribe('name', 'Eugenia'); escribe('product', 'Crema Despigmentante'); escribe('advance', '20000'); $(P('gen')).click();
+    assert.strictEqual($(P('out')).value, L.lgMessage('anticipo', { name: 'Eugenia', product: 'Crema Despigmentante', advance: 20000 }));
+    assert.ok($(P('out')).value.includes('$20.000'));
+    $(P('clear')).click();
+    assert.ok($(P('f-name')).value === '' && $(P('out')).value === '', 'Limpiar vacía');
+  }
+
+  // 8i. Logística · tarjetas contraídas: se abren y se cierran tocando su nombre (SPEC 13).
+  {
+    const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
+    const lgS = PYL.app.state.logistics;
+    const claves = ['pedido', 'guia', 'confirmado', 'recordatorio', 'tercero', 'anticipo'];
+    const abierta = (k) => $('#lg-card-' + k).classList.contains('open');
+    // Todas empiezan contraídas: solo se ve el nombre.
+    for (const k of claves) {
+      const t = $('#lg-' + k + '-toggle'), body = $('#lg-' + k + '-body');
+      assert.ok(t && t.tagName === 'BUTTON' && t.closest('h2') && t.textContent === $('#lg-card-' + k + ' h2').textContent, k + ': el nombre es un botón dentro del título');
+      assert.ok(t.getAttribute('aria-expanded') === 'false' && t.getAttribute('aria-controls') === 'lg-' + k + '-body', k + ': aria-expanded=false');
+      assert.ok(body.hidden && !abierta(k) && lgS.cards[k].open === false, k + ': contraída');
+      assert.ok(t.querySelector('.lg-chev svg'), k + ': con su flecha');
+      assert.ok(body.querySelector('.lg-form') && body.querySelector('textarea') && body.querySelector('.lg-acts'), k + ': el formulario, el mensaje y los botones están dentro del cuerpo');
+    }
+    // Un clic en el nombre la abre; otro la cierra.
+    $('#lg-pedido-toggle').click();
+    assert.ok(abierta('pedido') && !$('#lg-pedido-body').hidden && $('#lg-pedido-toggle').getAttribute('aria-expanded') === 'true' && lgS.cards.pedido.open === true, 'Se abre');
+    assert.ok(claves.filter((k) => k !== 'pedido').every((k) => !abierta(k) && $('#lg-' + k + '-body').hidden), 'Las demás siguen contraídas');
+    // Son independientes: se pueden tener varias abiertas.
+    $('#lg-recordatorio-toggle').click();
+    assert.ok(abierta('pedido') && abierta('recordatorio') && !abierta('guia') && !abierta('confirmado'), 'Varias abiertas a la vez');
+    $('#lg-pedido-toggle').click();
+    assert.ok(!abierta('pedido') && $('#lg-pedido-body').hidden && $('#lg-pedido-toggle').getAttribute('aria-expanded') === 'false', 'Se vuelve a cerrar');
+    // Contraer no borra lo escrito ni el mensaje.
+    const i = $('#lg-recordatorio-f-name'); i.value = 'Eugenia'; i.dispatchEvent(new window.Event('input', { bubbles: true }));
+    $('#lg-recordatorio-gen').click();
+    const msg = $('#lg-recordatorio-out').value;
+    $('#lg-recordatorio-toggle').click(); $('#lg-recordatorio-toggle').click();
+    assert.ok(i.value === 'Eugenia' && $('#lg-recordatorio-out').value === msg && msg !== '', 'Cerrar y abrir conserva lo escrito y el mensaje');
+    // Dejar todas contraídas para lo siguiente.
+    $('#lg-recordatorio-clear').click();
+    $('#lg-recordatorio-toggle').click();
+    assert.ok(claves.every((k) => !abierta(k)), 'Todas contraídas');
+    assert.ok(!PYL.services.storage.logistics, 'Qué tarjetas están abiertas no se guarda');
   }
 
   // 9. Escalado · Fase de testeo: 6 pasos, cada uno con su bloque, y el avance.
@@ -931,6 +1067,13 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.ok(copiado.startsWith('¡Hola Eugenia! 🌟') && copiado !== $('#lg-guia-out').value, 'No es el de Guia');
     for (const k of ['name', 'product', 'address', 'city', 'dept', 'phone', 'total']) escribeP(k, '');
     $('#lg-pedido-clear').click();
+    // Pedido Confirmado copia su propio mensaje.
+    $('#lg-confirmado-gen').click();
+    $('#lg-confirmado-copy').click();
+    await new Promise((ok) => setTimeout(ok, 20));
+    assert.strictEqual(copiado, $('#lg-confirmado-out').value, 'Copia el mensaje de Pedido Confirmado');
+    assert.ok(copiado.startsWith('Gracias por confirmar.'), 'Es el de Pedido Confirmado');
+    $('#lg-confirmado-clear').click();
     // Dejar el formulario vacío para el resto de las pruebas.
     for (const k of ['name', 'product', 'guide', 'price', 'address']) escribe(k, '');
     $('#lg-guia-clear').click();
