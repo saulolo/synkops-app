@@ -21,6 +21,7 @@
 <link rel="stylesheet" href="css/modules/cheat.css">
 <link rel="stylesheet" href="css/modules/scaling.css">
 <link rel="stylesheet" href="css/modules/logistics.css">
+<link rel="stylesheet" href="css/modules/hub.css">
 <link rel="stylesheet" href="css/themes.css">
 <link rel="stylesheet" href="css/modules/pnl.css">
 <link rel="stylesheet" href="css/report.css">
@@ -148,6 +149,19 @@
       </g>
     </svg>
   </div>
+
+  <!-- Centro de mando: accesos directos (los arma js/modules/hub). En pantallas anchas vive en el margen derecho. -->
+  <aside class="hb-rail" id="hb-rail" aria-label="Centro de mando">
+  <div class="card mt hb" id="hb-root">
+    <h2>Centro de mando</h2>
+    <div class="hb-grid" id="hb-grid"></div>
+    <div id="hb-list" hidden></div>
+    <div class="hb-actions">
+      <button class="btn ghost" type="button" id="hb-cancel" hidden>Cancelar</button>
+      <button class="btn ghost" type="button" id="hb-edit">Editar</button>
+    </div>
+  </div>
+  </aside>
 
   <div class="card mt">
     <div class="row between">
@@ -1124,6 +1138,7 @@
 <script src="js/modules/scaling/core/scaling.js"></script>
 <script src="js/modules/cheat/core/cheat.js"></script>
 <script src="js/modules/logistics/core/logistics.js"></script>
+<script src="js/modules/hub/core/hub.js"></script>
 <!-- Services: archivos y almacenamiento del navegador -->
 <script src="js/shared/services/storage.js"></script>
 <script src="js/shared/services/files.js"></script>
@@ -1158,6 +1173,7 @@
 <script src="js/modules/cheat/ui/cheat.js"></script>
 <script src="js/modules/scaling/ui/scaling.js"></script>
 <script src="js/modules/logistics/ui/logistics.js"></script>
+<script src="js/modules/hub/ui/hub.js"></script>
 <!-- App: estado, casos de uso y arranque (main.js va al final) -->
 <script src="js/app/state.js"></script>
 <script src="js/modules/pnl/app/filters.js"></script>
@@ -1175,6 +1191,7 @@
 <script src="js/modules/cheat/app/cheat.js"></script>
 <script src="js/modules/scaling/app/scaling.js"></script>
 <script src="js/modules/logistics/app/logistics.js"></script>
+<script src="js/modules/hub/app/hub.js"></script>
 <script src="js/modules/trainer/app/trainer.js"></script>
 <script src="js/app/nav.js"></script>
 <script src="js/app/main.js"></script>

@@ -11,7 +11,7 @@ const caso = (nombre, fn) => casos.push([nombre, fn]);
 
 caso('exporta todas las funciones del núcleo aplanadas', () => {
   const claves = Object.keys(core).sort().join(',');
-  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CH_CPA_READ,CH_HELP,CH_SIDES,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,LADDER_BLOCKS,LANDING,LEVELS,LG_DAYS,LG_PARTS,LG_STORE,LG_TEMPLATES,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,chChain,chHard,chPlat,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,isDropi,isMetrics,key,kpis,lgForm,lgMessage,lgMoney,lgMoneyText,lgPrefill,lgTemplate,lgValues,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
+  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CH_CPA_READ,CH_HELP,CH_SIDES,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,HUB_DEFAULTS,HUB_VERSION,LADDER_BLOCKS,LANDING,LEVELS,LG_DAYS,LG_PARTS,LG_STORE,LG_TEMPLATES,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,chChain,chHard,chPlat,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,hubAdd,hubCheck,hubClean,hubDefaults,hubDomain,hubFavicon,hubInitials,hubLoad,hubOrder,hubRemove,hubSet,hubUrl,isDropi,isMetrics,key,kpis,lgForm,lgMessage,lgMoney,lgMoneyText,lgPrefill,lgTemplate,lgValues,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
 });
 
 caso('Costeo: proveedor 30.000 da precio $99.900 y tope $21.617', () => {
@@ -1299,6 +1299,77 @@ caso('logistics: lgMessage es idéntico al texto de la spec', () => {
   assert.strictEqual(core.lgMessage('x', PEDIDO), core.lgMessage('pedido', PEDIDO), 'Una clave desconocida cae en la primera plantilla');
   assert.ok(core.lgMessage('guia', { ...v, price: 1234567 }).includes('*$1.234.567*'));
   assert.ok(core.LG_STORE.includes('VidanovaStore'));
+});
+
+caso('Centro de mando: iniciales, URL, dominio y favicon', () => {
+  assert.strictEqual(core.hubInitials('TikTok Ads'), 'TA');
+  assert.strictEqual(core.hubInitials('Dropi'), 'D');
+  assert.strictEqual(core.hubInitials('Mi gran tienda nueva'), 'MGT');
+  assert.strictEqual(core.hubInitials('  '), '');
+  assert.deepStrictEqual(core.hubUrl(''), { ok: true, url: '', err: null });
+  assert.deepStrictEqual(core.hubUrl(' https://x.co '), { ok: true, url: 'https://x.co', err: null });
+  assert.strictEqual(core.hubUrl('x.co').ok, false);
+  assert.strictEqual(core.hubUrl('https://a b').ok, false);
+  assert.strictEqual(core.hubUrl('javascript:alert(1)').ok, false);
+  assert.strictEqual(core.hubDomain('https://www.skool.com/x'), 'skool.com');
+  assert.strictEqual(core.hubDomain('https://ads.tiktok.com/'), 'ads.tiktok.com');
+  assert.strictEqual(core.hubDomain(''), '');
+  assert.strictEqual(core.hubDomain('x.co'), '');
+  assert.strictEqual(core.hubFavicon('https://ads.tiktok.com/'), 'https://www.google.com/s2/favicons?domain=ads.tiktok.com&sz=64');
+  assert.strictEqual(core.hubFavicon(''), null);
+});
+
+caso('Centro de mando: hubLoad valida lo guardado', () => {
+  const fab = core.hubDefaults();
+  assert.strictEqual(fab.length, 9);
+  assert.deepStrictEqual(fab.map((x) => x.id), ['tiktok', 'meta', 'adlib', 'dropi', 'dropkiller', 'kalodata', 'skool', 'chatgpt', 'claude']);
+  assert.ok(fab.every((x) => x.url === '' && x.icon === null));
+  assert.deepStrictEqual(core.hubLoad(null), fab);
+  assert.deepStrictEqual(core.hubLoad('{roto'), fab);
+  assert.deepStrictEqual(core.hubLoad(JSON.stringify({ v: 2, items: [{ id: 'a', name: 'A' }] })), fab);
+  const items = core.hubLoad(JSON.stringify({ v: 1, items: [
+    { id: 'a', name: 'Alfa', url: 'https://a.co', icon: 'data:image/png;base64,xx' },
+    { id: 'b', name: '', url: '' },
+    { name: 'sin id' },
+    { id: 'c', name: 'Ce', url: 'javascript:alert(1)', icon: 'http://x/y.png' },
+    { id: 'a', name: 'Repetido' },
+  ] }));
+  assert.deepStrictEqual(items, [
+    { id: 'a', name: 'Alfa', ini: 'A', url: 'https://a.co', icon: 'data:image/png;base64,xx' },
+    { id: 'c', name: 'Ce', ini: 'C', url: '', icon: null },
+  ]);
+});
+
+caso('Centro de mando: hubCheck, hubAdd, hubOrder, hubRemove y hubSet', () => {
+  const base = [{ id: 'a', name: 'A', ini: 'A', url: '', icon: null }, { id: 'b', name: 'B', ini: 'B', url: '', icon: null }, { id: 'c', name: 'C', ini: 'C', url: '', icon: null }];
+  assert.deepStrictEqual(core.hubCheck(base), { ok: true, errors: {} });
+  const mal = core.hubSet(core.hubSet(base, 'a', { url: 'x.co' }), 'b', { name: ' ' });
+  const r = core.hubCheck(mal);
+  assert.strictEqual(r.ok, false);
+  assert.ok(r.errors.a.url && !r.errors.a.name);
+  assert.ok(r.errors.b.name);
+  assert.strictEqual(r.errors.c, undefined);
+  const sucio = [{ id: 'a', name: '  Alfa ', ini: '', url: ' https://a.co ', icon: null }];
+  assert.deepStrictEqual(core.hubClean(sucio), [{ id: 'a', name: 'Alfa', ini: 'A', url: 'https://a.co', icon: null }]);
+  assert.strictEqual(sucio[0].name, '  Alfa ', 'hubClean no toca la lista recibida');
+  assert.strictEqual(core.hubAdd(base, { name: '', url: 'https://x.co' }).ok, false);
+  assert.strictEqual(core.hubAdd(base, { name: 'X', url: '' }).ok, false);
+  assert.strictEqual(core.hubAdd(base, { name: 'X', url: 'x.co' }).ok, false);
+  const add = core.hubAdd(base, { name: ' Mi Tienda ', url: 'https://x.co' }, 1000);
+  assert.strictEqual(add.ok, true);
+  assert.strictEqual(base.length, 3, 'no debe tocar la lista recibida');
+  assert.deepStrictEqual(add.items[3], { id: 'urs', name: 'Mi Tienda', ini: 'MT', url: 'https://x.co', icon: null });
+  const dos = core.hubAdd(core.hubAdd(base, { name: 'X', url: 'https://x.co' }, 7).items, { name: 'Y', url: 'https://y.co' }, 7);
+  assert.strictEqual(new Set(dos.items.map((x) => x.id)).size, 5, 'Dos altas en el mismo instante no repiten id');
+  assert.deepStrictEqual(core.hubOrder(base, ['c', 'a', 'b']).map((x) => x.id), ['c', 'a', 'b'], 'hubOrder sigue el orden pedido');
+  assert.deepStrictEqual(core.hubOrder(base, ['c', 'zz']).map((x) => x.id), ['c', 'a', 'b'], 'hubOrder ignora ids desconocidos y deja al final los que faltan');
+  assert.deepStrictEqual(core.hubOrder(base, ['b', 'b']).map((x) => x.id), ['b', 'a', 'c'], 'hubOrder no repite');
+  assert.strictEqual(core.hubOrder(base, ['a', 'b', 'c'])[0], base[0], 'hubOrder conserva los mismos objetos');
+  assert.deepStrictEqual(core.hubRemove(base, 'b').map((x) => x.id), ['a', 'c']);
+  assert.strictEqual(base.length, 3);
+  const ren = core.hubSet(base, 'a', { name: 'Mi gran tienda' });
+  assert.strictEqual(ren[0].ini, 'MGT');
+  assert.strictEqual(base[0].ini, 'A');
 });
 
 let fallos = 0;

@@ -43,6 +43,10 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.deepStrictEqual(actual[capa], BASE_KEYS[capa], `Claves de PYL.${capa} distintas de la línea base`);
   }
 
+  // 1b. SPEC 14: services.storage.hub (clave pyl-hub). Sin localStorage (file://) no lanza: load da null y save da false.
+  assert.strictEqual(PYL.services.storage.hub.load(), null, 'hub.load sin localStorage');
+  assert.strictEqual(PYL.services.storage.hub.save({ v: 1, items: [] }), false, 'hub.save sin localStorage avisa con false');
+
   // 2. Las 11 pestañas abren su vista y marcan aria-current.
   const tabs = [...document.querySelectorAll('#tabs button')];
   assert.strictEqual(tabs.length, 11, 'Debe haber 11 pestañas');
@@ -971,6 +975,30 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   assert.deepStrictEqual([...run().order].sort(), [...PYL.core.testing.TEST_CASES.map((c) => c.id)].sort(), 'La ronda pasa por los 11 casos');
   paso(0);
 
+  // 7b. Centro de mando (SPEC 14, paso 3): tarjeta entre el hero y la cadena; 9 accesos de fábrica sin URL; con URL es un enlace.
+  {
+    const dash = document.querySelector('#v-dash'), kids = [...dash.children];
+    const iHb = kids.findIndex((k) => k.id === 'hb-rail'), iHero = kids.findIndex((k) => k.classList.contains('hero'));
+    const iChain = kids.findIndex((k) => /La cadena que decide todo/.test(k.textContent) && k.id !== 'hb-rail');
+    assert.ok(iHero >= 0 && iHb === iHero + 1 && iChain > iHb, 'Centro de mando justo bajo el hero y antes de la cadena');
+    assert.strictEqual(document.querySelectorAll('#hb-root').length, 1, '#hb-root único');
+    assert.strictEqual(document.querySelector('#hb-root').parentElement.id, 'hb-rail', 'La tarjeta va dentro del aside #hb-rail');
+    const tiles = [...document.querySelectorAll('#hb-grid .hb-tile')];
+    assert.deepStrictEqual(tiles.map((t) => t.dataset.id), ['tiktok', 'meta', 'adlib', 'dropi', 'dropkiller', 'kalodata', 'skool', 'chatgpt', 'claude'], 'Los 9 de fábrica, en orden');
+    assert.ok(tiles.every((t) => t.tagName === 'BUTTON' && t.classList.contains('hb-empty') && /poner enlace/.test(t.textContent)), 'Todos botones punteados con "poner enlace"');
+    assert.deepStrictEqual(tiles.slice(0, 2).map((t) => t.querySelector('.hb-name').textContent + '/' + t.querySelector('.hb-ini').textContent), ['TikTok Ads/TT', 'Meta Ads/M']);
+    assert.strictEqual(PYL.app.state.hub.items.length, 9);
+    assert.strictEqual(PYL.app.state.hub.editing, false);
+    const a = PYL.ui.hub.tile({ id: 'x', name: 'Skool', ini: 'S', url: 'https://www.skool.com/', icon: null });
+    assert.ok(a.tagName === 'A' && a.getAttribute('href') === 'https://www.skool.com/' && a.target === '_blank' && a.rel === 'noopener noreferrer', 'Con URL: enlace a pestaña nueva');
+    assert.ok(!/poner enlace/.test(a.textContent) && !a.classList.contains('hb-empty'), 'Con URL no dice "poner enlace"');
+    assert.ok(a.querySelector('img.hb-fav') && a.querySelector('img.hb-fav').src.includes('google.com/s2/favicons?domain=skool.com&sz=64'), 'Favicon de Google s2');
+    const own = PYL.ui.hub.tile({ id: 'y', name: 'Mío', ini: 'M', url: 'https://x.co', icon: 'data:image/png;base64,AA' });
+    assert.ok(own.querySelector('img') && !own.querySelector('img.hb-fav') && own.querySelector('img').src.startsWith('data:image/'), 'Con ícono propio no pide favicon');
+    const g = document.createElement('div'); PYL.ui.hub.grid(g, [], {});
+    assert.strictEqual(g.textContent, 'Sin accesos. Toca Editar para agregar uno.');
+  }
+
   // 8. Rastros de la SPEC 08 (SPEC 09): Estrategias solo VDO y Por proveedor, 'auto' guardado cae en VDO y pyl-auto se borra.
   // En jsdom con file:// no hay localStorage: se arma otra página con uno simulado.
   const store = { 'pyl-search': JSON.stringify({ strat: 'auto' }), 'pyl-auto': '{"hist":[]}',
@@ -1402,7 +1430,354 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     ST.testing.sim.plat = simPlat; $('#ch-d-x').click();
   };
 
-  return lgTest().then(dkTest).then(apTest).then(chTest).then(chCadenaTest).then(chDurasTest).then(fresca).then((d2) => {
+  // 8f. Centro de mando · modo Editar, validación, Listo y Cancelar (SPEC 14, paso 4). Async: usa un localStorage simulado.
+  const hubTest = async () => {
+    delete store['pyl-hub'];
+    const d = await fresca(), W = d.window, D = W.document, P = W.PYL;
+    const $ = (q) => D.querySelector(q), $$ = (q) => [...D.querySelectorAll(q)];
+    const tipea = (el, v) => { el.value = v; el.dispatchEvent(new W.Event('input', { bubbles: true })); el.dispatchEvent(new W.Event('change', { bubbles: true })); };
+    const H = P.app.state.hub;
+    // Sin clave: los 9 de fábrica.
+    assert.strictEqual(H.items.length, 9, 'Sin pyl-hub arranca con los 9');
+    // Editar: una fila por acceso, botón "Listo", "Cancelar" visible, rejilla oculta.
+    assert.ok($('#hb-cancel').hidden && $('#hb-list').hidden && $('#hb-edit').textContent === 'Editar', 'Al inicio: sin Cancelar ni lista');
+    $('#hb-edit').click();
+    assert.strictEqual($$('#hb-list .hb-row').length, 9, 'Editar muestra 9 filas');
+    assert.ok($('#hb-edit').textContent === 'Listo' && !$('#hb-cancel').hidden && $('#hb-grid').hidden && !$('#hb-list').hidden, 'Listo + Cancelar, rejilla oculta');
+    assert.strictEqual(H.editing, true);
+    // "Usar ads.tiktok.com" solo en accesos de fábrica con URL vacía; pone la URL sugerida y se oculta.
+    const use = $('#hb-list .hb-row[data-id="tiktok"] .hb-use');
+    assert.strictEqual(use.textContent, 'Usar ads.tiktok.com');
+    assert.ok($$('#hb-list .hb-use').length === 9 && $$('#hb-list .hb-use').every((b) => !b.hidden), 'Los 9 de fábrica ofrecen su dominio');
+    use.click();
+    assert.strictEqual($('#hb-f-url-tiktok').value, 'https://ads.tiktok.com/');
+    assert.ok(use.hidden, 'Con URL el botón se oculta');
+    tipea($('#hb-f-url-tiktok'), '');
+    assert.ok(!use.hidden, 'Con la URL vacía vuelve a aparecer');
+    // Sin línea de ayuda: ni la de TikTok ni la de Meta.
+    assert.strictEqual($$('#hb-list .hb-hint').length, 0, 'Ya no hay textos de ayuda');
+    assert.ok(!/aadvid|act=/.test($('#hb-list').textContent), 'Sin el texto de la cuenta publicitaria');
+    // URL inválida: .hb-bad, aria-invalid, mensaje; "Listo" no guarda ni contrae.
+    tipea($('#hb-f-url-meta'), 'x.co');
+    assert.ok($('#hb-f-url-meta').classList.contains('hb-bad') && $('#hb-f-url-meta').getAttribute('aria-invalid') === 'true', 'x.co se marca');
+    assert.ok(/http/.test($('#hb-err-meta').textContent), 'Mensaje de error de la URL');
+    $('#toast').textContent = '';
+    $('#hb-edit').click();
+    assert.ok(H.editing && !$('#hb-list').hidden && /rojo/.test($('#toast').textContent), 'Con error no contrae y avisa');
+    assert.strictEqual(store['pyl-hub'], undefined, 'Nada se guarda con errores');
+    assert.strictEqual(D.activeElement && D.activeElement.id, 'hb-f-url-meta', 'El cursor va al primer campo con error');
+    // Nombre vacío también es error.
+    tipea($('#hb-f-url-meta'), '');
+    tipea($('#hb-f-name-dropi'), '  ');
+    assert.ok($('#hb-f-name-dropi').classList.contains('hb-bad'), 'Nombre vacío se marca');
+    tipea($('#hb-f-name-dropi'), 'Dropi');
+    assert.ok($$('#hb-list .hb-bad').length === 0 && $$('#hb-list .hb-err').every((e) => e.textContent === ''), 'Se limpian los errores al corregir');
+    // Renombrar recalcula las iniciales en la vista previa.
+    tipea($('#hb-f-name-claude'), 'Mi gran tienda');
+    assert.strictEqual($('#hb-list .hb-row[data-id="claude"] .hb-ini').textContent, 'MGT', 'La vista previa recalcula las iniciales');
+    // Nada en pyl-hub hasta "Listo"; Cancelar descarta el borrador sin preguntar.
+    tipea($('#hb-f-url-skool'), 'https://www.skool.com/');
+    assert.strictEqual(store['pyl-hub'], undefined, 'Nada cambia en pyl-hub antes de Listo');
+    $('#hb-cancel').click();
+    assert.ok(!H.editing && $('#hb-list').hidden && !$('#hb-grid').hidden && $('#hb-list').children.length === 0, 'Cancelar contrae');
+    assert.ok(H.items.every((x) => x.url === '') && H.items.find((x) => x.id === 'claude').name === 'Claude', 'Cancelar descarta los cambios');
+    assert.strictEqual($('#hb-grid .hb-tile[data-id="skool"]').tagName, 'BUTTON');
+    // Clic en un acceso sin URL abre Editar con el cursor en su URL.
+    $('#hb-grid .hb-tile[data-id="dropkiller"]').click();
+    assert.ok(H.editing && $$('#hb-list .hb-row').length === 9, 'Clic en acceso sin URL abre Editar');
+    assert.strictEqual(D.activeElement && D.activeElement.id, 'hb-f-url-dropkiller', 'Cursor en su URL');
+    // "Listo" válido: guarda (v 1), contrae y repinta la rejilla.
+    tipea($('#hb-f-url-skool'), ' https://www.skool.com/grupo ');
+    tipea($('#hb-f-name-claude'), ' Claude Code ');
+    $('#hb-edit').click();
+    assert.ok(!H.editing && $('#hb-list').hidden && $('#hb-edit').textContent === 'Editar' && $('#hb-cancel').hidden, 'Listo contrae');
+    const g = JSON.parse(store['pyl-hub']);
+    assert.ok(g.v === 1 && g.items.length === 9, 'Guarda { v: 1, items }');
+    assert.strictEqual(g.items.find((x) => x.id === 'skool').url, 'https://www.skool.com/grupo', 'Guarda la URL recortada');
+    assert.strictEqual(g.items.find((x) => x.id === 'claude').name, 'Claude Code');
+    const sk = $('#hb-grid .hb-tile[data-id="skool"]');
+    assert.ok(sk.tagName === 'A' && sk.target === '_blank' && sk.getAttribute('href') === 'https://www.skool.com/grupo', 'Skool ahora es un enlace');
+    W.close();
+    // Recargar: conserva lo guardado.
+    const d2 = await fresca();
+    assert.strictEqual(d2.window.document.querySelector('#hb-grid .hb-tile[data-id="skool"]').getAttribute('href'), 'https://www.skool.com/grupo', 'Tras recargar conserva la URL');
+    d2.window.close();
+    // Guardado roto o de otra versión: los 9 de fábrica, sin errores en consola.
+    for (const raro of ['{roto', JSON.stringify({ v: 9, items: [{ id: 'a', name: 'A' }] })]) {
+      store['pyl-hub'] = raro;
+      const d3 = await fresca();
+      assert.strictEqual(d3.window.document.querySelectorAll('#hb-grid .hb-tile').length, 9, 'Guardado roto: 9 de fábrica');
+      d3.window.close();
+    }
+    delete store['pyl-hub'];
+  };
+
+  // 8g. Centro de mando · orden, quitar y agregar (SPEC 14, paso 5). Async: los diálogos son promesas.
+  const hubTest2 = async () => {
+    delete store['pyl-hub'];
+    const d = await fresca(), W = d.window, D = W.document, P = W.PYL;
+    const $ = (q) => D.querySelector(q), $$ = (q) => [...D.querySelectorAll(q)];
+    const tick = () => new Promise((ok) => setTimeout(ok, 0));
+    const tipea = (el, v) => { el.value = v; el.dispatchEvent(new W.Event('input', { bubbles: true })); el.dispatchEvent(new W.Event('change', { bubbles: true })); };
+    const ids = () => $$('#hb-list .hb-row').map((r) => r.dataset.id);
+    const H = P.app.state.hub;
+    $('#hb-edit').click();
+    // Sin colores: las filas ya no traen selector.
+    assert.strictEqual($$('#hb-list .hb-sw, #hb-list .hb-colors').length, 0, 'No hay selector de color');
+    // Reordenar se hace arrastrando en la vista normal: las filas ya no traen ↑ ni ↓.
+    assert.strictEqual($$('#hb-list .hb-up, #hb-list .hb-down, #hb-list .hb-mv').length, 0, 'Sin botones ↑ ↓');
+    // Quitar una fila rehace la lista pero conserva lo escrito en las otras filas y en la fila Agregar.
+    tipea($('#hb-f-name-dropi'), 'Dropi Pro');
+    $('#hb-new-name').value = 'Pendiente';
+    // Quitar: pregunta antes; Cancelar no quita, Quitar sí.
+    $('#hb-list .hb-row[data-id="kalodata"] .hb-del').click();
+    await tick();
+    assert.ok($('#modal').classList.contains('show') && /Quitar «Kalodata» del Centro de mando\?/.test($('#modal-p').textContent), 'Pregunta con el nombre');
+    $('#modal [data-r="cancel"]').click(); await tick();
+    assert.ok(ids().includes('kalodata'), 'Cancelar la pregunta no quita nada');
+    $('#hb-list .hb-row[data-id="kalodata"] .hb-del').click(); await tick();
+    $('#modal [data-r="del"]').click(); await tick();
+    assert.ok(!ids().includes('kalodata') && ids().length === 8, 'Quitar saca la fila');
+    assert.strictEqual($('#hb-f-name-dropi').value, 'Dropi Pro', 'Quitar no pierde nombres editados');
+    assert.strictEqual($('#hb-new-name').value, 'Pendiente', 'Quitar no vacía la fila Agregar');
+    $('#hb-new-name').value = '';
+    assert.ok(H.items.some((x) => x.id === 'kalodata'), 'Lo guardado no cambia hasta Listo');
+    // Agregar: los dos campos son obligatorios y la URL va con http(s)://.
+    $('#hb-add').click();
+    assert.ok(/nombre/i.test($('#hb-err-new').textContent) && $('#hb-new-name').classList.contains('hb-bad') && ids().length === 8, 'Sin nada: avisa y no agrega');
+    tipea($('#hb-new-name'), 'Mi tienda');
+    assert.strictEqual($('#hb-err-new').textContent, '', 'Escribir limpia el aviso');
+    $('#hb-add').click();
+    assert.ok(/dirección/i.test($('#hb-err-new').textContent) && ids().length === 8, 'Sin URL: avisa y no agrega');
+    tipea($('#hb-new-url'), 'mitienda.co');
+    $('#hb-add').click();
+    assert.ok($('#hb-new-url').classList.contains('hb-bad') && ids().length === 8, 'URL sin http(s) no agrega');
+    tipea($('#hb-new-url'), 'https://mitienda.co');
+    $('#hb-add').click();
+    assert.strictEqual(ids().length, 9, 'Con datos agrega');
+    const nuevo = $$('#hb-list .hb-row').pop();
+    assert.ok(/^u/.test(nuevo.dataset.id) && nuevo.querySelector('input[type=text]').value === 'Mi tienda', 'El nuevo queda al final con su nombre');
+    assert.ok(!nuevo.querySelector('.hb-use'), 'Sin "Usar dominio"');
+    assert.ok($('#hb-new-name').value === '' && $('#hb-new-url').value === '' && $('#hb-err-new').textContent === '', 'Los campos se vacían');
+    assert.strictEqual(D.activeElement && D.activeElement.id, 'hb-new-name', 'El cursor vuelve a Nombre');
+    // Enter en la fila Agregar también agrega.
+    tipea($('#hb-new-name'), 'Otra'); tipea($('#hb-new-url'), 'https://otra.co');
+    $('#hb-new-url').dispatchEvent(new W.KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    assert.strictEqual(ids().length, 10, 'Enter agrega');
+    // Dos altas seguidas no repiten id.
+    assert.strictEqual(new Set(ids()).size, 10, 'Ids únicos');
+    // Cancelar descarta todo el borrador (orden, quitados, agregados y textos): al volver a Editar están los 9 de fábrica.
+    tipea($('#hb-f-url-tiktok'), 'https://ads.tiktok.com/x');
+    $('#hb-cancel').click(); $('#hb-edit').click();
+    assert.deepStrictEqual(ids(), ['tiktok', 'meta', 'adlib', 'dropi', 'dropkiller', 'kalodata', 'skool', 'chatgpt', 'claude'], 'Cancelar descarta los cambios del borrador');
+    assert.ok($$('#hb-list input[id^="hb-f-url-"]').every((i) => i.value === ''), 'Sin URL');
+    assert.ok(!$('#hb-reset'), 'Ya no existe Restaurar botones');
+    assert.strictEqual(store['pyl-hub'], undefined, 'Nada se guardó en todo el recorrido');
+    // Listo guarda lo hecho: quitar y agregar.
+    $('#hb-list .hb-row[data-id="chatgpt"] .hb-del').click(); await tick();
+    $('#modal [data-r="del"]').click(); await tick();
+    tipea($('#hb-new-name'), 'Mi tienda'); tipea($('#hb-new-url'), 'https://mitienda.co'); $('#hb-add').click();
+    $('#hb-edit').click();
+    const g = JSON.parse(store['pyl-hub']);
+    assert.deepStrictEqual(g.items.map((x) => x.id).slice(0, 8), ['tiktok', 'meta', 'adlib', 'dropi', 'dropkiller', 'kalodata', 'skool', 'claude'], 'Guarda el orden (sin ChatGPT)');
+    assert.strictEqual(g.items.length, 9);
+    assert.strictEqual(g.items[8].name, 'Mi tienda');
+    // Lista vacía: mensaje en la rejilla.
+    $('#hb-edit').click();
+    for (const id of ids()) { $(`#hb-list .hb-row[data-id="${id}"] .hb-del`).click(); await tick(); $('#modal [data-r="del"]').click(); await tick(); }
+    assert.strictEqual(ids().length, 0);
+    $('#hb-edit').click();
+    assert.strictEqual($('#hb-grid').textContent, 'Sin accesos. Toca Editar para agregar uno.', 'Lista vacía');
+    W.close();
+    delete store['pyl-hub'];
+  };
+
+  // 8h. Centro de mando · ícono propio: archivo, Ctrl+V en la fila enfocada y quitar (SPEC 14, paso 6). jsdom no carga imágenes: imageDataURL se simula.
+  const hubTest3 = async () => {
+    delete store['pyl-hub'];
+    const d = await fresca(), W = d.window, D = W.document, P = W.PYL;
+    const $ = (q) => D.querySelector(q), $$ = (q) => [...D.querySelectorAll(q)];
+    const tick = () => new Promise((ok) => setTimeout(ok, 0));
+    const medidas = [];
+    P.services.files.imageDataURL = async (f, max, q, type) => { medidas.push(max + ':' + type); if (f.name === 'malo.png') throw new Error('x'); return 'data:image/jpeg;base64,' + f.name; };
+    const H = P.app.state.hub;
+    const row = (id) => $(`#hb-list .hb-row[data-id="${id}"]`);
+    const pega = (files, texto) => {
+      const ev = new W.Event('paste', { bubbles: true, cancelable: true });
+      ev.clipboardData = { files, items: [], getData: () => texto || '' };
+      D.activeElement.dispatchEvent(ev);
+      return ev;
+    };
+    const png = (name) => new W.File(['x'], name, { type: 'image/png' });
+    // Con el modo Editar cerrado, pegar no hace nada.
+    assert.strictEqual(pega([png('a.png')]).defaultPrevented, false, 'Sin Editar no se escucha el pegado');
+    $('#hb-edit').click();
+    // Subir por archivo: se reduce a 128 px y la vista previa usa el ícono propio.
+    assert.ok(row('dropi').querySelector('.hb-icon-up') && row('dropi').querySelector('.hb-icon-rm').hidden, 'Subir ícono visible, Quitar oculto');
+    const inp = row('dropi').querySelector('.hb-file');
+    Object.defineProperty(inp, 'files', { configurable: true, value: [png('dropi.png')] });
+    inp.dispatchEvent(new W.Event('change', { bubbles: true }));
+    await tick();
+    assert.deepStrictEqual(medidas, ['128:image/png'], 'imageDataURL a 128 px y en PNG (conserva la transparencia)');
+    assert.strictEqual(H.draft.find((x) => x.id === 'dropi').icon, 'data:image/jpeg;base64,dropi.png', 'El borrador guarda el ícono');
+    assert.ok(!row('dropi').querySelector('.hb-icon-rm').hidden, 'Aparece Quitar ícono');
+    const pi = row('dropi').querySelector('.hb-ico img');
+    assert.ok(pi && pi.src.startsWith('data:image/jpeg') && !row('dropi').querySelector('img.hb-fav'), 'La vista previa muestra el ícono propio (sin favicon)');
+    // Aunque tenga URL (favicon), manda el ícono propio.
+    const url = $('#hb-f-url-dropi'); url.value = 'https://app.dropi.co/'; url.dispatchEvent(new W.Event('input', { bubbles: true })); url.dispatchEvent(new W.Event('change', { bubbles: true }));
+    assert.ok(row('dropi').querySelector('.hb-ico img') && !row('dropi').querySelector('img.hb-fav'), 'Con ícono propio no se pide el favicon');
+    // Ctrl+V: solo aplica a la fila que tiene el foco.
+    $('#hb-f-name-meta').focus();
+    const ev = pega([png('meta.png')]);
+    assert.ok(ev.defaultPrevented, 'La imagen pegada se atiende');
+    await tick();
+    assert.strictEqual(H.draft.find((x) => x.id === 'meta').icon, 'data:image/jpeg;base64,meta.png', 'Pegado en la fila enfocada');
+    assert.ok(H.draft.filter((x) => x.icon).map((x) => x.id).sort().join() === 'dropi,meta', 'Ninguna otra fila cambió');
+    // Sin fila enfocada: no hace nada.
+    D.activeElement.blur(); $('#hb-edit').focus();
+    const sin = pega([png('x.png')]);
+    assert.strictEqual(sin.defaultPrevented, false, 'Sin fila enfocada no se atiende');
+    // Solo texto: sigue su curso normal.
+    $('#hb-f-name-meta').focus();
+    assert.strictEqual(pega([], 'hola').defaultPrevented, false, 'Un pegado de texto no se intercepta');
+    // Imagen que no se puede leer: avisa y no cambia.
+    $('#toast').textContent = '';
+    pega([png('malo.png')]); await tick();
+    assert.ok(/imagen/.test($('#toast').textContent) && H.draft.find((x) => x.id === 'meta').icon === 'data:image/jpeg;base64,meta.png', 'Imagen inválida: avisa');
+    // Quitar ícono.
+    row('meta').querySelector('.hb-icon-rm').click();
+    assert.strictEqual(H.draft.find((x) => x.id === 'meta').icon, null, 'Quitar ícono');
+    assert.ok(row('meta').querySelector('.hb-icon-rm').hidden && !row('meta').querySelector('.hb-ico img'), 'Vuelve a iniciales (meta no tiene URL)');
+    // Listo guarda el ícono; recargar lo conserva; el ícono propio sobrevive a que se rehagan las filas (al agregar un botón).
+    $('#hb-new-name').value = 'Otro'; $('#hb-new-url').value = 'https://otro.co'; $('#hb-add').click();
+    assert.ok(row('dropi').querySelector('.hb-ico img'), 'Rehacer las filas conserva el ícono');
+    $('#hb-edit').click();
+    const g = JSON.parse(store['pyl-hub']);
+    assert.strictEqual(g.items.find((x) => x.id === 'dropi').icon, 'data:image/jpeg;base64,dropi.png', 'Listo guarda el ícono propio');
+    assert.strictEqual(g.items.find((x) => x.id === 'meta').icon, null);
+    assert.strictEqual($('#hb-grid .hb-tile[data-id="dropi"] img').src, 'data:image/jpeg;base64,dropi.png', 'La rejilla muestra el ícono propio');
+    // Cerrado Editar, el pegado vuelve a ignorarse.
+    D.body.focus();
+    assert.strictEqual(pega([png('z.png')]).defaultPrevented, false, 'Cerrado Editar se deja de escuchar');
+    W.close();
+    const d2 = await fresca();
+    assert.ok(d2.window.document.querySelector('#hb-grid .hb-tile[data-id="dropi"] img').src.startsWith('data:image/jpeg'), 'Tras recargar conserva el ícono');
+    d2.window.close();
+    delete store['pyl-hub'];
+  };
+
+  // 8i. Centro de mando · reubicar arrastrando en la vista normal (SPEC 14). Los eventos de puntero se simulan; jsdom no tiene layout.
+  const hubTest4 = async () => {
+    delete store['pyl-hub'];
+    const d = await fresca(), W = d.window, D = W.document, P = W.PYL;
+    const $ = (q) => D.querySelector(q);
+    const H = P.app.state.hub;
+    const orden = () => [...D.querySelectorAll('#hb-grid .hb-tile')].map((t) => t.dataset.id);
+    const tile = (id) => $(`#hb-grid .hb-tile[data-id="${id}"]`);
+    let sobre = null;
+    D.elementFromPoint = () => sobre;
+    const ev = (tipo, x, y, objetivo) => {
+      const e = new W.MouseEvent(tipo, { bubbles: true, cancelable: true, clientX: x, clientY: y, button: 0 });
+      (objetivo || D).dispatchEvent(e);
+      return e;
+    };
+    // Sin mover (menos de 6 px) es un clic normal: el orden no cambia y no hay copia flotante.
+    ev('pointerdown', 10, 10, tile('meta'));
+    ev('pointermove', 12, 11);
+    assert.ok(!$('.hb-ghost') && !tile('meta').classList.contains('hb-lifted'), 'Con menos de 6 px no empieza el arrastre');
+    ev('pointerup', 12, 11);
+    assert.strictEqual(store['pyl-hub'], undefined, 'Un toque no guarda nada');
+    // Arrastrar Meta sobre Ad Library: queda después de ella, se guarda y la rejilla se repinta.
+    ev('pointerdown', 10, 10, tile('meta'));
+    ev('pointermove', 40, 10);
+    assert.ok($('.hb-ghost') && tile('meta').classList.contains('hb-lifted') && D.body.classList.contains('hb-dragging'), 'Al arrastrar: copia flotante, botón tenue y cursor');
+    sobre = tile('adlib');
+    ev('pointermove', 60, 12);
+    assert.deepStrictEqual(orden().slice(0, 3), ['tiktok', 'adlib', 'meta'], 'Los demás se acomodan al instante');
+    ev('pointerup', 60, 12);
+    assert.ok(!$('.hb-ghost') && !D.body.classList.contains('hb-dragging'), 'Al soltar se quita la copia');
+    assert.deepStrictEqual(orden().slice(0, 3), ['tiktok', 'adlib', 'meta'], 'La rejilla queda en el nuevo orden');
+    assert.deepStrictEqual(JSON.parse(store['pyl-hub']).items.map((x) => x.id).slice(0, 3), ['tiktok', 'adlib', 'meta'], 'El orden se guarda al soltar');
+    assert.deepStrictEqual([...H.items.map((x) => x.id)], orden(), 'El estado coincide con la rejilla');
+    // El clic que llega al soltar no abre el editor.
+    tile('meta').dispatchEvent(new W.MouseEvent('click', { bubbles: true, cancelable: true }));
+    assert.strictEqual(H.editing, false, 'Tras arrastrar no se abre el editor');
+    await new Promise((ok) => setTimeout(ok, 5));
+    // Un clic normal después sí abre el editor (la supresión es de una sola vez).
+    tile('kalodata').click();
+    assert.strictEqual(H.editing, true, 'Un clic normal vuelve a abrir el editor');
+    $('#hb-cancel').click();
+    // Esc cancela y devuelve el botón a su lugar.
+    const antes = orden().join();
+    ev('pointerdown', 10, 10, tile('skool'));
+    ev('pointermove', 40, 10);
+    sobre = tile('tiktok');
+    ev('pointermove', 41, 10);
+    assert.notStrictEqual(orden().join(), antes, 'En pleno arrastre el orden cambia');
+    D.dispatchEvent(new W.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    assert.strictEqual(orden().join(), antes, 'Esc devuelve todo a su lugar');
+    assert.ok(!$('.hb-ghost') && JSON.parse(store['pyl-hub']).items.map((x) => x.id).join() === antes, 'Esc no guarda nada');
+    ev('pointerup', 41, 10);
+    // Soltar sin haber cambiado el orden no guarda de nuevo.
+    store['pyl-hub'] = 'SENTINELA';
+    sobre = null;
+    ev('pointerdown', 10, 10, tile('claude'));
+    ev('pointermove', 40, 10);
+    ev('pointerup', 40, 10);
+    assert.strictEqual(store['pyl-hub'], 'SENTINELA', 'Sin cambio de orden no se guarda');
+    // Con el modo Editar abierto, la rejilla está oculta y no se arrastra (las filas usan ↑ y ↓).
+    W.close();
+    delete store['pyl-hub'];
+  };
+
+  // 8j. Centro de mando · sin espacio para guardar y ids únicos (SPEC 14, criterios de persistencia y calidad).
+  const hubTest5 = async () => {
+    delete store['pyl-hub'];
+    const d = await fresca(), W = d.window, D = W.document, P = W.PYL;
+    const $ = (q) => D.querySelector(q);
+    const tipea = (el, v) => { el.value = v; el.dispatchEvent(new W.Event('input', { bubbles: true })); el.dispatchEvent(new W.Event('change', { bubbles: true })); };
+    const H = P.app.state.hub;
+    const real = W.localStorage.setItem;
+    const sinEspacio = () => { W.localStorage.setItem = () => { throw new Error('QuotaExceededError'); }; };
+    // Ids #hb- únicos con el modo Editar abierto (9 filas).
+    $('#hb-edit').click();
+    const hbIds = [...D.querySelectorAll('[id^="hb-"]')].map((e) => e.id);
+    assert.strictEqual(new Set(hbIds).size, hbIds.length, 'Los ids #hb- son únicos: ' + hbIds.filter((x, i) => hbIds.indexOf(x) !== i));
+    // Sin espacio: «Listo» avisa, no contrae, conserva el borrador y no cambia lo guardado.
+    sinEspacio();
+    tipea($('#hb-f-url-skool'), 'https://www.skool.com/x');
+    $('#toast').textContent = '';
+    $('#hb-edit').click();
+    assert.ok(H.editing && !$('#hb-list').hidden && /poco espacio/.test($('#toast').textContent), 'Sin espacio: avisa y deja Editar abierto');
+    assert.strictEqual($('#hb-f-url-skool').value, 'https://www.skool.com/x', 'El borrador no se pierde');
+    assert.ok(H.draft.find((x) => x.id === 'skool').url === 'https://www.skool.com/x' && H.items.every((x) => x.url === ''), 'Lo guardado no cambió');
+    assert.strictEqual(store['pyl-hub'], undefined, 'No se escribió nada');
+    // Con espacio otra vez, el mismo borrador se guarda.
+    W.localStorage.setItem = real;
+    $('#hb-edit').click();
+    assert.ok(!H.editing && JSON.parse(store['pyl-hub']).items.find((x) => x.id === 'skool').url === 'https://www.skool.com/x', 'Con espacio, el borrador conservado se guarda');
+    // Arrastrar sin espacio: avisa y deja el orden anterior.
+    const tile = (id) => $(`#hb-grid .hb-tile[data-id="${id}"]`);
+    const orden = () => [...D.querySelectorAll('#hb-grid .hb-tile')].map((t) => t.dataset.id).join();
+    const antes = orden();
+    let sobre = null;
+    D.elementFromPoint = () => sobre;
+    const ev = (tipo, x, y, objetivo) => (objetivo || D).dispatchEvent(new W.MouseEvent(tipo, { bubbles: true, cancelable: true, clientX: x, clientY: y, button: 0 }));
+    sinEspacio();
+    $('#toast').textContent = '';
+    ev('pointerdown', 10, 10, tile('meta'));
+    ev('pointermove', 40, 10);
+    sobre = tile('adlib');
+    ev('pointermove', 60, 12);
+    ev('pointerup', 60, 12);
+    assert.ok(/orden/.test($('#toast').textContent), 'Arrastrar sin espacio avisa');
+    assert.strictEqual(orden(), antes, 'Y deja el orden anterior');
+    assert.strictEqual(JSON.parse(store['pyl-hub']).items.map((x) => x.id).join(), antes, 'Sin cambios en lo guardado');
+    W.close();
+    delete store['pyl-hub'];
+  };
+
+  return lgTest().then(dkTest).then(apTest).then(chTest).then(chCadenaTest).then(chDurasTest).then(hubTest).then(hubTest2).then(hubTest3).then(hubTest4).then(hubTest5).then(fresca).then((d2) => {
     const doc2 = d2.window.document;
     assert.deepStrictEqual([...doc2.querySelectorAll('#b-strats .st-tab')].map((b) => b.textContent.length > 0), [true, true], 'Estrategias muestra solo 2 tarjetas');
     assert.deepStrictEqual([...d2.window.PYL.core.search.STRATEGIES.map((x) => x.k)], ['vdo', 'prov'], 'STRATEGIES = vdo y prov');
