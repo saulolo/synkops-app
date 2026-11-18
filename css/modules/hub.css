@@ -1,0 +1,114 @@
+/* Centro de mando (js/modules/hub): accesos directos de Inicio. Se carga antes de themes.css. */
+/* Los botones van debajo del último acceso (o de la lista, al editar). */
+.hb-actions{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:12px}
+.hb-actions .btn{font-size:12px;letter-spacing:.12em;text-transform:uppercase;padding:9px 16px}
+.hb-actions [hidden]{display:none}
+.hb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin-top:14px}
+.hb-none{grid-column:1/-1;margin:6px 0}
+.hb-tile{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:10px;min-width:0;padding:7px 10px;text-align:left;background:var(--bg-2);border:1px solid var(--line);border-radius:11px;transition:transform .15s,border-color .15s}
+.hb-tile{user-select:none;-webkit-user-drag:none}
+.hb-tile:hover,.hb-tile:focus-visible{transform:translateY(-1px);border-color:var(--b)}
+/* Arrastrar para reubicar: el botón levantado queda tenue en su lugar y una copia sigue al cursor. */
+.hb-lifted{opacity:.35;border-style:dashed}
+.hb-ghost{position:fixed;z-index:60;margin:0;pointer-events:none;opacity:.95;box-shadow:0 12px 30px rgba(0,0,0,.5)}
+body.hb-dragging,body.hb-dragging *{cursor:grabbing!important}
+.hb-tile:focus-visible{outline:2px solid var(--b);outline-offset:2px}
+.hb-empty{border-style:dashed;border-color:var(--line-2)}
+.hb-preview{cursor:default}
+.hb-preview:hover{transform:none;border-color:var(--line)}
+.hb-preview.hb-empty:hover{border-color:var(--line-2)}
+.hb-text{display:flex;flex-direction:column;min-width:0;line-height:1.2}
+.hb-name{font-size:13px;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hb-sub{font-size:10.5px;color:var(--soft)}
+.hb-ico{position:relative;flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:8px;overflow:hidden;font-size:11px;font-weight:800;letter-spacing:-.02em;background:#1f2430;color:#fff}
+/* El ícono propio y el favicon llenan el cuadro sin fondo: se ve solo la imagen sobre el fondo oscuro de la tarjeta. */
+.hb-ico img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.hb-ico-own{background:transparent}
+.hb-ico-fav{background:transparent}
+.hb-ico img.hb-fav{padding:0;box-sizing:border-box;object-fit:contain}
+.hb-ico img[hidden]{display:none}
+.hb-grid[hidden],#hb-list[hidden]{display:none}
+/* Modo Editar: una fila por acceso, con la vista previa a la izquierda. */
+#hb-list{margin-top:10px}
+.hb-row{display:grid;grid-template-columns:90px minmax(0,1fr);gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+/* Izquierda: el botón de vista previa (ícono arriba, nombre debajo) y, debajo, los botones de ícono y la papelera. Derecha: los campos uno debajo del otro. */
+.hb-prev{display:flex;flex-direction:column;gap:6px;min-width:0}
+.hb-prev .hb-tile{width:100%;flex-direction:column;gap:4px;padding:6px 3px;text-align:center}
+.hb-prev .hb-ico{width:24px;height:24px;border-radius:7px;font-size:9px}
+.hb-prev .hb-text{align-items:center;width:100%}
+.hb-prev .hb-name{white-space:normal;overflow-wrap:anywhere;font-size:10px;text-align:center}
+.hb-prev .hb-sub{font-size:9.5px}
+.hb-fields{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;align-content:start;min-width:0}
+.hb-fields .field{gap:3px}
+.hb-fields .field label,.hb-add .field label{font-size:11px}
+.hb-fields .field input{min-height:32px;padding:5px 9px;font-size:13px;font-weight:600}
+.hb-fields .field input.hb-bad{border-color:var(--r)}
+.hb-err{grid-column:1/-1;font-size:11px;font-weight:600;color:var(--r)}
+.hb-err:empty{display:none}
+.hb-side{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.hb-use{font-size:11px;padding:4px 10px;letter-spacing:0}
+.hb-use[hidden]{display:none}
+.hb-ib{all:unset;cursor:pointer;box-sizing:border-box;width:28px;height:28px;display:grid;place-items:center;border-radius:8px;border:1px solid var(--line-2);color:var(--ink)}
+.hb-ib:hover{border-color:var(--b)}
+.hb-ib:focus-visible{outline:2px solid var(--b)}
+.hb-ib[hidden]{display:none}
+.hb-ctl{display:flex;justify-content:center;gap:3px}
+.hb-del{width:28px;height:28px;border-radius:8px}
+/* Fila Agregar y pie. */
+.hb-add{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;padding:10px 0 4px;border-top:1px solid var(--line)}
+.hb-add .field{gap:3px}
+.hb-add .field input{min-height:32px;padding:5px 9px;font-size:13px;font-weight:600}
+.hb-add .field input.hb-bad{border-color:var(--r)}
+.hb-add .btn{min-height:32px;padding:0 14px;box-sizing:border-box;font-size:12px;justify-self:stretch;margin-top:2px}
+.hb-add .hb-err{grid-column:1/-1}
+/* Campos compactos: sin etiqueta visible (la etiqueta queda para lectores de pantalla y el texto de ayuda va dentro del campo). */
+.hb-fields .field label,.hb-add .field label{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.hb-fields .field input,.hb-add .field input{min-height:28px;height:28px;padding:0 11px;border-radius:10px;font-size:12px;font-weight:600}
+.hb-fields .field input::placeholder,.hb-add .field input::placeholder{color:var(--soft);font-weight:500}
+.hb-fields .field input:focus,.hb-add .field input:focus{box-shadow:0 0 0 2px rgba(var(--b-rgb),.3),0 0 12px rgba(var(--b-rgb),.3)}
+/* Botones con halo de luz. */
+.hb-actions .btn{border-radius:999px;font-weight:800}
+.hb-actions .btn.ghost{border-color:rgba(var(--b-rgb),.55);box-shadow:0 0 0 1px rgba(var(--b-rgb),.16),0 0 14px rgba(var(--b-rgb),.28);transition:box-shadow .2s,background .2s,transform .15s}
+.hb-actions .btn.ghost:hover{background:rgba(var(--b-rgb),.12);box-shadow:0 0 0 1px rgba(var(--b-rgb),.45),0 0 22px rgba(var(--b-rgb),.5)}
+.hb-actions .btn.hb-done{background:linear-gradient(135deg,var(--b),var(--b3));color:var(--on-b);border-color:transparent;box-shadow:0 0 0 1px rgba(var(--b-rgb),.5),0 0 20px rgba(var(--b-rgb),.55)}
+.hb-actions .btn.hb-done:hover{background:linear-gradient(135deg,var(--b),var(--b3));filter:brightness(1.1);box-shadow:0 0 0 1px rgba(var(--b-rgb),.7),0 0 26px rgba(var(--b-rgb),.7)}
+/* «Editar» (antes de editar) va distinto: plano y teñido, sin halo. Cancelar y Listo conservan el suyo. */
+#hb-edit:not(.hb-done){background:rgba(var(--b-rgb),.16);color:var(--b-ink);border-color:transparent;box-shadow:none}
+#hb-edit:not(.hb-done):hover{background:rgba(var(--b-rgb),.28);box-shadow:none}
+.hb-add .btn{border-radius:999px;letter-spacing:.1em;text-transform:uppercase;box-shadow:0 0 0 1px rgba(var(--b-rgb),.4),0 0 16px rgba(var(--b-rgb),.4)}
+.hb-add .btn:hover{box-shadow:0 0 0 1px rgba(var(--b-rgb),.7),0 0 24px rgba(var(--b-rgb),.65)}
+.hb-use{border-radius:999px;border-color:rgba(var(--b-rgb),.5);box-shadow:0 0 10px rgba(var(--b-rgb),.25)}
+.hb-use:hover{box-shadow:0 0 16px rgba(var(--b-rgb),.5)}
+.hb-ib:hover{box-shadow:0 0 12px rgba(var(--b-rgb),.5)}
+.hb-del:hover{box-shadow:0 0 12px rgba(244,63,94,.55)}
+/* Los accesos con enlace tienen un halo suave que se intensifica al pasar el mouse. */
+a.hb-tile{box-shadow:0 0 0 1px rgba(var(--b-rgb),.14),0 0 12px rgba(var(--b-rgb),.12)}
+.hb-tile:hover,.hb-tile:focus-visible{box-shadow:0 0 0 1px rgba(var(--b-rgb),.5),0 0 18px rgba(var(--b-rgb),.45)}
+.hb-tile.hb-preview,.hb-tile.hb-preview:hover{box-shadow:none}
+.hb-tile.hb-ghost{box-shadow:0 12px 30px rgba(0,0,0,.5),0 0 20px rgba(var(--b-rgb),.5)}
+/* Pantallas anchas: el Centro de mando vive en el margen derecho, en una columna vertical que me acompaña al bajar.
+   Al editar se abre como panel flotante a la derecha. Más angosto, queda en el flujo bajo el hero. */
+@media (min-width:1680px){
+  #v-dash{position:relative}
+  .hb-rail{position:absolute;top:0;bottom:0;left:calc(100% + 14px);width:210px}
+  .hb-rail .hb{position:sticky;top:var(--hb-top,170px);margin-top:0;padding:14px;min-height:calc(100vh - var(--hb-top,170px) - 20px)}
+  #v-dash #hb-root h2{font-size:14.5px;gap:8px;margin:0}
+  #v-dash #hb-root h2::before{height:16px;width:4px}
+  .hb-rail .hb:not(.hb-editing) .hb-actions .btn{flex:1;font-size:10.5px;letter-spacing:.08em;padding:6px 10px}
+  .hb-rail .hb-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+  /* «Editar» anclado al fondo de la columna alargada. */
+  .hb-rail .hb:not(.hb-editing){display:flex;flex-direction:column}
+  .hb-rail .hb:not(.hb-editing) .hb-actions{margin-top:auto;padding-top:14px}
+  /* Dos botones por fila: ícono arriba y el nombre debajo (más pequeño). */
+  .hb-rail .hb:not(.hb-editing) .hb-tile{flex-direction:column;justify-content:flex-start;gap:6px;padding:10px 4px 8px;text-align:center}
+  .hb-rail .hb:not(.hb-editing) .hb-text{align-items:center;width:100%}
+  .hb-rail .hb:not(.hb-editing) .hb-name{font-size:11.5px;white-space:normal;overflow-wrap:anywhere;text-align:center}
+  .hb-rail .hb:not(.hb-editing) .hb-sub{font-size:9.5px}
+  .hb-rail .hb.hb-editing{min-height:0;position:fixed;top:var(--hb-top,170px);right:16px;z-index:25;width:min(340px,calc(100vw - 32px));max-height:calc(100vh - var(--hb-top,170px) - 20px);overflow:auto;padding:14px 16px;box-shadow:0 18px 50px rgba(0,0,0,.45)}
+  .hb-rail .hb.hb-editing .hb-actions .btn{font-size:10.5px;letter-spacing:.1em;padding:6px 12px}
+  /* En el panel de edición, Cancelar y Listo quedan fijos al pie aunque la lista se desplace. */
+  .hb-rail .hb.hb-editing .hb-actions{position:sticky;bottom:-14px;margin:10px -16px -14px;padding:10px 16px 14px;background:var(--card);border-top:1px solid var(--line)}
+  #v-dash #hb-root.hb-editing h2{font-size:16px;gap:8px;margin:0}
+  #v-dash #hb-root.hb-editing h2::before{height:18px;width:4px}
+}
+@media (prefers-reduced-motion:reduce){.hb-tile{transition:none}.hb-tile:hover,.hb-tile:focus-visible{transform:none}}

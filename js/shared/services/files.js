@@ -43,8 +43,8 @@
     setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
   }
 
-  // Foto de producto reducida a JPEG (lado mayor = max px) para que quepa en localStorage.
-  function imageDataURL(file, max = 400, quality = 0.75) {
+  // Foto de producto reducida (lado mayor = max px) para que quepa en localStorage. JPEG por defecto; con 'image/png' conserva la transparencia.
+  function imageDataURL(file, max = 400, quality = 0.75, type = 'image/jpeg') {
     return new Promise((res, rej) => {
       const r = new FileReader();
       r.onerror = () => rej(r.error);
@@ -56,7 +56,7 @@
           const c = document.createElement('canvas');
           c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
           c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-          res(c.toDataURL('image/jpeg', quality));
+          res(c.toDataURL(type, quality));
         };
         img.src = r.result;
       };

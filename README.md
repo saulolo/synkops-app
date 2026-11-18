@@ -29,6 +29,7 @@ leer el testeo y medir la utilidad real cruzando **Dropi** con **Meta Ads**.
 - [🧩 Las partes de la app](#-las-partes-de-la-app)
 - [✨ Qué hace en 30 segundos](#-qué-hace-en-30-segundos)
 - [🚀 Empieza en 4 pasos](#-empieza-en-4-pasos)
+- [🏠 Centro de mando](#-centro-de-mando)
 - [🔎 Buscar producto](#-buscar-producto)
 - [🛍️ Desarrollo de la landing](#️-desarrollo-de-la-landing)
 - [🎓 Entrenador de métricas](#-entrenador-de-métricas)
@@ -56,7 +57,7 @@ Todo vive en una sola página (`index.html`). Las pestañas de la barra superior
 
 | Pestaña | Para qué sirve |
 |---|---|
-| 🏠 **Inicio** | Resumen del método de Juan Herrera (NovaSociety) y la cadena CPM → CPC → CPPI → CPA. |
+| 🏠 **Inicio** | Resumen del método de Juan Herrera (NovaSociety), la cadena CPM → CPC → CPPI → CPA y el **Centro de mando** con accesos directos a mis herramientas. |
 | 🔎 **Buscar producto** | Encontrar y evaluar un producto antes de gastar: flujograma de DropKiller, mi candidato con score, bitácora y estrategias de búsqueda. Un botón flotante guarda productos al vuelo y otro arma el prompt para buscar en DropKiller. |
 | 🧮 **Costeo** | Cuánto cobrar, cuánto me queda por pedido entregado y mi CPA máximo. |
 | 🛍️ **Desarrollo** | Montar la landing del producto en Shopify y crear su campaña en Meta Ads, paso a paso. |
@@ -103,6 +104,18 @@ En contra entrega (COD) lo que vende Meta **no** es lo que entra a tu bolsillo: 
 
 > [!NOTE]
 > La primera vez necesitas internet: la app descarga la librería que lee archivos Excel y las tipografías. Tus datos nunca se envían a ningún lado.
+
+---
+
+## 🏠 Centro de mando
+
+En **Inicio** tengo una tarjeta con botones pequeños hacia las herramientas que más uso: TikTok Ads, Meta Ads, Ad Library, Dropi, Dropkiller, Kalodata, Skool, ChatGPT y Claude. En pantalla ancha (1680 px o más) es una columna en el margen derecho que me acompaña al bajar; en una pantalla más angosta queda bajo el encabezado.
+
+- **Abrir:** cada botón abre su enlace en pestaña nueva. Los que aún no tienen enlace dicen "poner enlace" y, al tocarlos, abren el editor.
+- **Ícono:** uso mi propio ícono (PNG o JPG) si lo subí, si no el favicon del sitio, y si tampoco, las iniciales.
+- **Reordenar:** mantengo presionado un botón y lo arrastro; el orden se guarda al soltar.
+- **Editar:** el botón **Editar** abre un panel donde cambio nombre y enlace, subo o quito el ícono (también con Ctrl+V), quito accesos y agrego nuevos. Nada se guarda hasta **Listo**; **Cancelar** descarta los cambios.
+- Se guarda solo en este navegador (clave `pyl-hub`).
 
 ---
 
@@ -552,6 +565,7 @@ css/
     trainer.css       Entrenador: Inicio, Costeo, escalera y pipeline
     search.css        Buscar producto, Mi candidato, bitácora y estadísticas
     quick.css         Guardado rápido (título del panel con barrita de acento)
+    hub.css           Centro de mando: columna lateral desde 1680 px, panel de edición, halos de luz
     dkprompt.css      Prompt DropKiller: botón azul y panel con los filtros; título del panel con barrita (--fab)
     landing.css       Desarrollo → Shopify
     ads.css           Desarrollo → Meta Ads
@@ -592,6 +606,10 @@ js/
       core/quick.js   Valida (nombre, ID, ID repetido), arma la lista, quita un producto y convierte el precio escrito a pesos
       ui/quick.js     Botón flotante, panel con formulario en fila y lista
       app/quick.js    Estado (app.state.quick) y envío a Mi candidato (evento rapido:candidato)
+    hub/              Centro de mando en Inicio (SPEC 14)
+      core/hub.js     Accesos de fábrica, validación (hubCheck), altas, orden (hubOrder) y carga (hubLoad); sin DOM
+      ui/hub.js       Botones, rejilla, arrastre, filas de edición y fila Agregar
+      app/hub.js      Estado (app.state.hub: items, editing, draft), Editar/Listo/Cancelar, Ctrl+V, arrastrar y guardar (pyl-hub)
     dkprompt/         Prompt DropKiller (SPEC 09)
       core/dkprompt.js Valores por defecto, validación (dkValues) y plantilla del prompt (dkPrompt); sin DOM
       ui/dkprompt.js  Botón flotante con el logo, cuadrícula de filtros y cuadro del prompt
@@ -629,7 +647,7 @@ js/
 
 - **Sin `import`/`export`.** Los navegadores bloquean los ES modules en `file://`. Cada archivo es un IIFE que publica su API en el namespace global `PYL` (`PYL.core.pnl`, `PYL.ui.funnel`, etc.).
 - **El orden importa.** `index.html` carga los scripts en el orden de las capas (`core → services → ui → app`; dentro de cada capa, `shared` y luego los módulos), con `app/nav.js` antes de `main.js`. Los `<link>` de CSS también van en un orden fijo (ver el árbol). Un archivo nuevo va en `modules/<módulo>/<capa>/`, o en `shared/` si lo usan varios módulos, antes de los que lo usan.
-- **Carpeta = módulo, namespace = capa.** `js/modules/search/core/search.js` publica `PYL.core.search`. Un módulo solo usa `shared/` y los módulos que se cargan antes (`search` usa `pnl`; `quick` usa `search`; `dkprompt` solo usa `shared/` (se coordina con `quick` por el evento `flotante:abierto`); `adprompt` usa `search` (candidato abierto) y los estilos de `dkprompt` y `quick`; `ads` usa `landing` y `search`; `metrics` solo usa `shared/`; `testing` usa `metrics`, `ads` y `landing`; `scaling` usa `metrics` y `testing`; `trainer` usa `search`).
+- **Carpeta = módulo, namespace = capa.** `js/modules/search/core/search.js` publica `PYL.core.search`. Un módulo solo usa `shared/` y los módulos que se cargan antes (`search` usa `pnl`; `quick` usa `search`; `hub` solo usa `shared/` (y la clase `.cd-act.del` de `search.css`); `dkprompt` solo usa `shared/` (se coordina con `quick` por el evento `flotante:abierto`); `adprompt` usa `search` (candidato abierto) y los estilos de `dkprompt` y `quick`; `ads` usa `landing` y `search`; `metrics` solo usa `shared/`; `testing` usa `metrics`, `ads` y `landing`; `scaling` usa `metrics` y `testing`; `trainer` usa `search`).
 - **La navegación es de toda la app.** `app/nav.js` abre la vista y dispara `nav:vista`; cada módulo reacciona a ese evento.
 - **Solo la capa `app` modifica el estado.** Los componentes de `ui` reciben datos y callbacks (`onSelect`, `onAssign`).
 - **Los diagnósticos devuelven datos, no HTML.** El texto con formato se representa como segmentos: un string es texto plano, `{ b: '...' }` va en negrita y `{ a: '...', href }` es un enlace que abre en pestaña nueva. `shared/ui/dom.js` (`rich`) los pinta.

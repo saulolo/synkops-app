@@ -64,6 +64,15 @@
     save: (s) => { try { localStorage.setItem(QUICK_KEY, JSON.stringify(s)); return true; } catch { return false; } },
   };
 
+  // Inicio → Centro de mando: accesos directos (nombre, URL, color, ícono propio). Clave propia: los íconos pesan.
+  // load devuelve el texto guardado tal cual (o null): quien lo valida es core.hub.hubLoad.
+  const HUB_KEY = 'pyl-hub';
+  const hub = {
+    load: () => { try { return localStorage.getItem(HUB_KEY); } catch { return null; } },
+    // false si no cupo (los íconos pesan): quien llama avisa y deja abierto el modo Editar.
+    save: (s) => { try { localStorage.setItem(HUB_KEY, JSON.stringify(s)); return true; } catch { return false; } },
+  };
+
   // Limpieza única: la SPEC 08 (búsqueda automática, descartada) guardaba en pyl-auto; ya nadie la lee.
   try { localStorage.removeItem('pyl-auto'); } catch { /* sin almacenamiento */ }
 
@@ -83,5 +92,5 @@
     return { get: (k) => tx('readonly', (s) => s.get(k)), set: (k, v) => tx('readwrite', (s) => s.put(v, k)) };
   })();
 
-  services.storage = { campaignMap, search, landing, ads, testing, scaling, quick, idb };
+  services.storage = { campaignMap, search, landing, ads, testing, scaling, quick, hub, idb };
 })();
