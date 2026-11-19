@@ -420,8 +420,22 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.strictEqual(g.getAttribute('aria-labelledby'), 'lg-group-clientes-h');
     assert.ok(g.querySelector('#lg-cards') && g.querySelectorAll('#lg-cards > .lg-card').length === 12, 'Las 12 tarjetas están dentro');
     assert.strictEqual(document.querySelectorAll('#lg-cards').length, 1);
-    assert.deepStrictEqual([...document.querySelectorAll('#lg-msgs > *')].map((n) => n.id), ['lg-group-clientes'], 'Hoy solo hay el grupo de clientes');
+    assert.deepStrictEqual([...document.querySelectorAll('#lg-msgs > *')].map((n) => n.id), ['lg-group-clientes', 'lg-group-proveedores'], 'Clientes y, debajo, Proveedores');
     assert.ok(!document.querySelector('#lg-parts + #lg-cards'), '#lg-cards ya no cuelga directo de la pestaña');
+  }
+  { // Contenedor «Mensajes a Proveedores» (SPEC 16, Parte 1): debajo de Clientes, mismo estilo; las tarjetas se reparten por `group`.
+    const msgs = document.querySelector('#lg-msgs'), g = document.querySelector('#lg-group-proveedores');
+    assert.ok(g && g.tagName === 'SECTION' && g.parentElement === msgs && g.classList.contains('card') && g.classList.contains('lg-group'), 'Es un <section class="card lg-group"> dentro de #lg-msgs');
+    assert.strictEqual(g.previousElementSibling.id, 'lg-group-clientes', 'Va debajo de Clientes');
+    assert.strictEqual(g.querySelector('#lg-group-proveedores-h').textContent, 'Mensajes a Proveedores');
+    assert.strictEqual(g.getAttribute('aria-labelledby'), 'lg-group-proveedores-h');
+    assert.strictEqual(document.querySelectorAll('#lg-cards-prov').length, 1);
+    assert.ok(g.querySelector('#lg-cards-prov.lg-cards'), 'Su rejilla es .lg-cards');
+    assert.deepStrictEqual([...document.querySelectorAll('#lg-cards-prov > *')].map((n) => n.id), ['lg-card-valida', 'lg-card-privatiza'], 'Validación y Privatización, en ese orden');
+    assert.ok(![...document.querySelectorAll('#lg-cards > *')].some((n) => /valida|privatiza/.test(n.id)), 'Las de proveedores no van en #lg-cards');
+    assert.strictEqual(document.querySelectorAll('#lg-cards > .lg-card').length, 12, 'Clientes sigue con 12');
+    assert.deepStrictEqual([...document.querySelectorAll('#lg-cards-prov .lg-card')].map((c) => c.querySelector('.lg-toggle').getAttribute('aria-expanded')), ['false', 'false'], 'Contraídas al abrir');
+    assert.deepStrictEqual([...document.querySelectorAll('#lg-cards-prov .lg-stage')].map((n) => [n.dataset.stage, n.textContent]), [['validar', 'Validar'], ['privatizar', 'Privatizar']]);
   }
   lgPartes[1].click();
   assert.strictEqual(PYL.app.state.logistics.part, 'msgs', 'Un clic en Seguimiento no lo abre');
@@ -674,6 +688,83 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
       assert.strictEqual(c.querySelector('h2').textContent, tpl.title, tpl.k + ': el título sigue siendo solo el nombre');
     }
     assert.deepStrictEqual([...new Set($$('#lg-cards .lg-stage').map((n) => n.dataset.stage))].sort(), ['cobro', 'confirmar', 'entrega', 'envio']);
+  }
+
+  // 8h1e. Logística · Mensajes a Proveedores (SPEC 16, Partes 2, 3, 5 y 6): «Traer de Mi candidato», ID solo números, Generar/Copiar/Limpiar.
+  {
+    const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
+    const tab = (v) => $('[data-v="' + v + '"]');
+    const draft = PYL.app.state.search.draft, landing = PYL.app.state.landing, lgS = PYL.app.state.logistics;
+    const antes = { name: draft.name, dropi: draft.dropi, suppliers: draft.suppliers }, prod = landing.prod;
+    const escribe = (k, f, t) => { const i = $('#lg-' + k + '-f-' + f); i.value = t; i.dispatchEvent(new window.Event('input', { bubbles: true })); };
+    const valores = (k) => ['supplier', 'product', 'dropi'].map((f) => $('#lg-' + k + '-f-' + f).value);
+    const abre = () => { tab('dash').click(); tab('logistica').click(); };
+    // Botón: «Traer de Mi candidato» en las dos nuevas; «Traer de Desarrollo» en las demás.
+    for (const k of ['valida', 'privatiza']) {
+      const b = $('#lg-' + k + '-import');
+      assert.ok(b && b.classList.contains('lg-import') && b.closest('h2'), k + ': botón dentro del título');
+      assert.ok(/Traer de Mi candidato/.test(b.title) && b.getAttribute('aria-label') === 'Traer de Mi candidato', k + ': título y aria-label');
+    }
+    assert.ok(/Traer de Desarrollo/.test($('#lg-guia-import').title) && $('#lg-guia-import').getAttribute('aria-label') === 'Traer de Desarrollo', 'Las demás siguen con Desarrollo');
+    // Un solo proveedor: trae los tres campos.
+    landing.prod = { name: 'De Desarrollo' };
+    draft.name = ' Crema Arbutina '; draft.dropi = '2234277'; draft.suppliers = [{ name: 'Botania', created: '' }];
+    $('#toast').textContent = '';
+    $('#lg-valida-import').click();
+    assert.deepStrictEqual(valores('valida'), ['Botania', 'Crema Arbutina', '2234277'], 'Con un proveedor llena los tres');
+    assert.ok(/Traje «Crema Arbutina» de Mi candidato\./.test($('#toast').textContent) && !/a mano/.test($('#toast').textContent), 'Aviso sin pedir proveedor');
+    assert.deepStrictEqual(valores('privatiza'), ['', '', ''], 'La otra tarjeta no cambia');
+    // Dos proveedores: producto e ID sí; el proveedor se queda como estaba y el aviso lo pide.
+    draft.name = 'Faja Térmica'; draft.dropi = '999'; draft.suppliers = [{ name: 'Botania' }, { name: 'Nibresma' }];
+    escribe('valida', 'supplier', 'Escrito a mano');
+    $('#toast').textContent = '';
+    $('#lg-valida-import').click();
+    assert.deepStrictEqual(valores('valida'), ['Escrito a mano', 'Faja Térmica', '999'], 'Con dos no toca el proveedor');
+    assert.ok(/Escribe el proveedor a mano: Mi candidato no tiene uno solo\./.test($('#toast').textContent), 'El aviso pide el proveedor');
+    // Un dato vacío en Mi candidato no borra lo escrito.
+    draft.dropi = ''; draft.suppliers = [];
+    escribe('valida', 'dropi', '12345');
+    $('#lg-valida-import').click();
+    assert.strictEqual($('#lg-valida-f-dropi').value, '12345', 'Dato vacío no borra');
+    // Sin nombre: avisa y no cambia nada.
+    draft.name = '   ';
+    const previo = valores('valida');
+    $('#toast').textContent = '';
+    $('#lg-valida-import').click();
+    assert.ok(/Mi candidato no tiene producto/.test($('#toast').textContent) && JSON.stringify(valores('valida')) === JSON.stringify(previo), 'Sin nombre avisa y no cambia');
+    // ID solo números.
+    escribe('valida', 'supplier', 'Botania'); escribe('valida', 'product', 'Crema Arbutina');
+    for (const t of ['22.34277', 'ID2234277']) {
+      escribe('valida', 'dropi', t); $('#lg-valida-gen').click();
+      assert.strictEqual($('#lg-valida-err-dropi').textContent, 'ID inválido: solo números', 'Rechaza ' + t);
+      assert.strictEqual($('#lg-valida-out').value, '', 'No arma el mensaje');
+    }
+    escribe('valida', 'dropi', ''); $('#lg-valida-gen').click();
+    assert.strictEqual($('#lg-valida-err-dropi').textContent, 'Escribe id dropi');
+    // Generar, Copiar y Limpiar (valida).
+    escribe('valida', 'dropi', ' 2234277 '); $('#lg-valida-gen').click();
+    assert.strictEqual($('#lg-valida-err-dropi').textContent, '', 'Sin error');
+    const msg = lgS.cards.valida.last;
+    assert.ok(msg.startsWith('Hola, buen día equipo de Botania.') && msg.includes('*Crema Arbutina* con ID: *2234277*.') && msg.includes('🍃*VidanovaStore®*'), 'Mensaje de Validación');
+    assert.strictEqual($('#lg-valida-out').value, msg, 'Se ve en la tarjeta');
+    $('#lg-valida-clear').click();
+    assert.strictEqual(lgS.cards.valida.last, '', 'Limpiar borra el mensaje');
+    assert.deepStrictEqual(valores('valida'), ['Botania', 'Crema Arbutina', ' 2234277 '], 'Limpiar no vacía los campos from');
+    // Privatización con los mismos datos.
+    escribe('privatiza', 'supplier', 'Botania'); escribe('privatiza', 'product', 'Crema Arbutina'); escribe('privatiza', 'dropi', '2234277');
+    $('#lg-privatiza-gen').click();
+    const m2 = lgS.cards.privatiza.last;
+    assert.ok(m2.includes('(ID: 2234277)') && m2.includes('*privatización*') && !m2.includes('pedidos diarios'), 'Mensaje de Privatización');
+    // Al abrir la pestaña: los vacíos de estas tarjetas se llenan de Mi candidato (no de Desarrollo); los escritos no se pisan.
+    draft.name = 'Del candidato'; draft.dropi = '777'; draft.suppliers = [{ name: 'Uno' }];
+    landing.prod = { name: 'De Desarrollo' };
+    for (const f of ['supplier', 'product', 'dropi']) escribe('valida', f, '');
+    escribe('privatiza', 'supplier', 'Ya escrito'); escribe('privatiza', 'product', ''); escribe('privatiza', 'dropi', '');
+    abre();
+    assert.deepStrictEqual(valores('valida'), ['Uno', 'Del candidato', '777'], 'Prellena de Mi candidato (no de Desarrollo)');
+    assert.deepStrictEqual(valores('privatiza'), ['Ya escrito', 'Del candidato', '777'], 'No pisa lo escrito');
+    assert.ok($$('#lg-cards-prov input').every((i) => !i.readOnly && !i.disabled), 'Campos editables');
+    draft.name = antes.name; draft.dropi = antes.dropi; draft.suppliers = antes.suppliers; landing.prod = prod;
   }
 
   // 8h1d. Logística · Envío de Infografía (SPEC 15, Parte 12): justo después de Confirmación de Guia, solo con el producto de Desarrollo.
@@ -1362,6 +1453,14 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     $('#lg-pedido-copy').click();
     await new Promise((ok) => setTimeout(ok, 20));
     assert.ok(/Primero toca/.test($('#toast').textContent), 'Copiar sin mensaje en Pedidos avisa');
+    // Mensajes a Proveedores (SPEC 16): Copiar manda el mensaje de su tarjeta (los campos quedaron prellenados de Mi candidato).
+    for (const [f, v] of [['supplier', 'Botania'], ['product', 'Crema Arbutina'], ['dropi', '2234277']]) { const i = $('#lg-valida-f-' + f); i.value = v; i.dispatchEvent(new window.Event('input', { bubbles: true })); }
+    $('#lg-valida-gen').click();
+    $('#toast').textContent = ''; copiado = null;
+    $('#lg-valida-copy').click();
+    await new Promise((ok) => setTimeout(ok, 20));
+    assert.ok(copiado && copiado === PYL.app.state.logistics.cards.valida.last && copiado.startsWith('Hola, buen día equipo de'), 'Validación copia su propio mensaje');
+    assert.ok(/Mensaje copiado/.test($('#toast').textContent), 'Avisa que copió');
     for (const [k, v] of Object.entries({ name: 'Eugenia', product: 'Omegaxl joint support', address: 'Calle 1', city: 'PASTO', dept: 'NARIÑO', phone: '3214566677', total: '97400' })) escribeP(k, v);
     $('#lg-pedido-gen').click();
     $('#lg-pedido-copy').click();

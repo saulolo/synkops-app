@@ -52,7 +52,7 @@
     node.querySelector('.lg-body').hidden = !isOpen;
   }
 
-  // Una tarjeta por plantilla: título con el botón «Traer de Desarrollo», un campo por `field`, el mensaje y los botones.
+  // Una tarjeta por plantilla: título con el botón «Traer de Desarrollo» (o «de Mi candidato»), un campo por `field`, el mensaje y los botones.
   // Los ids llevan la clave de la plantilla (#lg-<k>-f-<campo>, #lg-<k>-err-<campo>, #lg-<k>-out, #lg-<k>-gen…) para que
   // dos tarjetas no repitan ids. values = textos actuales del formulario.
   // on = { toggle(), change(k, text), blur(k), importar(), generate(), copy(), clear() }. Nace contraída (ver `open`).
@@ -73,9 +73,11 @@
     tg.addEventListener('click', on.toggle);
     h.append(tg);
     head.append(h);
-    if (tpl.fields.some((f) => f.from)) { // «Traer de Desarrollo» solo si la plantilla trae algo de Desarrollo; va dentro del título para pegarse a la flecha
+    if (tpl.fields.some((f) => f.from)) { // «Traer de Desarrollo» (o «de Mi candidato» si `src: 'cand'`) solo si la plantilla trae algo de ahí; va dentro del título para pegarse a la flecha
       const imp = el('button', 'btn ghost sm lg-import'); imp.type = 'button'; imp.id = id('import'); imp.dataset.ic = 'import';
-      imp.title = 'Traer de Desarrollo: pone el producto de «Producto que estoy montando»'; imp.setAttribute('aria-label', 'Traer de Desarrollo');
+      const cand = tpl.src === 'cand';
+      imp.title = cand ? 'Traer de Mi candidato: pone el proveedor (si hay uno solo), el producto y el ID Dropi de Mi candidato' : 'Traer de Desarrollo: pone el producto de «Producto que estoy montando»';
+      imp.setAttribute('aria-label', cand ? 'Traer de Mi candidato' : 'Traer de Desarrollo');
       imp.addEventListener('click', on.importar);
       h.append(imp);
     }

@@ -20,6 +20,8 @@
 .lg-stage[data-stage=cobro]{--st:var(--y);--st-ink:var(--y-ink)}
 .lg-stage[data-stage=envio]{--st:var(--b2);--st-ink:var(--b2-ink)}
 .lg-stage[data-stage=entrega]{--st:var(--g);--st-ink:var(--g-ink)}
+.lg-stage[data-stage=validar]{--st:var(--o);--st-ink:var(--o-ink)}
+.lg-stage[data-stage=privatizar]{--st:var(--r);--st-ink:var(--r-ink)}
 /* «Traer de Desarrollo» queda fijo justo debajo de la flecha de contraer, en el espacio libre junto al subtítulo (así no se pulsa sin querer
    al contraer). El subtítulo deja ese hueco a la derecha. */
 .lg-import{position:absolute;right:-6px;top:calc(100% + 4px);padding:7px 9px}
