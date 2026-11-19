@@ -11,7 +11,7 @@ const caso = (nombre, fn) => casos.push([nombre, fn]);
 
 caso('exporta todas las funciones del núcleo aplanadas', () => {
   const claves = Object.keys(core).sort().join(',');
-  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CH_CPA_READ,CH_HELP,CH_SIDES,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,HUB_DEFAULTS,HUB_VERSION,LADDER_BLOCKS,LANDING,LEVELS,LG_ACCOUNTS,LG_BANK,LG_CATALOG,LG_DAYS,LG_NEQUI,LG_PARTS,LG_STAGES,LG_STORE,LG_TEMPLATES,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,chChain,chHard,chPlat,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,hubAdd,hubCheck,hubClean,hubDefaults,hubDomain,hubFavicon,hubInitials,hubLoad,hubOrder,hubRemove,hubSet,hubUrl,isDropi,isMetrics,key,kpis,lgForm,lgMessage,lgMoney,lgMoneyText,lgPhone,lgPrefill,lgTemplate,lgValues,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
+  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CH_CPA_READ,CH_HELP,CH_SIDES,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,HUB_DEFAULTS,HUB_VERSION,LADDER_BLOCKS,LANDING,LEVELS,LG_ACCOUNTS,LG_BANK,LG_CATALOG,LG_DAYS,LG_NEQUI,LG_PARTS,LG_STAGES,LG_STORE,LG_TEMPLATES,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,chChain,chHard,chPlat,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,hubAdd,hubCheck,hubClean,hubDefaults,hubDomain,hubFavicon,hubInitials,hubLoad,hubOrder,hubRemove,hubSet,hubUrl,isDropi,isMetrics,key,kpis,lgForm,lgFromCand,lgMessage,lgMoney,lgMoneyText,lgPhone,lgPrefill,lgTemplate,lgValues,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
 });
 
 caso('Costeo: proveedor 30.000 da precio $99.900 y tope $21.617', () => {
@@ -1111,8 +1111,8 @@ caso('cheat: el núcleo no escribe números de métricas a mano', () => {
 });
 
 caso('logistics: lgTemplate cae en la primera con una clave desconocida', () => {
-  assert.deepStrictEqual(core.LG_TEMPLATES.map((t) => t.k), ['pedido', 'reconfirma', 'tercero', 'confirmado', 'guia', 'infografia', 'anticipo', 'reintento', 'flete', 'enruta', 'entregado', 'oficina'], 'Una tarjeta por plantilla; sin Segundo Intento (SPEC 15, Parte 10)');
-  assert.deepStrictEqual(core.LG_TEMPLATES.map((t) => t.title), ['Confirmación de Pedidos', 'Reconfirmación de Pedido', 'Tercer Intento', 'Pedido Confirmado', 'Confirmación de Guia', 'Envío de Infografía', 'Solicitud de Anticipo', 'Reintento de Entrega', 'Flete Especial', 'Recordatorio En Ruta', 'Pedido Entregado', 'Reclamar en Oficina']);
+  assert.deepStrictEqual(core.LG_TEMPLATES.map((t) => t.k), ['pedido', 'reconfirma', 'tercero', 'confirmado', 'guia', 'infografia', 'anticipo', 'reintento', 'flete', 'enruta', 'entregado', 'oficina', 'valida', 'privatiza'], 'Una tarjeta por plantilla; sin Segundo Intento (SPEC 15, Parte 10)');
+  assert.deepStrictEqual(core.LG_TEMPLATES.map((t) => t.title), ['Confirmación de Pedidos', 'Reconfirmación de Pedido', 'Tercer Intento', 'Pedido Confirmado', 'Confirmación de Guia', 'Envío de Infografía', 'Solicitud de Anticipo', 'Reintento de Entrega', 'Flete Especial', 'Recordatorio En Ruta', 'Pedido Entregado', 'Reclamar en Oficina', 'Validación de Producto', 'Solicitud de Privatización']);
   assert.deepStrictEqual(core.LG_TEMPLATES.filter((t) => t.newRow).map((t) => t.k), [], 'Las tarjetas fluyen por ancho: sin saltos de fila');
   assert.strictEqual(core.lgTemplate('guia').k, 'guia');
   assert.strictEqual(core.lgTemplate('x').k, 'pedido');
@@ -1418,6 +1418,90 @@ caso('logistics: lgPhone acepta solo las formas pedidas y devuelve 10 dígitos',
   assert.deepStrictEqual(core.lgValues(tpl, { ...base, phone: '' }).errors, { phone: 'Escribe teléfono de contacto' });
 });
 
+caso('logistics: campo digits (solo números) en lgValues', () => {
+  const tpl = { k: 'prueba', fields: [{ k: 'dropi', label: 'ID Dropi', type: 'digits', ph: 'Ej: 2234277', errDigits: 'ID inválido: solo números' }] };
+  assert.deepStrictEqual(core.lgValues(tpl, {}).errors, { dropi: 'Escribe id dropi' }, 'Vacío');
+  assert.deepStrictEqual(core.lgValues(tpl, { dropi: '   ' }).errors, { dropi: 'Escribe id dropi' }, 'Solo espacios');
+  assert.deepStrictEqual(core.lgValues(tpl, { dropi: '2234277' }), { ok: true, values: { dropi: '2234277' }, errors: {} });
+  assert.strictEqual(core.lgValues(tpl, { dropi: ' 2234277 ' }).values.dropi, '2234277', 'Recorta espacios');
+  for (const t of ['22.34277', 'ID2234277', '22 34', '-5', '1e3', '2234277x']) assert.deepStrictEqual(core.lgValues(tpl, { dropi: t }).errors, { dropi: 'ID inválido: solo números' }, 'Rechazado: ' + t);
+  const sinAviso = { k: 'p2', fields: [{ k: 'dropi', label: 'ID Dropi', type: 'digits' }] };
+  assert.strictEqual(core.lgValues(sinAviso, { dropi: 'abc' }).errors.dropi, 'Solo números', 'Aviso por defecto');
+  assert.strictEqual(core.lgValues(tpl, { dropi: '0012' }).values.dropi, '0012', 'Se conserva tal cual');
+});
+
+caso('logistics: lgFromCand toma producto, ID y proveedor único de Mi candidato', () => {
+  assert.deepStrictEqual(core.lgFromCand(null), { product: '', dropi: '', supplier: '' });
+  assert.deepStrictEqual(core.lgFromCand({}), { product: '', dropi: '', supplier: '' });
+  assert.deepStrictEqual(core.lgFromCand({ name: 'Crema Arbutina', dropi: '2234277', suppliers: [] }), { product: 'Crema Arbutina', dropi: '2234277', supplier: '' }, '0 proveedores');
+  assert.deepStrictEqual(core.lgFromCand({ name: ' Crema Arbutina ', dropi: ' 2234277 ', suppliers: [{ name: ' Botania ' }] }), { product: 'Crema Arbutina', dropi: '2234277', supplier: 'Botania' }, '1 proveedor, recortado');
+  assert.strictEqual(core.lgFromCand({ name: 'X', suppliers: [{ name: 'Botania' }, { name: 'Nibresma' }] }).supplier, '', '2 proveedores');
+  assert.strictEqual(core.lgFromCand({ name: 'X', suppliers: [{ name: 'Botania' }, { name: '   ' }] }).supplier, 'Botania', 'Uno con nombre vacío no cuenta');
+  assert.strictEqual(core.lgFromCand({ name: 'X', suppliers: [{ name: '' }, { name: '' }] }).supplier, '', 'Todos vacíos');
+  assert.strictEqual(core.lgFromCand({ name: 'X', suppliers: [{ name: 'Botania' }, { name: 'Botania' }] }).supplier, '', 'Dos con nombre, aunque iguales');
+  assert.strictEqual(core.lgFromCand({ name: 'X', suppliers: null }).supplier, '', 'suppliers no es arreglo');
+  assert.strictEqual(core.lgFromCand({ dropi: 2234277 }).dropi, '2234277', 'ID numérico → texto');
+});
+
+caso('logistics: etapas Validar y Privatizar', () => {
+  assert.strictEqual(core.LG_STAGES.validar, 'Validar');
+  assert.strictEqual(core.LG_STAGES.privatizar, 'Privatizar');
+});
+
+caso('logistics: Validación de Producto (proveedores, Mi candidato)', () => {
+  const tpl = core.lgTemplate('valida');
+  assert.strictEqual(tpl.k, 'valida');
+  assert.strictEqual(tpl.group, 'prov');
+  assert.strictEqual(tpl.src, 'cand');
+  assert.strictEqual(tpl.stage, 'validar');
+  assert.strictEqual(tpl.title, 'Validación de Producto');
+  assert.strictEqual(tpl.sub, 'Antes de escalar la pauta: valido con el proveedor stock, hora de corte y restock.');
+  assert.deepStrictEqual(tpl.fields.map((f) => [f.k, f.type, f.from, f.ph, f.errDigits || null]), [
+    ['supplier', 'text', 'supplier', 'Ej: Botania', null],
+    ['product', 'text', 'name', 'Ej: Crema Arbutina', null],
+    ['dropi', 'digits', 'dropi', 'Ej: 2234277', 'ID inválido: solo números']]);
+  assert.deepStrictEqual(core.lgValues(tpl, core.lgForm(tpl)).errors, { supplier: 'Escribe proveedor', product: 'Escribe producto', dropi: 'Escribe id dropi' });
+  assert.deepStrictEqual(core.lgValues(tpl, { supplier: 'Botania', product: 'Crema Arbutina', dropi: '22.3' }).errors, { dropi: 'ID inválido: solo números' });
+  const r = core.lgValues(tpl, { supplier: ' Botania ', product: 'Crema Arbutina', dropi: ' 2234277 ' });
+  assert.ok(r.ok);
+  assert.strictEqual(core.lgMessage('valida', r.values), `Hola, buen día equipo de Botania. Les saluda Saul de la tienda 🍃*VidanovaStore®* (Comunidad NovaProject).
+Estamos por iniciar pauta publicitaria escalada para su producto *Crema Arbutina* con ID: *2234277*.
+
+Quisiera validar con ustedes rápidamente 3 puntos operativos:
+1. ¿Tienen stock físico real en bodega para despachos inmediatos?
+2. ¿Cuál es su hora de corte para despachar el mismo día las guías generadas?
+3. ¿Tienen proyección de restock continuo para este producto en caso de escalar a 15-20 pedidos diarios?
+
+Quedo atento para coordinar y empezar a meterle volumen. Muchas gracias.`);
+  assert.ok(!core.LG_TEMPLATES.filter((t) => t.group !== 'prov').some((t) => t.src), 'Las de clientes no traen src ni group');
+});
+
+caso('logistics: Solicitud de Privatización (proveedores, Mi candidato)', () => {
+  const tpl = core.lgTemplate('privatiza');
+  assert.strictEqual(tpl.k, 'privatiza');
+  assert.strictEqual(tpl.group, 'prov');
+  assert.strictEqual(tpl.src, 'cand');
+  assert.strictEqual(tpl.stage, 'privatizar');
+  assert.strictEqual(tpl.title, 'Solicitud de Privatización');
+  assert.strictEqual(tpl.sub, 'Cuando el producto funciona: le pido al proveedor que lo privatice para mi tienda.');
+  assert.deepStrictEqual(tpl.fields, core.lgTemplate('valida').fields, 'Mismos tres campos que Validación');
+  assert.deepStrictEqual(core.lgValues(tpl, core.lgForm(tpl)).errors, { supplier: 'Escribe proveedor', product: 'Escribe producto', dropi: 'Escribe id dropi' });
+  assert.deepStrictEqual(core.lgValues(tpl, { supplier: 'Botania', product: 'Crema Arbutina', dropi: 'ID2234277' }).errors, { dropi: 'ID inválido: solo números' });
+  const r = core.lgValues(tpl, { supplier: 'Botania', product: 'Crema Arbutina', dropi: '2234277' });
+  assert.ok(r.ok);
+  const m = core.lgMessage('privatiza', r.values);
+  assert.strictEqual(m, `Hola, buen día equipo de Botania. Les saluda Saul de la tienda 🍃*VidanovaStore®* (Comunidad NovaProject).
+
+Venimos trabajando con su producto *Crema Arbutina* (ID: 2234277) y los resultados de la pauta han sido muy buenos. Es un producto en el que creemos y queremos apostarle fuerte.
+
+Por eso quisiera proponerles la *privatización* del producto para nuestra tienda. A cambio, nos comprometemos a:
+✅ Invertir en pauta publicitaria constante para mover volumen.
+✅ Cuidar la imagen del producto con una página y unos creativos de calidad.
+
+Quedo atento a su respuesta. ¡Muchas gracias por su apoyo! 🤝`);
+  assert.ok(!m.includes('pedidos diarios') && !m.includes('condiciones'), 'Sin la línea de pedidos diarios ni la pregunta de condiciones');
+});
+
 caso('logistics: ya no existe Segundo Intento (recordatorio)', () => {
   assert.ok(!core.LG_TEMPLATES.some((t) => t.k === 'recordatorio' || t.title === 'Segundo Intento'));
   assert.strictEqual(core.lgTemplate('recordatorio').k, 'pedido', 'Una clave que ya no existe cae en la primera plantilla');
@@ -1451,8 +1535,8 @@ caso('logistics: el producto sale en negrita y las cuentas salen de LG_ACCOUNTS'
 });
 
 caso('logistics: cada plantilla trae su etapa para el chip del título', () => {
-  assert.deepStrictEqual(core.LG_STAGES, { confirmar: 'Confirmar', cobro: 'Cobro', envio: 'Envío', entrega: 'Entrega' });
-  assert.deepStrictEqual(Object.fromEntries(core.LG_TEMPLATES.map((t) => [t.k, t.stage])), {'pedido': 'confirmar', 'reconfirma': 'confirmar', 'tercero': 'confirmar', 'confirmado': 'confirmar', 'guia': 'envio', 'infografia': 'envio', 'anticipo': 'cobro', 'reintento': 'envio', 'flete': 'cobro', 'enruta': 'envio', 'entregado': 'entrega', 'oficina': 'envio'});
+  assert.deepStrictEqual(core.LG_STAGES, { confirmar: 'Confirmar', cobro: 'Cobro', envio: 'Envío', entrega: 'Entrega', validar: 'Validar', privatizar: 'Privatizar' });
+  assert.deepStrictEqual(Object.fromEntries(core.LG_TEMPLATES.map((t) => [t.k, t.stage])), {'pedido': 'confirmar', 'reconfirma': 'confirmar', 'tercero': 'confirmar', 'confirmado': 'confirmar', 'guia': 'envio', 'infografia': 'envio', 'anticipo': 'cobro', 'reintento': 'envio', 'flete': 'cobro', 'enruta': 'envio', 'entregado': 'entrega', 'oficina': 'envio', 'valida': 'validar', 'privatiza': 'privatizar'});
   assert.ok(core.LG_TEMPLATES.every((t) => t.stage in core.LG_STAGES));
 });
 

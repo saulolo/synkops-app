@@ -65,7 +65,7 @@ Todo vive en una sola página (`index.html`). Las pestañas de la barra superior
 | 📏 **Métricas** | Guía de consulta de las métricas duras (CTR, CPC, CPM, CPPI, CPA) para Meta y TikTok: qué significa cada una, su fórmula, sus rangos, qué falla y cómo se arregla; y un glosario de las métricas base del Administrador de anuncios con las que se calculan. |
 | 🧪 **Testeo** | Aprendo el testeo de NovaSociety: un paso a paso con los cortes de 20K / 30K / 40K, la cadena que reviso si apago, una práctica de 11 casos y un simulador de un conjunto. Es para aprender: no lee mis campañas reales. |
 | 📈 **Escalado** | Pronto: aquí aprenderé a escalar un conjunto que ya pasó el testeo (Surfing Scaling). |
-| 💬 **Logística** | Plantillas de mensajes de WhatsApp para mis clientes (confirmar el pedido, avisar la guía, el envío, el cobro y la entrega): lleno los datos, genero el mensaje y lo copio. |
+| 💬 **Logística** | Plantillas de mensajes de WhatsApp para mis clientes (confirmar el pedido, avisar la guía, el envío, el cobro y la entrega) y para mis proveedores (validar un producto y pedir que me lo privaticen): lleno los datos, genero el mensaje y lo copio. |
 | 🪜 **Escalera** | Los 15 escalones para escalar (+20% de presupuesto cada uno). |
 | 🎬 **Creativos** | Pipeline y cadencia de creativos, y cuándo el problema es el creativo. |
 | 💸 **Tablero P&L** | La utilidad real contra entrega cruzando Dropi y Meta Ads (lo que explica la mayor parte de este documento). |
@@ -264,12 +264,13 @@ Tiene tres sub-pestañas: **📂 Lectura real · pronto** (subir el reporte de m
 
 ## 💬 Logística
 
-**Logística** arma los mensajes que mando a mis clientes por WhatsApp. No manda nada ni guarda nada: lleno los datos del pedido, toco **Generar mensaje** y lo copio para pegarlo.
+**Logística** arma los mensajes que mando a mis clientes y a mis proveedores por WhatsApp. No manda nada ni guarda nada: lleno los datos del pedido, toco **Generar mensaje** y lo copio para pegarlo.
 
-- **Sub-pestañas:** **💬 Plantillas de mensajes** (la que uso hoy) y **📦 Seguimiento de pedidos** (pronto, apagada). Dentro de Plantillas hay un contenedor **Mensajes a Clientes**; más adelante tendrá un hermano para **Mensajes a Proveedores**.
-- **Tarjetas:** hay una por mensaje, tres por fila y todas **contraídas** al abrir la pestaña. Se abren tocando su nombre. Cada una trae una etiqueta de color con la etapa del pedido: **Confirmar**, **Cobro**, **Envío** o **Entrega**.
+- **Sub-pestañas:** **💬 Plantillas de mensajes** (la que uso hoy) y **📦 Seguimiento de pedidos** (pronto, apagada). Dentro de Plantillas hay dos contenedores, uno debajo del otro: **Mensajes a Clientes** y **Mensajes a Proveedores**.
+- **Tarjetas:** hay una por mensaje, tres por fila y todas **contraídas** al abrir la pestaña. Se abren tocando su nombre. Cada una trae una etiqueta de color con la etapa del pedido: **Confirmar**, **Cobro**, **Envío** o **Entrega** (en Proveedores, **Validar** o **Privatizar**).
 - **Botones:** **Generar mensaje** (arriba, el destacado) valida y arma el texto; **Copiar mensaje** lo copia (o avisa si todavía no lo generé); **Limpiar** vacía los datos del pedido y el mensaje. El mensaje no se actualiza solo: cambia únicamente al volver a tocar **Generar mensaje**.
 - **Traer de Desarrollo:** el botón bajo la flecha de las tarjetas con **Producto** pone el producto de «Producto que estoy montando». Al abrir la pestaña ese campo se llena solo si está vacío.
+- **Traer de Mi candidato:** en las tarjetas de proveedores el mismo botón trae **Proveedor**, **Producto** e **ID Dropi** de Mi candidato (Buscar producto). El proveedor solo se trae si Mi candidato tiene exactamente uno; si no, el aviso me pide escribirlo a mano. Un dato vacío no borra lo que ya escribí. El **ID Dropi** acepta solo números.
 - **Dinero:** lo escribo como `97400`, `97.400` o `$ 97.400`; el campo muestra `$ 97.400` y en el mensaje sale `$97.400`.
 - **Teléfono:** acepta `+57 311 7624068`, `311 7624068` o sin espacios; cualquier otra forma se rechaza con un aviso. En el mensaje siempre sale `3117624068`.
 - **Manual de regalo:** en **Pedido Entregado** y **Reclamar en Oficina** la casilla **Incluye manual** viene marcada y pide el **título del manual**; si la desmarco, ese campo se oculta, no se exige y el mensaje sale sin el manual. **Limpiar** no los vacía porque son del producto, no del pedido.
@@ -290,6 +291,8 @@ Tiene tres sub-pestañas: **📂 Lectura real · pronto** (subir el reporte de m
 | Envío | Recordatorio En Ruta | Cliente y producto |
 | Entrega | Pedido Entregado | Cliente, casilla de manual y su título |
 | Envío | Reclamar en Oficina | Producto, casilla de manual y su título |
+| Validar | Validación de Producto (a proveedores) | Proveedor, producto e ID Dropi |
+| Privatizar | Solicitud de Privatización (a proveedores) | Proveedor, producto e ID Dropi |
 
 ---
 
@@ -667,10 +670,10 @@ js/
     scaling/          Escalado (SPEC 06): solo anuncia Surfing Scaling
       core/scaling.js Tarjeta "Pronto" de Surfing Scaling (`SCALING_SOON`)
       app/scaling.js  Pinta la tarjeta con `ui.testing.soon`; sin estado ni guardado
-    logistics/        Logística → plantillas de mensajes a clientes (SPEC 13 y 15)
-      core/logistics.js Constantes de la tienda (LG_STORE, LG_ACCOUNTS…), las 12 plantillas (LG_TEMPLATES), sus textos, validación (lgValues, lgMoney, lgPhone); sin DOM
+    logistics/        Logística → plantillas de mensajes a clientes y proveedores (SPEC 13, 15 y 16)
+      core/logistics.js Constantes de la tienda (LG_STORE, LG_ACCOUNTS…), las 14 plantillas (LG_TEMPLATES), sus textos, validación (lgValues, lgMoney, lgPhone, ID solo números) y lgFromCand (Mi candidato); sin DOM
       ui/logistics.js Sub-pestañas, tarjeta por plantilla (chip de etapa, campos, mensaje y botones) y campos condicionales
-      app/logistics.js Estado (app.state.logistics), Generar, Copiar, Limpiar y Traer de Desarrollo; no guarda nada
+      app/logistics.js Estado (app.state.logistics), Generar, Copiar, Limpiar y Traer de Desarrollo / de Mi candidato; reparte las tarjetas por grupo; no guarda nada
     trainer/
       app/trainer.js  Entrenador de métricas (fase 1: copiado del prototipo)
 

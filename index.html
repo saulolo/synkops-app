@@ -713,12 +713,17 @@
 
   <div class="seg" id="lg-parts" role="group" aria-label="Parte de logística"></div>
 
-  <!-- Sub-pestaña «Plantillas de mensajes»: un contenedor por grupo (hoy solo Mensajes a Clientes; luego, Mensajes a Proveedores como otro <section class="lg-group"> hermano) -->
+  <!-- Sub-pestaña «Plantillas de mensajes»: un contenedor por grupo (Mensajes a Clientes y, debajo, Mensajes a Proveedores; cada plantilla elige el suyo con `group`) -->
   <div id="lg-msgs">
     <section class="card lg-group" id="lg-group-clientes" aria-labelledby="lg-group-clientes-h">
       <h2 id="lg-group-clientes-h">Mensajes a Clientes</h2>
       <!-- Una tarjeta por plantilla, lado a lado (las arma js/modules/logistics/ui/logistics.js) -->
       <div class="lg-cards" id="lg-cards"></div>
+    </section>
+    <section class="card lg-group" id="lg-group-proveedores" aria-labelledby="lg-group-proveedores-h">
+      <h2 id="lg-group-proveedores-h">Mensajes a Proveedores</h2>
+      <!-- Las plantillas con group: 'prov' (las arma js/modules/logistics/ui/logistics.js) -->
+      <div class="lg-cards" id="lg-cards-prov"></div>
     </section>
   </div>
 </section>

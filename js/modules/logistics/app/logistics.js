@@ -20,6 +20,16 @@
     return { product: p.product, price: p.price == null ? '' : C.lgMoneyText(p.price) };
   };
 
+  // Datos de Mi candidato (Buscar producto), ya como texto de campo: product, dropi y supplier (solo si hay uno).
+  const fromCand = () => C.lgFromCand(PYL.app.state.search.draft);
+
+  // Fuente de los campos `from` de una plantilla: Mi candidato (`src: 'cand'`) o Desarrollo. Las claves son las de `from` (name/dropi/supplier/price).
+  const source = (tpl) => {
+    if (tpl.src !== 'cand') { const d = fromDev(); return { name: d.product, price: d.price, product: d.product }; }
+    const c = fromCand();
+    return { name: c.product, dropi: c.dropi, supplier: c.supplier, product: c.product };
+  };
+
   // Escribe en el estado y en el campo de esa tarjeta.
   const put = (tpl, k, text) => { S.cards[tpl.k].form[k] = text; U.setField(nodes[tpl.k], k, text); };
 
@@ -32,18 +42,27 @@
     U.message(nodes[tpl.k], st.last);
   }
 
-  // Al abrir la pestaña: los campos que vienen de Desarrollo (`from`) se llenan solo si están vacíos.
+  // Al abrir la pestaña: los campos con `from` se llenan de su fuente (Desarrollo o Mi candidato) solo si están vacíos.
   function prefill() {
-    const d = fromDev();
-    for (const tpl of C.LG_TEMPLATES) for (const f of tpl.fields) if (f.from && !S.cards[tpl.k].form[f.k].trim() && d[f.k]) put(tpl, f.k, d[f.k]);
+    for (const tpl of C.LG_TEMPLATES) {
+      const d = source(tpl);
+      for (const f of tpl.fields) if (f.from && !S.cards[tpl.k].form[f.k].trim() && d[f.from]) put(tpl, f.k, d[f.from]);
+    }
   }
 
-  // Botón «Traer de Desarrollo» de una tarjeta: pisa sus campos `from`. Sin nombre en Desarrollo no cambia nada.
+  // Botón «Traer de Desarrollo» / «Traer de Mi candidato» de una tarjeta: pisa sus campos `from` que tengan dato (uno vacío no borra
+  // lo escrito). Sin nombre en la fuente no cambia nada.
   function importar(tpl) {
-    const d = fromDev();
-    if (!d.product) { toast('Desarrollo no tiene producto: llena «Producto que estoy montando» o escribe los datos aquí.', 'error'); return; }
-    for (const f of tpl.fields) if (f.from && d[f.k]) put(tpl, f.k, d[f.k]);
-    toast('Traje «' + d.product + '» de Desarrollo.', 'ok');
+    const d = source(tpl);
+    if (tpl.src === 'cand') {
+      if (!d.name) { toast('Mi candidato no tiene producto: llena «Mi candidato» en Buscar producto o escribe los datos aquí.', 'error'); return; }
+      for (const f of tpl.fields) if (f.from && d[f.from]) put(tpl, f.k, d[f.from]);
+      toast('Traje «' + d.name + '» de Mi candidato.' + (d.supplier ? '' : ' Escribe el proveedor a mano: Mi candidato no tiene uno solo.'), 'ok');
+      return;
+    }
+    if (!d.name) { toast('Desarrollo no tiene producto: llena «Producto que estoy montando» o escribe los datos aquí.', 'error'); return; }
+    for (const f of tpl.fields) if (f.from && d[f.from]) put(tpl, f.k, d[f.from]);
+    toast('Traje «' + d.name + '» de Desarrollo.', 'ok');
   }
 
   // «Generar mensaje»: valida; con errores marca los campos y deja el mensaje anterior.
@@ -94,10 +113,12 @@
     $('#lg-msgs').hidden = S.part !== 'msgs';
   }
 
-  // Las tarjetas se arman una sola vez, de izquierda a derecha en el orden de LG_TEMPLATES.
-  const root = $('#lg-cards');
-  root.textContent = '';
+  // Las tarjetas se arman una sola vez, de izquierda a derecha en el orden de LG_TEMPLATES. Cada una va al contenedor de su `group`:
+  // 'prov' = Mensajes a Proveedores (#lg-cards-prov); sin `group` = Mensajes a Clientes (#lg-cards).
+  const roots = { clientes: $('#lg-cards'), prov: $('#lg-cards-prov') };
+  for (const r of Object.values(roots)) r.textContent = '';
   for (const tpl of C.LG_TEMPLATES) {
+    const root = roots[tpl.group || 'clientes'];
     nodes[tpl.k] = U.card(tpl, S.cards[tpl.k].form, handlers(tpl));
     if (tpl.newRow) root.append(U.rowBreak()); // salto de línea: la tarjeta empieza una fila nueva
     root.append(nodes[tpl.k]);

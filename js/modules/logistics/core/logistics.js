@@ -9,7 +9,7 @@
   const LG_NEQUI = '3182110955'; // cuentas fijas (Solicitud de Anticipo, Flete Especial)
   const LG_BANK = '23015881151'; // Ahorros - Bancolombia
   // Etapa del pedido de cada plantilla (chip sobre el título de su tarjeta): clave → texto.
-  const LG_STAGES = { confirmar: 'Confirmar', cobro: 'Cobro', envio: 'Envío', entrega: 'Entrega' };
+  const LG_STAGES = { confirmar: 'Confirmar', cobro: 'Cobro', envio: 'Envío', entrega: 'Entrega', validar: 'Validar', privatizar: 'Privatizar' };
 
   // Bloque de cuentas de Solicitud de Anticipo y Flete Especial: cada cuenta con su ícono, su nombre y su número en líneas aparte.
   const LG_ACCOUNTS = `📱 *Nequi/Daviplata*
@@ -118,6 +118,22 @@ ${LG_BANK}`;
         { k: 'manual', label: 'Incluye manual', type: 'check', def: true, keep: true },
         { k: 'manualTitle', label: 'Título del manual', type: 'text', when: 'manual', keep: true, ph: 'Ej: Manual de Bienestar Articular' },
       ] },
+    // Mensajes a proveedores (SPEC 16): `group: 'prov'` = contenedor «Mensajes a Proveedores»; `src: 'cand'` = sus `from` salen de
+    // Mi candidato (ver lgFromCand: 'name' → producto, 'dropi' → ID, 'supplier' → proveedor); `type: 'digits'` = solo números (`errDigits`).
+    // Validación: antes de pautar en serio, confirmo con el proveedor stock real, hora de corte y restock.
+    { k: 'valida', group: 'prov', src: 'cand', stage: 'validar', title: 'Validación de Producto', sub: 'Antes de escalar la pauta: valido con el proveedor stock, hora de corte y restock.',
+      fields: [
+        { k: 'supplier', label: 'Proveedor', type: 'text', from: 'supplier', ph: 'Ej: Botania' },
+        { k: 'product', label: 'Producto', type: 'text', from: 'name', ph: 'Ej: Crema Arbutina' },
+        { k: 'dropi', label: 'ID Dropi', type: 'digits', from: 'dropi', ph: 'Ej: 2234277', errDigits: 'ID inválido: solo números' },
+      ] },
+    // Privatización: cuando el producto funciona, le pido al proveedor que lo privatice para mi tienda. Mismos campos que Validación.
+    { k: 'privatiza', group: 'prov', src: 'cand', stage: 'privatizar', title: 'Solicitud de Privatización', sub: 'Cuando el producto funciona: le pido al proveedor que lo privatice para mi tienda.',
+      fields: [
+        { k: 'supplier', label: 'Proveedor', type: 'text', from: 'supplier', ph: 'Ej: Botania' },
+        { k: 'product', label: 'Producto', type: 'text', from: 'name', ph: 'Ej: Crema Arbutina' },
+        { k: 'dropi', label: 'ID Dropi', type: 'digits', from: 'dropi', ph: 'Ej: 2234277', errDigits: 'ID inválido: solo números' },
+      ] },
   ];
 
   const ERR_MONEY = 'Precio mayor a 0';
@@ -155,6 +171,10 @@ ${LG_BANK}`;
         if (n != null) values[fl.k] = n; else errors[fl.k] = t ? (fl.errMoney || ERR_MONEY) : `Escribe ${fl.label.toLowerCase()}`;
         continue;
       }
+      if (fl.type === 'digits' && t) { // solo dígitos: se conserva tal cual (sin puntos ni formato)
+        if (/^\d+$/.test(t)) values[fl.k] = t; else errors[fl.k] = fl.errDigits || 'Solo números';
+        continue;
+      }
       if (fl.type === 'phone' && t) {
         const p = lgPhone(t);
         if (p) values[fl.k] = p; else errors[fl.k] = fl.errPhone || 'Teléfono inválido';
@@ -174,10 +194,37 @@ ${LG_BANK}`;
     return { product: clean(p.name), price: Number(p.price) > 0 ? Number(p.price) : null };
   };
 
-  const STORE_BOLD = LG_STORE.replace('🍃', '🍃*') + '*'; // 🍃*VidanovaStore®*
+  // Datos de Mi candidato (search.draft) para las plantillas con `src: 'cand'`. El proveedor solo sale si hay exactamente uno con nombre.
+  const lgFromCand = (draft) => {
+    const d = draft || {};
+    const names = (Array.isArray(d.suppliers) ? d.suppliers : []).map((s) => clean(s && s.name)).filter(Boolean);
+    return { product: clean(d.name), dropi: clean(d.dropi), supplier: names.length === 1 ? names[0] : '' };
+  };
+
+  const STORE_BOLD =LG_STORE.replace('🍃', '🍃*') + '*'; // 🍃*VidanovaStore®*
 
   // Texto de cada plantilla: recibe los valores ya validados (price = número).
   const TEXT = {
+    privatiza: (v) => `Hola, buen día equipo de ${v.supplier}. Les saluda Saul de la tienda ${STORE_BOLD} (Comunidad NovaProject).
+
+Venimos trabajando con su producto *${v.product}* (ID: ${v.dropi}) y los resultados de la pauta han sido muy buenos. Es un producto en el que creemos y queremos apostarle fuerte.
+
+Por eso quisiera proponerles la *privatización* del producto para nuestra tienda. A cambio, nos comprometemos a:
+✅ Invertir en pauta publicitaria constante para mover volumen.
+✅ Cuidar la imagen del producto con una página y unos creativos de calidad.
+
+Quedo atento a su respuesta. ¡Muchas gracias por su apoyo! 🤝`,
+
+    valida: (v) => `Hola, buen día equipo de ${v.supplier}. Les saluda Saul de la tienda ${STORE_BOLD} (Comunidad NovaProject).
+Estamos por iniciar pauta publicitaria escalada para su producto *${v.product}* con ID: *${v.dropi}*.
+
+Quisiera validar con ustedes rápidamente 3 puntos operativos:
+1. ¿Tienen stock físico real en bodega para despachos inmediatos?
+2. ¿Cuál es su hora de corte para despachar el mismo día las guías generadas?
+3. ¿Tienen proyección de restock continuo para este producto en caso de escalar a 15-20 pedidos diarios?
+
+Quedo atento para coordinar y empezar a meterle volumen. Muchas gracias.`,
+
     anticipo: (v) => `Hola, ${v.name} 👋
 
 Recibimos tu pedido de *${v.product}* en ${STORE_BOLD} y queremos que te llegue sin contratiempos 📦
@@ -293,5 +340,5 @@ El tiempo estimado de entrega es de *${LG_DAYS} días hábiles*.
 
   const lgMessage = (k, values) => TEXT[lgTemplate(k).k](values || {});
 
-  core.logistics = { LG_STORE, LG_DAYS, LG_CATALOG, LG_NEQUI, LG_BANK, LG_ACCOUNTS, LG_STAGES, LG_PARTS, LG_TEMPLATES, lgTemplate, lgMoney, lgMoneyText, lgPhone, lgForm, lgValues, lgPrefill, lgMessage };
+  core.logistics = { LG_STORE, LG_DAYS, LG_CATALOG, LG_NEQUI, LG_BANK, LG_ACCOUNTS, LG_STAGES, LG_PARTS, LG_TEMPLATES, lgTemplate, lgMoney, lgMoneyText, lgPhone, lgForm, lgValues, lgPrefill, lgFromCand, lgMessage };
 })();
