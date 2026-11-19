@@ -11,7 +11,7 @@ const caso = (nombre, fn) => casos.push([nombre, fn]);
 
 caso('exporta todas las funciones del núcleo aplanadas', () => {
   const claves = Object.keys(core).sort().join(',');
-  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CH_CPA_READ,CH_HELP,CH_SIDES,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,HUB_DEFAULTS,HUB_VERSION,LADDER_BLOCKS,LANDING,LEVELS,LG_DAYS,LG_PARTS,LG_STORE,LG_TEMPLATES,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,chChain,chHard,chPlat,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,hubAdd,hubCheck,hubClean,hubDefaults,hubDomain,hubFavicon,hubInitials,hubLoad,hubOrder,hubRemove,hubSet,hubUrl,isDropi,isMetrics,key,kpis,lgForm,lgMessage,lgMoney,lgMoneyText,lgPrefill,lgTemplate,lgValues,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
+  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CH_CPA_READ,CH_HELP,CH_SIDES,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,HUB_DEFAULTS,HUB_VERSION,LADDER_BLOCKS,LANDING,LEVELS,LG_ACCOUNTS,LG_BANK,LG_CATALOG,LG_DAYS,LG_NEQUI,LG_PARTS,LG_STAGES,LG_STORE,LG_TEMPLATES,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,chChain,chHard,chPlat,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,hubAdd,hubCheck,hubClean,hubDefaults,hubDomain,hubFavicon,hubInitials,hubLoad,hubOrder,hubRemove,hubSet,hubUrl,isDropi,isMetrics,key,kpis,lgForm,lgMessage,lgMoney,lgMoneyText,lgPhone,lgPrefill,lgTemplate,lgValues,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
 });
 
 caso('Costeo: proveedor 30.000 da precio $99.900 y tope $21.617', () => {
@@ -1111,9 +1111,9 @@ caso('cheat: el núcleo no escribe números de métricas a mano', () => {
 });
 
 caso('logistics: lgTemplate cae en la primera con una clave desconocida', () => {
-  assert.deepStrictEqual(core.LG_TEMPLATES.map((t) => t.k), ['pedido', 'confirmado', 'guia', 'recordatorio', 'tercero', 'anticipo'], 'Una tarjeta por plantilla; Segundo Intento va debajo de Pedido Confirmado');
-  assert.deepStrictEqual(core.LG_TEMPLATES.map((t) => t.title), ['Confirmación de Pedidos', 'Pedido Confirmado', 'Confirmación de Guia', 'Segundo Intento', 'Tercer Intento', 'Solicitud de Anticipo']);
-  assert.deepStrictEqual(core.LG_TEMPLATES.filter((t) => t.newRow).map((t) => t.k), ['recordatorio'], 'Segundo Intento abre la segunda fila');
+  assert.deepStrictEqual(core.LG_TEMPLATES.map((t) => t.k), ['pedido', 'reconfirma', 'tercero', 'confirmado', 'guia', 'infografia', 'anticipo', 'reintento', 'flete', 'enruta', 'entregado', 'oficina'], 'Una tarjeta por plantilla; sin Segundo Intento (SPEC 15, Parte 10)');
+  assert.deepStrictEqual(core.LG_TEMPLATES.map((t) => t.title), ['Confirmación de Pedidos', 'Reconfirmación de Pedido', 'Tercer Intento', 'Pedido Confirmado', 'Confirmación de Guia', 'Envío de Infografía', 'Solicitud de Anticipo', 'Reintento de Entrega', 'Flete Especial', 'Recordatorio En Ruta', 'Pedido Entregado', 'Reclamar en Oficina']);
+  assert.deepStrictEqual(core.LG_TEMPLATES.filter((t) => t.newRow).map((t) => t.k), [], 'Las tarjetas fluyen por ancho: sin saltos de fila');
   assert.strictEqual(core.lgTemplate('guia').k, 'guia');
   assert.strictEqual(core.lgTemplate('x').k, 'pedido');
   assert.strictEqual(core.lgTemplate().k, 'pedido');
@@ -1187,7 +1187,7 @@ caso('logistics: lgMessage de Confirmación de Pedidos es el de la spec', () => 
   const esperado = [
     '¡Hola Eugenia! 🌟',
     '',
-    'Acabamos de recibir tu compra del producto -- Omegaxl joint support -- en nuestra tienda 🍃*VidanovaStore*',
+    'Acabamos de recibir tu compra del producto -- *Omegaxl joint support* -- en nuestra tienda 🍃*VidanovaStore®*',
     '',
     'El cual será entregado en:',
     '',
@@ -1234,30 +1234,12 @@ caso('logistics: Pedido Confirmado es un mensaje fijo con un solo check de obseq
   assert.ok(!core.lgMessage('confirmado', { gift: false }).includes('obsequio'));
 });
 
-caso('logistics: Segundo Intento pide el nombre y recuerda confirmar el pedido', () => {
-  const tpl = core.lgTemplate('recordatorio');
-  assert.deepStrictEqual(tpl.fields.map((f) => [f.k, f.type, f.label, f.ph]), [['name', 'text', 'Nombre de cliente', 'Ej: Eugenia']]);
-  assert.deepStrictEqual(Object.keys(core.lgValues(tpl, {}).errors), ['name'], 'El nombre es obligatorio');
-  assert.deepStrictEqual(core.lgValues(tpl, { name: ' Eugenia ' }), { ok: true, values: { name: 'Eugenia' }, errors: {} });
-  const esperado = [
-    '¡Hola de nuevo, Eugenia! 👋',
-    '',
-    'Te escribimos otra vez por tu pedido en 🍃*VidanovaStore*.',
-    '',
-    'Por favor *confírmanos* si tus datos son correctos para pasar tu pedido a despacho 🚚',
-    '',
-    'Si algo no está bien, cuéntanos por aquí y lo corregimos 🤍',
-  ].join('\n');
-  assert.strictEqual(core.lgMessage('recordatorio', { name: 'Eugenia' }), esperado);
-  assert.ok(!core.lgMessage('recordatorio', { name: 'Eugenia' }).includes('undefined'));
-});
-
 caso('logistics: Tercer Intento avisa que la orden se cancelará sin confirmación', () => {
   const tpl = core.lgTemplate('tercero');
   assert.deepStrictEqual(tpl.fields.map((f) => [f.k, f.label, f.from || null, f.ph]), [['name', 'Nombre de cliente', null, 'Ej: Eugenia'], ['product', 'Producto', 'name', 'Ej: Crema Despigmentante'], ['city', 'Ciudad / Municipio', null, 'Ej: Pasto']]);
   assert.deepStrictEqual(Object.keys(core.lgValues(tpl, {}).errors).sort(), ['city', 'name', 'product']);
   const esperado = [
-    'Hola, Eugenia. Intentamos comunicarnos contigo por llamada para autorizar el despacho de tu Crema Despigmentante con Envío Gratis. 📦',
+    'Hola, Eugenia. Intentamos comunicarnos contigo por llamada para autorizar el despacho de tu *Crema Despigmentante* con Envío Gratis. 📦',
     '',
     'Por políticas de seguridad y alta demanda, si no recibimos tu confirmación el sistema cancelará tu orden automáticamente y cederemos la unidad a otro cliente.',
     '',
@@ -1275,16 +1257,271 @@ caso('logistics: Solicitud de Anticipo explica el historial de devoluciones y pi
   const m = core.lgMessage('anticipo', r.values);
   assert.ok(m.includes('Eugenia') && m.includes('Crema Despigmentante') && m.includes('$20.000') && m.includes('se descuenta del total'));
   assert.ok(m.includes('historial de altas devoluciones') && m.includes('red logística nacional') && m.includes('gráfica oficial adjunta') && m.includes('protocolo de la bodega'), 'Da el motivo y remite a la gráfica');
-  assert.ok(m.includes('📱 *Nequi/Daviplata*: 3182110955') && m.includes('Ahorros - Bancolombia\n23015881151') && m.includes('comprobante'), 'Trae las cuentas para el abono');
+  assert.ok(m.includes('📱 *Nequi/Daviplata*\n3182110955\n\n🏦 *Ahorros - Bancolombia*\n23015881151') && m.includes('comprobante'), 'Trae las cuentas para el abono');
   assert.ok(!m.includes('undefined'));
+});
+
+caso('logistics: Reconfirmación de Pedido', () => {
+  const tpl = core.lgTemplate('reconfirma');
+  assert.strictEqual(tpl.k, 'reconfirma');
+  assert.deepStrictEqual(tpl.fields.map((f) => [f.k, f.type, f.from || null, f.ph]), [['name', 'text', null, 'Ej: Eugenia']], 'Solo el nombre y sin «Traer de Desarrollo»');
+  assert.deepStrictEqual(core.lgValues(tpl, {}).errors, { name: 'Escribe nombre de cliente' });
+  const r = core.lgValues(tpl, { name: ' Eugenia ' });
+  assert.ok(r.ok && r.values.name === 'Eugenia');
+  const esperado = [
+    '¡Hola Eugenia! 👋 Te escribíamos de la tienda 🍃*VidanovaStore®* nuevamente.',
+    '',
+    'Te contactamos brevemente para confirmar los datos y asegurarnos de que tu *Envío Gratis* salga hoy mismo hacia tu dirección. 📦',
+    '',
+    'Recuerda que con nosotros *no arriesgas nada ni pagas por adelantado*: el pago es 100% en efectivo únicamente cuando el repartidor de la transportadora te entregue el paquete en la puerta de tu casa. 💵🤝',
+    '',
+    '¿Nos confirmas por favor con un simple "SÍ" o un "OK" si todo está correcto para proceder con el despacho? ¡Quedamos atentos! ✨',
+  ].join('\n');
+  assert.strictEqual(core.lgMessage('reconfirma', r.values), esperado);
+});
+
+caso('logistics: Reintento de Entrega', () => {
+  const tpl = core.lgTemplate('reintento');
+  assert.strictEqual(tpl.k, 'reintento');
+  assert.deepStrictEqual(tpl.fields.map((f) => [f.k, f.type, f.from || null, f.ph]), [['name', 'text', null, 'Ej: Rafael'], ['product', 'text', 'name', 'Ej: Crema Despigmentante Coreana']]);
+  assert.deepStrictEqual(core.lgValues(tpl, {}).errors, { name: 'Escribe nombre de cliente', product: 'Escribe producto' });
+  assert.deepStrictEqual(Object.keys(core.lgValues(tpl, { name: 'Rafael' }).errors), ['product']);
+  const r = core.lgValues(tpl, { name: 'Rafael', product: 'Crema Despigmentante Coreana' });
+  assert.ok(r.ok);
+  const esperado = [
+    '¡Saludos, Rafael! ☀️',
+    '',
+    'Te escribimos de la tienda 🍃*VidanovaStore®*.',
+    '',
+    'Queremos informarle que su *Crema Despigmentante Coreana* ya salió nuevamente en ruta de reparto para ser entregada hoy en la dirección confirmada. 🚚📦',
+    '',
+    'Tuvimos un intento de entrega anterior donde no fue posible ubicarl@, por lo que le pedimos el favor de *dejar encargado a alguien con el dinero en efectivo* o estar muy atent@ a su celular por si el repartidor de la transportadora se comunica.',
+    '',
+    'Cualquier novedad, quedamos muy atentos por este medio. ¡Que tenga un excelente día! 😊',
+  ].join('\n');
+  assert.strictEqual(core.lgMessage('reintento', r.values), esperado);
+});
+
+caso('logistics: Flete Especial', () => {
+  const tpl = core.lgTemplate('flete');
+  assert.strictEqual(tpl.k, 'flete');
+  assert.deepStrictEqual(tpl.fields.map((f) => [f.k, f.type, f.from || null, f.ph]), [
+    ['name', 'text', null, 'Ej: Rafael'], ['city', 'text', null, 'Ej: Vaupés'], ['shipping', 'money', null, 'Ej: $ 50.000'],
+    ['product', 'text', 'name', 'Ej: Crema arbutina'], ['advance', 'money', null, 'Ej: $ 20.000']]);
+  assert.deepStrictEqual(Object.keys(core.lgValues(tpl, {}).errors).sort(), ['advance', 'city', 'name', 'product', 'shipping']);
+  const mal = core.lgValues(tpl, { name: 'Rafael', city: 'Vaupés', product: 'Crema arbutina', shipping: '0', advance: 'abc' }).errors;
+  assert.deepStrictEqual(mal, { shipping: 'Flete mayor a 0', advance: 'Anticipo mayor a 0' });
+  for (const t of ['50000', '50.000', '$ 50.000']) assert.strictEqual(core.lgValues(tpl, { name: 'R', city: 'C', product: 'P', shipping: t, advance: '20000' }).values.shipping, 50000, t);
+  const r = core.lgValues(tpl, { name: 'Rafael', city: 'Vaupés', shipping: '$ 50.000', product: 'Crema arbutina', advance: '$ 20.000' });
+  assert.ok(r.ok);
+  const esperado = [
+    '¡Hola, Rafael! Te saludamos de 🍃*VidanovaStore®*',
+    '',
+    'Te comparto la captura de la transportadora: al ser una zona aérea especial hacia Vaupés, el flete nos sale en $50.000, por lo que lastimosamente nos es imposible enviarlo con flete gratis total. 🥺',
+    '',
+    'Queremos que no te quedes sin tu *Crema arbutina*, nosotros asumimos la mayor parte del envío si tú nos apoyas con un anticipo de $20.000 parte del flete, y el producto lo pagas en efectivo al recibir en tu casa. 🚚✨',
+    '',
+    '📱 *Nequi/Daviplata*',
+    '3182110955',
+    '',
+    '🏦 *Ahorros - Bancolombia*',
+    '23015881151',
+    '',
+    '¿Te gustaría transferir el flete para despacharte de una vez, o prefieres que cancelemos la orden? ¡Lo que tú decidas lo entendemos con el mayor gusto! 🤍',
+  ].join('\n');
+  assert.strictEqual(core.lgMessage('flete', r.values), esperado);
+});
+
+caso('logistics: Recordatorio En Ruta', () => {
+  const tpl = core.lgTemplate('enruta');
+  assert.strictEqual(tpl.k, 'enruta');
+  assert.deepStrictEqual(tpl.fields.map((f) => [f.k, f.type, f.from || null, f.ph]), [['name', 'text', null, 'Ej: Beatriz'], ['product', 'text', 'name', 'Ej: Crema Arbutina']]);
+  assert.deepStrictEqual(core.lgValues(tpl, {}).errors, { name: 'Escribe nombre de cliente', product: 'Escribe producto' });
+  const r = core.lgValues(tpl, { name: 'Beatriz', product: 'Crema Arbutina' });
+  assert.ok(r.ok);
+  const esperado = [
+    'Hola, Beatriz, *tu pedido Crema Arbutina ya se encuentra en ruta de entrega*.',
+    '',
+    '📦 Al ser un servicio *contra entrega*, recuerda estar pendiente de la llegada del repartidor o dejar el dinero listo con un conocido para asegurar una entrega rápida.',
+    '',
+    '¡Agradecemos mucho tu colaboración! ✨',
+  ].join('\n');
+  assert.strictEqual(core.lgMessage('enruta', r.values), esperado);
+  assert.ok(!core.lgMessage('enruta', r.values).includes('MENSAJE RECORDATORIO'), 'La etiqueta del usuario no va en el mensaje');
+});
+
+caso('logistics: Pedido Entregado, con y sin manual', () => {
+  const tpl = core.lgTemplate('entregado');
+  assert.strictEqual(tpl.k, 'entregado');
+  assert.deepStrictEqual(tpl.fields.map((f) => [f.k, f.type, f.when || null, !!f.keep, f.ph || null]), [
+    ['name', 'text', null, false, 'Ej: Beatriz'], ['manual', 'check', null, true, null], ['manualTitle', 'text', 'manual', true, 'Ej: Manual de Bienestar Articular']]);
+  assert.deepStrictEqual(core.lgForm(tpl), { name: '', manual: true, manualTitle: '' }, 'Con manual marcado de fábrica');
+  assert.deepStrictEqual(core.lgValues(tpl, core.lgForm(tpl)).errors, { name: 'Escribe nombre de cliente', manualTitle: 'Escribe título del manual' }, 'Marcada: el título es obligatorio');
+  assert.deepStrictEqual(core.lgValues(tpl, { name: 'Beatriz', manual: false, manualTitle: '' }).errors, {}, 'Desmarcada: el título no se exige');
+  const abre = [
+    '¡Hola, Beatriz! 👋 Espero que estés teniendo un excelente día.',
+    '',
+    'Te escribimos desde 🍃*VidanovaStore®* porque vimos que ya recibiste tu pedido. ¡Nos alegra mucho que ya esté contigo! Queremos que le saques el mayor provecho desde hoy.',
+    '¡Gracias de corazón por confiar en nosotros! 🤍',
+    '',
+  ];
+  const manual = [
+    'Como un detalle especial por tu compra, te comparto este manual exclusivo que preparamos para ti:',
+    '📄 Tu guía adjunta: *Manual de Bienestar Articular*. (Una guía valorada por especialistas, exclusiva para ti).',
+    '💡 Un consejo clave: Échale un vistazo antes de empezar a usar tu producto; ahí tienes las pautas exactas para ver los mejores resultados paso a paso.',
+    '',
+  ];
+  const cierra = [
+    'Si más adelante quieres pedir algo nuevo para ti o recomendárselo a alguien, puedes ver todo nuestro catálogo aquí:',
+    '🔗 https://vidanovastore.com/products',
+    '',
+    'Cualquier duda que tengas sobre cómo usarlo, escríbeme por aquí, me llamo Saul y con gusto te ayudo. ¡Que lo disfrutes mucho! ✨',
+    '',
+    'Equipo 🍃 *VidanovaStore®*',
+  ];
+  const con = core.lgValues(tpl, { name: 'Beatriz', manual: true, manualTitle: 'Manual de Bienestar Articular' });
+  assert.ok(con.ok);
+  assert.strictEqual(core.lgMessage('entregado', con.values), [...abre, ...manual, ...cierra].join('\n'), 'Con manual');
+  const sin = core.lgValues(tpl, { name: 'Beatriz', manual: false, manualTitle: 'Manual de Bienestar Articular' });
+  assert.ok(sin.ok);
+  assert.strictEqual(core.lgMessage('entregado', sin.values), [...abre, ...cierra].join('\n'), 'Sin manual: se quita todo el bloque, incluido el consejo');
+  assert.ok(core.lgMessage('entregado', sin.values).includes(core.LG_CATALOG), 'El catálogo sale de LG_CATALOG');
+});
+
+caso('logistics: Reclamar en Oficina, con y sin manual', () => {
+  const tpl = core.lgTemplate('oficina');
+  assert.strictEqual(tpl.k, 'oficina');
+  assert.deepStrictEqual(tpl.fields.map((f) => [f.k, f.type, f.from || null, f.when || null, !!f.keep, f.ph || null]), [
+    ['product', 'text', 'name', null, false, 'Ej: Crema Arbutina'], ['manual', 'check', null, null, true, null], ['manualTitle', 'text', null, 'manual', true, 'Ej: Manual de Bienestar Articular']]);
+  assert.deepStrictEqual(core.lgForm(tpl), { product: '', manual: true, manualTitle: '' });
+  assert.deepStrictEqual(core.lgValues(tpl, core.lgForm(tpl)).errors, { product: 'Escribe producto', manualTitle: 'Escribe título del manual' });
+  assert.deepStrictEqual(core.lgValues(tpl, { product: 'Crema Arbutina', manual: false, manualTitle: '' }).errors, {}, 'Desmarcada: el título no se exige');
+  const con = core.lgValues(tpl, { product: 'Crema Arbutina', manual: true, manualTitle: 'Manual de Bienestar Articular' });
+  assert.ok(con.ok);
+  assert.strictEqual(core.lgMessage('oficina', con.values), 'Saludos desde 🍃*VidanovaStore®*, le informamos que su pedido de *Crema Arbutina* ya se encuentra en la oficina para ser reclamado.\nPor favor, nos informe cuando lo obtenga para enviarle el Manual de Bienestar Articular.');
+  const sin = core.lgValues(tpl, { product: 'Crema Arbutina', manual: false, manualTitle: 'Manual de Bienestar Articular' });
+  assert.ok(sin.ok);
+  assert.strictEqual(core.lgMessage('oficina', sin.values), 'Saludos desde 🍃*VidanovaStore®*, le informamos que su pedido de *Crema Arbutina* ya se encuentra en la oficina para ser reclamado.\nPor favor, nos informe cuando lo obtenga.');
+});
+
+caso('logistics: lgPhone acepta solo las formas pedidas y devuelve 10 dígitos', () => {
+  for (const t of ['+57 311 7624068', '311 7624068', '3117624068', '+573117624068', '+57 3117624068', ' 311 7624068 ']) assert.strictEqual(core.lgPhone(t), '3117624068', 'Válido: ' + t);
+  for (const t of ['', '   ', 'abc', '311-762-4068', '(311) 7624068', '311.7624068', '311 762 4068', '31 17624068', '311762406', '31176240689', '+1 311 7624068', '+57311 762 4068', '++57 311 7624068', '57 311 7624068', '2117624068', '311 7624068 x', '+57  311 7624068']) assert.strictEqual(core.lgPhone(t), null, 'Rechazado: ' + JSON.stringify(t));
+  const tpl = core.lgTemplate('pedido');
+  assert.strictEqual(tpl.fields.find((f) => f.k === 'phone').type, 'phone');
+  const base = { name: 'Eugenia', product: 'Omegaxl joint support', address: 'Calle 1', city: 'PASTO', dept: 'NARIÑO', total: '97400' };
+  const bien = core.lgValues(tpl, { ...base, phone: '+57 311 7624068' });
+  assert.ok(bien.ok && bien.values.phone === '3117624068', 'Se guarda normalizado');
+  assert.ok(core.lgMessage('pedido', bien.values).includes('*Teléfono:* 3117624068'), 'El mensaje lo muestra sin espacios ni +57');
+  const mal = core.lgValues(tpl, { ...base, phone: '311-762-4068' });
+  assert.deepStrictEqual(mal.errors, { phone: 'Teléfono inválido: usa 311 7624068 o +57 311 7624068' });
+  assert.deepStrictEqual(core.lgValues(tpl, { ...base, phone: '' }).errors, { phone: 'Escribe teléfono de contacto' });
+});
+
+caso('logistics: ya no existe Segundo Intento (recordatorio)', () => {
+  assert.ok(!core.LG_TEMPLATES.some((t) => t.k === 'recordatorio' || t.title === 'Segundo Intento'));
+  assert.strictEqual(core.lgTemplate('recordatorio').k, 'pedido', 'Una clave que ya no existe cae en la primera plantilla');
+});
+
+caso('logistics: el producto sale en negrita y las cuentas salen de LG_ACCOUNTS', () => {
+  assert.strictEqual(core.LG_ACCOUNTS, '📱 *Nequi/Daviplata*\n' + core.LG_NEQUI + '\n\n🏦 *Ahorros - Bancolombia*\n' + core.LG_BANK);
+  const P = 'Plant Pwr Calma Panico Polvora Mascotas';
+  const casos = {
+    pedido: { name: 'Eugenia', product: P, address: 'Calle 1', city: 'PASTO', dept: 'NARIÑO', phone: '3214566677', total: 97400 },
+    guia: { name: 'Pablo', product: P, guide: '074102602224', price: 97400, address: 'Calle 1' },
+    tercero: { name: 'Eugenia', product: P, city: 'Pasto' },
+    anticipo: { name: 'Eugenia', product: P, advance: 20000 },
+    reintento: { name: 'Rafael', product: P },
+    flete: { name: 'Rafael', city: 'Vaupés', shipping: 50000, product: P, advance: 20000 },
+    enruta: { name: 'Beatriz', product: P },
+    oficina: { product: P, manual: false },
+  };
+  for (const [k, v] of Object.entries(casos)) {
+    const m = core.lgMessage(k, v);
+    assert.ok(m.includes('*' + P + '*') || (k === 'enruta' && m.includes(P)), k + ': producto en negrita');
+    assert.ok(!m.includes('**'), k + ': sin asteriscos anidados');
+  }
+  assert.ok(core.lgMessage('enruta', casos.enruta).includes('*tu pedido ' + P + ' ya se encuentra en ruta de entrega*'), 'enruta lo lleva dentro de su frase en negrita');
+  for (const k of ['anticipo', 'flete']) {
+    const m = core.lgMessage(k, casos[k]);
+    assert.ok(m.includes(core.LG_ACCOUNTS), k + ': trae el bloque de cuentas');
+    assert.strictEqual(m.split(core.LG_NEQUI).length - 1, 1, k + ': el Nequi sale una vez');
+    assert.strictEqual(m.split(core.LG_BANK).length - 1, 1, k + ': la cuenta de ahorros sale una vez');
+  }
+});
+
+caso('logistics: cada plantilla trae su etapa para el chip del título', () => {
+  assert.deepStrictEqual(core.LG_STAGES, { confirmar: 'Confirmar', cobro: 'Cobro', envio: 'Envío', entrega: 'Entrega' });
+  assert.deepStrictEqual(Object.fromEntries(core.LG_TEMPLATES.map((t) => [t.k, t.stage])), {'pedido': 'confirmar', 'reconfirma': 'confirmar', 'tercero': 'confirmar', 'confirmado': 'confirmar', 'guia': 'envio', 'infografia': 'envio', 'anticipo': 'cobro', 'reintento': 'envio', 'flete': 'cobro', 'enruta': 'envio', 'entregado': 'entrega', 'oficina': 'envio'});
+  assert.ok(core.LG_TEMPLATES.every((t) => t.stage in core.LG_STAGES));
+});
+
+caso('logistics: Envío de Infografía', () => {
+  const tpl = core.lgTemplate('infografia');
+  assert.strictEqual(tpl.k, 'infografia');
+  assert.deepStrictEqual(tpl.fields.map((f) => [f.k, f.type, f.from || null, f.ph]), [['product', 'text', 'name', 'Ej: Crema Arbutina']], 'Solo el producto, de Desarrollo');
+  assert.deepStrictEqual(core.lgValues(tpl, {}).errors, { product: 'Escribe producto' });
+  const r = core.lgValues(tpl, { product: ' Crema Arbutina ' });
+  assert.ok(r.ok);
+  const esperado = [
+    '¡Hola! 👋 Te saludamos de 🍃*VidanovaStore®*.',
+    '',
+    'Para que le saques el máximo provecho a tu producto y veas resultados más rápido, te compartimos esta *infografía visual* con el paso a paso exacto para aplicar tu *Crema Arbutina* en tu rutina. 🌙✨',
+    '',
+    '¡Guárdala en tu celular para tenerla a la mano! Cualquier duda con el uso, con gusto te asesoramos por aquí. 😊',
+  ].join('\n');
+  assert.strictEqual(core.lgMessage('infografia', r.values), esperado);
+});
+
+caso('logistics: constantes de la tienda y Solicitud de Anticipo con el texto de siempre', () => {
+  assert.strictEqual(core.LG_CATALOG, 'https://vidanovastore.com/products');
+  assert.strictEqual(core.LG_NEQUI, '3182110955');
+  assert.strictEqual(core.LG_BANK, '23015881151');
+  const esperado = [
+    'Hola, Eugenia 👋',
+    '',
+    'Recibimos tu pedido de *Crema Despigmentante* en 🍃*VidanovaStore®* y queremos que te llegue sin contratiempos 📦',
+    '',
+    'Debido a nuestras políticas de seguridad y a un historial de altas devoluciones registradas con tu número en la red logística nacional (te compartimos la gráfica oficial adjunta), por protocolo de la bodega no podemos arriesgar el despacho sin un pequeño anticipo de *$20.000* 🔒',
+    '',
+    'Ese valor *se descuenta del total* que pagarás contra entrega: no es un costo adicional, solo la garantía de que tu pedido salga hoy mismo 🚚',
+    '',
+    'Puedes realizar el abono a cualquiera de nuestras dos cuentas:',
+    '',
+    '📱 *Nequi/Daviplata*',
+    '3182110955',
+    '',
+    '🏦 *Ahorros - Bancolombia*',
+    '23015881151',
+    '',
+    'Apenas nos envíes el comprobante por este chat, programamos tu despacho 🤍',
+  ].join('\n');
+  assert.strictEqual(core.lgMessage('anticipo', { name: 'Eugenia', product: 'Crema Despigmentante', advance: 20000 }), esperado);
+});
+
+caso('logistics: lgValues con campo condicional (when)', () => {
+  const tpl = { k: 'prueba', fields: [
+    { k: 'name', label: 'Nombre de cliente', type: 'text' },
+    { k: 'manual', label: 'Incluye manual', type: 'check', def: true, keep: true },
+    { k: 'manualTitle', label: 'Título del manual', type: 'text', when: 'manual', keep: true },
+  ] };
+  const marcada = core.lgValues(tpl, { name: 'Ana', manual: true, manualTitle: '' });
+  assert.ok(!marcada.ok && Object.keys(marcada.errors).join() === 'manualTitle', 'Marcada: el título es obligatorio');
+  const conTitulo = core.lgValues(tpl, { name: 'Ana', manual: true, manualTitle: 'Manual X' });
+  assert.ok(conTitulo.ok && conTitulo.values.manualTitle === 'Manual X' && conTitulo.values.manual === true);
+  const desmarcada = core.lgValues(tpl, { name: 'Ana', manual: false, manualTitle: '' });
+  assert.ok(desmarcada.ok && !('manualTitle' in desmarcada.values) && desmarcada.values.manual === false, 'Desmarcada: no da error ni entra en values');
+  const conTextoOculto = core.lgValues(tpl, { name: 'Ana', manual: false, manualTitle: 'Manual X' });
+  assert.ok(conTextoOculto.ok && !('manualTitle' in conTextoOculto.values), 'Desmarcada: lo escrito no entra en values');
+  assert.deepStrictEqual(core.lgForm(tpl), { name: '', manual: true, manualTitle: '' });
 });
 
 caso('logistics: lgMessage es idéntico al texto de la spec', () => {
   const esperado = [
     '*CONFIRMACIÓN GUIA*',
-    '¡Hola, Pablo! 👋 Te saludamos nuevamente de 🍃*VidanovaStore*.',
+    '¡Hola, Pablo! 👋 Te saludamos nuevamente de 🍃*VidanovaStore®*.',
     '',
-    'Te confirmamos que tu pedido de la Omegaxl joint support ya fue empacado y entregado a la transportadora. 📦✨',
+    'Te confirmamos que tu pedido de la *Omegaxl joint support* ya fue empacado y entregado a la transportadora. 📦✨',
     '',
     '🚚 *Número de Guía*: 074102602224',
     '🔗 *Rastreo*: Puedes consultar el estado de tu paquete directamente en la página web de la transportadora con ese número de guía.',
@@ -1298,7 +1535,7 @@ caso('logistics: lgMessage es idéntico al texto de la spec', () => {
   assert.strictEqual(core.lgMessage('guia', v), esperado, 'Aunque llegue otro days, el mensaje usa el fijo');
   assert.strictEqual(core.lgMessage('x', PEDIDO), core.lgMessage('pedido', PEDIDO), 'Una clave desconocida cae en la primera plantilla');
   assert.ok(core.lgMessage('guia', { ...v, price: 1234567 }).includes('*$1.234.567*'));
-  assert.ok(core.LG_STORE.includes('VidanovaStore'));
+  assert.ok(core.LG_STORE === '🍃VidanovaStore®');
 });
 
 caso('Centro de mando: iniciales, URL, dominio y favicon', () => {

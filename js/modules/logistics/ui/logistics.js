@@ -64,6 +64,7 @@
 
     // El nombre es el botón que abre y cierra la tarjeta; el resto (subtítulo, formulario y mensaje) va en el cuerpo.
     const head = el('div', 'lg-head');
+    if (tpl.stage) { const st = el('span', 'lg-stage', PYL.core.logistics.LG_STAGES[tpl.stage] || tpl.stage); st.dataset.stage = tpl.stage; head.append(st); } // chip de etapa sobre el nombre
     const h = el('h2');
     const tg = el('button', 'lg-toggle'); tg.type = 'button'; tg.id = id('toggle');
     tg.setAttribute('aria-expanded', 'false'); tg.setAttribute('aria-controls', id('body'));
@@ -72,11 +73,11 @@
     tg.addEventListener('click', on.toggle);
     h.append(tg);
     head.append(h);
-    if (tpl.fields.some((f) => f.from)) { // «Traer de Desarrollo» solo si la plantilla trae algo de Desarrollo
+    if (tpl.fields.some((f) => f.from)) { // «Traer de Desarrollo» solo si la plantilla trae algo de Desarrollo; va dentro del título para pegarse a la flecha
       const imp = el('button', 'btn ghost sm lg-import'); imp.type = 'button'; imp.id = id('import'); imp.dataset.ic = 'import';
       imp.title = 'Traer de Desarrollo: pone el producto de «Producto que estoy montando»'; imp.setAttribute('aria-label', 'Traer de Desarrollo');
       imp.addEventListener('click', on.importar);
-      head.append(imp);
+      h.append(imp);
     }
 
     const form = el('div', 'lg-form'); form.id = id('form');
@@ -90,9 +91,10 @@
         continue;
       }
       const cell = el('div', 'lg-cell');
+      if (f.when) { cell.dataset.when = f.when; cell.hidden = !values[f.when]; } // campo condicional: solo se ve con su casilla marcada
       const lab = el('label', 'lg-lab', f.label); lab.htmlFor = id('f-' + f.k);
       const x = el('input'); x.type = 'text'; x.id = id('f-' + f.k); x.dataset.k = f.k; x.autocomplete = 'off'; x.placeholder = f.ph || '';
-      if (f.type === 'money') x.inputMode = 'numeric';
+      if (f.type === 'money' || f.type === 'phone') x.inputMode = f.type === 'phone' ? 'tel' : 'numeric';
       x.value = values[f.k] || '';
       x.addEventListener('input', () => on.change(f.k, x.value));
       x.addEventListener('blur', () => on.blur(f.k));
@@ -112,10 +114,11 @@
       b.addEventListener('click', fn);
       return b;
     };
+    // «Generar mensaje» arriba (a todo el ancho, destacado); «Limpiar» y «Copiar» debajo, en una fila.
     acts.append(
+      btn('lg-gen', 'gen', 'Generar mensaje', on.generate),
       btn('ghost lg-clear', 'clear', 'Limpiar', on.clear, 'Vacía los datos de este pedido y el mensaje; deja el producto'),
-      btn('ghost lg-copy', 'copy', 'Copiar mensaje', on.copy),
-      btn('lg-gen', 'gen', 'Generar mensaje', on.generate));
+      btn('ghost lg-copy', 'copy', 'Copiar mensaje', on.copy));
     out.append(lab, ta, acts);
 
     const body = el('div', 'lg-body'); body.id = id('body'); body.hidden = true;
@@ -146,6 +149,11 @@
     if (x.type === 'checkbox') x.checked = !!text; else x.value = text;
   }
 
+  // Muestra u oculta los campos condicionales (`when`) según su casilla; lo escrito en ellos no se toca.
+  function showWhen(node, form) {
+    for (const c of node.querySelectorAll('[data-when]')) c.hidden = !form[c.dataset.when];
+  }
+
   // Marca los campos con error ({ campo: mensaje }) y limpia el resto.
   function errors(node, errs) {
     for (const x of node.querySelectorAll('input[data-k]')) {
@@ -159,5 +167,5 @@
   // Muestra el mensaje generado ('' = vacío) en el cuadro de solo lectura de la tarjeta.
   function message(node, text) { node.querySelector('textarea').value = text; }
 
-  PYL.ui.logistics = { parts, card, open, stack, rowBreak, setField, errors, message, icons };
+  PYL.ui.logistics = { parts, card, open, stack, rowBreak, setField, showWhen, errors, message, icons };
 })();
