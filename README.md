@@ -34,6 +34,7 @@ leer el testeo y medir la utilidad real cruzando **Dropi** con **Meta Ads**.
 - [🛍️ Desarrollo de la landing](#️-desarrollo-de-la-landing)
 - [🎓 Entrenador de métricas](#-entrenador-de-métricas)
 - [🧪 Testeo y 📈 Escalado](#-testeo-y--escalado)
+- [💬 Logística](#-logística)
 - [🎨 Temas](#-temas)
 - [📂 Los archivos que necesitas](#-los-archivos-que-necesitas)
 - [🧭 Recorrido por el tablero](#-recorrido-por-el-tablero)
@@ -64,6 +65,7 @@ Todo vive en una sola página (`index.html`). Las pestañas de la barra superior
 | 📏 **Métricas** | Guía de consulta de las métricas duras (CTR, CPC, CPM, CPPI, CPA) para Meta y TikTok: qué significa cada una, su fórmula, sus rangos, qué falla y cómo se arregla; y un glosario de las métricas base del Administrador de anuncios con las que se calculan. |
 | 🧪 **Testeo** | Aprendo el testeo de NovaSociety: un paso a paso con los cortes de 20K / 30K / 40K, la cadena que reviso si apago, una práctica de 11 casos y un simulador de un conjunto. Es para aprender: no lee mis campañas reales. |
 | 📈 **Escalado** | Pronto: aquí aprenderé a escalar un conjunto que ya pasó el testeo (Surfing Scaling). |
+| 💬 **Logística** | Plantillas de mensajes de WhatsApp para mis clientes (confirmar el pedido, avisar la guía, el envío, el cobro y la entrega): lleno los datos, genero el mensaje y lo copio. |
 | 🪜 **Escalera** | Los 15 escalones para escalar (+20% de presupuesto cada uno). |
 | 🎬 **Creativos** | Pipeline y cadencia de creativos, y cuándo el problema es el creativo. |
 | 💸 **Tablero P&L** | La utilidad real contra entrega cruzando Dropi y Meta Ads (lo que explica la mayor parte de este documento). |
@@ -257,6 +259,37 @@ Tiene tres sub-pestañas: **📂 Lectura real · pronto** (subir el reporte de m
   - **Escenarios:** 💸 CPM caro, 😐 Producto no interesa, 🧱 Página no convierte y 🏆 Ganador cargan una cadena de ejemplo y arman una corrida nueva. Como hay azar, a veces no caen donde se espera: pruebo otra corrida.
   - Al fin del día, si el corte 3 dio «Dejar gastar el día», la app avisa que dejó de ser testeo y pasa a Escalado.
 - **🎛️ Números a mano:** cambio presupuesto, gasto, pagos iniciados, ventas y tope, y veo el corte, el día del testeo, el CPPI, el CPA y qué diría el Lab (antes se llamaba «Juega con los números» y vivía en el paso 6).
+
+---
+
+## 💬 Logística
+
+**Logística** arma los mensajes que mando a mis clientes por WhatsApp. No manda nada ni guarda nada: lleno los datos del pedido, toco **Generar mensaje** y lo copio para pegarlo.
+
+- **Sub-pestañas:** **💬 Plantillas de mensajes** (la que uso hoy) y **📦 Seguimiento de pedidos** (pronto, apagada). Dentro de Plantillas hay un contenedor **Mensajes a Clientes**; más adelante tendrá un hermano para **Mensajes a Proveedores**.
+- **Tarjetas:** hay una por mensaje, tres por fila y todas **contraídas** al abrir la pestaña. Se abren tocando su nombre. Cada una trae una etiqueta de color con la etapa del pedido: **Confirmar**, **Cobro**, **Envío** o **Entrega**.
+- **Botones:** **Generar mensaje** (arriba, el destacado) valida y arma el texto; **Copiar mensaje** lo copia (o avisa si todavía no lo generé); **Limpiar** vacía los datos del pedido y el mensaje. El mensaje no se actualiza solo: cambia únicamente al volver a tocar **Generar mensaje**.
+- **Traer de Desarrollo:** el botón bajo la flecha de las tarjetas con **Producto** pone el producto de «Producto que estoy montando». Al abrir la pestaña ese campo se llena solo si está vacío.
+- **Dinero:** lo escribo como `97400`, `97.400` o `$ 97.400`; el campo muestra `$ 97.400` y en el mensaje sale `$97.400`.
+- **Teléfono:** acepta `+57 311 7624068`, `311 7624068` o sin espacios; cualquier otra forma se rechaza con un aviso. En el mensaje siempre sale `3117624068`.
+- **Manual de regalo:** en **Pedido Entregado** y **Reclamar en Oficina** la casilla **Incluye manual** viene marcada y pide el **título del manual**; si la desmarco, ese campo se oculta, no se exige y el mensaje sale sin el manual. **Limpiar** no los vacía porque son del producto, no del pedido.
+- **Texto:** la tienda sale como `🍃*VidanovaStore®*`, el producto va en **negrita** (un asterisco, como pide WhatsApp) y las cuentas de Nequi/Daviplata y Bancolombia salen con su ícono y por separado.
+- **Imágenes:** la captura de la transportadora, el manual en PDF y la infografía se adjuntan aparte en WhatsApp; la app no las manda.
+
+| Etapa | Mensaje | Qué pide |
+|---|---|---|
+| Confirmar | Confirmación de Pedidos | Cliente, producto, dirección, ciudad, departamento, teléfono y total |
+| Confirmar | Reconfirmación de Pedido | Cliente |
+| Confirmar | Tercer Intento (llamada sin respuesta) | Cliente, producto y ciudad |
+| Confirmar | Pedido Confirmado | Casilla de obsequio |
+| Envío | Confirmación de Guia | Destinatario, producto, guía, precio y dirección |
+| Envío | Envío de Infografía | Producto |
+| Cobro | Solicitud de Anticipo | Cliente, producto y valor del anticipo |
+| Envío | Reintento de Entrega | Cliente y producto |
+| Cobro | Flete Especial | Cliente, ciudad, flete, producto y anticipo |
+| Envío | Recordatorio En Ruta | Cliente y producto |
+| Entrega | Pedido Entregado | Cliente, casilla de manual y su título |
+| Envío | Reclamar en Oficina | Producto, casilla de manual y su título |
 
 ---
 
@@ -572,13 +605,14 @@ css/
     adprompt.css      Prompt buscar anuncios: botón verde (reutiliza .dk-* y .qk-photo*)
     metrics.css       Métricas: ruta, diagrama de métricas duras, avisos, panel "i", botón Expandir y tabla de Métricas base
     testing.css       Testeo: barra de gasto, tarjetas de corte, práctica y Simulador
+    logistics.css     Logística: contenedor de mensajes, rejilla de tarjetas, chip de etapa, botones y campo condicional
   themes.css          Selector de tema, modo claro, temas oscuros y SVG con colores fijos
   modules/pnl.css     Solo lo propio del Tablero P&L (acotado a #v-pyl)
   report.css          Informe PDF: documento claro en A4, visible solo al imprimir
 
 tests/
-  core.test.js        Núcleo en Node puro (costeo, guardado rápido, prompt DropKiller, prompt buscar anuncios, simulador de testeo, P&L)
-  smoke.test.js       jsdom: claves de PYL.*, 10 pestañas, navegación, paneles Prompt DropKiller y Prompt buscar anuncios, Simulador de testeo y consola limpia
+  core.test.js        Núcleo en Node puro (costeo, guardado rápido, prompt DropKiller, prompt buscar anuncios, simulador de testeo, mensajes de logística, P&L)
+  smoke.test.js       jsdom: claves de PYL.*, 11 pestañas, navegación, paneles Prompt DropKiller y Prompt buscar anuncios, Simulador de testeo y consola limpia
   fixtures/           CSV de prueba de Dropi (datos inventados) y claves de PYL.*
 
 js/
@@ -633,6 +667,10 @@ js/
     scaling/          Escalado (SPEC 06): solo anuncia Surfing Scaling
       core/scaling.js Tarjeta "Pronto" de Surfing Scaling (`SCALING_SOON`)
       app/scaling.js  Pinta la tarjeta con `ui.testing.soon`; sin estado ni guardado
+    logistics/        Logística → plantillas de mensajes a clientes (SPEC 13 y 15)
+      core/logistics.js Constantes de la tienda (LG_STORE, LG_ACCOUNTS…), las 12 plantillas (LG_TEMPLATES), sus textos, validación (lgValues, lgMoney, lgPhone); sin DOM
+      ui/logistics.js Sub-pestañas, tarjeta por plantilla (chip de etapa, campos, mensaje y botones) y campos condicionales
+      app/logistics.js Estado (app.state.logistics), Generar, Copiar, Limpiar y Traer de Desarrollo; no guarda nada
     trainer/
       app/trainer.js  Entrenador de métricas (fase 1: copiado del prototipo)
 
@@ -672,7 +710,7 @@ NODE_PATH=<carpeta>/node_modules node tests/smoke.test.js   # abre index.html en
 node --check archivo.js                                      # sintaxis de un archivo
 ```
 
-`smoke.test.js` necesita **jsdom** (`npm i jsdom@26` en una carpeta fuera del repo): revisa las claves de `PYL.*`, que las 10 pestañas abran, los eventos de navegación y que la consola esté limpia. Si agregas o quitas una clave de `PYL.*`, regenera `tests/fixtures/claves-pyl.json` con `node tests/smoke.test.js --claves`.
+`smoke.test.js` necesita **jsdom** (`npm i jsdom@26` en una carpeta fuera del repo): revisa las claves de `PYL.*`, que las 11 pestañas abran, los eventos de navegación y que la consola esté limpia. Si agregas o quitas una clave de `PYL.*`, regenera `tests/fixtures/claves-pyl.json` con `node tests/smoke.test.js --claves`.
 
 ### Cómo se desarrolla (SDD)
 

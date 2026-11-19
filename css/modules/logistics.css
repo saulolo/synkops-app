@@ -7,20 +7,43 @@
 
 /* ---------- Formulario del mensaje ---------- */
 .lg-acts{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
-.lg-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.lg-head h2{flex:1;min-width:0}
-.lg-import{flex:none;padding:7px 9px}
-/* Una tarjeta por plantilla, lado a lado. Nacen contraídas (solo el nombre) y se abren al tocarlo. Cada una es angosta, del tamaño del
-   panel de Prompt buscar anuncios; si no caben, bajan de fila. Las abiertas de una misma fila miden lo mismo de alto (la que tiene menos
-   campos reparte lo que le sobra al cuadro Mensaje); las contraídas no se estiran. */
-.lg-cards{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start;margin-top:16px}
+/* Cabecera de la tarjeta en una sola línea: chip de etapa, nombre (compacto y sin la barrita de acento, que queda para el título del contenedor) y
+   la flecha de contraer a la derecha. Un nombre largo pasa a una segunda línea en vez de cortarse. */
+.lg-head{display:flex;align-items:center;gap:8px}
+.lg-head h2{flex:1;min-width:0;position:relative;margin:0}
+.lg-card.open .lg-head{margin-bottom:8px}
+#v-logistica .lg-card .lg-head h2{font-size:15.5px;margin:0;line-height:1.2}
+#v-logistica .lg-card .lg-head .lg-name{text-wrap:balance}
+.lg-stage{flex:none}
+#v-logistica .lg-card .lg-head h2::before{display:none}
+.lg-stage{--st:var(--b);--st-ink:var(--b-ink);display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;line-height:1.4;color:var(--st-ink);background:color-mix(in srgb,var(--st) 14%,transparent);border:1px solid color-mix(in srgb,var(--st) 38%,transparent)}
+.lg-stage[data-stage=cobro]{--st:var(--y);--st-ink:var(--y-ink)}
+.lg-stage[data-stage=envio]{--st:var(--b2);--st-ink:var(--b2-ink)}
+.lg-stage[data-stage=entrega]{--st:var(--g);--st-ink:var(--g-ink)}
+/* «Traer de Desarrollo» queda fijo justo debajo de la flecha de contraer, en el espacio libre junto al subtítulo (así no se pulsa sin querer
+   al contraer). El subtítulo deja ese hueco a la derecha. */
+.lg-import{position:absolute;right:-6px;top:calc(100% + 4px);padding:7px 9px}
+.lg-card:has(.lg-import) .lg-body>.b-sub{padding-right:48px}
+/* Una tarjeta por plantilla, en una rejilla de tres columnas iguales que llenan el ancho del contenedor (dos si es más angosto, una en pantalla
+   chica; ver los @container de .lg-group). Nacen contraídas (solo el nombre) y se abren al tocarlo. Las abiertas de una misma fila miden lo
+   mismo de alto (la que tiene menos campos reparte lo que le sobra al cuadro Mensaje); las contraídas no se estiran. */
+.lg-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:start;margin-top:16px}
 .lg-cards[hidden]{display:none}
-.lg-card{flex:0 1 385px;max-width:385px;min-width:0;display:flex;flex-direction:column}
+#lg-msgs[hidden]{display:none}
+/* Contenedor de un grupo de mensajes (hoy «Mensajes a Clientes»): es un .card como los de los demás módulos, con su mismo título de barrita de
+   acento (base.css); los grupos nuevos se suman como hermanos. Las tarjetas de adentro se distinguen con un borde y sin degradado. */
+.lg-group{margin-top:16px;min-width:0;container-type:inline-size}
+.lg-group+.lg-group{margin-top:18px}
+.lg-group>.lg-cards{margin-top:16px}
+.lg-group .lg-card{background:var(--card);border-color:var(--line-2);box-shadow:none}
+@container (max-width:929px){.lg-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@container (max-width:619px){.lg-cards{grid-template-columns:minmax(0,1fr)}}
+.lg-card{min-width:0;display:flex;flex-direction:column}
 .lg-break{flex-basis:100%;height:0;margin:-18px 0 0}
 .lg-card.open{align-self:stretch}
 .lg-body{display:flex;flex-direction:column;flex:1;min-height:0}
 .lg-body[hidden]{display:none}
-/* Columna con dos tarjetas apiladas (Pedido Confirmado y Segundo Intento): abiertas, juntas miden lo que una tarjeta de la fila; el cuadro Mensaje de cada una es más bajo. */
+/* Columna con dos tarjetas apiladas (hoy ninguna plantilla lo usa: las tarjetas fluyen por ancho): abiertas, juntas miden lo que una tarjeta de la fila; el cuadro Mensaje de cada una es más bajo. */
 .lg-col{flex:1 1 340px;max-width:420px;min-width:0;display:flex;flex-direction:column;gap:18px}
 .lg-col:has(.lg-card.open){align-self:stretch}
 .lg-col>.lg-card{flex:none;max-width:none}
@@ -28,17 +51,17 @@
 .lg-col .lg-out{margin-top:12px;padding-top:10px}
 .lg-col .lg-out textarea{min-height:120px}
 /* Nombre de la tarjeta = botón que la abre y la cierra, con una flecha que gira. */
-.lg-toggle{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;flex:1;min-width:0;border-radius:8px}
+.lg-toggle{all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;flex:1;min-width:0;border-radius:8px}
 .lg-toggle:hover .lg-name{color:var(--b)}
 .lg-toggle:focus-visible{outline:2px solid var(--b);outline-offset:4px}
 .lg-chev{margin-left:auto;display:inline-flex;color:var(--muted);transition:transform .2s}
 .lg-card.open .lg-chev{transform:rotate(180deg)}
-.lg-card:not(.open) .lg-head h2{margin-bottom:0}
 .lg-card:not(.open) .lg-import{display:none}
 @media (prefers-reduced-motion:reduce){.lg-chev{transition:none}}
 .lg-body>.b-sub{margin-top:0}
 .lg-form{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin-top:12px}
 .lg-cell{display:flex;flex-direction:column;gap:4px;min-width:0}
+.lg-cell[hidden]{display:none}
 .lg-check{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;font-weight:700;color:var(--ink)}
 .lg-check input{width:18px;height:18px;margin:0;accent-color:var(--b);cursor:pointer;flex:none}
 .lg-lab{font-size:12.5px;font-weight:600;color:var(--muted)}
@@ -56,9 +79,15 @@
 .lg-out textarea::placeholder{color:var(--soft)}
 .lg-out textarea:focus{outline:none;border-color:var(--b);box-shadow:0 0 0 3px var(--b-bg)}
 
-/* Los tres botones del mensaje se reparten el ancho de la tarjeta y nunca se salen de ella: en una sola fila si caben y, si no, Generar baja a una segunda fila a todo el ancho. */
-.lg-out .lg-acts{flex-wrap:wrap;gap:6px;justify-content:stretch}
-.lg-out .lg-acts .btn{flex:1 1 auto;min-width:0;padding:8px 8px;gap:6px;white-space:nowrap}
+/* Botones del mensaje: «Generar mensaje» arriba, a todo el ancho y destacado (degradado del acento, brillo suave); debajo, «Limpiar» y «Copiar mensaje»
+   se reparten una fila. Nunca se salen de la tarjeta. Solo tokens de color. */
+.lg-out .lg-acts{flex-wrap:wrap;gap:8px;justify-content:stretch}
+.lg-out .lg-acts .btn{flex:1 1 0;min-width:0;padding:8px 8px;gap:6px;white-space:nowrap}
+.lg-out .lg-acts .lg-gen{flex:1 1 100%;padding:11px 14px;font-size:14.5px;font-weight:800;letter-spacing:.2px;border:0;color:var(--on-b);background:linear-gradient(135deg,var(--b),var(--b2));box-shadow:0 6px 18px rgba(var(--b-rgb),.32),inset 0 1px 0 rgba(255,255,255,.28);transition:transform .15s,box-shadow .15s,filter .15s}
+.lg-out .lg-acts .lg-gen:hover{transform:translateY(-1px);filter:brightness(1.08);box-shadow:0 9px 22px rgba(var(--b-rgb),.42),inset 0 1px 0 rgba(255,255,255,.34)}
+.lg-out .lg-acts .lg-gen:active{transform:none;filter:none;box-shadow:0 3px 10px rgba(var(--b-rgb),.3),inset 0 1px 0 rgba(255,255,255,.2)}
+.lg-out .lg-acts .lg-gen:focus-visible{outline:2px solid var(--b2);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){.lg-out .lg-acts .lg-gen{transition:none}.lg-out .lg-acts .lg-gen:hover{transform:none}}
 
 /* ---------- Íconos de los botones: dos tonos y animación al pasar el mouse ---------- */
 .lg-ic{display:inline-flex;flex:none}

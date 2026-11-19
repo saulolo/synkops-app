@@ -27,6 +27,7 @@
   function paint(tpl) {
     const st = S.cards[tpl.k];
     for (const f of tpl.fields) U.setField(nodes[tpl.k], f.k, st.form[f.k]);
+    U.showWhen(nodes[tpl.k], st.form);
     U.errors(nodes[tpl.k], errs[tpl.k]);
     U.message(nodes[tpl.k], st.last);
   }
@@ -62,20 +63,21 @@
     else toast('No pude copiar. Selecciona el texto y usa Ctrl+C.', 'error');
   }
 
-  // «Limpiar»: vacía los datos propios de cada pedido (los que no vienen de Desarrollo ni traen valor por defecto) y el mensaje.
+  // «Limpiar»: vacía los datos propios de cada pedido (los que no vienen de Desarrollo, no traen valor por defecto ni son `keep`) y el mensaje.
   function clear(tpl) {
-    for (const f of tpl.fields) if (!f.from && f.def == null) S.cards[tpl.k].form[f.k] = '';
+    for (const f of tpl.fields) if (!f.from && f.def == null && !f.keep) S.cards[tpl.k].form[f.k] = '';
     S.cards[tpl.k].last = ''; errs[tpl.k] = {};
     paint(tpl);
   }
 
   const handlers = (tpl) => ({
     toggle: () => { const st = S.cards[tpl.k]; st.open = !st.open; U.open(nodes[tpl.k], st.open); },
-    change: (k, text) => { S.cards[tpl.k].form[k] = text; },
-    // Al salir del campo de dinero se muestra formateado ($ 97.400); un texto inválido se deja para que se corrija.
+    change: (k, text) => { S.cards[tpl.k].form[k] = text; if (tpl.fields.some((f) => f.when === k)) U.showWhen(nodes[tpl.k], S.cards[tpl.k].form); },
+    // Al salir del campo de dinero se muestra formateado ($ 97.400) y el teléfono sin espacios ni +57; un texto inválido se deja para que se corrija.
     blur: (k) => {
       const f = tpl.fields.find((x) => x.k === k);
-      if (!f || f.type !== 'money') return;
+      if (!f || (f.type !== 'money' && f.type !== 'phone')) return;
+      if (f.type === 'phone') { const p = C.lgPhone(S.cards[tpl.k].form[k]); if (p) put(tpl, k, p); return; }
       const n = C.lgMoney(S.cards[tpl.k].form[k]);
       if (n != null) put(tpl, k, C.lgMoneyText(n));
     },
@@ -89,7 +91,7 @@
     const open = C.LG_PARTS.find((p) => p.k === S.part && !p.disabled) || C.LG_PARTS.find((p) => !p.disabled);
     S.part = open.k;
     U.parts($('#lg-parts'), C.LG_PARTS, S.part, (k) => { S.part = k; render(); });
-    $('#lg-cards').hidden = S.part !== 'msgs';
+    $('#lg-msgs').hidden = S.part !== 'msgs';
   }
 
   // Las tarjetas se arman una sola vez, de izquierda a derecha en el orden de LG_TEMPLATES.

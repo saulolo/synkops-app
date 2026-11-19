@@ -409,19 +409,29 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   assert.ok(text('#v-logistica .lead').includes('seguimiento') && text('#v-logistica .lead').includes('mensajes a clientes'), 'Lead de Logística');
   const lgPartes = [...document.querySelectorAll('#lg-parts [data-part]')];
   assert.deepStrictEqual(lgPartes.map((b) => b.dataset.part), ['msgs', 'track']);
-  assert.deepStrictEqual(lgPartes.map((b) => b.textContent), ['💬 Mensajes a clientes', '📦 Seguimiento de pedidos · pronto']);
+  assert.deepStrictEqual(lgPartes.map((b) => b.textContent), ['💬 Plantillas de mensajes', '📦 Seguimiento de pedidos · pronto']);
   assert.deepStrictEqual(lgPartes.map((b) => b.disabled), [false, true], 'Seguimiento está deshabilitado');
   assert.strictEqual(lgPartes[0].getAttribute('aria-pressed'), 'true');
-  assert.ok(!document.querySelector('#lg-cards').hidden, 'Mensajes abre al cargar');
+  assert.ok(!document.querySelector('#lg-msgs').hidden, 'Plantillas de mensajes abre al cargar');
+  { // Contenedor «Mensajes a Clientes» (SPEC 15, Parte 11): dentro de #lg-msgs y con todas las tarjetas; deja lugar a otros grupos hermanos.
+    const g = document.querySelector('#lg-group-clientes');
+    assert.ok(g && g.tagName === 'SECTION' && g.parentElement === document.querySelector('#lg-msgs') && g.closest('#v-logistica'), 'El grupo vive en #lg-msgs');
+    assert.strictEqual(g.querySelector('#lg-group-clientes-h').textContent, 'Mensajes a Clientes', 'Título del contenedor');
+    assert.strictEqual(g.getAttribute('aria-labelledby'), 'lg-group-clientes-h');
+    assert.ok(g.querySelector('#lg-cards') && g.querySelectorAll('#lg-cards > .lg-card').length === 12, 'Las 12 tarjetas están dentro');
+    assert.strictEqual(document.querySelectorAll('#lg-cards').length, 1);
+    assert.deepStrictEqual([...document.querySelectorAll('#lg-msgs > *')].map((n) => n.id), ['lg-group-clientes'], 'Hoy solo hay el grupo de clientes');
+    assert.ok(!document.querySelector('#lg-parts + #lg-cards'), '#lg-cards ya no cuelga directo de la pestaña');
+  }
   lgPartes[1].click();
   assert.strictEqual(PYL.app.state.logistics.part, 'msgs', 'Un clic en Seguimiento no lo abre');
-  assert.ok(!document.querySelector('#lg-cards').hidden && document.querySelector('#lg-parts [aria-pressed="true"]').dataset.part === 'msgs');
+  assert.ok(!document.querySelector('#lg-msgs').hidden && document.querySelector('#lg-parts [aria-pressed="true"]').dataset.part === 'msgs');
 
   // 8d. Logística · formulario y prellenado desde Desarrollo (SPEC 13, paso 3).
   {
     const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
     const lgS = PYL.app.state.logistics, landing = PYL.app.state.landing;
-    assert.deepStrictEqual($$('#lg-cards .lg-card').map((c) => [c.id, c.querySelector('h2').textContent]), [['lg-card-pedido', 'Confirmación de Pedidos'], ['lg-card-confirmado', 'Pedido Confirmado'], ['lg-card-guia', 'Confirmación de Guia'], ['lg-card-recordatorio', 'Segundo Intento'], ['lg-card-tercero', 'Tercer Intento'], ['lg-card-anticipo', 'Solicitud de Anticipo']], 'Tarjetas separadas: Pedidos, Pedido Confirmado y Guia; en la segunda fila, Segundo, Tercer Intento y Solicitud de Anticipo');
+    assert.deepStrictEqual($$('#lg-cards .lg-card').map((c) => [c.id, c.querySelector('h2').textContent]), [['lg-card-pedido', 'Confirmación de Pedidos'], ['lg-card-reconfirma', 'Reconfirmación de Pedido'], ['lg-card-tercero', 'Tercer Intento'], ['lg-card-confirmado', 'Pedido Confirmado'], ['lg-card-guia', 'Confirmación de Guia'], ['lg-card-infografia', 'Envío de Infografía'], ['lg-card-anticipo', 'Solicitud de Anticipo'], ['lg-card-reintento', 'Reintento de Entrega'], ['lg-card-flete', 'Flete Especial'], ['lg-card-enruta', 'Recordatorio En Ruta'], ['lg-card-entregado', 'Pedido Entregado'], ['lg-card-oficina', 'Reclamar en Oficina']], 'Una tarjeta por plantilla, en el orden de LG_TEMPLATES (SPEC 15, Parte 10)');
     assert.ok(!$('#lg-tpls') && !$$('#lg-cards [data-tpl]').some((n) => n.tagName === 'BUTTON'), 'Ya no hay selector de plantilla: cada plantilla es su tarjeta');
     const ids = $$('#lg-cards [id]').map((n) => n.id);
     assert.strictEqual(new Set(ids).size, ids.length, 'Ids únicos entre las tarjetas');
@@ -479,14 +489,14 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     const escribe = (sel, v) => { const i = $(sel); i.value = v; i.dispatchEvent(new window.Event('input', { bubbles: true })); };
     const abre = () => { tab('dash').click(); tab('logistica').click(); };
     const card = $('#lg-card-pedido');
-    assert.ok(card && card === $('#lg-cards').firstElementChild && card.nextElementSibling === $('#lg-card-confirmado'), 'La tarjeta de Pedidos va primero, a la izquierda de Pedido Confirmado');
+    assert.ok(card && card === $('#lg-cards').firstElementChild && card.nextElementSibling === $('#lg-card-reconfirma'), 'La tarjeta de Pedidos va primero, a la izquierda de Reconfirmación de Pedido');
     assert.strictEqual($('#lg-card-pedido h2').textContent, 'Confirmación de Pedidos');
     const campos = ['name', 'product', 'address', 'city', 'dept', 'phone', 'total'];
     assert.deepStrictEqual($$('#lg-pedido-form input').map((i) => i.id), campos.map((k) => 'lg-pedido-f-' + k), '7 campos en orden');
     assert.deepStrictEqual($$('#lg-pedido-form label').map((l) => l.textContent), ['Nombre de cliente', 'Producto', 'Dirección de entrega', 'Ciudad / Municipio', 'Departamento', 'Teléfono de contacto', 'Total a pagar (COD - contraentrega)']);
     assert.deepStrictEqual($$('#lg-pedido-form input').map((i) => i.placeholder), ['Ej: Eugenia', 'Ej: Omegaxl joint support', 'Ej: Colombia 20# 19 .30 - barrio Capri', 'Ej: PASTO', 'Ej: NARIÑO', 'Ej: 3214566677', 'Ej: $ 97.400']);
     assert.ok(campos.every((k) => $(P('err-' + k))), 'Cada campo trae su aviso');
-    assert.deepStrictEqual($$('#lg-card-pedido .lg-acts button').map((b) => b.id), ['lg-pedido-clear', 'lg-pedido-copy', 'lg-pedido-gen'], 'Sus propios botones');
+    assert.deepStrictEqual($$('#lg-card-pedido .lg-acts button').map((b) => b.id), ['lg-pedido-gen', 'lg-pedido-clear', 'lg-pedido-copy'], 'Sus propios botones');
     assert.ok($$('#lg-card-pedido [data-ic]').every((b) => b.querySelector('.lg-ic svg')), 'Con sus íconos');
     // Producto viene de Desarrollo; el total no.
     escribe(P('f-product'), '');
@@ -496,6 +506,19 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.strictEqual($(P('f-total')).value, '', 'El total no se trae de Desarrollo');
     // Generar con campos vacíos marca los que faltan, solo en su tarjeta.
     $(P('gen')).click();
+    // Teléfono (SPEC 15, Parte 10): solo `+57 311 7624068` o `311 7624068`; se reescribe sin espacios al salir y el mensaje lo muestra igual.
+    {
+      const tel = $(P('f-phone'));
+      escribe(P('f-phone'), '311-762-4068'); tel.dispatchEvent(new window.Event('blur'));
+      assert.strictEqual(tel.value, '311-762-4068', 'Un teléfono inválido no se reescribe');
+      $(P('gen')).click();
+      assert.ok(tel.classList.contains('lg-bad') && $(P('err-phone')).textContent === 'Teléfono inválido: usa 311 7624068 o +57 311 7624068', 'Avisa las formas válidas');
+      for (const t of ['+57 311 7624068', '311 7624068']) {
+        escribe(P('f-phone'), t); tel.dispatchEvent(new window.Event('blur'));
+        assert.strictEqual(tel.value, '3117624068', 'Al salir queda sin espacios: ' + t);
+      }
+      escribe(P('f-phone'), ''); $(P('gen')).click(); // vuelve al estado de «todo vacío» para lo que sigue
+    }
     for (const k of ['name', 'address', 'city', 'dept', 'phone', 'total']) assert.ok($(P('f-' + k)).classList.contains('lg-bad') && /^Escribe /.test($(P('err-' + k)).textContent), k + ' marcado');
     assert.ok(!$(P('f-product')).classList.contains('lg-bad') && $(P('out')).value === '', 'Producto no se marca y no hay mensaje');
     assert.strictEqual($$('#lg-guia-form .lg-bad').length, 0, 'La tarjeta de Guia no se toca');
@@ -510,7 +533,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.strictEqual($(P('out')).value, esperado, 'Mensaje generado');
     assert.ok($(P('out')).value.includes('*Departamento:* NARIÑO') && $(P('f-dept')).value === 'nariño', 'El departamento sale en mayúsculas en el mensaje y el campo no se toca');
     assert.ok($(P('out')).value.includes('🛍️🤍\n\n🚚 Por favor'), 'Línea en blanco antes del último párrafo');
-    assert.ok($(P('out')).value.startsWith('¡Hola Eugenia! 🌟') && $(P('out')).value.includes('*Total a Pagar:* $97.400') && $(P('out')).value.includes('🍃*VidanovaStore*'), 'Saludo, total y tienda');
+    assert.ok($(P('out')).value.startsWith('¡Hola Eugenia! 🌟') && $(P('out')).value.includes('*Total a Pagar:* $97.400') && $(P('out')).value.includes('🍃*VidanovaStore®*'), 'Saludo, total y tienda');
     assert.strictEqual(lgS.cards.pedido.last, esperado);
     assert.strictEqual($(G('out')).value, '', 'El mensaje de Guia no cambia');
     // Editar después no cambia el mensaje hasta volver a generar.
@@ -548,12 +571,12 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     const L = PYL.core.logistics, lgS = PYL.app.state.logistics;
     const P = (s) => '#lg-confirmado-' + s;
     const card = $('#lg-card-confirmado');
-    assert.ok(card && card.previousElementSibling === $('#lg-card-pedido') && card.nextElementSibling === $('#lg-card-guia'), 'Va entre Pedidos y Guia');
+    assert.ok(card && card.previousElementSibling === $('#lg-card-tercero') && card.nextElementSibling === $('#lg-card-guia'), 'Va entre Tercer Intento y Guia');
     assert.strictEqual(card.querySelector('h2').textContent, 'Pedido Confirmado');
     assert.deepStrictEqual($$('#lg-confirmado-form input').map((i) => [i.id, i.type]), [['lg-confirmado-f-gift', 'checkbox']], 'Solo el check, sin campos de ingreso');
     assert.ok($(P('f-gift')).checked && /Incluye obsequio/.test($(P('form')).textContent), 'Check "Incluye obsequio" marcado por defecto');
     assert.ok(!$(P('import')), 'Sin «Traer de Desarrollo»: no trae nada de Desarrollo');
-    assert.deepStrictEqual($$('#lg-card-confirmado .lg-acts button').map((b) => b.id), ['lg-confirmado-clear', 'lg-confirmado-copy', 'lg-confirmado-gen']);
+    assert.deepStrictEqual($$('#lg-card-confirmado .lg-acts button').map((b) => b.id), ['lg-confirmado-gen', 'lg-confirmado-clear', 'lg-confirmado-copy']);
     // Con obsequio.
     $(P('gen')).click();
     assert.strictEqual($(P('out')).value, L.lgMessage('confirmado', { gift: true }));
@@ -576,41 +599,13 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.strictEqual(lgS.cards.confirmado.form.gift, true);
   }
 
-  // 8h. Logística · Segundo Intento (SPEC 13): tarjeta apilada justo debajo de Pedido Confirmado.
-  {
-    const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
-    const L = PYL.core.logistics, lgS = PYL.app.state.logistics;
-    const P = (s) => '#lg-recordatorio-' + s;
-    const escribe = (v) => { const i = $(P('f-name')); i.value = v; i.dispatchEvent(new window.Event('input', { bubbles: true })); };
-    const card = $('#lg-card-recordatorio');
-    assert.ok(card.previousElementSibling.classList.contains('lg-break') && card.previousElementSibling.previousElementSibling === $('#lg-card-guia'), 'Abre la segunda fila (tras un salto de línea), debajo de la primera');
-    assert.deepStrictEqual($$('#lg-cards > *').length, 7, 'Seis tarjetas y un salto de línea');
-    assert.deepStrictEqual([...$('#lg-cards').children].map((c) => c.id || c.className), ['lg-card-pedido', 'lg-card-confirmado', 'lg-card-guia', 'lg-break', 'lg-card-recordatorio', 'lg-card-tercero', 'lg-card-anticipo'], 'Fila 1: Pedidos, Pedido Confirmado, Guia; fila 2: Segundo y Tercer Intento');
-    assert.strictEqual(card.querySelector('h2').textContent, 'Segundo Intento');
-    assert.deepStrictEqual($$('#lg-recordatorio-form input').map((i) => [i.id, i.placeholder]), [['lg-recordatorio-f-name', 'Ej: Eugenia']], 'Solo el nombre');
-    assert.ok(!$(P('import')), 'Sin «Traer de Desarrollo»');
-    assert.deepStrictEqual($$('#lg-card-recordatorio .lg-acts button').map((b) => b.id), ['lg-recordatorio-clear', 'lg-recordatorio-copy', 'lg-recordatorio-gen']);
-    // Generar sin nombre lo marca; con nombre arma el mensaje.
-    $(P('gen')).click();
-    assert.ok($(P('f-name')).classList.contains('lg-bad') && /^Escribe /.test($(P('err-name')).textContent) && $(P('out')).value === '', 'Sin nombre no genera');
-    escribe('Eugenia'); $(P('gen')).click();
-    assert.strictEqual($(P('out')).value, L.lgMessage('recordatorio', { name: 'Eugenia' }));
-    assert.ok($(P('out')).value.startsWith('¡Hola de nuevo, Eugenia! 👋') && $(P('out')).value.includes('*confírmanos*'), 'Saludo y pedido de confirmación');
-    escribe('Ana');
-    assert.ok($(P('out')).value.includes('Eugenia'), 'No se actualiza en vivo');
-    assert.strictEqual(lgS.cards.recordatorio.form.name, 'Ana');
-    assert.ok($('#lg-confirmado-out').value === '' && $('#lg-pedido-out').value === '', 'No toca los otros mensajes');
-    $(P('clear')).click();
-    assert.ok($(P('f-name')).value === '' && $(P('out')).value === '' && lgS.cards.recordatorio.last === '', 'Limpiar vacía el nombre y el mensaje');
-  }
-
   // 8j. Logística · Tercer Intento (SPEC 13): tarjeta propia a la derecha de la pila Pedidos + Segundo Intento.
   {
     const $ = (q) => document.querySelector(q);
     const L = PYL.core.logistics, lgS = PYL.app.state.logistics;
     const P = (s) => '#lg-tercero-' + s;
     const card = $('#lg-card-tercero');
-    assert.ok(card.previousElementSibling === $('#lg-card-recordatorio') && card.nextElementSibling === $('#lg-card-anticipo'), 'A la derecha de Segundo Intento');
+    assert.ok(card.previousElementSibling === $('#lg-card-reconfirma') && card.nextElementSibling === $('#lg-card-confirmado'), 'A la derecha de Reconfirmación de Pedido');
     assert.strictEqual(card.querySelector('h2').textContent, 'Tercer Intento');
     const escribe = (k, v) => { const i = $(P('f-' + k)); i.value = v; i.dispatchEvent(new window.Event('input', { bubbles: true })); };
     $(P('f-product')).value = ''; $(P('f-product')).dispatchEvent(new window.Event('input', { bubbles: true })); // Desarrollo pudo prellenarlo
@@ -629,7 +624,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     const L = PYL.core.logistics;
     const P = (s) => '#lg-anticipo-' + s;
     const card = $('#lg-card-anticipo');
-    assert.ok(card.previousElementSibling === $('#lg-card-tercero') && !card.nextElementSibling && card.querySelector('h2').textContent === 'Solicitud de Anticipo', 'Última, a la derecha de Tercer Intento');
+    assert.ok(card.previousElementSibling === $('#lg-card-infografia') && card.nextElementSibling === $('#lg-card-reintento') && card.querySelector('h2').textContent === 'Solicitud de Anticipo', 'A la derecha de Guia');
     const escribe = (k, v) => { const i = $(P('f-' + k)); i.value = v; i.dispatchEvent(new window.Event('input', { bubbles: true })); };
     escribe('name', ''); escribe('product', ''); escribe('advance', '');
     $(P('gen')).click();
@@ -641,11 +636,248 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.ok($(P('f-name')).value === '' && $(P('out')).value === '', 'Limpiar vacía');
   }
 
+  // 8h1. Logística · «Traer de Desarrollo» (SPEC 15, Parte 10): vive dentro del título, justo después del botón de la flecha, para
+  // quedar pegado a ella (el estilo lo coloca a su izquierda); solo lo traen las tarjetas con un campo de Desarrollo.
+  {
+    const $$ = (q) => [...document.querySelectorAll(q)];
+    const con = $$('#lg-cards .lg-card').filter((c) => c.querySelector('.lg-import'));
+    assert.deepStrictEqual(con.map((c) => c.dataset.tpl), ['pedido', 'tercero', 'guia', 'infografia', 'anticipo', 'reintento', 'flete', 'enruta', 'oficina'].filter((k) => con.some((c) => c.dataset.tpl === k)), 'Las tarjetas con producto de Desarrollo');
+    assert.ok(con.length >= 5, 'Hay tarjetas con el botón');
+    for (const c of con) {
+      const h2 = c.querySelector('h2'), imp = c.querySelector('.lg-import'), tg = c.querySelector('.lg-toggle');
+      assert.ok(imp.parentElement === h2 && tg.parentElement === h2 && tg.nextElementSibling === imp, c.dataset.tpl + ': el botón va dentro del título, tras el de la flecha');
+      assert.strictEqual(h2.textContent, tg.textContent, c.dataset.tpl + ': el título sigue siendo solo el nombre');
+    }
+    assert.ok($$('#lg-cards .lg-card').filter((c) => !c.querySelector('.lg-import')).every((c) => !c.querySelector('h2 .lg-import')), 'Sin botón donde no hay campo de Desarrollo');
+  }
+
+  // 8h1b. Logística · todas las tarjetas (SPEC 15, Parte 10): sin saltos de fila, en orden, y «Generar mensaje» arriba de «Limpiar» y «Copiar».
+  {
+    const $$ = (q) => [...document.querySelectorAll(q)];
+    assert.deepStrictEqual($$('#lg-cards > *').map((c) => c.id), ['pedido', 'reconfirma', 'tercero', 'confirmado', 'guia', 'infografia', 'anticipo', 'reintento', 'flete', 'enruta', 'entregado', 'oficina'].map((k) => 'lg-card-' + k), 'Once tarjetas, sin saltos de línea');
+    for (const c of $$('#lg-cards .lg-card')) {
+      const k = c.dataset.tpl;
+      assert.deepStrictEqual([...c.querySelectorAll('.lg-acts button')].map((b) => b.id), ['gen', 'clear', 'copy'].map((a) => 'lg-' + k + '-' + a), k + ': Generar arriba, Limpiar y Copiar debajo');
+      assert.ok(c.querySelector('.lg-acts button').classList.contains('lg-gen') && !c.querySelector('.lg-acts button').classList.contains('ghost'), k + ': Generar es el botón destacado');
+    }
+  }
+
+  // 8h1c. Logística · chip de etapa en el título (SPEC 15, Parte 11): antes del nombre, fuera del <h2>.
+  {
+    const $$ = (q) => [...document.querySelectorAll(q)];
+    const L = PYL.core.logistics;
+    for (const c of $$('#lg-cards .lg-card')) {
+      const tpl = L.lgTemplate(c.dataset.tpl), chip = c.querySelector('.lg-head > .lg-stage');
+      assert.ok(chip && chip === c.querySelector('.lg-head').firstElementChild && chip.nextElementSibling === c.querySelector('h2'), tpl.k + ': el chip va antes del título');
+      assert.strictEqual(chip.textContent, L.LG_STAGES[tpl.stage], tpl.k + ': texto de la etapa');
+      assert.strictEqual(chip.dataset.stage, tpl.stage);
+      assert.strictEqual(c.querySelector('h2').textContent, tpl.title, tpl.k + ': el título sigue siendo solo el nombre');
+    }
+    assert.deepStrictEqual([...new Set($$('#lg-cards .lg-stage').map((n) => n.dataset.stage))].sort(), ['cobro', 'confirmar', 'entrega', 'envio']);
+  }
+
+  // 8h1d. Logística · Envío de Infografía (SPEC 15, Parte 12): justo después de Confirmación de Guia, solo con el producto de Desarrollo.
+  {
+    const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
+    const L = PYL.core.logistics, lgS = PYL.app.state.logistics, landing = PYL.app.state.landing;
+    const P = (s) => '#lg-infografia-' + s;
+    const card = $('#lg-card-infografia');
+    assert.ok(card.previousElementSibling === $('#lg-card-guia') && card.nextElementSibling === $('#lg-card-anticipo'), 'Va justo después de Confirmación de Guia');
+    assert.strictEqual(card.querySelector('h2').textContent, 'Envío de Infografía');
+    assert.deepStrictEqual($$('#lg-infografia-form input').map((i) => [i.id, i.placeholder]), [['lg-infografia-f-product', 'Ej: Crema Arbutina']], 'Solo el producto');
+    assert.ok($(P('import')), 'Con «Traer de Desarrollo»');
+    const i = $(P('f-product')); i.value = ''; i.dispatchEvent(new window.Event('input', { bubbles: true }));
+    $(P('gen')).click();
+    assert.ok(i.classList.contains('lg-bad') && $(P('out')).value === '', 'Sin producto no genera');
+    const previo = landing.prod;
+    landing.prod = { name: 'Crema Arbutina', price: 50000 };
+    $(P('import')).click();
+    landing.prod = previo;
+    assert.strictEqual(i.value, 'Crema Arbutina', 'Trae el producto');
+    $(P('gen')).click();
+    assert.strictEqual($(P('out')).value, L.lgMessage('infografia', { product: 'Crema Arbutina' }));
+    assert.ok($(P('out')).value.includes('*infografía visual*') && $(P('out')).value.includes('*Crema Arbutina*'), 'Con negritas');
+    $(P('clear')).click();
+    assert.ok(i.value === 'Crema Arbutina' && $(P('out')).value === '' && lgS.cards.infografia.last === '', 'Limpiar vacía el mensaje y deja el producto');
+  }
+
+  // 8h2. Logística · Reconfirmación de Pedido (SPEC 15): justo a la derecha de Confirmación de Pedidos, solo con el nombre.
+  {
+    const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
+    const L = PYL.core.logistics, lgS = PYL.app.state.logistics;
+    const P = (s) => '#lg-reconfirma-' + s;
+    const card = $('#lg-card-reconfirma');
+    assert.ok(card.previousElementSibling === $('#lg-card-pedido') && card.nextElementSibling === $('#lg-card-tercero'), 'Justo a la derecha de Pedidos');
+    assert.strictEqual(card.querySelector('h2').textContent, 'Reconfirmación de Pedido');
+    assert.deepStrictEqual($$('#lg-reconfirma-form input').map((i) => [i.id, i.placeholder]), [['lg-reconfirma-f-name', 'Ej: Eugenia']], 'Solo el nombre');
+    assert.ok(!$(P('import')), 'Sin «Traer de Desarrollo»');
+    assert.deepStrictEqual($$('#lg-card-reconfirma .lg-acts button').map((b) => b.id), ['lg-reconfirma-gen', 'lg-reconfirma-clear', 'lg-reconfirma-copy']);
+    $(P('gen')).click();
+    assert.ok($(P('f-name')).classList.contains('lg-bad') && $(P('out')).value === '', 'Sin nombre no genera');
+    const i = $(P('f-name')); i.value = 'Eugenia'; i.dispatchEvent(new window.Event('input', { bubbles: true }));
+    $(P('gen')).click();
+    assert.strictEqual($(P('out')).value, L.lgMessage('reconfirma', { name: 'Eugenia' }));
+    assert.ok($(P('out')).value.startsWith('¡Hola Eugenia! 👋 Te escribíamos de la tienda 🍃*VidanovaStore®* nuevamente.'));
+    assert.ok($('#lg-tercero-out').value === '' && $('#lg-pedido-out').value === '', 'No toca los otros mensajes');
+    $(P('clear')).click();
+    assert.ok($(P('f-name')).value === '' && $(P('out')).value === '' && lgS.cards.reconfirma.last === '', 'Limpiar vacía el nombre y el mensaje');
+  }
+
+  // 8h3. Logística · Reintento de Entrega (SPEC 15): nombre y producto; «Traer de Desarrollo» pisa solo el producto.
+  {
+    const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
+    const L = PYL.core.logistics, lgS = PYL.app.state.logistics, landing = PYL.app.state.landing;
+    const P = (s) => '#lg-reintento-' + s;
+    const escribe = (k, v) => { const i = $(P('f-' + k)); i.value = v; i.dispatchEvent(new window.Event('input', { bubbles: true })); };
+    const card = $('#lg-card-reintento');
+    assert.ok(card.previousElementSibling === $('#lg-card-anticipo') && card.nextElementSibling === $('#lg-card-flete'), 'Va después de Solicitud de Anticipo');
+    assert.strictEqual(card.querySelector('h2').textContent, 'Reintento de Entrega');
+    assert.deepStrictEqual($$('#lg-reintento-form input').map((i) => [i.id, i.placeholder]), [['lg-reintento-f-name', 'Ej: Rafael'], ['lg-reintento-f-product', 'Ej: Crema Despigmentante Coreana']]);
+    assert.ok($(P('import')), 'Con «Traer de Desarrollo»');
+    assert.deepStrictEqual($$('#lg-card-reintento .lg-acts button').map((b) => b.id), ['lg-reintento-gen', 'lg-reintento-clear', 'lg-reintento-copy']);
+    escribe('product', ''); $(P('gen')).click();
+    assert.ok($(P('f-name')).classList.contains('lg-bad') && $(P('f-product')).classList.contains('lg-bad') && $(P('out')).value === '', 'Sin datos no genera');
+    const previo = landing.prod;
+    landing.prod = { name: 'Crema Despigmentante Coreana', price: 50000 };
+    escribe('name', 'Rafael');
+    $(P('import')).click();
+    assert.strictEqual($(P('f-product')).value, 'Crema Despigmentante Coreana', 'Trae el producto');
+    assert.strictEqual($(P('f-name')).value, 'Rafael', 'No pisa el nombre');
+    landing.prod = previo;
+    $(P('gen')).click();
+    assert.strictEqual($(P('out')).value, L.lgMessage('reintento', { name: 'Rafael', product: 'Crema Despigmentante Coreana' }));
+    assert.ok($(P('out')).value.includes('*Crema Despigmentante Coreana*') && $(P('out')).value.includes('ubicarl@') && $(P('out')).value.includes('atent@'), 'Producto en negrita y con arroba');
+    assert.ok($('#lg-anticipo-out').value === '' && $('#lg-pedido-out').value === '', 'No toca los otros mensajes');
+    $(P('clear')).click();
+    assert.ok($(P('f-name')).value === '' && $(P('f-product')).value === 'Crema Despigmentante Coreana' && $(P('out')).value === '' && lgS.cards.reintento.last === '', 'Limpiar vacía el nombre y el mensaje; deja el producto');
+  }
+
+  // 8h4. Logística · Flete Especial (SPEC 15): 5 campos (2 de dinero), producto de Desarrollo y las cuentas fijas.
+  {
+    const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
+    const L = PYL.core.logistics, lgS = PYL.app.state.logistics, landing = PYL.app.state.landing;
+    const P = (s) => '#lg-flete-' + s;
+    const escribe = (k, v) => { const i = $(P('f-' + k)); i.value = v; i.dispatchEvent(new window.Event('input', { bubbles: true })); };
+    const card = $('#lg-card-flete');
+    assert.ok(card.previousElementSibling === $('#lg-card-reintento') && card.nextElementSibling === $('#lg-card-enruta'), 'Va después de Reintento de Entrega');
+    assert.strictEqual(card.querySelector('h2').textContent, 'Flete Especial');
+    assert.deepStrictEqual($$('#lg-flete-form input').map((i) => [i.id, i.placeholder]), [['lg-flete-f-name', 'Ej: Rafael'], ['lg-flete-f-city', 'Ej: Vaupés'], ['lg-flete-f-shipping', 'Ej: $ 50.000'], ['lg-flete-f-product', 'Ej: Crema arbutina'], ['lg-flete-f-advance', 'Ej: $ 20.000']]);
+    assert.ok($(P('import')), 'Con «Traer de Desarrollo»');
+    escribe('product', ''); $(P('gen')).click();
+    assert.ok(['name', 'city', 'shipping', 'product', 'advance'].every((k) => $(P('f-' + k)).classList.contains('lg-bad')) && $(P('out')).value === '', 'Sin datos no genera');
+    escribe('shipping', '0'); escribe('advance', 'abc'); $(P('gen')).click();
+    assert.strictEqual($(P('err-shipping')).textContent, 'Flete mayor a 0');
+    assert.strictEqual($(P('err-advance')).textContent, 'Anticipo mayor a 0');
+    for (const t of ['50000', '50.000', '$ 50.000']) {
+      escribe('shipping', t); $(P('f-shipping')).dispatchEvent(new window.Event('blur'));
+      assert.strictEqual($(P('f-shipping')).value, '$ 50.000', 'Formatea ' + t);
+    }
+    const previo = landing.prod;
+    landing.prod = { name: 'Crema arbutina', price: 50000 };
+    $(P('import')).click();
+    landing.prod = previo;
+    assert.strictEqual($(P('f-product')).value, 'Crema arbutina', 'Trae el producto');
+    escribe('name', 'Rafael'); escribe('city', 'Vaupés'); escribe('advance', '20000'); $(P('f-advance')).dispatchEvent(new window.Event('blur'));
+    $(P('gen')).click();
+    assert.strictEqual($(P('out')).value, L.lgMessage('flete', { name: 'Rafael', city: 'Vaupés', shipping: 50000, product: 'Crema arbutina', advance: 20000 }));
+    assert.ok($(P('out')).value.includes('$50.000') && $(P('out')).value.includes('$20.000') && $(P('out')).value.includes('3182110955') && $(P('out')).value.includes('23015881151'), 'Montos sin espacio y las dos cuentas');
+    assert.ok($(P('out')).value.includes('🍃*VidanovaStore®*'), 'Con la marca');
+    $(P('clear')).click();
+    assert.ok(['name', 'city', 'shipping', 'advance'].every((k) => $(P('f-' + k)).value === '') && $(P('f-product')).value === 'Crema arbutina' && $(P('out')).value === '' && lgS.cards.flete.last === '', 'Limpiar vacía lo del pedido y deja el producto');
+  }
+
+  // 8h5. Logística · Recordatorio En Ruta (SPEC 15): nombre y producto de Desarrollo.
+  {
+    const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
+    const L = PYL.core.logistics, lgS = PYL.app.state.logistics, landing = PYL.app.state.landing;
+    const P = (s) => '#lg-enruta-' + s;
+    const escribe = (k, v) => { const i = $(P('f-' + k)); i.value = v; i.dispatchEvent(new window.Event('input', { bubbles: true })); };
+    const card = $('#lg-card-enruta');
+    assert.ok(card.previousElementSibling === $('#lg-card-flete') && card.nextElementSibling === $('#lg-card-entregado'), 'Va después de Flete Especial');
+    assert.strictEqual(card.querySelector('h2').textContent, 'Recordatorio En Ruta');
+    assert.deepStrictEqual($$('#lg-enruta-form input').map((i) => [i.id, i.placeholder]), [['lg-enruta-f-name', 'Ej: Beatriz'], ['lg-enruta-f-product', 'Ej: Crema Arbutina']]);
+    assert.ok($(P('import')), 'Con «Traer de Desarrollo»');
+    escribe('product', ''); $(P('gen')).click();
+    assert.ok($(P('f-name')).classList.contains('lg-bad') && $(P('f-product')).classList.contains('lg-bad') && $(P('out')).value === '', 'Sin datos no genera');
+    const previo = landing.prod;
+    landing.prod = { name: 'Crema Arbutina', price: 50000 };
+    $(P('import')).click();
+    landing.prod = previo;
+    assert.strictEqual($(P('f-product')).value, 'Crema Arbutina', 'Trae el producto');
+    escribe('name', 'Beatriz'); $(P('gen')).click();
+    assert.strictEqual($(P('out')).value, L.lgMessage('enruta', { name: 'Beatriz', product: 'Crema Arbutina' }));
+    assert.ok($(P('out')).value.startsWith('Hola, Beatriz, *tu pedido Crema Arbutina ya se encuentra en ruta de entrega*.'));
+    $(P('clear')).click();
+    assert.ok($(P('f-name')).value === '' && $(P('f-product')).value === 'Crema Arbutina' && $(P('out')).value === '' && lgS.cards.enruta.last === '', 'Limpiar vacía el nombre y el mensaje; deja el producto');
+  }
+
+  // 8h6. Logística · Pedido Entregado (SPEC 15): primera tarjeta real con casilla «Incluye manual» y título condicional.
+  {
+    const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
+    const L = PYL.core.logistics, lgS = PYL.app.state.logistics;
+    const P = (s) => '#lg-entregado-' + s;
+    const escribe = (k, v) => { const i = $(P('f-' + k)); i.value = v; i.dispatchEvent(new window.Event('input', { bubbles: true })); };
+    const marca = (v) => { const c = $(P('f-manual')); c.checked = v; c.dispatchEvent(new window.Event('change', { bubbles: true })); };
+    const celda = () => $(P('f-manualTitle')).closest('.lg-cell');
+    const card = $('#lg-card-entregado');
+    assert.ok(card.previousElementSibling === $('#lg-card-enruta') && card.nextElementSibling === $('#lg-card-oficina'), 'Va después de Recordatorio En Ruta');
+    assert.strictEqual(card.querySelector('h2').textContent, 'Pedido Entregado');
+    assert.deepStrictEqual($$('#lg-entregado-form input').map((i) => i.id), ['lg-entregado-f-name', 'lg-entregado-f-manual', 'lg-entregado-f-manualTitle']);
+    assert.ok(!$(P('import')), 'Sin «Traer de Desarrollo»');
+    assert.ok($(P('f-manual')).checked && !celda().hidden && $(P('f-manualTitle')).placeholder === 'Ej: Manual de Bienestar Articular', 'Casilla marcada y título visible al abrir');
+    escribe('name', 'Beatriz'); $(P('gen')).click();
+    assert.ok($(P('f-manualTitle')).classList.contains('lg-bad') && $(P('out')).value === '', 'Marcada y con el título vacío: error y sin mensaje');
+    escribe('manualTitle', 'Manual de Bienestar Articular'); $(P('gen')).click();
+    assert.strictEqual($(P('out')).value, L.lgMessage('entregado', { name: 'Beatriz', manual: true, manualTitle: 'Manual de Bienestar Articular' }));
+    assert.ok($(P('out')).value.includes('📄 Tu guía adjunta: *Manual de Bienestar Articular*') && $(P('out')).value.includes('💡'), 'Con manual');
+    marca(false);
+    assert.ok(celda().hidden && $(P('f-manualTitle')).value === 'Manual de Bienestar Articular', 'Desmarcada: el título se oculta y se conserva');
+    $(P('gen')).click();
+    assert.strictEqual($(P('out')).value, L.lgMessage('entregado', { name: 'Beatriz', manual: false }));
+    assert.ok(!$(P('out')).value.includes('📄') && !$(P('out')).value.includes('💡') && $(P('out')).value.includes('https://vidanovastore.com/products'), 'Sin manual: se quita el bloque');
+    marca(true); $(P('clear')).click();
+    assert.ok($(P('f-name')).value === '' && $(P('out')).value === '' && lgS.cards.entregado.last === '', 'Limpiar vacía el nombre y el mensaje');
+    assert.ok($(P('f-manual')).checked && $(P('f-manualTitle')).value === 'Manual de Bienestar Articular' && !celda().hidden, 'Limpiar deja la casilla y el título');
+    marca(false); $(P('clear')).click();
+    assert.ok(!$(P('f-manual')).checked && celda().hidden && $(P('f-manualTitle')).value === 'Manual de Bienestar Articular', 'Limpiar respeta la casilla desmarcada');
+    marca(true); $(P('f-manualTitle')).value = ''; escribe('manualTitle', '');
+  }
+
+  // 8h7. Logística · Reclamar en Oficina (SPEC 15): producto de Desarrollo y manual condicional, sin nombre de cliente.
+  {
+    const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
+    const L = PYL.core.logistics, lgS = PYL.app.state.logistics, landing = PYL.app.state.landing;
+    const P = (s) => '#lg-oficina-' + s;
+    const escribe = (k, v) => { const i = $(P('f-' + k)); i.value = v; i.dispatchEvent(new window.Event('input', { bubbles: true })); };
+    const marca = (v) => { const c = $(P('f-manual')); c.checked = v; c.dispatchEvent(new window.Event('change', { bubbles: true })); };
+    const celda = () => $(P('f-manualTitle')).closest('.lg-cell');
+    const card = $('#lg-card-oficina');
+    assert.ok(card.previousElementSibling === $('#lg-card-entregado') && !card.nextElementSibling, 'Es la última tarjeta');
+    assert.strictEqual(card.querySelector('h2').textContent, 'Reclamar en Oficina');
+    assert.deepStrictEqual($$('#lg-oficina-form input').map((i) => i.id), ['lg-oficina-f-product', 'lg-oficina-f-manual', 'lg-oficina-f-manualTitle'], 'Sin nombre de cliente');
+    assert.ok($(P('import')) && $(P('f-manual')).checked && !celda().hidden, 'Con «Traer de Desarrollo»; casilla marcada y título visible');
+    escribe('product', ''); $(P('gen')).click();
+    assert.ok($(P('f-product')).classList.contains('lg-bad') && $(P('f-manualTitle')).classList.contains('lg-bad') && $(P('out')).value === '', 'Sin datos no genera');
+    const previo = landing.prod;
+    landing.prod = { name: 'Crema Arbutina', price: 50000 };
+    $(P('import')).click();
+    landing.prod = previo;
+    assert.strictEqual($(P('f-product')).value, 'Crema Arbutina', 'Trae el producto');
+    escribe('manualTitle', 'Manual de Bienestar Articular'); $(P('gen')).click();
+    assert.strictEqual($(P('out')).value, L.lgMessage('oficina', { product: 'Crema Arbutina', manual: true, manualTitle: 'Manual de Bienestar Articular' }));
+    assert.ok($(P('out')).value.endsWith('para enviarle el Manual de Bienestar Articular.') && !$(P('out')).value.includes('*Manual'), 'Con manual, sin negrita');
+    marca(false); $(P('gen')).click();
+    assert.ok(celda().hidden && $(P('out')).value.endsWith('cuando lo obtenga.') && !$(P('out')).value.includes('Manual'), 'Sin manual');
+    marca(true); $(P('clear')).click();
+    assert.ok($(P('f-product')).value === 'Crema Arbutina' && $(P('out')).value === '' && lgS.cards.oficina.last === '', 'Limpiar vacía el mensaje y deja el producto');
+    assert.ok($(P('f-manual')).checked && $(P('f-manualTitle')).value === 'Manual de Bienestar Articular' && !celda().hidden, 'Limpiar deja la casilla y el título');
+  }
+
   // 8i. Logística · tarjetas contraídas: se abren y se cierran tocando su nombre (SPEC 13).
   {
     const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
     const lgS = PYL.app.state.logistics;
-    const claves = ['pedido', 'guia', 'confirmado', 'recordatorio', 'tercero', 'anticipo'];
+    const claves = ['pedido', 'reconfirma', 'guia', 'confirmado', 'tercero', 'anticipo', 'reintento', 'flete', 'enruta', 'entregado', 'oficina'];
     const abierta = (k) => $('#lg-card-' + k).classList.contains('open');
     // Todas empiezan contraídas: solo se ve el nombre.
     for (const k of claves) {
@@ -661,21 +893,64 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.ok(abierta('pedido') && !$('#lg-pedido-body').hidden && $('#lg-pedido-toggle').getAttribute('aria-expanded') === 'true' && lgS.cards.pedido.open === true, 'Se abre');
     assert.ok(claves.filter((k) => k !== 'pedido').every((k) => !abierta(k) && $('#lg-' + k + '-body').hidden), 'Las demás siguen contraídas');
     // Son independientes: se pueden tener varias abiertas.
-    $('#lg-recordatorio-toggle').click();
-    assert.ok(abierta('pedido') && abierta('recordatorio') && !abierta('guia') && !abierta('confirmado'), 'Varias abiertas a la vez');
+    $('#lg-reconfirma-toggle').click();
+    assert.ok(abierta('pedido') && abierta('reconfirma') && !abierta('guia') && !abierta('confirmado'), 'Varias abiertas a la vez');
     $('#lg-pedido-toggle').click();
     assert.ok(!abierta('pedido') && $('#lg-pedido-body').hidden && $('#lg-pedido-toggle').getAttribute('aria-expanded') === 'false', 'Se vuelve a cerrar');
     // Contraer no borra lo escrito ni el mensaje.
-    const i = $('#lg-recordatorio-f-name'); i.value = 'Eugenia'; i.dispatchEvent(new window.Event('input', { bubbles: true }));
-    $('#lg-recordatorio-gen').click();
-    const msg = $('#lg-recordatorio-out').value;
-    $('#lg-recordatorio-toggle').click(); $('#lg-recordatorio-toggle').click();
-    assert.ok(i.value === 'Eugenia' && $('#lg-recordatorio-out').value === msg && msg !== '', 'Cerrar y abrir conserva lo escrito y el mensaje');
+    const i = $('#lg-reconfirma-f-name'); i.value = 'Eugenia'; i.dispatchEvent(new window.Event('input', { bubbles: true }));
+    $('#lg-reconfirma-gen').click();
+    const msg = $('#lg-reconfirma-out').value;
+    $('#lg-reconfirma-toggle').click(); $('#lg-reconfirma-toggle').click();
+    assert.ok(i.value === 'Eugenia' && $('#lg-reconfirma-out').value === msg && msg !== '', 'Cerrar y abrir conserva lo escrito y el mensaje');
     // Dejar todas contraídas para lo siguiente.
-    $('#lg-recordatorio-clear').click();
-    $('#lg-recordatorio-toggle').click();
+    $('#lg-reconfirma-clear').click();
+    $('#lg-reconfirma-toggle').click();
     assert.ok(claves.every((k) => !abierta(k)), 'Todas contraídas');
     assert.ok(!PYL.services.storage.logistics, 'Qué tarjetas están abiertas no se guarda');
+  }
+
+  // 8j. Logística · campo condicional (`when`) y campo que se conserva (`keep`) (SPEC 15). Se siembra una plantilla de prueba y se
+  // vuelve a ejecutar app/logistics.js para que pinte su tarjeta; al final se quita y se restaura la pantalla.
+  {
+    const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
+    const fs = require('fs');
+    const src = fs.readFileSync(path.join(__dirname, '..', 'js', 'modules', 'logistics', 'app', 'logistics.js'), 'utf8');
+    const L = PYL.core.logistics;
+    L.LG_TEMPLATES.push({ k: 'prueba', title: 'Prueba', fields: [
+      { k: 'name', label: 'Nombre de cliente', type: 'text', ph: 'Ej: Ana' },
+      { k: 'manual', label: 'Incluye manual', type: 'check', def: true, keep: true },
+      { k: 'manualTitle', label: 'Título del manual', type: 'text', when: 'manual', keep: true, ph: 'Ej: Manual X' },
+    ] });
+    window.eval(src);
+    const lgS = PYL.app.state.logistics;
+    const escribe = (sel, v) => { const i = $(sel); i.value = v; i.dispatchEvent(new window.Event('input', { bubbles: true })); };
+    const marca = (v) => { const c = $('#lg-prueba-f-manual'); c.checked = v; c.dispatchEvent(new window.Event('change', { bubbles: true })); };
+    const celda = () => $('#lg-prueba-f-manualTitle').closest('.lg-cell');
+    assert.ok($('#lg-card-prueba') && $('#lg-prueba-f-manual').checked && !celda().hidden, 'Con la casilla marcada el campo condicional se ve');
+    escribe('#lg-prueba-f-manualTitle', 'Manual X');
+    marca(false);
+    assert.ok(celda().hidden && lgS.cards.prueba.form.manual === false, 'Desmarcada: el campo se oculta');
+    assert.strictEqual($('#lg-prueba-f-manualTitle').value, 'Manual X', 'Lo escrito no se pierde');
+    marca(true);
+    assert.ok(!celda().hidden && $('#lg-prueba-f-manualTitle').value === 'Manual X' && lgS.cards.prueba.form.manualTitle === 'Manual X', 'Al volver a marcarla reaparece con lo escrito');
+    // Marcada y con el título vacío, «Generar mensaje» marca el campo y no arma nada.
+    escribe('#lg-prueba-f-manualTitle', ''); escribe('#lg-prueba-f-name', 'Ana');
+    $('#lg-prueba-gen').click();
+    assert.ok($('#lg-prueba-f-manualTitle').classList.contains('lg-bad') && /^Escribe /.test($('#lg-prueba-err-manualTitle').textContent) && $('#lg-prueba-out').value === '', 'Marcada: el título es obligatorio');
+    // Desmarcada, el título no se exige (aquí solo falta el nombre).
+    marca(false); escribe('#lg-prueba-f-name', '');
+    $('#lg-prueba-gen').click();
+    assert.ok($('#lg-prueba-f-name').classList.contains('lg-bad') && !$('#lg-prueba-f-manualTitle').classList.contains('lg-bad') && $('#lg-prueba-err-manualTitle').textContent === '', 'Desmarcada: el título no se exige');
+    // «Limpiar» vacía el nombre pero conserva la casilla y el título (keep).
+    marca(true); escribe('#lg-prueba-f-manualTitle', 'Manual X'); escribe('#lg-prueba-f-name', 'Ana');
+    $('#lg-prueba-clear').click();
+    assert.ok($('#lg-prueba-f-name').value === '' && $('#lg-prueba-f-manual').checked && $('#lg-prueba-f-manualTitle').value === 'Manual X' && !celda().hidden, 'Limpiar conserva la casilla y el título');
+    // Se quita la plantilla de prueba y se restaura la pantalla real.
+    L.LG_TEMPLATES.pop();
+    window.eval(src);
+    assert.ok(!$('#lg-card-prueba') && $$('#lg-cards .lg-card').length === 12, 'Plantilla de prueba retirada');
+    assert.ok(!PYL.services.storage.logistics, 'Sin persistencia');
   }
 
   // 9. Escalado · Fase de testeo: 6 pasos, cada uno con su bloque, y el avance.
@@ -1020,7 +1295,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     Object.defineProperty(window.navigator, 'clipboard', { configurable: true, value: { writeText: async (t) => { copiado = t; } } });
     tab('logistica').click();
     assert.ok($('#lg-guia-out').readOnly && $('#lg-guia-out').value === '', 'Mensaje de solo lectura y vacío al cargar');
-    assert.deepStrictEqual($$('#lg-card-guia .lg-acts button').map((b) => b.id), ['lg-guia-clear', 'lg-guia-copy', 'lg-guia-gen'], 'Botones en .lg-acts');
+    assert.deepStrictEqual($$('#lg-card-guia .lg-acts button').map((b) => b.id), ['lg-guia-gen', 'lg-guia-clear', 'lg-guia-copy'], 'Botones en .lg-acts');
     assert.ok($('#lg-head, .lg-head #lg-guia-import'), 'Traer de Desarrollo es un ícono junto al título');
     assert.deepStrictEqual($$('#lg-guia-clear, #lg-guia-copy, #lg-guia-gen').map((b) => b.textContent).sort(), ['Generar mensaje', 'Copiar mensaje', 'Limpiar'].sort());
     assert.ok($$('#lg-guia-import, #lg-guia-clear, #lg-guia-copy, #lg-guia-gen').every((b) => b.querySelector('.lg-ic svg') && b.querySelectorAll('.lg-ic').length === 1), 'Cada botón trae su ícono dibujado (SVG), sin emojis');
@@ -1050,7 +1325,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     const esperado = L.lgMessage('guia', { name: 'Pablo', product: 'Omegaxl joint support', guide: '074102602224', price: 97400, address: 'Cra 67 # 25 - 34 Itagui - Calatrava' });
     assert.strictEqual($('#lg-guia-out').value, esperado, 'Mensaje generado');
     assert.ok($('#lg-guia-out').value.includes('*2 a 4 días hábiles*'), 'Tiempo de entrega fijo');
-    assert.ok($('#lg-guia-out').value.includes('🍃*VidanovaStore*') && $('#lg-guia-out').value.includes('*$97.400*'), 'Tienda y precio sin espacio');
+    assert.ok($('#lg-guia-out').value.includes('🍃*VidanovaStore®*') && $('#lg-guia-out').value.includes('*$97.400*'), 'Tienda y precio sin espacio');
     assert.ok($$('#lg-guia-form .lg-bad').length === 0 && $$('.lg-err').every((e) => e.textContent === ''), 'Sin errores tras generar');
     assert.strictEqual(PYL.app.state.logistics.cards.guia.last, esperado);
     // Editar después no cambia el mensaje hasta volver a generar.
