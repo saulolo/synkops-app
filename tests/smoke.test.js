@@ -58,6 +58,38 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   assert.strictEqual(PYL.services.storage.hub.load(), null, 'hub.load sin localStorage');
   assert.strictEqual(PYL.services.storage.hub.save({ v: 1, items: [] }), false, 'hub.save sin localStorage avisa con false');
 
+  // 1c. SPEC 18: tarjeta de Inicio (saludo, frase, Synkops, eyebrow, slogan, descripción y dos botones).
+  {
+    const hero = document.querySelector('#v-dash .hero');
+    const txt = (n) => n.textContent.replace(/\s+/g, ' ').trim();
+    const hijos = (n) => [...n.children].map((c) => c.id || c.tagName.toLowerCase() + '.' + (c.getAttribute('class') || '').split(' ').pop());
+    assert.deepStrictEqual(hijos(hero), ['div.home-band', 'div.', 'svg.hero-art'], 'Franja de ancho completo arriba, luego texto e ilustración');
+    assert.deepStrictEqual(hijos(hero.querySelector('.home-band')), ['home-hello', 'home-quote'], 'Saludo y, seguida, la frase');
+    assert.deepStrictEqual(hijos(hero.children[1]), ['h1.', 'div.hero-eyebrow', 'p.hero-slogan', 'p.lead', 'div.mt'], 'Orden del texto de la tarjeta');
+    assert.ok(!document.getElementById('home-hello').textContent.includes('👋'), 'El saludo va sin emoji');
+    assert.strictEqual(document.querySelector('#home-hello .home-name').textContent, 'Saúl', 'El nombre va en su propio renglón, debajo del saludo');
+    assert.ok(/^(Buenos días|Buenas tardes|Buenas noches),$/.test(document.querySelector('#home-hello .home-greet').textContent));
+    assert.ok(/^(Buenos días|Buenas tardes|Buenas noches), Saúl$/.test(txt(document.getElementById('home-hello'))), 'Saludo según la hora');
+    assert.strictEqual(txt(hero.querySelector('h1')), 'Synkops');
+    assert.strictEqual(txt(hero.querySelector('.hero-eyebrow')), 'Mi copiloto de ecommerce');
+    assert.ok(hero.querySelector('.hero-eyebrow svg'), 'El eyebrow conserva el ícono');
+    assert.strictEqual(txt(hero.querySelector('.hero-slogan')), 'Cada peso medido, cada paso conectado');
+    assert.ok(hero.querySelector('.hero-slogan').classList.contains('grad'), 'El slogan va con degradado');
+    assert.strictEqual(txt(hero.querySelector('.lead')), 'Synkops es el centro de mando de mi ecommerce, donde todo mi negocio vive en un solo lugar. Desde encontrar y costear un producto hasta lanzarlo, testearlo y escalarlo, con el método NovaSociety y mi experiencia propia.');
+    const botones = [...hero.querySelectorAll('.row.mt button')];
+    assert.deepStrictEqual(botones.map((b) => [txt(b), b.dataset.go, b.className]), [
+      ['Empezar por buscar producto', 'buscar', 'btn big'], ['Costear producto', 'costeo', 'btn ghost big']], 'Dos botones nuevos');
+    assert.ok(botones.every((b) => b.querySelector('svg')), 'Cada botón trae su ícono');
+    for (const b of botones) {
+      b.click();
+      assert.deepStrictEqual([...document.querySelectorAll('.view.on')].map((v) => v.id), ['v-' + b.dataset.go], `${txt(b)} abre su pestaña`);
+    }
+    document.querySelector('#tabs [data-v="dash"]').click();
+    for (const viejo of ['Mi copiloto de pauta', 'Lectura de campañas', 'Empezar por el costeo', 'Evaluar un conjunto']) {
+      assert.ok(!document.body.textContent.includes(viejo), 'Ya no existe: ' + viejo);
+    }
+  }
+
   // 2. Las 11 pestañas abren su vista y marcan aria-current.
   const tabs = [...document.querySelectorAll('#tabs button')];
   assert.strictEqual(tabs.length, 11, 'Debe haber 11 pestañas');
@@ -2217,13 +2249,30 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.deepStrictEqual([...doc4.querySelectorAll('.view.on')].map((v) => v.id), ['v-logistica'], 'Cambiar de pestaña sigue funcionando');
     assert.strictEqual(store['ns_view'], JSON.stringify('logistica'), 'Ya no se guarda la vista: el valor viejo queda tal cual');
     d4.window.close();
+  }).then(() => {
+    // SPEC 18: frases locales. Inicio muestra la frase de la media jornada, que sale de la lista y trae su etiqueta.
+    return fresca();
+  }).then((d5) => {
+    const W5 = d5.window, doc5 = W5.document;
+    const lista = W5.PYL.core.homeQuotes.HOME_QUOTES, esperada = W5.PYL.core.home.homePick(lista, new W5.Date());
+    const q5 = doc5.getElementById('home-quote');
+    assert.ok(!q5.hidden, 'La frase se ve');
+    assert.strictEqual(doc5.getElementById('home-quote-text').textContent, `“${esperada.text}”`);
+    assert.strictEqual(doc5.getElementById('home-quote-author').textContent, `— ${esperada.author}`);
+    assert.strictEqual(q5.querySelector('.home-quote-label').textContent, esperada.label, 'Etiqueta de la media jornada');
+    assert.ok(lista.some((q) => q.text === esperada.text && q.author === esperada.author), 'La frase sale de la lista');
+    assert.deepStrictEqual(JSON.parse(JSON.stringify(W5.PYL.app.state.home)), { slot: esperada.slot, text: esperada.text, author: esperada.author });
+    W5.close();
   }).then(() => new Promise((ok) => setTimeout(ok, 200))).then(() => {
+    // SPEC 18: en la página principal también hay frase (lista local, sin fetch).
+    assert.ok(!document.getElementById('home-quote').hidden, 'La frase se ve');
+    assert.ok(/^“.+”$/.test(document.getElementById('home-quote-text').textContent), 'Frase entre comillas');
     assert.ok(ladder.classList.contains('grown'), 'La escalera debe terminar crecida');
     // 7. Consola limpia salvo scrollTo.
     const malos = errores.filter((m) => !esperado(m));
     assert.deepStrictEqual(malos, [], 'Errores en consola:\n' + malos.join('\n'));
 
-    console.log(`OK smoke: ${Object.values(actual).flat().length} claves en PYL, ${tabs.length} pestañas, navegación, guía Hard Metrics y consola limpia`);
+    console.log(`OK smoke: ${Object.values(actual).flat().length} claves en PYL, ${tabs.length} pestañas, navegación, Inicio (saludo y frase del día), guía Hard Metrics y consola limpia`);
     window.close();
   });
 }).catch((e) => { console.error('FALLO smoke:', e.message); process.exit(1); });

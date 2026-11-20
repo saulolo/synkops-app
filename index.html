@@ -23,6 +23,7 @@
 <link rel="stylesheet" href="css/modules/scaling.css">
 <link rel="stylesheet" href="css/modules/logistics.css">
 <link rel="stylesheet" href="css/modules/hub.css">
+<link rel="stylesheet" href="css/modules/home.css">
 <link rel="stylesheet" href="css/themes.css">
 <link rel="stylesheet" href="css/modules/pnl.css">
 <link rel="stylesheet" href="css/report.css">
@@ -70,19 +71,31 @@
 <!-- ================= DASHBOARD ================= -->
 <section class="view on" id="v-dash">
   <div class="card hero">
-    <div>
-      <div class="eyebrow">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-        Mi copiloto de pauta
+    <div class="home-band">
+      <p class="home-hello" id="home-hello"></p>
+      <div class="home-quote" id="home-quote">
+        <span class="home-quote-label"></span>
+        <span class="home-quote-text" id="home-quote-text"></span>
+        <span class="home-quote-author" id="home-quote-author"></span>
       </div>
-      <h1>Lectura de campañas <span class="grad grad-line">mis métricas antes de gastar</span></h1>
-      <p class="lead">Costeo, hard metrics, protocolo de testeo 20K / 30K / 40K, escalera de 15 niveles y pipeline de creativos. Todo conectado: lo que calculo en el costeo alimenta el resto de la app.</p>
+    </div>
+    <div>
+      <h1>Synkops</h1>
+      <div class="eyebrow hero-eyebrow">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        Mi copiloto de ecommerce
+      </div>
+      <p class="grad grad-line hero-slogan">Cada peso medido, cada paso conectado</p>
+      <p class="lead">Synkops es el centro de mando de mi ecommerce, donde todo mi negocio vive en un solo lugar. Desde encontrar y costear un producto hasta lanzarlo, testearlo y escalarlo, con el método NovaSociety y mi experiencia propia.</p>
       <div class="row mt">
-        <button class="btn big" data-go="costeo">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h2M12 11h2M16 11h0M8 15h2M12 15h2M8 18h8"/></svg>
-          Empezar por el costeo
+        <button class="btn big" data-go="buscar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+          Empezar por buscar producto
         </button>
-        <button class="btn ghost big" data-go="testeo">Evaluar un conjunto</button>
+        <button class="btn ghost big" data-go="costeo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h2M12 11h2M16 11h0M8 15h2M12 15h2M8 18h8"/></svg>
+          Costear producto
+        </button>
       </div>
     </div>
     <svg class="hero-art" viewBox="0 0 460 340" role="img" aria-label="Ilustración: teléfono con un anuncio y tarjetas de métricas flotando">
@@ -1151,6 +1164,8 @@
 <script src="js/modules/cheat/core/cheat.js"></script>
 <script src="js/modules/logistics/core/logistics.js"></script>
 <script src="js/modules/hub/core/hub.js"></script>
+<script src="js/modules/home/core/quotes.js"></script>
+<script src="js/modules/home/core/home.js"></script>
 <!-- Services: archivos y almacenamiento del navegador -->
 <script src="js/shared/services/storage.js"></script>
 <script src="js/shared/services/files.js"></script>
@@ -1186,6 +1201,7 @@
 <script src="js/modules/scaling/ui/scaling.js"></script>
 <script src="js/modules/logistics/ui/logistics.js"></script>
 <script src="js/modules/hub/ui/hub.js"></script>
+<script src="js/modules/home/ui/home.js"></script>
 <!-- App: estado, casos de uso y arranque (main.js va al final) -->
 <script src="js/app/state.js"></script>
 <script src="js/modules/pnl/app/filters.js"></script>
@@ -1204,6 +1220,7 @@
 <script src="js/modules/scaling/app/scaling.js"></script>
 <script src="js/modules/logistics/app/logistics.js"></script>
 <script src="js/modules/hub/app/hub.js"></script>
+<script src="js/modules/home/app/home.js"></script>
 <script src="js/modules/trainer/app/trainer.js"></script>
 <script src="js/app/nav.js"></script>
 <script src="js/app/main.js"></script>
