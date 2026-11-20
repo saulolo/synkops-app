@@ -11,7 +11,7 @@ const caso = (nombre, fn) => casos.push([nombre, fn]);
 
 caso('exporta todas las funciones del núcleo aplanadas', () => {
   const claves = Object.keys(core).sort().join(',');
-  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CH_CPA_READ,CH_HELP,CH_SIDES,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,HUB_DEFAULTS,HUB_VERSION,LADDER_BLOCKS,LANDING,LEVELS,LG_ACCOUNTS,LG_BANK,LG_CATALOG,LG_DAYS,LG_NEQUI,LG_PARTS,LG_STAGES,LG_STORE,LG_TEMPLATES,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,chChain,chHard,chPlat,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,hubAdd,hubCheck,hubClean,hubDefaults,hubDomain,hubFavicon,hubInitials,hubLoad,hubOrder,hubRemove,hubSet,hubUrl,isDropi,isMetrics,key,kpis,lgForm,lgFromCand,lgMessage,lgMoney,lgMoneyText,lgPhone,lgPrefill,lgTemplate,lgValues,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
+  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CH_CPA_READ,CH_HELP,CH_SIDES,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,HOME_EPOCH,HOME_NAME,HOME_QUOTES,HOME_SEED,HOME_SLOTS,HUB_DEFAULTS,HUB_VERSION,LADDER_BLOCKS,LANDING,LEVELS,LG_ACCOUNTS,LG_BANK,LG_CATALOG,LG_DAYS,LG_NEQUI,LG_PARTS,LG_STAGES,LG_STORE,LG_TEMPLATES,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,chChain,chHard,chPlat,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,homeDay,homeGreeting,homeHello,homeOrder,homePick,homeSlot,hubAdd,hubCheck,hubClean,hubDefaults,hubDomain,hubFavicon,hubInitials,hubLoad,hubOrder,hubRemove,hubSet,hubUrl,isDropi,isMetrics,key,kpis,lgForm,lgFromCand,lgMessage,lgMoney,lgMoneyText,lgPhone,lgPrefill,lgTemplate,lgValues,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
 });
 
 caso('Costeo: proveedor 30.000 da precio $99.900 y tope $21.617', () => {
@@ -1723,6 +1723,72 @@ caso('Centro de mando: hubCheck, hubAdd, hubOrder, hubRemove y hubSet', () => {
   const ren = core.hubSet(base, 'a', { name: 'Mi gran tienda' });
   assert.strictEqual(ren[0].ini, 'MGT');
   assert.strictEqual(base[0].ini, 'A');
+});
+
+caso('Inicio: saludo según la hora', () => {
+  const h = (hour) => core.homeGreeting(hour);
+  assert.strictEqual(h(4), 'Buenas noches');
+  assert.strictEqual(h(5), 'Buenos días');
+  assert.strictEqual(h(11), 'Buenos días');
+  assert.strictEqual(h(12), 'Buenas tardes');
+  assert.strictEqual(h(18), 'Buenas tardes');
+  assert.strictEqual(h(19), 'Buenas noches');
+  assert.strictEqual(h(23), 'Buenas noches');
+  assert.strictEqual(h(0), 'Buenas noches');
+  assert.strictEqual(core.HOME_NAME, 'Saúl');
+  assert.strictEqual(core.homeHello(10), 'Buenos días, Saúl');
+  assert.strictEqual(core.homeHello(15), 'Buenas tardes, Saúl');
+  assert.strictEqual(core.homeHello(21), 'Buenas noches, Saúl');
+  assert.strictEqual(core.homeHello(3), 'Buenas noches, Saúl');
+});
+
+caso('Inicio: lista local de frases (HOME_QUOTES)', () => {
+  const Q = core.HOME_QUOTES;
+  assert.strictEqual(Q.length, 864, '365 + 500 sin la repetida');
+  const norm = (t) => t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
+  assert.strictEqual(new Set(Q.map((q) => norm(q.text))).size, Q.length, 'Sin frases repetidas');
+  for (const q of Q) {
+    assert.deepStrictEqual(Object.keys(q).sort(), ['author', 'text'], 'Solo text y author');
+    assert.ok(q.text && q.text === q.text.trim() && q.text.length <= 200, 'Texto no vacío, sin espacios sobrantes y de hasta 200 caracteres: ' + q.text);
+    assert.ok(q.author && q.author === q.author.trim(), 'Autor presente: ' + q.text);
+    assert.ok(!/^["“«]|["”»]$/.test(q.text), 'Sin comillas externas: ' + q.text);
+  }
+});
+
+caso('Inicio: media jornada, día y baraja', () => {
+  assert.strictEqual(core.homeSlot(0), 0);
+  assert.strictEqual(core.homeSlot(11), 0);
+  assert.strictEqual(core.homeSlot(12), 1);
+  assert.strictEqual(core.homeSlot(23), 1);
+  assert.strictEqual(core.homeDay(new Date(2026, 0, 1, 23, 59)), 0);
+  assert.strictEqual(core.homeDay(new Date(2026, 0, 2, 0, 0)), 1);
+  assert.strictEqual(core.homeDay(new Date(2025, 11, 31, 12)), -1);
+  assert.strictEqual(core.homeDay(new Date(2027, 0, 1)), 365);
+  const p = core.homeOrder(864, 18);
+  assert.deepStrictEqual([...p].sort((a, b) => a - b), Array.from({ length: 864 }, (_, i) => i), 'Es una permutación');
+  assert.deepStrictEqual(core.homeOrder(864, 18), p, 'Misma semilla, mismo orden');
+  assert.notDeepStrictEqual(core.homeOrder(864, 19), p, 'Otra semilla, otro orden');
+  assert.notDeepStrictEqual(p.slice(0, 20), Array.from({ length: 20 }, (_, i) => i), 'Barajada, no en orden');
+});
+
+caso('Inicio: homePick da una frase en la mañana y otra en la tarde, sin repetir', () => {
+  const Q = core.HOME_QUOTES;
+  const at = (y, m, d, h) => core.homePick(Q, new Date(y, m, d, h, 30));
+  const m1 = at(2026, 10, 20, 0), m2 = at(2026, 10, 20, 11), t1 = at(2026, 10, 20, 12), t2 = at(2026, 10, 20, 23);
+  assert.deepStrictEqual(m1, m2, 'Toda la mañana la misma frase');
+  assert.deepStrictEqual(t1, t2, 'Toda la tarde (y la noche) la misma frase');
+  assert.notStrictEqual(m1.text, t1.text, 'Mañana y tarde distintas');
+  assert.strictEqual(m1.slot, 0); assert.strictEqual(m1.label, 'Frase de la mañana:');
+  assert.strictEqual(t1.slot, 1); assert.strictEqual(t1.label, 'FRASE DE HOY');
+  assert.notStrictEqual(at(2026, 10, 21, 9).text, m1.text, 'Al día siguiente cambia');
+  assert.ok(Q.some((q) => q.text === m1.text && q.author === m1.author), 'Sale de la lista');
+  // Una vuelta completa (432 días = 864 medias jornadas) usa cada frase una sola vez; luego empieza otra baraja.
+  const vistos = new Set();
+  for (let d = 0; d < Q.length / 2; d++) for (const h of [8, 15]) vistos.add(core.homePick(Q, new Date(2026, 0, 1 + d, h)).text);
+  assert.strictEqual(vistos.size, Q.length, 'Ninguna se repite hasta usarlas todas');
+  assert.ok(core.homePick(Q, new Date(2025, 5, 1, 8)), 'Fechas antes del inicio también dan frase');
+  assert.strictEqual(core.homePick([], new Date()), null);
+  assert.deepStrictEqual(core.homePick([{ text: 'A', author: 'B' }], new Date(2026, 3, 3, 14)), { slot: 1, label: 'FRASE DE HOY', text: 'A', author: 'B' });
 });
 
 let fallos = 0;

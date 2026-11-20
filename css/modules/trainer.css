@@ -4,6 +4,9 @@
 .hero h1{font-size:38px}
 .hero .grad{background:linear-gradient(90deg,var(--b-ink),var(--b2-ink));-webkit-background-clip:text;background-clip:text;color:transparent}
 .hero .grad-line{display:block;font-size:.72em;white-space:nowrap;margin-top:4px;width:max-content;max-width:100%}
+/* SPEC 18: el eyebrow va entre «Synkops» y el slogan; el slogan sale del h1 con el mismo tamaño (.72 × 38px) y peso. */
+.hero .hero-eyebrow{display:flex;margin:8px 0 0}
+.hero .hero-slogan{font-size:27px;font-weight:900;line-height:1.12;letter-spacing:-.025em;margin:6px 0 0}
 .hero-art{width:100%;max-width:470px;justify-self:end}
 .float{animation:float 5s ease-in-out infinite}
 .float.d2{animation-delay:-1.6s}.float.d3{animation-delay:-3.1s}
@@ -192,6 +195,7 @@
   .hero{grid-template-columns:1fr;padding:24px}
   .hero-art{justify-self:center}
   .hero h1{font-size:30px}
+  .hero .hero-slogan{font-size:22px;white-space:normal}
   h1{font-size:26px}
   .top-in{padding:10px 14px}
   main.main{padding:20px 14px 70px}

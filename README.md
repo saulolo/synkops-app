@@ -29,6 +29,7 @@ leer el testeo y medir la utilidad real cruzando **Dropi** con **Meta Ads**.
 - [🧩 Las partes de la app](#-las-partes-de-la-app)
 - [✨ Qué hace en 30 segundos](#-qué-hace-en-30-segundos)
 - [🚀 Empieza en 4 pasos](#-empieza-en-4-pasos)
+- [🏠 Inicio: saludo y frase del día](#-inicio-saludo-y-frase-del-día)
 - [🏠 Centro de mando](#-centro-de-mando)
 - [🔎 Buscar producto](#-buscar-producto)
 - [🛍️ Desarrollo de la landing](#️-desarrollo-de-la-landing)
@@ -58,7 +59,7 @@ Todo vive en una sola página (`index.html`). Siempre abre en **Inicio**, aunque
 
 | Pestaña | Para qué sirve |
 |---|---|
-| 🏠 **Inicio** | Resumen del método de Juan Herrera (NovaSociety), la cadena CPM → CPC → CPPI → CPA y el **Centro de mando** con accesos directos a mis herramientas. |
+| 🏠 **Inicio** | Me saluda según la hora y me muestra una **frase del día** (una por la mañana y otra por la tarde), presenta Synkops con dos botones (buscar y costear un producto) y trae el resumen del método de Juan Herrera (NovaSociety), la cadena CPM → CPC → CPPI → CPA y el **Centro de mando** con accesos directos a mis herramientas. |
 | 🔎 **Buscar producto** | Encontrar y evaluar un producto antes de gastar: flujograma de DropKiller, mi candidato con score, bitácora y estrategias de búsqueda. Un botón flotante guarda productos al vuelo y otro arma el prompt para buscar en DropKiller. |
 | 🧮 **Costeo** | Cuánto cobrar, cuánto me queda por pedido entregado y mi CPA máximo. |
 | 🛍️ **Desarrollo** | Montar la landing del producto en Shopify y crear su campaña en Meta Ads, paso a paso. |
@@ -106,6 +107,18 @@ En contra entrega (COD) lo que vende Meta **no** es lo que entra a tu bolsillo: 
 
 > [!NOTE]
 > La primera vez necesitas internet: la app descarga la librería que lee archivos Excel y las tipografías. Tus datos nunca se envían a ningún lado.
+
+---
+
+## 🏠 Inicio: saludo y frase del día
+
+La tarjeta principal de **Inicio** recibe a Saúl y presenta la app:
+
+- **Saludo:** «Buenos días» (05:00 a 11:59), «Buenas tardes» (12:00 a 18:59) o «Buenas noches» (19:00 a 04:59), con el nombre debajo. Se calcula al abrir la página.
+- **Frase del día, dos por día:** una de 00:00 a 11:59 («Frase de la mañana:») y otra de 12:00 a 23:59 («FRASE DE HOY»; de noche se ve esa). Salen de una lista de 864 frases de libros de mentalidad y finanzas y de personajes célebres, sin repetir ninguna hasta usarlas todas. Recargar el mismo día muestra las mismas dos. Funciona sin internet.
+- **Presentación:** «Synkops», «Mi copiloto de ecommerce», el slogan «Cada peso medido, cada paso conectado», una descripción corta y dos botones: **Empezar por buscar producto** y **Costear producto**.
+
+Para agregar o quitar frases se edita `js/modules/home/core/quotes.js`. Hay una copia de referencia de la lista en `docs/referencia/frases.json` (la app no la lee: con `file://` el navegador no deja cargar archivos `.json`). Tras cambiar la cantidad, ajusta el número que espera la prueba «Inicio: lista local de frases» en `tests/core.test.js`.
 
 ---
 
@@ -596,6 +609,7 @@ img/
 
 docs/referencia/
   novasociety-metricas-v2.html   Prototipo original del entrenador (referencia, no se carga)
+  frases.json                    Las 864 frases de Inicio (copia de referencia; la app lee js/modules/home/core/quotes.js)
 
 css/
   base.css            Sistema de diseño: tokens, barra superior, tarjetas, botones, campos, tablas,
@@ -612,6 +626,7 @@ css/
     metrics.css       Métricas: ruta, diagrama de métricas duras, avisos, panel "i", botón Expandir y tabla de Métricas base
     testing.css       Testeo: barra de gasto, tarjetas de corte, práctica y Simulador
     logistics.css     Logística: contenedor de mensajes, rejilla de tarjetas, chip de etapa, botones y campo condicional
+    home.css          Inicio: franja de saludo y frase de la tarjeta principal (SPEC 18)
   themes.css          Selector de tema, modo claro, temas oscuros y SVG con colores fijos
   modules/pnl.css     Solo lo propio del Tablero P&L (acotado a #v-pyl)
   report.css          Informe PDF: documento claro en A4, visible solo al imprimir
@@ -677,6 +692,11 @@ js/
       core/logistics.js Constantes de la tienda (LG_STORE, LG_ACCOUNTS…), las 14 plantillas (LG_TEMPLATES), sus textos, validación (lgValues, lgMoney, lgPhone, ID solo números) y lgFromCand (Mi candidato); sin DOM
       ui/logistics.js Sub-pestañas, tarjeta por plantilla (chip de etapa, campos, mensaje y botones) y campos condicionales
       app/logistics.js Estado (app.state.logistics), Generar, Copiar, Limpiar y Traer de Desarrollo / de Mi candidato; reparte las tarjetas por grupo; no guarda nada
+    home/             Tarjeta principal de Inicio: saludo y frase del día (SPEC 18)
+      core/quotes.js  Lista local HOME_QUOTES (864 frases únicas con autor)
+      core/home.js    Saludo por hora, media jornada, baraja con semilla y homePick; sin DOM ni red
+      ui/home.js      Pinta el saludo (dos renglones) y la frase con su etiqueta
+      app/home.js     Elige la frase al cargar y guarda app.state.home; no usa red ni localStorage
     trainer/
       app/trainer.js  Entrenador de métricas (fase 1: copiado del prototipo)
 
@@ -691,7 +711,7 @@ js/
 
 - **Sin `import`/`export`.** Los navegadores bloquean los ES modules en `file://`. Cada archivo es un IIFE que publica su API en el namespace global `PYL` (`PYL.core.pnl`, `PYL.ui.funnel`, etc.).
 - **El orden importa.** `index.html` carga los scripts en el orden de las capas (`core → services → ui → app`; dentro de cada capa, `shared` y luego los módulos), con `app/nav.js` antes de `main.js`. Los `<link>` de CSS también van en un orden fijo (ver el árbol). Un archivo nuevo va en `modules/<módulo>/<capa>/`, o en `shared/` si lo usan varios módulos, antes de los que lo usan.
-- **Carpeta = módulo, namespace = capa.** `js/modules/search/core/search.js` publica `PYL.core.search`. Un módulo solo usa `shared/` y los módulos que se cargan antes (`search` usa `pnl`; `quick` usa `search`; `hub` solo usa `shared/` (y la clase `.cd-act.del` de `search.css`); `dkprompt` solo usa `shared/` (se coordina con `quick` por el evento `flotante:abierto`); `adprompt` usa `search` (candidato abierto) y los estilos de `dkprompt` y `quick`; `ads` usa `landing` y `search`; `metrics` solo usa `shared/`; `testing` usa `metrics`, `ads` y `landing`; `scaling` usa `metrics` y `testing`; `trainer` usa `search`).
+- **Carpeta = módulo, namespace = capa.** `js/modules/search/core/search.js` publica `PYL.core.search`. Un módulo solo usa `shared/` y los módulos que se cargan antes (`search` usa `pnl`; `quick` usa `search`; `hub` solo usa `shared/` (y la clase `.cd-act.del` de `search.css`); `home` solo usa `shared/`; `dkprompt` solo usa `shared/` (se coordina con `quick` por el evento `flotante:abierto`); `adprompt` usa `search` (candidato abierto) y los estilos de `dkprompt` y `quick`; `ads` usa `landing` y `search`; `metrics` solo usa `shared/`; `testing` usa `metrics`, `ads` y `landing`; `scaling` usa `metrics` y `testing`; `trainer` usa `search`).
 - **La navegación es de toda la app.** `app/nav.js` abre la vista y dispara `nav:vista`; cada módulo reacciona a ese evento.
 - **Solo la capa `app` modifica el estado.** Los componentes de `ui` reciben datos y callbacks (`onSelect`, `onAssign`).
 - **Los diagnósticos devuelven datos, no HTML.** El texto con formato se representa como segmentos: un string es texto plano, `{ b: '...' }` va en negrita y `{ a: '...', href }` es un enlace que abre en pestaña nueva. `shared/ui/dom.js` (`rich`) los pinta.
@@ -716,7 +736,7 @@ NODE_PATH=<carpeta>/node_modules node tests/smoke.test.js   # abre index.html en
 node --check archivo.js                                      # sintaxis de un archivo
 ```
 
-`smoke.test.js` necesita **jsdom** (`npm i jsdom@26` en una carpeta fuera del repo): revisa las claves de `PYL.*`, que las 11 pestañas abran, los eventos de navegación y que la consola esté limpia. Si agregas o quitas una clave de `PYL.*`, regenera `tests/fixtures/claves-pyl.json` con `node tests/smoke.test.js --claves`.
+`smoke.test.js` necesita **jsdom** (`npm i jsdom@26` en una carpeta fuera del repo): revisa las claves de `PYL.*`, la tarjeta de Inicio (saludo, frase y botones), que las 11 pestañas abran, los eventos de navegación y que la consola esté limpia. Si agregas o quitas una clave de `PYL.*`, regenera `tests/fixtures/claves-pyl.json` con `node tests/smoke.test.js --claves`.
 
 ### Cómo se desarrolla (SDD)
 
@@ -792,7 +812,7 @@ Agradezco sinceramente el tiempo dedicado a revisar este proyecto. Valoro cualqu
 | **Autor** | Saul Echeverri |
 | **Versión** | 1.1.0 |
 | **Fecha de creación** | 12 de octubre de 2026 |
-| **Última actualización** | 7 de noviembre de 2026 |
+| **Última actualización** | 20 de noviembre de 2026 |
 | **Notas adicionales** | Aplicación web local (HTML, CSS y JavaScript sin dependencias de compilación) con el método de NovaSociety: buscar y evaluar productos, montar la landing en Shopify, entrenador de métricas y el P&L real contra entrega cruzando Dropi y Meta Ads. |
 
 ---
