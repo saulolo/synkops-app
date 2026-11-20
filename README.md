@@ -54,7 +54,7 @@ leer el testeo y medir la utilidad real cruzando **Dropi** con **Meta Ads**.
 
 Synkops es mi app personal: hoy la uso solo en mi PC y en el navegador. Quiero que centralice y automatice mi ecommerce, pero todavía no se conecta directamente con Dropi, Shopify ni Meta: los datos entran subiendo archivos o escribiéndolos a mano.
 
-Todo vive en una sola página (`index.html`). Las pestañas de la barra superior siguen el orden en que trabajo un producto:
+Todo vive en una sola página (`index.html`). Siempre abre en **Inicio**, aunque la última vez la haya cerrado en otra pestaña. Las pestañas de la barra superior siguen el orden en que trabajo un producto:
 
 | Pestaña | Para qué sirve |
 |---|---|
@@ -196,7 +196,7 @@ Módulo 5 de NovaSociety: lo que hago a mano para montar el producto en Shopify.
 - Títulos y etiquetas con unidad, regalo y garantía; prompts de miniaturas.
 - **Reseñas** (TrustWill): primero reúno mínimo 6 imágenes reales del producto (Amazon o similares); si no existen, hay un prompt para generarlas con IA.
 - **Traer de mi candidato** llena nombre, ID de Dropi y precios desde Buscar producto.
-- **Meta Ads:** paso a paso según la estrategia que voy a montar (selector ABO / CBO; CBO aparece como "pronto"). ABO: campaña de testeo (1 campaña → 4 conjuntos → 1 anuncio con su video en cada uno, 30.000 al día por conjunto). Mapa informativo de la campaña, tabla "campo → valor" en cada paso, nombre de la campaña (día de mañana, mes y primer nombre del producto), fecha de inicio (mañana, 5:00 a. m.), URL de la product page con identificador editable, ciudades excluidas de Lugares y prompt de 3 copies, títulos y descripciones.
+- **Meta Ads:** paso a paso según la estrategia que voy a montar (selector ABO / CBO; CBO aparece como "pronto"). ABO: campaña de testeo (1 campaña → 4 conjuntos → 1 anuncio con su video en cada uno, 30.000 al día por conjunto). Mapa informativo de la campaña, tabla "campo → valor" en cada paso, nombre de la campaña (día de mañana, mes y primer nombre del producto), fecha de inicio (mañana, 5:00 a. m.), URL de la product page con identificador editable, ciudades excluidas de Lugares (al día con Meta; Amazonas, Guainía, Vaupés y Vichada completos) y prompt de 3 copies, títulos y descripciones.
 - TikTok Ads aparece como "pronto".
 
 ### 📣 Prompt buscar anuncios
@@ -283,7 +283,7 @@ Tiene tres sub-pestañas: **📂 Lectura real · pronto** (subir el reporte de m
 | Confirmar | Reconfirmación de Pedido | Cliente |
 | Confirmar | Tercer Intento (llamada sin respuesta) | Cliente, producto y ciudad |
 | Confirmar | Pedido Confirmado | Casilla de obsequio |
-| Envío | Confirmación de Guia | Destinatario, producto, guía, precio y dirección |
+| Envío | Confirmación de Guia | Destinatario, producto, guía, transportadora (sale en MAYÚSCULAS), precio y dirección |
 | Envío | Envío de Infografía | Producto |
 | Cobro | Solicitud de Anticipo | Cliente, producto y valor del anticipo |
 | Envío | Reintento de Entrega | Cliente y producto |
@@ -299,6 +299,8 @@ Tiene tres sub-pestañas: **📂 Lectura real · pronto** (subir el reporte de m
 ## 🎨 Temas
 
 El botón de tema de la barra superior cambia los colores de toda la app: **Dark** (por defecto), **Light**, **Gold** (negro y amarillo NovaSociety), **Ember**, **IntelliJ Dark**, **IntelliJ Gold** y **Nebula**. La app recuerda el que elegí.
+
+El logo es un pulso: en la pestaña del navegador (favicon) siempre sale dorado; en la barra superior sigue el tema y late como un monitor cardíaco (más rápido con el cursor encima, quieto si el sistema pide reducir movimiento).
 
 ---
 
@@ -590,6 +592,7 @@ specs/                Specs del proyecto; 00-estado-actual.md es la línea base
 
 img/
   autor.png           Logo del autor (pie de la app y del informe)
+  favicon.svg         Favicon de Synkops: pulso sobre dorado (SPEC 17)
 
 docs/referencia/
   novasociety-metricas-v2.html   Prototipo original del entrenador (referencia, no se carga)
