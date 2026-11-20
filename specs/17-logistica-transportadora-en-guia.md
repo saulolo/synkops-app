@@ -1,6 +1,6 @@
 # SPEC 17 — Logística: transportadora en Confirmación de Guia y arranque siempre en Inicio, ciudades excluidas al día y favicon
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 13, SPEC 15
 > **Fecha:** 2026-11-20
 > **Objetivo:** (1) Sumar a la tarjeta «Confirmación de Guia» el campo obligatorio «Transportadora», que el mensaje imprime siempre en MAYÚSCULAS debajo del número de guía. (2) Que la app arranque siempre en Inicio, aunque la última vez se haya cerrado en otra pestaña. (3) Poner al día las ciudades excluidas de Meta Ads en Desarrollo. (4) Darle a la app un favicon propio y usar el mismo pulso como logo de la barra superior.
