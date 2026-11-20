@@ -19,25 +19,29 @@
     ig: 'VidanovaStoreOficial',
   };
 
-  // Ciudades que excluyo en Audiencia → Lugares, por departamento y escritas tal como salen en Meta.
+  // Ciudades que excluyo en Audiencia → Lugares (Inclusión: Colombia), por departamento, en el orden y con los nombres de Meta.
+  // Un departamento excluido completo lleva un solo valor: 'Todo el departamento'.
+  const ALL_DEPT = ['Todo el departamento'];
   const EXCLUDED = [
-    ['Antioquia', ['Amagá', 'Amalfi', 'Santa Fe de Antioquia', 'Caicedo', 'Ciudad Bolívar (Antioquia)', 'Guatapé', 'San Andrés de Cuerquia', 'Santa Fe De Antioquia', 'Santuario', 'Tarso']],
-    ['Arauca', ['Arauca', 'Arauquita', 'Cravo', 'Tame', 'Valparaíso']],
-    ['Caquetá', ['Albania (Caquetá)', 'Belén', 'Belén Del Andaquí', 'Belén De Los Andaquíes', 'Morelia (Caquetá)', 'Puerto Rico (Caquetá)', 'Puerto Solano', 'San José del Fragua', 'San Vicente De Caguán', 'San Vicente del Caguán', 'Solano', 'Valparaíso']],
+    ['Amazonas', ALL_DEPT],
+    ['Antioquia', ['Caicedo', 'San Andrés de Cuerquia', 'Tarso']],
+    ['Arauca', ['Arauca', 'Arauquita', 'Cravo', 'Tame']],
+    ['Caquetá', ['Albania (Caquetá)', 'Belén De Los Andaquíes', 'Morelia (Caquetá)', 'Puerto Rico (Caquetá)', 'Puerto Solano', 'San José del Fragua', 'San Vicente De Caguán', 'Solano']],
     ['Chocó', ['Bahía Solano']],
+    ['Guainía', ALL_DEPT],
     ['Huila', ['Isnos', 'San José De Isnos']],
     ['Magdalena', ['Nueva Granada (Magdalena)']],
     ['Meta', ['Guamal']],
-    ['Norte de Santander', ['San José De Cúcuta']],
     ['Putumayo', ['La Hormiga', 'Puerto Asís', 'Puerto Guzmán', 'Villagarzón']],
-    ['Risaralda', ['Morelia', 'Caldas']],
     ['San Andrés y Providencia', ['San Andrés (San Andrés y Providencia)', 'Providencia']],
     ['Santander', ['Carcasí']],
     ['Sucre', ['El Francés', 'El Islote', 'El Roble']],
     ['Tolima', ['Venadillo']],
-    ['Casanare', ['El Yopal', 'Valparaíso', 'Villanueva (Casanare)', 'Yopalito', 'Yopal']],
-    ['Cundinamarca', ['Chipaque', 'Cogua', 'Fómeque', 'Pacho', 'Quebradanegra', 'Quito']],
-    ['Boyacá', ['Jericó', 'Nobsa']],
+    ['Vaupés', ALL_DEPT],
+    ['Vichada', ALL_DEPT],
+    ['Casanare', ['Villanueva (Casanare)']],
+    ['Cundinamarca', ['Fómeque', 'Quebradanegra', 'Quito']],
+    ['Boyacá', ['Jericó']],
   ];
 
   const LEVELS = { camp: 'Campaña', set: 'Conjunto de anuncios', ad: 'Anuncio', all: 'Toda la campaña' };

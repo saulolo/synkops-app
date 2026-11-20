@@ -65,6 +65,7 @@ ${LG_BANK}`;
         { k: 'name', label: 'Nombre del destinatario', type: 'text', ph: 'Ej: Pablo' },
         { k: 'product', label: 'Producto', type: 'text', from: 'name', ph: 'Ej: Omegaxl joint support' },
         { k: 'guide', label: 'Número de guía', type: 'text', ph: 'Ej: 074102602224' },
+        { k: 'carrier', label: 'Transportadora', type: 'text', ph: 'Ej: ENVIA' },
         { k: 'price', label: 'Precio', type: 'money', from: 'price', ph: 'Ej: $ 97.400' },
         { k: 'address', label: 'Dirección de entrega', type: 'text', ph: 'Ej: Cra 67 # 25 - 34 Itagui - Calatrava' },
       ] },
@@ -330,6 +331,7 @@ El *envío* es totalmente *Gratis* y el pago es *Contra Entrega* para tu segurid
 Te confirmamos que tu pedido de la *${v.product}* ya fue empacado y entregado a la transportadora. 📦✨
 
 🚚 *Número de Guía*: ${v.guide}
+🚛 *Transportadora*: ${String(v.carrier || '').toLocaleUpperCase('es-CO')}
 🔗 *Rastreo*: Puedes consultar el estado de tu paquete directamente en la página web de la transportadora con ese número de guía.
 
 El tiempo estimado de entrega es de *${LG_DAYS} días hábiles*.

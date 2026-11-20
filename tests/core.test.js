@@ -1117,9 +1117,9 @@ caso('logistics: lgTemplate cae en la primera con una clave desconocida', () => 
   assert.strictEqual(core.lgTemplate('guia').k, 'guia');
   assert.strictEqual(core.lgTemplate('x').k, 'pedido');
   assert.strictEqual(core.lgTemplate().k, 'pedido');
-  assert.deepStrictEqual(core.lgTemplate('guia').fields.map((f) => f.k), ['name', 'product', 'guide', 'price', 'address']);
+  assert.deepStrictEqual(core.lgTemplate('guia').fields.map((f) => f.k), ['name', 'product', 'guide', 'carrier', 'price', 'address']);
   assert.strictEqual(core.LG_DAYS, '2 a 4', 'El tiempo de entrega es fijo');
-  assert.deepStrictEqual(core.lgTemplate('guia').fields.map((f) => f.ph), ['Ej: Pablo', 'Ej: Omegaxl joint support', 'Ej: 074102602224', 'Ej: $ 97.400', 'Ej: Cra 67 # 25 - 34 Itagui - Calatrava'], 'Cada campo trae su ejemplo');
+  assert.deepStrictEqual(core.lgTemplate('guia').fields.map((f) => f.ph), ['Ej: Pablo', 'Ej: Omegaxl joint support', 'Ej: 074102602224', 'Ej: ENVIA', 'Ej: $ 97.400', 'Ej: Cra 67 # 25 - 34 Itagui - Calatrava'], 'Cada campo trae su ejemplo');
   assert.deepStrictEqual(core.LG_PARTS.map((p) => [p.k, !!p.disabled]), [['msgs', false], ['track', true]]);
 });
 
@@ -1138,14 +1138,17 @@ caso('logistics: lgValues marca cada campo vacío y el precio inválido', () => 
   const tpl = core.lgTemplate('guia');
   const vacio = core.lgValues(tpl, {});
   assert.strictEqual(vacio.ok, false);
-  assert.deepStrictEqual(Object.keys(vacio.errors).sort(), ['address', 'guide', 'name', 'price', 'product']);
+  assert.deepStrictEqual(Object.keys(vacio.errors).sort(), ['address', 'carrier', 'guide', 'name', 'price', 'product']);
   assert.ok(/^Escribe /.test(vacio.errors.name));
-  const base = { name: ' Pablo ', product: 'Omegaxl joint support', guide: ' 074102602224 ', price: '$ 97.400', address: 'Cra 67 # 25 - 34 Itagui - Calatrava' };
+  assert.strictEqual(vacio.errors.carrier, 'Escribe transportadora');
+  assert.strictEqual(core.lgValues(tpl, { carrier: '   ' }).errors.carrier, 'Escribe transportadora', 'Solo espacios cuenta como vacío');
+  const base = { name: ' Pablo ', product: 'Omegaxl joint support', guide: ' 074102602224 ', carrier: ' envia ', price: '$ 97.400', address: 'Cra 67 # 25 - 34 Itagui - Calatrava' };
   const ok = core.lgValues(tpl, base);
   assert.strictEqual(ok.ok, true);
   assert.deepStrictEqual(ok.errors, {});
   assert.strictEqual(ok.values.name, 'Pablo');
   assert.strictEqual(ok.values.guide, '074102602224');
+  assert.strictEqual(ok.values.carrier, 'envia', 'El valor no se pasa a mayúsculas: eso lo hace el mensaje');
   assert.strictEqual(ok.values.price, 97400);
   const malo = core.lgValues(tpl, { ...base, price: 'abc' });
   assert.strictEqual(malo.ok, false);
@@ -1225,7 +1228,7 @@ caso('logistics: Pedido Confirmado es un mensaje fijo con un solo check de obseq
   const tpl = core.lgTemplate('confirmado');
   assert.deepStrictEqual(tpl.fields.map((f) => [f.k, f.type, f.label]), [['gift', 'check', 'Incluye obsequio']], 'Sin campos de ingreso: solo el check');
   assert.deepStrictEqual(core.lgForm(tpl), { gift: true }, 'El obsequio viene marcado por defecto');
-  assert.deepStrictEqual(core.lgForm(core.lgTemplate('guia')), { name: '', product: '', guide: '', price: '', address: '' }, 'Los campos de texto arrancan vacíos');
+  assert.deepStrictEqual(core.lgForm(core.lgTemplate('guia')), { name: '', product: '', guide: '', carrier: '', price: '', address: '' }, 'Los campos de texto arrancan vacíos');
   assert.deepStrictEqual(core.lgValues(tpl, { gift: true }), { ok: true, values: { gift: true }, errors: {} });
   assert.deepStrictEqual(core.lgValues(tpl, { gift: false }), { ok: true, values: { gift: false }, errors: {} }, 'Nunca da error');
   assert.strictEqual(core.lgValues(tpl, {}).ok, true);
@@ -1512,7 +1515,7 @@ caso('logistics: el producto sale en negrita y las cuentas salen de LG_ACCOUNTS'
   const P = 'Plant Pwr Calma Panico Polvora Mascotas';
   const casos = {
     pedido: { name: 'Eugenia', product: P, address: 'Calle 1', city: 'PASTO', dept: 'NARIÑO', phone: '3214566677', total: 97400 },
-    guia: { name: 'Pablo', product: P, guide: '074102602224', price: 97400, address: 'Calle 1' },
+    guia: { name: 'Pablo', product: P, guide: '074102602224', carrier: 'ENVIA', price: 97400, address: 'Calle 1' },
     tercero: { name: 'Eugenia', product: P, city: 'Pasto' },
     anticipo: { name: 'Eugenia', product: P, advance: 20000 },
     reintento: { name: 'Rafael', product: P },
@@ -1608,6 +1611,7 @@ caso('logistics: lgMessage es idéntico al texto de la spec', () => {
     'Te confirmamos que tu pedido de la *Omegaxl joint support* ya fue empacado y entregado a la transportadora. 📦✨',
     '',
     '🚚 *Número de Guía*: 074102602224',
+    '🚛 *Transportadora*: ENVIA',
     '🔗 *Rastreo*: Puedes consultar el estado de tu paquete directamente en la página web de la transportadora con ese número de guía.',
     '',
     'El tiempo estimado de entrega es de *2 a 4 días hábiles*.',
@@ -1615,11 +1619,39 @@ caso('logistics: lgMessage es idéntico al texto de la spec', () => {
     '',
     '¡Cualquier duda que tengas durante el camino, nos puedes escribir por aquí! Que tengas un excelente día. 😊',
   ].join('\n');
-  const v = { name: 'Pablo', product: 'Omegaxl joint support', guide: '074102602224', price: 97400, address: 'Cra 67 # 25 - 34 Itagui - Calatrava', days: '9 a 9' };
+  const v = { name: 'Pablo', product: 'Omegaxl joint support', guide: '074102602224', carrier: 'envia', price: 97400, address: 'Cra 67 # 25 - 34 Itagui - Calatrava', days: '9 a 9' };
   assert.strictEqual(core.lgMessage('guia', v), esperado, 'Aunque llegue otro days, el mensaje usa el fijo');
   assert.strictEqual(core.lgMessage('x', PEDIDO), core.lgMessage('pedido', PEDIDO), 'Una clave desconocida cae en la primera plantilla');
+  for (const c of ['envia', 'Envia', 'ENVIA']) assert.strictEqual(core.lgMessage('guia', { ...v, carrier: c }), esperado, `Transportadora «${c}» sale en mayúsculas`);
   assert.ok(core.lgMessage('guia', { ...v, price: 1234567 }).includes('*$1.234.567*'));
   assert.ok(core.LG_STORE === '🍃VidanovaStore®');
+});
+
+caso('Meta Ads: ciudades excluidas tal como están hoy en Meta (SPEC 17)', () => {
+  const TODO = ['Todo el departamento'];
+  assert.deepStrictEqual(core.EXCLUDED, [
+    ['Amazonas', TODO],
+    ['Antioquia', ['Caicedo', 'San Andrés de Cuerquia', 'Tarso']],
+    ['Arauca', ['Arauca', 'Arauquita', 'Cravo', 'Tame']],
+    ['Caquetá', ['Albania (Caquetá)', 'Belén De Los Andaquíes', 'Morelia (Caquetá)', 'Puerto Rico (Caquetá)', 'Puerto Solano', 'San José del Fragua', 'San Vicente De Caguán', 'Solano']],
+    ['Chocó', ['Bahía Solano']],
+    ['Guainía', TODO],
+    ['Huila', ['Isnos', 'San José De Isnos']],
+    ['Magdalena', ['Nueva Granada (Magdalena)']],
+    ['Meta', ['Guamal']],
+    ['Putumayo', ['La Hormiga', 'Puerto Asís', 'Puerto Guzmán', 'Villagarzón']],
+    ['San Andrés y Providencia', ['San Andrés (San Andrés y Providencia)', 'Providencia']],
+    ['Santander', ['Carcasí']],
+    ['Sucre', ['El Francés', 'El Islote', 'El Roble']],
+    ['Tolima', ['Venadillo']],
+    ['Vaupés', TODO],
+    ['Vichada', TODO],
+    ['Casanare', ['Villanueva (Casanare)']],
+    ['Cundinamarca', ['Fómeque', 'Quebradanegra', 'Quito']],
+    ['Boyacá', ['Jericó']],
+  ]);
+  const places = core.ABO_STEPS.flatMap((s) => s.items || []).find((it) => it.k === 'places');
+  assert.strictEqual(places.more.groups, core.EXCLUDED, 'El desplegable «Ver ciudades que excluyo» usa la lista');
 });
 
 caso('Centro de mando: iniciales, URL, dominio y favicon', () => {
