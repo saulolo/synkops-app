@@ -31,6 +31,7 @@ leer el testeo y medir la utilidad real cruzando **Dropi** con **Meta Ads**.
 - [🚀 Empieza en 4 pasos](#-empieza-en-4-pasos)
 - [🏠 Inicio: saludo y frase del día](#-inicio-saludo-y-frase-del-día)
 - [🏠 Centro de mando](#-centro-de-mando)
+- [📝 Mis tareas](#-mis-tareas)
 - [🔎 Buscar producto](#-buscar-producto)
 - [🛍️ Desarrollo de la landing](#️-desarrollo-de-la-landing)
 - [🎓 Entrenador de métricas](#-entrenador-de-métricas)
@@ -59,7 +60,7 @@ Todo vive en una sola página (`index.html`). Siempre abre en **Inicio**, aunque
 
 | Pestaña | Para qué sirve |
 |---|---|
-| 🏠 **Inicio** | Me saluda según la hora y me muestra una **frase del día** (una por la mañana y otra por la tarde), presenta Synkops con dos botones (buscar y costear un producto) y trae el resumen del método de Juan Herrera (NovaSociety), la cadena CPM → CPC → CPPI → CPA y el **Centro de mando** con accesos directos a mis herramientas. |
+| 🏠 **Inicio** | Me saluda según la hora y me muestra una **frase del día** (una por la mañana y otra por la tarde), presenta Synkops con dos botones (buscar y costear un producto) y trae el resumen del método de Juan Herrera (NovaSociety), la cadena CPM → CPC → CPPI → CPA, el **Centro de mando** con accesos directos a mis herramientas y **Mis tareas**, una nota adhesiva con las tareas del día. |
 | 🔎 **Buscar producto** | Encontrar y evaluar un producto antes de gastar: flujograma de DropKiller, mi candidato con score, bitácora y estrategias de búsqueda. Un botón flotante guarda productos al vuelo y otro arma el prompt para buscar en DropKiller. |
 | 🧮 **Costeo** | Cuánto cobrar, cuánto me queda por pedido entregado y mi CPA máximo. |
 | 🛍️ **Desarrollo** | Montar la landing del producto en Shopify y crear su campaña en Meta Ads, paso a paso. |
@@ -131,6 +132,21 @@ En **Inicio** tengo una tarjeta con botones pequeños hacia las herramientas que
 - **Reordenar:** mantengo presionado un botón y lo arrastro; el orden se guarda al soltar.
 - **Editar:** el botón **Editar** abre un panel donde cambio nombre y enlace, subo o quito el ícono (también con Ctrl+V), quito accesos y agrego nuevos. Nada se guarda hasta **Listo**; **Cancelar** descarta los cambios.
 - Se guarda solo en este navegador (clave `pyl-hub`).
+
+---
+
+## 📝 Mis tareas
+
+En **Inicio** tengo una nota adhesiva para organizar las tareas del día (port en el navegador de mi app de escritorio My Sticky Notes). En pantalla ancha (1680 px o más) es una columna en el margen izquierdo, espejo del Centro de mando, que me acompaña al bajar; en una pantalla más angosta queda bajo el encabezado, antes del Centro de mando. Las dos tarjetas laterales se destacan con un borde y una sombra con más relieve.
+
+- **Días:** pestañas **Ayer**, **Hoy** y **Mañana**; el reloj abre los días anteriores con tareas (se conservan los últimos 5 días). Siempre arranca en Hoy y a medianoche pasa sola al día nuevo.
+- **Tareas:** «+» abre la fila de añadir: hora (0–23; vacía = la actual) y texto, Enter crea. Cada tarea muestra su hora; la casilla la tacha; doble clic edita el texto o la hora; la papelera la borra sin preguntar.
+- **Subtareas:** el «+» de la fila agrega varias seguidas; el chip `hechas/total` se rellena en proporción y, con un clic en la fila, se contraen o expanden.
+- **Reordenar:** mantengo presionada una tarea, o una subtarea dentro de su tarea, y la arrastro; Esc devuelve el orden.
+- **Progreso:** `N de M hechas` cuenta tareas y subtareas; el doble check marca o desmarca todo el día.
+- **Traer tareas de ayer:** con Hoy vacío, copia (sin marcar) las del último día con tareas; una vez por día.
+- **Engranaje:** «Acerca de Mis tareas».
+- Se guarda solo en este navegador (clave `pyl-tasks`, 300 ms después de cada cambio). Si lo guardado está roto, arranca vacía y el texto queda aparte en `pyl-tasks-corrupt`. El pie de formato (negrita, lista, imagen…) aún no hace nada.
 
 ---
 
@@ -612,8 +628,8 @@ docs/referencia/
   frases.json                    Las 864 frases de Inicio (copia de referencia; la app lee js/modules/home/core/quotes.js)
 
 css/
-  base.css            Sistema de diseño: tokens, barra superior, tarjetas, botones, campos, tablas,
-                      aviso, indicador de desplegable y alias de tokens del tablero
+  base.css            Sistema de diseño: tokens, barra superior, tarjetas (y .card-side, las tarjetas laterales de Inicio),
+                      botones, campos, tablas, aviso, indicador de desplegable y alias de tokens del tablero
   modules/            Un CSS por módulo, en este orden de carga (la cascada depende de él):
     trainer.css       Entrenador: Inicio, Costeo, escalera y pipeline
     search.css        Buscar producto, Mi candidato, bitácora y estadísticas
@@ -627,13 +643,14 @@ css/
     testing.css       Testeo: barra de gasto, tarjetas de corte, práctica y Simulador
     logistics.css     Logística: contenedor de mensajes, rejilla de tarjetas, chip de etapa, botones y campo condicional
     home.css          Inicio: franja de saludo y frase de la tarjeta principal (SPEC 18)
+    tasks.css         Mis tareas: columna lateral izquierda desde 1680 px, filas, subtareas, menús, arrastre y Acerca de (SPEC 19)
   themes.css          Selector de tema, modo claro, temas oscuros y SVG con colores fijos
   modules/pnl.css     Solo lo propio del Tablero P&L (acotado a #v-pyl)
   report.css          Informe PDF: documento claro en A4, visible solo al imprimir
 
 tests/
-  core.test.js        Núcleo en Node puro (costeo, guardado rápido, prompt DropKiller, prompt buscar anuncios, simulador de testeo, mensajes de logística, P&L)
-  smoke.test.js       jsdom: claves de PYL.*, 11 pestañas, navegación, paneles Prompt DropKiller y Prompt buscar anuncios, Simulador de testeo y consola limpia
+  core.test.js        Núcleo en Node puro (Mis tareas, costeo, guardado rápido, prompt DropKiller, prompt buscar anuncios, simulador de testeo, mensajes de logística, P&L)
+  smoke.test.js       jsdom: claves de PYL.*, 11 pestañas, navegación, Mis tareas (añadir, editar, subtareas, días, guardado, medianoche, arrastre), paneles Prompt DropKiller y Prompt buscar anuncios, Simulador de testeo y consola limpia
   fixtures/           CSV de prueba de Dropi (datos inventados) y claves de PYL.*
 
 js/
@@ -697,6 +714,10 @@ js/
       core/home.js    Saludo por hora, media jornada, baraja con semilla y homePick; sin DOM ni red
       ui/home.js      Pinta el saludo (dos renglones) y la frase con su etiqueta
       app/home.js     Elige la frase al cargar y guarda app.state.home; no usa red ni localStorage
+    tasks/            Mis tareas en Inicio (SPEC 19)
+      core/tasks.js   Días y etiquetas, hora, comandos inmutables (añadir, marcar, editar, mover tareas y subtareas…), poda de días, traer de ayer y carga (tkLoad); sin DOM
+      ui/tasks.js     Cabecera con engranaje, fila de días, progreso, lista (filas, subtareas, edición, fila de añadir), menús y Acerca de
+      app/tasks.js    Estado (app.state.tasks), autoguardado (pyl-tasks), medianoche, menús, arrastre de tareas y subtareas
     trainer/
       app/trainer.js  Entrenador de métricas (fase 1: copiado del prototipo)
 
@@ -711,7 +732,7 @@ js/
 
 - **Sin `import`/`export`.** Los navegadores bloquean los ES modules en `file://`. Cada archivo es un IIFE que publica su API en el namespace global `PYL` (`PYL.core.pnl`, `PYL.ui.funnel`, etc.).
 - **El orden importa.** `index.html` carga los scripts en el orden de las capas (`core → services → ui → app`; dentro de cada capa, `shared` y luego los módulos), con `app/nav.js` antes de `main.js`. Los `<link>` de CSS también van en un orden fijo (ver el árbol). Un archivo nuevo va en `modules/<módulo>/<capa>/`, o en `shared/` si lo usan varios módulos, antes de los que lo usan.
-- **Carpeta = módulo, namespace = capa.** `js/modules/search/core/search.js` publica `PYL.core.search`. Un módulo solo usa `shared/` y los módulos que se cargan antes (`search` usa `pnl`; `quick` usa `search`; `hub` solo usa `shared/` (y la clase `.cd-act.del` de `search.css`); `home` solo usa `shared/`; `dkprompt` solo usa `shared/` (se coordina con `quick` por el evento `flotante:abierto`); `adprompt` usa `search` (candidato abierto) y los estilos de `dkprompt` y `quick`; `ads` usa `landing` y `search`; `metrics` solo usa `shared/`; `testing` usa `metrics`, `ads` y `landing`; `scaling` usa `metrics` y `testing`; `trainer` usa `search`).
+- **Carpeta = módulo, namespace = capa.** `js/modules/search/core/search.js` publica `PYL.core.search`. Un módulo solo usa `shared/` y los módulos que se cargan antes (`search` usa `pnl`; `quick` usa `search`; `hub` solo usa `shared/` (y la clase `.cd-act.del` de `search.css`); `home` solo usa `shared/`; `tasks` solo usa `shared/`; `dkprompt` solo usa `shared/` (se coordina con `quick` por el evento `flotante:abierto`); `adprompt` usa `search` (candidato abierto) y los estilos de `dkprompt` y `quick`; `ads` usa `landing` y `search`; `metrics` solo usa `shared/`; `testing` usa `metrics`, `ads` y `landing`; `scaling` usa `metrics` y `testing`; `trainer` usa `search`).
 - **La navegación es de toda la app.** `app/nav.js` abre la vista y dispara `nav:vista`; cada módulo reacciona a ese evento.
 - **Solo la capa `app` modifica el estado.** Los componentes de `ui` reciben datos y callbacks (`onSelect`, `onAssign`).
 - **Los diagnósticos devuelven datos, no HTML.** El texto con formato se representa como segmentos: un string es texto plano, `{ b: '...' }` va en negrita y `{ a: '...', href }` es un enlace que abre en pestaña nueva. `shared/ui/dom.js` (`rich`) los pinta.

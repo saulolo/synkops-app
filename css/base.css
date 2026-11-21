@@ -65,6 +65,15 @@ h2{font-size:19px;letter-spacing:-.01em;margin:0 0 4px;font-weight:800}
 h3{font-size:15px;margin:0 0 6px;font-weight:700}
 .lead{color:var(--muted);max-width:720px;margin:8px 0 0;font-size:15.5px}
 .card{background:linear-gradient(180deg,var(--card-2),var(--card));border:1px solid var(--line);border-radius:var(--rad);padding:22px;box-shadow:var(--shadow)}
+/* Tarjetas laterales de Inicio (Mis tareas y Centro de mando): destacan por relieve, sin color de acento.
+   Borde gris más visible, fondo un tono más claro (--ink mezclado: sirve en temas claros y oscuros), brillo de 1 px arriba
+   y sombra más honda. Con #v-dash para ganarle al border-color de los temas (themes.css). */
+#v-dash .card.card-side{border-color:color-mix(in srgb,var(--ink) 16%,transparent);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--card-2) 94%,var(--ink)),var(--card-2) 140px,var(--card));
+  box-shadow:var(--shadow),inset 0 1px 0 color-mix(in srgb,var(--ink) 10%,transparent),0 14px 34px rgba(0,0,0,.28);transition:border-color .2s,box-shadow .2s}
+#v-dash .card.card-side:hover{border-color:color-mix(in srgb,var(--ink) 24%,transparent);
+  box-shadow:var(--shadow),inset 0 1px 0 color-mix(in srgb,var(--ink) 12%,transparent),0 18px 40px rgba(0,0,0,.34)}
+@media (prefers-reduced-motion:reduce){#v-dash .card.card-side{transition:none}}
 .grid{display:grid;gap:16px}
 .g2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
 .g3{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}

@@ -1,4 +1,4 @@
-// Persistencia en el navegador: asignaciones campaña → producto, búsqueda de productos y guardado rápido (localStorage)
+// Persistencia en el navegador: asignaciones campaña → producto, búsqueda de productos, guardado rápido y Mis tareas (localStorage)
 // y el acceso al archivo consolidado (IndexedDB, porque localStorage no guarda handles).
 (() => {
   const services = (globalThis.PYL.services ??= {});
@@ -73,6 +73,17 @@
     save: (s) => { try { localStorage.setItem(HUB_KEY, JSON.stringify(s)); return true; } catch { return false; } },
   };
 
+  // Inicio → Mis tareas (SPEC 19): nota de tareas por día y estado colapsado. Clave propia.
+  // load devuelve el texto guardado tal cual (o null): quien lo valida es core.tasks.tkLoad.
+  // corrupt guarda aparte el texto que no pasó la validación, para no perderlo (equivale al note.corrupt-<ts>.json del original).
+  const TASKS_KEY = 'pyl-tasks', TASKS_CORRUPT_KEY = 'pyl-tasks-corrupt';
+  const tasks = {
+    load: () => { try { return localStorage.getItem(TASKS_KEY); } catch { return null; } },
+    // false si no cupo: quien llama avisa y conserva el estado en pantalla.
+    save: (s) => { try { localStorage.setItem(TASKS_KEY, JSON.stringify(s)); return true; } catch { return false; } },
+    corrupt: (raw) => { try { localStorage.setItem(TASKS_CORRUPT_KEY, String(raw)); return true; } catch { return false; } },
+  };
+
   // Limpieza única: la SPEC 08 (búsqueda automática, descartada) guardaba en pyl-auto; ya nadie la lee.
   try { localStorage.removeItem('pyl-auto'); } catch { /* sin almacenamiento */ }
 
@@ -92,5 +103,5 @@
     return { get: (k) => tx('readonly', (s) => s.get(k)), set: (k, v) => tx('readwrite', (s) => s.put(v, k)) };
   })();
 
-  services.storage = { campaignMap, search, landing, ads, testing, scaling, quick, hub, idb };
+  services.storage = { campaignMap, search, landing, ads, testing, scaling, quick, hub, tasks, idb };
 })();
