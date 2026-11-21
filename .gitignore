@@ -1,2 +1,10 @@
 # Configuración local del IDE
 .idea/
+
+# Secretos y configuración local (nunca al repo)
+.env
+*.local.*
+.claude/settings.local.json
+
+# Exportes reales de Dropi o Meta guardados dentro del proyecto
+/exports/

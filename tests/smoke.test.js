@@ -50,7 +50,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.ok(require('fs').existsSync(path.join(__dirname, '..', 'img', 'favicon.svg')), 'El archivo del favicon existe');
     // SPEC 20: la marca (logo, «Synkops» y lema) salió de la barra; bajo el título «Synkops» de Inicio va un pulso subrayado.
     assert.ok(!document.querySelector('.brand-mark') && !document.querySelector('.brand'), 'Ya no existe la marca de la barra (.brand ni .brand-mark)');
-    assert.deepStrictEqual([...document.querySelector('header.top .top-in').children].map((n) => n.id || n.className), ['ck-root', 'top-row'], 'La barra: reloj y la fila del contenido');
+    assert.deepStrictEqual([...document.querySelector('header.top .top-in').children].map((n) => n.id || n.className), ['ck-root', 'top-row', 'mw-root', 'mw-audio'], 'La barra: reloj, la fila del contenido y los cortes de testeo (SPEC 21)');
     assert.deepStrictEqual([...document.querySelector('.top-in > .top-row').children].map((n) => n.id || n.className), ['pillProd', 'theme-pick', 'tabs'], 'La fila: píldora del producto activo, tema y pestañas (mide lo mismo que las pestañas)');
     const h1 = document.querySelector('#v-dash .hero h1');
     const pulse = h1.querySelector('svg.hero-pulse');
@@ -101,6 +101,48 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     PYL.app.clock.tick(new window.Date(2026, 10, 21, 0, 0, 5));
     assert.deepStrictEqual([document.getElementById('ck-day').textContent, document.getElementById('ck-date').textContent, ck.getAttribute('aria-label')], ['Sábado', '21 nov', 'Sábado, 21 nov · 12:00 a. m.'], 'Pasada la medianoche');
     PYL.app.clock.tick(new window.Date());
+  }
+
+  // 1c'. SPEC 21: cortes de testeo en el margen derecho de la barra (paso 4: sin conexión).
+  {
+    const root = document.getElementById('mw-root'), btn = root && root.querySelector('.mw-btn'), panel = document.getElementById('mw-panel');
+    assert.ok(root && root.parentElement === document.querySelector('header.top .top-in') && root.classList.contains('mw-rail'), '#mw-root.mw-rail dentro de header.top .top-in');
+    assert.ok(btn && btn.tagName === 'BUTTON' && btn.getAttribute('aria-controls') === 'mw-panel' && btn.getAttribute('aria-expanded') === 'false', 'El bloque es un botón que controla #mw-panel');
+    assert.ok(btn.querySelector('.mw-head') && /CORTES/.test(btn.querySelector('.mw-head').textContent), 'Cabecera CORTES');
+    assert.ok(/Conectar Meta/.test(btn.textContent), 'Sin token dice «Conectar Meta»');
+    assert.strictEqual(btn.getAttribute('aria-label'), 'Cortes de testeo: conectar Meta', 'aria-label sin token');
+    const audio = document.getElementById('mw-audio');
+    assert.ok(audio && audio.tagName === 'AUDIO' && audio.getAttribute('src') === 'sounds/corte.mp3' && audio.getAttribute('preload') === 'auto', '<audio id="mw-audio" src="sounds/corte.mp3">');
+    assert.ok(panel && panel.hidden && panel.getAttribute('role') === 'dialog' && panel.getAttribute('aria-labelledby'), 'Panel diálogo, cerrado al cargar');
+    assert.ok(document.getElementById(panel.getAttribute('aria-labelledby')), 'El título del panel existe');
+    assert.strictEqual(typeof PYL.app.metawatch.refresh, 'function');
+    assert.strictEqual(typeof PYL.app.metawatch.tick, 'function');
+    assert.strictEqual(typeof PYL.ui.metawatch.rail, 'function');
+    assert.strictEqual(typeof PYL.ui.metawatch.panel, 'function');
+    // Clic abre el panel con el token (sin guía: se quitó a pedido del usuario).
+    btn.click();
+    assert.ok(!panel.hidden && btn.getAttribute('aria-expanded') === 'true', 'El clic abre el panel');
+    const tok = document.getElementById('mw-token');
+    assert.ok(tok && tok.type === 'password' && document.getElementById('mw-connect'), 'Campo de token (password) y botón Conectar');
+    assert.strictEqual(document.activeElement, tok, 'El foco va al campo del token');
+    assert.ok(!document.getElementById('mw-guide') && !/Cómo sacar el token/.test(panel.textContent), 'Sin guía en el panel');
+    assert.ok(document.getElementById('mw-x'), 'Botón ✕');
+    // Esc cierra y el foco vuelve al bloque.
+    document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    assert.ok(panel.hidden && btn.getAttribute('aria-expanded') === 'false', 'Esc cierra');
+    assert.strictEqual(document.activeElement, btn, 'El foco vuelve al bloque');
+    // ✕ cierra.
+    btn.click(); document.getElementById('mw-x').click();
+    assert.ok(panel.hidden && document.activeElement === btn, '✕ cierra y devuelve el foco');
+    // Clic fuera cierra; clic dentro del panel no.
+    btn.click();
+    panel.dispatchEvent(new window.MouseEvent('pointerdown', { bubbles: true }));
+    assert.ok(!panel.hidden, 'Clic dentro del panel no cierra');
+    document.body.dispatchEvent(new window.MouseEvent('pointerdown', { bubbles: true }));
+    assert.ok(panel.hidden, 'Clic fuera cierra');
+    // Un segundo clic en el bloque con el panel abierto lo cierra.
+    btn.click(); btn.click();
+    assert.ok(panel.hidden, 'El bloque alterna el panel');
   }
 
   // 1d. SPEC 19: Mis tareas · tarjeta y ubicación (paso 6).
@@ -2303,6 +2345,318 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     },
   }).then((d) => new Promise((ok) => { if (d.window.document.readyState === 'complete') ok(d); else d.window.addEventListener('load', () => ok(d)); }));
 
+  // 8m. SPEC 21: servicio de Meta (paso 3). fetch simulado: URL, encabezado del token y errores traducidos.
+  const mwTest1 = async () => {
+    const S = PYL.services.metawatch, TK = 'EAAtokenSecreto123';
+    let calls = [], next = [];
+    const resp = (status, body) => ({ ok: status >= 200 && status < 300, status, json: async () => { if (body === undefined) throw new SyntaxError('no json'); return body; } });
+    window.fetch = async (url, opts) => {
+      calls.push({ url, auth: opts && opts.headers && opts.headers.Authorization });
+      const n = next.shift();
+      if (n instanceof Error) throw n;
+      return n;
+    };
+    const last = () => { const c = calls[calls.length - 1]; const u = new URL(c.url); return { c, u, p: Object.fromEntries(u.searchParams) }; };
+    const noToken = () => calls.forEach((c) => assert.ok(!c.url.includes(TK), 'El token nunca va en la URL'));
+
+    next.push(resp(200, { data: [{ id: 'act_1', name: 'VN-1', currency: 'COP', account_status: 1 }] }));
+    assert.deepStrictEqual(JSON.parse(JSON.stringify(await S.accounts(TK))), [{ id: 'act_1', name: 'VN-1', currency: 'COP', account_status: 1 }], 'accounts devuelve data');
+    let { c, u, p } = last();
+    assert.strictEqual(u.origin + u.pathname, 'https://graph.facebook.com/v27.0/me/adaccounts');
+    assert.strictEqual(p.fields, 'id,name,currency,account_status');
+    assert.strictEqual(c.auth, 'Bearer ' + TK, 'Token en el encabezado Authorization');
+
+    next.push(resp(200, { data: [] }));
+    await S.campaigns(TK, 'act_1');
+    ({ u, p } = last());
+    assert.strictEqual(u.pathname, '/v27.0/act_1/campaigns');
+    assert.deepStrictEqual([p.fields, p.effective_status], ['id,name,effective_status', '["ACTIVE"]']);
+
+    next.push(resp(200, { data: [] }));
+    await S.adsets(TK, '120');
+    ({ u, p } = last());
+    assert.deepStrictEqual([u.pathname, p.fields], ['/v27.0/120/adsets', 'id,name,effective_status,created_time']);
+
+    next.push(resp(200, { data: [] }));
+    await S.insights(TK, '120');
+    ({ u, p } = last());
+    assert.deepStrictEqual([u.pathname, p.level, p.date_preset, p.fields], ['/v27.0/120/insights', 'adset', 'maximum', 'adset_id,adset_name,spend,actions']);
+    noToken();
+
+    const falla = async (r, k, msg) => {
+      next.push(r);
+      const e = await S.accounts(TK).then(() => null, (x) => x);
+      assert.ok(e && e.k === k, msg + ' → ' + JSON.stringify(e));
+      assert.ok(!JSON.stringify(e).includes(TK), msg + ': el error no trae el token');
+    };
+    await falla(resp(400, { error: { code: 190, type: 'OAuthException', message: 'Error validating access token' } }), 'token', 'Token revocado');
+    await falla(resp(400, { error: { code: 17, message: 'User request limit reached' } }), 'limit', 'Límite de consultas');
+    await falla(new TypeError('Failed to fetch'), 'net', 'Sin red');
+    await falla(resp(500), 'other', 'Respuesta sin JSON');
+    await falla(resp(200, { nada: 1 }), 'other', '200 sin data');
+    noToken();
+
+    // Sin localStorage (file:// en jsdom): load da null, save false y clear no lanza.
+    assert.strictEqual(S.load(), null);
+    assert.strictEqual(S.save({ v: 1, token: 'x' }), false);
+    assert.doesNotThrow(() => S.clear());
+    delete window.fetch;
+  };
+
+  // 8n. SPEC 21: conectar y elegir campaña (paso 5). fetch simulado por ruta.
+  const MW_TK = 'EAAtokenBueno999';
+  const mwSets = [
+    { id: 's3', name: 'Plant · video 3', effective_status: 'ACTIVE', created_time: '2026-11-19T05:02:00-0500' },
+    { id: 's1', name: 'Plant · video 1', effective_status: 'ACTIVE', created_time: '2026-11-19T05:00:00-0500' },
+    { id: 's4', name: 'Plant · video 4', effective_status: 'PAUSED', created_time: '2026-11-19T05:03:00-0500' },
+    { id: 's2', name: 'Plant · video 2', effective_status: 'ACTIVE', created_time: '2026-11-19T05:01:00-0500' },
+  ];
+  const mwIns = (id, spend, pi = 0, sales = 0) => ({ adset_id: id, spend: String(spend), actions: [
+    { action_type: 'offsite_conversion.fb_pixel_initiate_checkout', value: String(pi) },
+    { action_type: 'offsite_conversion.fb_pixel_purchase', value: String(sales) },
+  ] });
+  // Respuestas por ruta; se pueden cambiar entre ciclos. err190 = el token deja de servir.
+  const mwFake = { ins: [mwIns('s1', 31250, 6, 1), mwIns('s2', 12000, 2), mwIns('s3', 18000, 1), mwIns('s4', 22000, 3)], err: null, calls: 0 };
+  const mwFetch = async (url, opts) => {
+    mwFake.calls++;
+    const u = new URL(url), p = u.pathname.replace('/v27.0/', '');
+    const ok = (data) => ({ ok: true, status: 200, json: async () => ({ data }) });
+    const bad = (code) => ({ ok: false, status: 400, json: async () => ({ error: { code, message: 'x' } }) });
+    if (mwFake.err === 'net') throw new TypeError('Failed to fetch');
+    if (mwFake.err) return bad(mwFake.err);
+    if (opts.headers.Authorization !== 'Bearer ' + MW_TK) return bad(190);
+    if (p === 'me/adaccounts') return ok([{ id: 'act_1', name: 'VN-1', currency: 'COP', account_status: 1 }]);
+    if (p === 'act_1/campaigns' && mwFake.noCamp) return ok([]);
+    if (p === 'act_1/campaigns') return ok([{ id: '120', name: 'TEST 21/11 Plant', effective_status: 'ACTIVE' }, { id: '121', name: 'TEST 22/11 Omega', effective_status: 'ACTIVE' }]);
+    if (p === '120/adsets') return ok(mwSets);
+    if (p === '120/insights') return ok(mwFake.ins);
+    if (p === '121/adsets' || p === '121/insights') return ok([]);
+    return bad(100);
+  };
+  const mwWait = () => new Promise((ok) => setTimeout(ok, 30));
+  const mwTest2 = async () => {
+    const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
+    const btn = $('#mw-root .mw-btn');
+    window.fetch = mwFetch;
+    const conecta = async (t) => { $('#mw-token').value = t; $('#mw-connect').click(); await mwWait(); };
+    btn.click();
+    // Token inválido al conectar: avisa y no guarda nada.
+    await conecta('malo');
+    assert.strictEqual($('#mw-status').textContent, 'Token inválido: vuelve a conectar');
+    assert.ok(!$('#mw-status').hidden && $('#mw-token'), 'Sigue el campo del token');
+    assert.strictEqual(PYL.app.state.metawatch.saved, null, 'No guarda un token inválido');
+    // Token bueno: lista cuentas (una sola → queda elegida) y campañas activas.
+    await conecta(MW_TK);
+    assert.ok(!$('#mw-token'), 'Conectado: ya no pide token');
+    assert.ok($('#mw-status').hidden, 'Sin error');
+    assert.deepStrictEqual($$('#mw-account option').map((o) => [o.value, o.textContent]), [['', 'Elige una cuenta'], ['act_1', 'VN-1 · COP']]);
+    assert.strictEqual($('#mw-account').value, 'act_1', 'Una sola cuenta: queda elegida');
+    assert.deepStrictEqual($$('#mw-campaign option').map((o) => o.value), ['', '120', '121'], 'Campañas activas de la cuenta');
+    assert.ok(/Elige una campaña/.test(btn.textContent), 'Sin campaña: «Elige una campaña»');
+    // Elegir la campaña ABO: 4 filas C1…C4 por orden de creación, con su gasto.
+    $('#mw-campaign').value = '120';
+    $('#mw-campaign').dispatchEvent(new window.Event('change', { bubbles: true }));
+    await mwWait();
+    assert.ok(/TEST 21\/11 Plant/.test(btn.querySelector('.mw-head').textContent), 'Cabecera con la campaña');
+    assert.ok(/↻ \d{1,2}:\d{2}/.test(btn.querySelector('.mw-time').textContent), 'Hora del último dato');
+    const sets = [...btn.querySelectorAll('.mw-set')];
+    assert.deepStrictEqual(sets.map((s) => [s.dataset.id, s.querySelector('.mw-short').textContent, s.querySelector('.mw-k').textContent]),
+      [['s1', 'C1', '31K'], ['s2', 'C2', '12K'], ['s3', 'C3', '18K'], ['s4', 'C4', '22K']]);
+    assert.strictEqual(sets[0].title, 'Plant · video 1', 'Nombre completo en title');
+    assert.strictEqual(sets[0].querySelectorAll('.mw-mark').length, 3, 'Marcas en 20K, 30K y 40K');
+    assert.deepStrictEqual(sets[0].querySelector('.mw-bar') && [...sets[0].querySelectorAll('.mw-mark')].map((m) => m.style.left), ['50%', '75%', '100%']);
+    assert.ok(sets[3].classList.contains('mw-off-set') && sets[3].querySelector('.mw-tag').textContent === 'OFF' && !sets[3].querySelector('.mw-bar'), 'Pausado: atenuado con OFF');
+    assert.strictEqual($$('#mw-rows .mw-prow').length, 4, 'El panel lista los 4 conjuntos');
+    // Campaña sin conjuntos.
+    $('#mw-campaign').value = '121';
+    $('#mw-campaign').dispatchEvent(new window.Event('change', { bubbles: true }));
+    await mwWait();
+    assert.ok(/La campaña no tiene conjuntos activos/.test(btn.textContent));
+    $('#mw-campaign').value = '120';
+    $('#mw-campaign').dispatchEvent(new window.Event('change', { bubbles: true }));
+    await mwWait();
+    // Actualizar trae datos nuevos.
+    mwFake.ins = [mwIns('s1', 33000, 6, 1), mwIns('s2', 12000, 2), mwIns('s3', 18000, 1), mwIns('s4', 22000, 3)];
+    $('#mw-refresh').click();
+    await mwWait();
+    assert.strictEqual(btn.querySelector('.mw-set[data-id="s1"] .mw-k').textContent, '33K', 'Actualizar repinta');
+    // Sin red: conserva los datos y avisa con la hora.
+    mwFake.err = 'net';
+    await PYL.app.metawatch.refresh();
+    assert.ok(/^Sin conexión · último dato \d{1,2}:\d{2}$/.test(btn.querySelector('.mw-msg').textContent), 'Sin red: aviso con la hora');
+    assert.strictEqual(btn.querySelectorAll('.mw-set').length, 4, 'Sin red: muestra los últimos datos');
+    // Límite de consultas.
+    mwFake.err = 17;
+    await PYL.app.metawatch.refresh();
+    assert.strictEqual(btn.querySelector('.mw-msg').textContent, 'Meta pidió esperar');
+    // Token revocado.
+    mwFake.err = 190;
+    await PYL.app.metawatch.refresh();
+    assert.strictEqual(btn.querySelector('.mw-msg').textContent, 'Token inválido: vuelve a conectar', 'Token revocado en el bloque');
+    assert.ok($('#mw-token'), 'Pide el token otra vez');
+    mwFake.err = null;
+    await conecta(MW_TK);
+    assert.ok(!btn.querySelector('.mw-msg') && $('#mw-campaign').value === '120', 'Reconectar conserva cuenta y campaña');
+    // El token no queda en el HTML ni en las etiquetas.
+    assert.ok(!document.documentElement.outerHTML.includes(MW_TK) && !btn.getAttribute('aria-label').includes(MW_TK), 'El token no aparece en el HTML');
+    document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+  };
+
+  // 8o. SPEC 21: cortes, veredicto y alerta (paso 6). Sigue conectado a la campaña 120 de mwTest2.
+  // setTimeout de la página y audio.play simulados; las esperas de la prueba usan el setTimeout de Node.
+  const mwTest3 = async () => {
+    const $ = (q) => document.querySelector(q);
+    const btn = $('#mw-root .mw-btn'), audio = $('#mw-audio'), W = PYL.app.metawatch;
+    const realST = window.setTimeout, timers = [];
+    window.setTimeout = (fn, ms) => { timers.push({ fn, ms }); return timers.length; };
+    let plays = 0;
+    audio.play = () => { plays++; return Promise.resolve(); };
+    const cycle = async () => {
+      const t = timers.filter((x) => x.ms === PYL.core.metawatch.MW_EVERY).pop();
+      assert.ok(t, 'Hay un ciclo programado a 15 min');
+      timers.length = 0;
+      t.fn();
+      await mwWait();
+    };
+    const set = (id) => btn.querySelector(`.mw-set[data-id="${id}"]`);
+    const prow = (id) => $(`#mw-rows .mw-prow[data-id="${id}"]`);
+    assert.strictEqual(typeof PYL.app.trainer.product, 'function', 'trainer publica product()');
+    assert.ok(PYL.app.trainer.product().tope > 0, 'product() trae el tope');
+
+    await W.refresh();
+    assert.ok(set('s1').classList.contains('mw-alert') && set('s1').dataset.cut === '1', 'Al elegir la campaña, C1 (33K) late en el corte 2 sin sonar');
+    assert.strictEqual(plays, 0, 'Elegir campaña no suena');
+    // Ciclo de 15 min: C3 pasa de 18.000 a 21.000 → late y suena una vez.
+    mwFake.ins = [mwIns('s1', 33000, 6, 1), mwIns('s2', 12000, 2), mwIns('s3', 21000, 4), mwIns('s4', 22000, 3)];
+    await cycle();
+    assert.ok(set('s3').classList.contains('mw-alert') && set('s3').dataset.cut === '0', 'C3 late en el corte 1');
+    assert.strictEqual(plays, 1, 'Suena una vez');
+    assert.ok(/C3 llegó a 20\.000, revisar/.test(btn.getAttribute('aria-label')), 'aria-label avisa: ' + btn.getAttribute('aria-label'));
+    assert.ok(!set('s4').classList.contains('mw-alert'), 'El pausado no late aunque pase un corte');
+    // Segundo ciclo, mismo corte → no vuelve a sonar.
+    mwFake.ins = [mwIns('s1', 33000, 6, 1), mwIns('s2', 12000, 2), mwIns('s3', 24000, 5), mwIns('s4', 22000, 3)];
+    await cycle();
+    assert.strictEqual(plays, 1, 'No vuelve a sonar el mismo corte');
+    assert.ok(set('s3').classList.contains('mw-alert'), 'Sigue latiendo hasta Revisado');
+    // Revisado quita el latido y se guarda.
+    btn.click();
+    assert.ok(prow('s3').querySelector('.mw-seen'), 'Botón Revisado en la fila que late');
+    assert.ok(!prow('s2').querySelector('.mw-seen'), 'Sin Revisado en la fila que no late');
+    prow('s3').querySelector('.mw-seen').click();
+    assert.ok(!set('s3').classList.contains('mw-alert') && !prow('s3').querySelector('.mw-seen'), 'Revisado quita el latido');
+    assert.strictEqual(PYL.app.state.metawatch.saved.seen.s3, 0, 'seen guarda el corte revisado');
+    // Siguiente corte → late y suena otra vez.
+    mwFake.ins = [mwIns('s1', 33000, 6, 1), mwIns('s2', 12000, 2), mwIns('s3', 30500, 6), mwIns('s4', 22000, 3)];
+    await cycle();
+    assert.ok(set('s3').classList.contains('mw-alert') && set('s3').dataset.cut === '1' && plays === 2, 'El corte 2 late y suena');
+    // Veredicto de testVerdict con el tope del producto activo (genérico = 15.000).
+    const T = PYL.core.testing;
+    const v1 = T.testVerdict({ spend: 33000, pi: 6, sales: 1, tope: 15000 });
+    assert.strictEqual(prow('s1').querySelector('.mw-verdict').textContent, v1.veredicto, 'Veredicto de testVerdict');
+    assert.ok(prow('s1').querySelector('.mw-verdict').classList.contains('mw-l-' + v1.light), 'Color de la luz');
+    const cells = (id) => Object.fromEntries([...prow(id).querySelectorAll('dt')].map((d) => [d.textContent, d.nextElementSibling.textContent]));
+    assert.deepStrictEqual(cells('s1'), { Gasto: '$ 33.000', PI: '6', Ventas: '1', CPPI: '$ 5.500', Corte: 'Corte 2 · 30.000' });
+    assert.ok(!prow('s2').querySelector('.mw-verdict') && cells('s2').Corte === 'Antes del corte 1', 'Antes del corte 1: sin veredicto');
+    assert.strictEqual(cells('s4').CPPI, '$ 7.333', 'CPPI redondeado');
+    // Producto activo con otro tope.
+    const prod = PYL.app.trainer.product;
+    PYL.app.trainer.product = () => ({ name: 'Plant Power Max', tope: 25000, escala: 20000, apaga: 33000 });
+    await W.refresh();
+    assert.strictEqual(prow('s1').querySelector('.mw-verdict').textContent, T.testVerdict({ spend: 33000, pi: 6, sales: 1, tope: 25000 }).veredicto, 'Usa el tope del producto');
+    assert.ok(/Plant/.test(btn.querySelector('.mw-head').textContent) && !/TEST 21/.test(btn.querySelector('.mw-head').textContent), 'Cabecera con el primer nombre del producto');
+    PYL.app.trainer.product = prod;
+    // Cuenta en otra moneda: sin veredicto y con aviso.
+    const acc = PYL.app.state.metawatch.saved.account;
+    acc.currency = 'USD';
+    await W.refresh();
+    assert.ok(!$('#mw-rows .mw-verdict'), 'USD: sin veredicto');
+    assert.strictEqual($('#mw-panel .mw-note').textContent, 'Cortes en COP: esta cuenta usa USD');
+    assert.ok(cells('s1').PI === '6' && cells('s1').Gasto, 'USD: sigue mostrando gasto y PI');
+    acc.currency = 'COP';
+    await W.refresh();
+    document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    window.setTimeout = realST;
+    delete audio.play;
+  };
+
+  // 8p. SPEC 21: sonido, Desconectar, cuenta sin campañas, audio que falta y recarga (paso 8).
+  const mwTest4 = async () => {
+    const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
+    const btn = $('#mw-root .mw-btn'), audio = $('#mw-audio'), W = PYL.app.metawatch, st = PYL.app.state.metawatch;
+    let plays = 0;
+    audio.play = () => { plays++; return Promise.reject(new Error('NotAllowedError')); }; // el navegador bloquea: no debe ensuciar la consola
+    btn.click();
+    // 🔔/🔕
+    const snd = $('#mw-sound');
+    assert.ok(snd && snd.getAttribute('aria-pressed') === 'true' && /🔔/.test(snd.textContent), 'Sonido encendido por defecto');
+    snd.click();
+    assert.ok($('#mw-sound').getAttribute('aria-pressed') === 'false' && /🔕/.test($('#mw-sound').textContent) && st.saved.sound === false, '🔕 apaga y se guarda');
+    mwFake.ins = [mwIns('s1', 41000, 8, 2), mwIns('s2', 12000, 2), mwIns('s3', 30500, 6), mwIns('s4', 22000, 3)];
+    await W.refresh();
+    assert.ok(btn.querySelector('.mw-set[data-id="s1"]').classList.contains('mw-alert'), 'Con 🔕 late igual');
+    assert.strictEqual(plays, 0, 'Con 🔕 no suena');
+    $('#mw-sound').click();
+    assert.strictEqual(st.saved.sound, true, '🔔 vuelve a encender');
+    mwFake.ins = [mwIns('s1', 41000, 8, 2), mwIns('s2', 20500, 3), mwIns('s3', 30500, 6), mwIns('s4', 22000, 3)];
+    await W.refresh();
+    await mwWait();
+    assert.strictEqual(plays, 1, 'Suena aunque el navegador rechace play (sin error en consola)');
+    // Si el archivo no carga (evento error del <audio>), ya no intenta sonar.
+    audio.dispatchEvent(new window.Event('error'));
+    mwFake.ins = [mwIns('s1', 41000, 8, 2), mwIns('s2', 30500, 3), mwIns('s3', 30500, 6), mwIns('s4', 22000, 3)];
+    await W.refresh();
+    assert.strictEqual(plays, 1, 'Sin archivo no intenta sonar');
+    // Desconectar pregunta; Cancelar no borra nada.
+    let cleared = 0;
+    const realClear = PYL.services.metawatch.clear;
+    PYL.services.metawatch.clear = () => { cleared++; return realClear(); };
+    $('#mw-off').click();
+    await mwWait();
+    assert.ok($('#modal').classList.contains('show') && /Desconectar Meta/.test($('#modal-h').textContent), 'Pregunta antes de desconectar');
+    $('#modal [data-r="cancel"]').click();
+    await mwWait();
+    assert.ok(st.saved && cleared === 0, 'Cancelar no borra');
+    $('#mw-off').click();
+    await mwWait();
+    $('#modal [data-r="off"]').click();
+    await mwWait();
+    assert.strictEqual(cleared, 1, 'Borra pyl-meta');
+    assert.strictEqual(st.saved, null, 'Sin conexión en memoria');
+    assert.ok(/Conectar Meta/.test(btn.textContent) && !btn.querySelector('.mw-set'), 'El bloque vuelve a «Conectar Meta»');
+    PYL.services.metawatch.clear = realClear;
+    // Cuenta sin campañas activas.
+    mwFake.noCamp = true;
+    if ($('#mw-panel').hidden) btn.click();
+    $('#mw-token').value = MW_TK; $('#mw-connect').click();
+    await mwWait();
+    assert.deepStrictEqual($$('#mw-campaign option').map((o) => o.textContent), ['No hay campañas activas'], 'Lista vacía: lo dice');
+    assert.ok($('#mw-campaign').disabled, 'Sin campañas: lista deshabilitada');
+    assert.strictEqual(btn.querySelector('.mw-msg').textContent, 'No hay campañas activas', 'El bloque también');
+    mwFake.noCamp = false;
+    document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    delete audio.play;
+    delete window.fetch;
+    // Recarga: pyl-meta guardado → muestra los últimos datos; lo revisado no late y lo que ya sonó no suena.
+    store['pyl-meta'] = JSON.stringify({
+      v: 1, token: MW_TK, account: { id: 'act_1', name: 'VN-1', currency: 'COP' }, campaign: { id: '120', name: 'TEST 21/11 Plant' },
+      sound: false, seen: { s1: 1 }, rung: { s1: 1, s3: 0 },
+      last: { at: Date.now(), rows: [
+        { id: 's1', name: 'Plant · video 1', short: 'C1', active: true, spend: 33000, pi: 6, sales: 1, created: '' },
+        { id: 's3', name: 'Plant · video 3', short: 'C2', active: true, spend: 21000, pi: 4, sales: 0, created: '' },
+      ] },
+    });
+    const d = await fresca();
+    await new Promise((ok) => setTimeout(ok, 60));
+    const b2 = d.window.document.querySelector('#mw-root .mw-btn');
+    assert.ok(!b2.querySelector('.mw-set[data-id="s1"]').classList.contains('mw-alert'), 'Recarga: lo revisado no late');
+    assert.ok(b2.querySelector('.mw-set[data-id="s3"]').classList.contains('mw-alert'), 'Recarga: lo no revisado sigue latiendo');
+    assert.ok(/^Sin conexión · último dato/.test(b2.querySelector('.mw-msg').textContent), 'Sin fetch: muestra los últimos datos con aviso');
+    assert.strictEqual(d.window.PYL.app.state.metawatch.saved.sound, false, 'Recarga: 🔕 se conserva');
+    assert.ok(!d.window.document.documentElement.outerHTML.includes(MW_TK), 'El token no aparece en el HTML tras recargar');
+    d.window.close();
+    delete store['pyl-meta'];
+  };
+
   const ckTest = async () => {
     const WIDE = '(min-width: 1680px)';
     const T0 = new Date(2026, 10, 20, 10, 42, 30).getTime();
@@ -2996,7 +3350,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     delete store['pyl-tasks'];
   };
 
-  return lgTest().then(dkTest).then(apTest).then(chTest).then(chCadenaTest).then(chDurasTest).then(hubTest).then(hubTest2).then(hubTest3).then(hubTest4).then(hubTest5).then(tkTest1).then(tkTest2).then(tkTest3).then(tkTest4).then(tkTest5).then(tkTest6).then(tkTest7).then(tkTest8).then(tkTest9).then(ckTest).then(fresca).then((d2) => {
+  return lgTest().then(dkTest).then(apTest).then(chTest).then(chCadenaTest).then(chDurasTest).then(hubTest).then(hubTest2).then(hubTest3).then(hubTest4).then(hubTest5).then(tkTest1).then(tkTest2).then(tkTest3).then(tkTest4).then(tkTest5).then(tkTest6).then(tkTest7).then(tkTest8).then(tkTest9).then(ckTest).then(mwTest1).then(mwTest2).then(mwTest3).then(mwTest4).then(fresca).then((d2) => {
     const doc2 = d2.window.document;
     assert.deepStrictEqual([...doc2.querySelectorAll('#b-strats .st-tab')].map((b) => b.textContent.length > 0), [true, true], 'Estrategias muestra solo 2 tarjetas');
     assert.deepStrictEqual([...d2.window.PYL.core.search.STRATEGIES.map((x) => x.k)], ['vdo', 'prov'], 'STRATEGIES = vdo y prov');

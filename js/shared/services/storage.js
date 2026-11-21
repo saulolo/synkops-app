@@ -84,6 +84,15 @@
     corrupt: (raw) => { try { localStorage.setItem(TASKS_CORRUPT_KEY, String(raw)); return true; } catch { return false; } },
   };
 
+  // Barra → cortes de testeo en vivo (SPEC 21): token de Meta, cuenta, campaña y alertas. Clave propia.
+  // load devuelve el texto guardado tal cual (o null): quien lo valida es core.metawatch.mwLoad.
+  const META_KEY = 'pyl-meta';
+  const meta = {
+    load: () => { try { return localStorage.getItem(META_KEY); } catch { return null; } },
+    save: (s) => { try { localStorage.setItem(META_KEY, JSON.stringify(s)); return true; } catch { return false; } },
+    clear: () => { try { localStorage.removeItem(META_KEY); return true; } catch { return false; } },
+  };
+
   // Limpieza única: la SPEC 08 (búsqueda automática, descartada) guardaba en pyl-auto; ya nadie la lee.
   try { localStorage.removeItem('pyl-auto'); } catch { /* sin almacenamiento */ }
 
@@ -103,5 +112,5 @@
     return { get: (k) => tx('readonly', (s) => s.get(k)), set: (k, v) => tx('readwrite', (s) => s.put(v, k)) };
   })();
 
-  services.storage = { campaignMap, search, landing, ads, testing, scaling, quick, hub, tasks, idb };
+  services.storage = { campaignMap, search, landing, ads, testing, scaling, quick, hub, tasks, meta, idb };
 })();

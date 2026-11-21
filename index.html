@@ -26,6 +26,7 @@
 <link rel="stylesheet" href="css/modules/home.css">
 <link rel="stylesheet" href="css/modules/tasks.css">
 <link rel="stylesheet" href="css/modules/clock.css">
+<link rel="stylesheet" href="css/modules/metawatch.css">
 <link rel="stylesheet" href="css/themes.css">
 <link rel="stylesheet" href="css/modules/pnl.css">
 <link rel="stylesheet" href="css/report.css">
@@ -64,6 +65,12 @@
         <button data-v="pyl">Tablero P&amp;L</button>
       </nav>
     </div>
+    <!-- Cortes de testeo en vivo (SPEC 21): solo desde 1680 px, en el margen derecho. Lo arma app/metawatch.js. -->
+    <div class="mw-rail" id="mw-root">
+      <button class="mw-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="mw-panel"></button>
+      <div class="mw-panel" id="mw-panel" role="dialog" aria-labelledby="mw-title" hidden></div>
+    </div>
+    <audio id="mw-audio" src="sounds/corte.mp3" preload="auto"></audio>
   </div>
 </header>
 
@@ -1174,10 +1181,12 @@
 <script src="js/modules/home/core/home.js"></script>
 <script src="js/modules/tasks/core/tasks.js"></script>
 <script src="js/modules/clock/core/clock.js"></script>
+<script src="js/modules/metawatch/core/metawatch.js"></script>
 <!-- Services: archivos y almacenamiento del navegador -->
 <script src="js/shared/services/storage.js"></script>
 <script src="js/shared/services/files.js"></script>
 <script src="js/modules/pnl/services/consolidado.js"></script>
+<script src="js/modules/metawatch/services/metawatch.js"></script>
 <!-- UI: componentes que pintan el DOM -->
 <script src="js/shared/ui/dom.js"></script>
 <script src="js/shared/ui/tooltip.js"></script>
@@ -1212,6 +1221,7 @@
 <script src="js/modules/home/ui/home.js"></script>
 <script src="js/modules/tasks/ui/tasks.js"></script>
 <script src="js/modules/clock/ui/clock.js"></script>
+<script src="js/modules/metawatch/ui/metawatch.js"></script>
 <!-- App: estado, casos de uso y arranque (main.js va al final) -->
 <script src="js/app/state.js"></script>
 <script src="js/modules/pnl/app/filters.js"></script>
@@ -1233,6 +1243,7 @@
 <script src="js/modules/home/app/home.js"></script>
 <script src="js/modules/tasks/app/tasks.js"></script>
 <script src="js/modules/clock/app/clock.js"></script>
+<script src="js/modules/metawatch/app/metawatch.js"></script>
 <script src="js/modules/trainer/app/trainer.js"></script>
 <script src="js/app/nav.js"></script>
 <script src="js/app/main.js"></script>
