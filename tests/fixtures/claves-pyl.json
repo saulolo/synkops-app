@@ -17,6 +17,7 @@
     "landing",
     "logistics",
     "meta",
+    "metawatch",
     "metrics",
     "parse",
     "pnl",
@@ -30,6 +31,7 @@
   "services": [
     "consolidado",
     "files",
+    "metawatch",
     "storage"
   ],
   "ui": [
@@ -49,6 +51,7 @@
     "hub",
     "landing",
     "logistics",
+    "metawatch",
     "metrics",
     "notices",
     "presets",
@@ -70,10 +73,12 @@
     "clock",
     "dataLoader",
     "filters",
+    "metawatch",
     "render",
     "report",
     "save",
     "state",
-    "theme"
+    "theme",
+    "trainer"
   ]
 }

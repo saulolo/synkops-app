@@ -509,4 +509,8 @@ wiz(0);
 renderKanban();
 renderRing();
 culpa();
+
+// SPEC 21: producto activo de la píldora (nombre y zonas de CPA) para los cortes de la barra.
+// Se lee al calcular, no se copia: siempre trae el S vigente.
+globalThis.PYL.app.trainer = { product: function(){ return S; } };
 })();

@@ -11,7 +11,7 @@ const caso = (nombre, fn) => casos.push([nombre, fn]);
 
 caso('exporta todas las funciones del núcleo aplanadas', () => {
   const claves = Object.keys(core).sort().join(',');
-  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CH_CPA_READ,CH_HELP,CH_SIDES,CK_DAYS,CK_MONTHS,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,HOME_EPOCH,HOME_NAME,HOME_QUOTES,HOME_SEED,HOME_SLOTS,HUB_DEFAULTS,HUB_VERSION,LADDER_BLOCKS,LANDING,LEVELS,LG_ACCOUNTS,LG_BANK,LG_CATALOG,LG_DAYS,LG_NEQUI,LG_PARTS,LG_STAGES,LG_STORE,LG_TEMPLATES,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TK_HISTORY_DAYS,TK_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,chChain,chHard,chPlat,ckAngles,ckDate,ckDay,ckLabel,ckTime,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,homeDay,homeGreeting,homeHello,homeOrder,homePick,homeSlot,hubAdd,hubCheck,hubClean,hubDefaults,hubDomain,hubFavicon,hubInitials,hubLoad,hubOrder,hubRemove,hubSet,hubUrl,isDropi,isMetrics,key,kpis,lgForm,lgFromCand,lgMessage,lgMoney,lgMoneyText,lgPhone,lgPrefill,lgTemplate,lgValues,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,tkAdd,tkAddDays,tkAddSub,tkCanCarry,tkCarry,tkCarrySource,tkDateLabel,tkDayDate,tkDayKey,tkDayLabel,tkDelete,tkDeleteSub,tkEdit,tkEditSub,tkEmpty,tkIsHour,tkLoad,tkMove,tkMoveSub,tkParseHour,tkPastDays,tkProgress,tkRollOver,tkSetAll,tkSetHour,tkShortDate,tkTasksOf,tkToggle,tkToggleCollapsed,tkToggleSub,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
+  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CH_CPA_READ,CH_HELP,CH_SIDES,CK_DAYS,CK_MONTHS,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,HOME_EPOCH,HOME_NAME,HOME_QUOTES,HOME_SEED,HOME_SLOTS,HUB_DEFAULTS,HUB_VERSION,LADDER_BLOCKS,LANDING,LEVELS,LG_ACCOUNTS,LG_BANK,LG_CATALOG,LG_DAYS,LG_NEQUI,LG_PARTS,LG_STAGES,LG_STORE,LG_TEMPLATES,LIMITS,MARGIN,MISTAKES,MSP,MW_API,MW_EVERY,MW_PI_TYPES,MW_SALE_TYPES,MW_VERSION,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TK_HISTORY_DAYS,TK_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,chChain,chHard,chPlat,ckAngles,ckDate,ckDay,ckLabel,ckTime,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,homeDay,homeGreeting,homeHello,homeOrder,homePick,homeSlot,hubAdd,hubCheck,hubClean,hubDefaults,hubDomain,hubFavicon,hubInitials,hubLoad,hubOrder,hubRemove,hubSet,hubUrl,isDropi,isMetrics,key,kpis,lgForm,lgFromCand,lgMessage,lgMoney,lgMoneyText,lgPhone,lgPrefill,lgTemplate,lgValues,list,marginLevel,matchProduct,mspLevel,mwAction,mwAlerts,mwCut,mwError,mwK,mwLoad,mwRow,mwRows,mwVerdict,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,tkAdd,tkAddDays,tkAddSub,tkCanCarry,tkCarry,tkCarrySource,tkDateLabel,tkDayDate,tkDayKey,tkDayLabel,tkDelete,tkDeleteSub,tkEdit,tkEditSub,tkEmpty,tkIsHour,tkLoad,tkMove,tkMoveSub,tkParseHour,tkPastDays,tkProgress,tkRollOver,tkSetAll,tkSetHour,tkShortDate,tkTasksOf,tkToggle,tkToggleCollapsed,tkToggleSub,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
 });
 
 caso('Costeo: proveedor 30.000 da precio $99.900 y tope $21.617', () => {
@@ -2260,6 +2260,129 @@ caso('Reloj: día, fecha, hora y etiqueta', () => {
   assert.strictEqual(core.ckTime(ckAt(12, 0)), '12:00 p. m.');
   assert.strictEqual(core.ckTime(ckAt(23, 59)), '11:59 p. m.');
   assert.strictEqual(core.ckLabel(ckAt(10, 42, 30)), 'Viernes, 20 nov · 10:42 a. m.');
+});
+
+// ---- Cortes de testeo en la barra (SPEC 21) ----
+const mwSet = (id, created, status = 'ACTIVE', name = 'Conjunto ' + id) => ({ id, name, effective_status: status, created_time: created });
+const mwIns = (id, spend, pi = 0, sales = 0) => ({
+  adset_id: id, adset_name: 'x', spend: String(spend),
+  actions: [
+    { action_type: 'link_click', value: '50' },
+    { action_type: 'offsite_conversion.fb_pixel_initiate_checkout', value: String(pi) },
+    { action_type: 'initiate_checkout', value: String(pi) },
+    { action_type: 'omni_initiated_checkout', value: String(pi) },
+    { action_type: 'offsite_conversion.fb_pixel_purchase', value: String(sales) },
+    { action_type: 'purchase', value: String(sales) },
+  ],
+});
+const mwR = (id, spend, active = true) => ({ id, name: id, short: id, active, spend, pi: 0, sales: 0, created: '' });
+
+caso('Cortes Meta: constantes', () => {
+  assert.strictEqual(core.MW_VERSION, 1);
+  assert.strictEqual(core.MW_API, 'v27.0');
+  assert.strictEqual(core.MW_EVERY, 15 * 60 * 1000);
+  assert.deepStrictEqual(core.MW_PI_TYPES, ['offsite_conversion.fb_pixel_initiate_checkout', 'initiate_checkout', 'omni_initiated_checkout']);
+  assert.deepStrictEqual(core.MW_SALE_TYPES, ['offsite_conversion.fb_pixel_purchase', 'purchase', 'omni_purchase']);
+});
+
+caso('Cortes Meta: mwAction toma el primer tipo presente y no suma duplicados', () => {
+  const a = mwIns('1', 0, 7, 2).actions;
+  assert.strictEqual(core.mwAction(a, core.MW_PI_TYPES), 7, 'PI = 7, no 21');
+  assert.strictEqual(core.mwAction(a, core.MW_SALE_TYPES), 2, 'Ventas = 2, no 4');
+  assert.strictEqual(core.mwAction([{ action_type: 'omni_purchase', value: '3' }], core.MW_SALE_TYPES), 3, 'Cae en el tercero si falta el primero');
+  assert.strictEqual(core.mwAction([{ action_type: 'link_click', value: '9' }], core.MW_PI_TYPES), 0, 'Sin el tipo → 0');
+  assert.strictEqual(core.mwAction(undefined, core.MW_PI_TYPES), 0, 'Sin actions → 0');
+});
+
+caso('Cortes Meta: mwRow y mwRows (orden por creación, C1…Cn, sin gasto = 0)', () => {
+  const row = core.mwRow(mwIns('a', '21500.5', 4, 1), mwSet('a', '2026-11-19T05:00:00-0500', 'PAUSED', 'Plant · video 1'));
+  assert.deepStrictEqual(row, { id: 'a', name: 'Plant · video 1', short: '', active: false, spend: 21500.5, pi: 4, sales: 1, created: '2026-11-19T05:00:00-0500' });
+  const sets = [mwSet('c', '2026-11-19T05:02:00-0500'), mwSet('a', '2026-11-19T05:00:00-0500'), mwSet('d', '2026-11-19T05:03:00-0500', 'CAMPAIGN_PAUSED'), mwSet('b', '2026-11-19T05:01:00-0500')];
+  const rows = core.mwRows([mwIns('b', 12000, 2), mwIns('a', 31250, 6, 1), mwIns('zz', 999)], sets);
+  assert.deepStrictEqual(rows.map((r) => r.id), ['a', 'b', 'c', 'd'], 'Orden por created_time');
+  assert.deepStrictEqual(rows.map((r) => r.short), ['C1', 'C2', 'C3', 'C4']);
+  assert.deepStrictEqual(rows.map((r) => r.spend), [31250, 12000, 0, 0], 'Conjunto sin insights = gasto 0; insight sin conjunto se ignora');
+  assert.deepStrictEqual(rows.map((r) => r.active), [true, true, true, false]);
+  assert.deepStrictEqual(core.mwRows(undefined, []), []);
+});
+
+caso('Cortes Meta: mwCut por gasto acumulado', () => {
+  for (const [spend, cut] of [[0, -1], [19999, -1], [20000, 0], [29999, 0], [30000, 1], [39999, 1], [40000, 2], [250000, 2]]) {
+    assert.strictEqual(core.mwCut(spend), cut, String(spend));
+  }
+});
+
+caso('Cortes Meta: mwAlerts late, suena una vez y respeta Revisado', () => {
+  // Ciclo 1: 18.000 → nada.
+  let a = core.mwAlerts([mwR('x', 18000)], {}, {});
+  assert.deepStrictEqual(a, { pulse: [], ring: [], rung: {} });
+  // Ciclo 2: pasa a 21.000 → late y suena.
+  a = core.mwAlerts([mwR('x', 21000)], {}, a.rung);
+  assert.deepStrictEqual(a, { pulse: ['x'], ring: ['x'], rung: { x: 0 } });
+  // Ciclo 3: mismo corte → late, no vuelve a sonar.
+  a = core.mwAlerts([mwR('x', 24000)], {}, a.rung);
+  assert.deepStrictEqual(a, { pulse: ['x'], ring: [], rung: { x: 0 } });
+  // Revisado (seen = 0) → deja de latir.
+  a = core.mwAlerts([mwR('x', 24000)], { x: 0 }, a.rung);
+  assert.deepStrictEqual(a, { pulse: [], ring: [], rung: { x: 0 } });
+  // Siguiente corte → late y suena otra vez.
+  a = core.mwAlerts([mwR('x', 30500)], { x: 0 }, a.rung);
+  assert.deepStrictEqual(a, { pulse: ['x'], ring: ['x'], rung: { x: 1 } });
+  // No muta lo que recibe.
+  const rung = { x: 0 };
+  core.mwAlerts([mwR('x', 41000)], {}, rung);
+  assert.deepStrictEqual(rung, { x: 0 });
+});
+
+caso('Cortes Meta: mwAlerts ignora conjuntos apagados y elegir campaña late sin sonar', () => {
+  const a = core.mwAlerts([mwR('on', 32000), mwR('off', 41000, false)], {}, {});
+  assert.deepStrictEqual(a, { pulse: ['on'], ring: ['on'], rung: { on: 1 } }, 'El apagado no late ni suena');
+  const q = core.mwAlerts([mwR('p', 41000), mwR('q', 5000)], {}, {}, true);
+  assert.deepStrictEqual(q, { pulse: ['p'], ring: [], rung: { p: 2 } }, 'quiet: late el último corte, sin sonido');
+  const n = core.mwAlerts([mwR('p', 41000)], {}, q.rung);
+  assert.deepStrictEqual(n.ring, [], 'El siguiente ciclo no suena lo ya pasado');
+});
+
+caso('Cortes Meta: mwVerdict = testVerdict en COP; null en otra moneda o antes del corte 1', () => {
+  const row = { id: 'x', spend: 30500, pi: 5, sales: 0 };
+  assert.deepStrictEqual(core.mwVerdict(row, 15000, 'COP'), core.testVerdict({ spend: 30500, pi: 5, sales: 0, tope: 15000 }));
+  assert.strictEqual(core.mwVerdict(row, 15000, 'USD'), null);
+  assert.strictEqual(core.mwVerdict({ ...row, spend: 19999 }, 15000, 'COP'), null);
+});
+
+caso('Cortes Meta: mwError traduce los errores de Meta', () => {
+  assert.strictEqual(core.mwError({ error: { code: 190, type: 'OAuthException', message: 'Error validating access token' } }, 400).k, 'token');
+  assert.strictEqual(core.mwError({ error: { code: 190 } }, 400).text, 'Token inválido: vuelve a conectar');
+  for (const code of [4, 17, 613]) {
+    const e = core.mwError({ error: { code, message: 'limit' } }, 400);
+    assert.deepStrictEqual(e, { k: 'limit', text: 'Meta pidió esperar' }, 'código ' + code);
+  }
+  assert.deepStrictEqual(core.mwError(null, 0), { k: 'net', text: 'Sin conexión' });
+  const o = core.mwError({ error: { code: 100, message: 'Unsupported get request.' } }, 400);
+  assert.strictEqual(o.k, 'other');
+  assert.ok(o.text.includes('Unsupported get request.'), o.text);
+  assert.strictEqual(core.mwError({}, 500).k, 'other');
+});
+
+caso('Cortes Meta: mwLoad valida pyl-meta', () => {
+  const ok = {
+    v: 1, token: 'EAAB123', account: { id: 'act_1', name: 'VN-1', currency: 'COP' }, campaign: { id: '120', name: 'TEST' },
+    sound: false, seen: { a: 0 }, rung: { a: 1 }, last: { at: 1763650000000, rows: [mwR('a', 31000)] },
+  };
+  assert.deepStrictEqual(core.mwLoad(JSON.stringify(ok)), ok);
+  assert.deepStrictEqual(core.mwLoad(JSON.stringify({ v: 1, token: 't' })),
+    { v: 1, token: 't', account: null, campaign: null, sound: true, seen: {}, rung: {}, last: null }, 'Faltantes = valores de arranque');
+  for (const [name, raw] of [
+    ['vacío', null], ['no JSON', '{roto'], ['otra v', JSON.stringify({ ...ok, v: 2 })], ['sin token', JSON.stringify({ ...ok, token: '' })],
+    ['cuenta rara', JSON.stringify({ ...ok, account: { id: 1 } })], ['campaña rara', JSON.stringify({ ...ok, campaign: 'x' })],
+    ['sound raro', JSON.stringify({ ...ok, sound: 'si' })], ['seen raro', JSON.stringify({ ...ok, seen: { a: 5 } })],
+    ['rung raro', JSON.stringify({ ...ok, rung: [] })], ['last raro', JSON.stringify({ ...ok, last: { at: 'hoy', rows: [] } })],
+    ['fila rara', JSON.stringify({ ...ok, last: { at: 1, rows: [{ id: 'a', spend: 'mucho' }] } })],
+  ]) assert.strictEqual(core.mwLoad(raw), null, name);
+});
+
+caso('Cortes Meta: mwK en miles hacia abajo', () => {
+  for (const [n, t] of [[31250, '31K'], [19999, '19K'], [20000, '20K'], [850, '0K'], [0, '0K'], [100000, '100K']]) assert.strictEqual(core.mwK(n), t, String(n));
 });
 
 let fallos = 0;
