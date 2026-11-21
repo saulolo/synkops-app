@@ -23,6 +23,7 @@
     "scaling",
     "search",
     "simulator",
+    "tasks",
     "testing"
   ],
   "services": [
@@ -56,6 +57,7 @@
     "search",
     "simulator",
     "summary",
+    "tasks",
     "testing",
     "tooltip",
     "trend",

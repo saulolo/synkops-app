@@ -11,7 +11,7 @@ const caso = (nombre, fn) => casos.push([nombre, fn]);
 
 caso('exporta todas las funciones del núcleo aplanadas', () => {
   const claves = Object.keys(core).sort().join(',');
-  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CH_CPA_READ,CH_HELP,CH_SIDES,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,HOME_EPOCH,HOME_NAME,HOME_QUOTES,HOME_SEED,HOME_SLOTS,HUB_DEFAULTS,HUB_VERSION,LADDER_BLOCKS,LANDING,LEVELS,LG_ACCOUNTS,LG_BANK,LG_CATALOG,LG_DAYS,LG_NEQUI,LG_PARTS,LG_STAGES,LG_STORE,LG_TEMPLATES,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,chChain,chHard,chPlat,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,homeDay,homeGreeting,homeHello,homeOrder,homePick,homeSlot,hubAdd,hubCheck,hubClean,hubDefaults,hubDomain,hubFavicon,hubInitials,hubLoad,hubOrder,hubRemove,hubSet,hubUrl,isDropi,isMetrics,key,kpis,lgForm,lgFromCand,lgMessage,lgMoney,lgMoneyText,lgPhone,lgPrefill,lgTemplate,lgValues,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
+  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CH_CPA_READ,CH_HELP,CH_SIDES,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,HOME_EPOCH,HOME_NAME,HOME_QUOTES,HOME_SEED,HOME_SLOTS,HUB_DEFAULTS,HUB_VERSION,LADDER_BLOCKS,LANDING,LEVELS,LG_ACCOUNTS,LG_BANK,LG_CATALOG,LG_DAYS,LG_NEQUI,LG_PARTS,LG_STAGES,LG_STORE,LG_TEMPLATES,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TK_HISTORY_DAYS,TK_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,chChain,chHard,chPlat,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,homeDay,homeGreeting,homeHello,homeOrder,homePick,homeSlot,hubAdd,hubCheck,hubClean,hubDefaults,hubDomain,hubFavicon,hubInitials,hubLoad,hubOrder,hubRemove,hubSet,hubUrl,isDropi,isMetrics,key,kpis,lgForm,lgFromCand,lgMessage,lgMoney,lgMoneyText,lgPhone,lgPrefill,lgTemplate,lgValues,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,tkAdd,tkAddDays,tkAddSub,tkCanCarry,tkCarry,tkCarrySource,tkDateLabel,tkDayDate,tkDayKey,tkDayLabel,tkDelete,tkDeleteSub,tkEdit,tkEditSub,tkEmpty,tkIsHour,tkLoad,tkMove,tkMoveSub,tkParseHour,tkPastDays,tkProgress,tkRollOver,tkSetAll,tkSetHour,tkShortDate,tkTasksOf,tkToggle,tkToggleCollapsed,tkToggleSub,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
 });
 
 caso('Costeo: proveedor 30.000 da precio $99.900 y tope $21.617', () => {
@@ -1789,6 +1789,447 @@ caso('Inicio: homePick da una frase en la mañana y otra en la tarde, sin repeti
   assert.ok(core.homePick(Q, new Date(2025, 5, 1, 8)), 'Fechas antes del inicio también dan frase');
   assert.strictEqual(core.homePick([], new Date()), null);
   assert.deepStrictEqual(core.homePick([{ text: 'A', author: 'B' }], new Date(2026, 3, 3, 14)), { slot: 1, label: 'FRASE DE HOY', text: 'A', author: 'B' });
+});
+
+// ---- Mis tareas (SPEC 19): port de tests/domain/* de My Sticky Notes ----
+
+caso('Mis tareas: tkDayKey formatea la fecha local con ceros', () => {
+  assert.strictEqual(core.tkDayKey(new Date(2026, 10, 14)), '2026-11-14');
+  assert.strictEqual(core.tkDayKey(new Date(2026, 0, 5)), '2026-01-05');
+  assert.strictEqual(core.tkDayKey(new Date(2026, 10, 14, 0, 0)), '2026-11-14', 'Local, no UTC');
+  assert.strictEqual(core.tkDayKey(new Date(2026, 10, 14, 23, 59)), '2026-11-14', 'Local, no UTC');
+});
+
+caso('Mis tareas: tkDayDate da la medianoche local', () => {
+  assert.strictEqual(core.tkDayDate('2026-11-14').getTime(), new Date(2026, 10, 14).getTime());
+  assert.strictEqual(core.tkDayKey(core.tkDayDate('2027-01-01')), '2027-01-01');
+});
+
+caso('Mis tareas: tkAddDays suma, resta y cruza meses, años y bisiestos', () => {
+  assert.strictEqual(core.tkAddDays('2026-11-14', 1), '2026-11-15');
+  assert.strictEqual(core.tkAddDays('2026-11-14', -5), '2026-11-09');
+  assert.strictEqual(core.tkAddDays('2026-11-14', 0), '2026-11-14');
+  assert.strictEqual(core.tkAddDays('2026-11-30', 1), '2026-12-01');
+  assert.strictEqual(core.tkAddDays('2026-12-31', 1), '2027-01-01');
+  assert.strictEqual(core.tkAddDays('2027-01-01', -1), '2026-12-31');
+  assert.strictEqual(core.tkAddDays('2028-02-28', 1), '2028-02-29');
+  assert.strictEqual(core.tkAddDays('2027-02-28', 1), '2027-03-01');
+});
+
+caso('Mis tareas: tkDayLabel nombra Hoy, Mañana, Ayer y los demás con la etiqueta larga', () => {
+  const today = '2026-11-14';
+  assert.strictEqual(core.tkDayLabel('2026-11-14', today), 'Hoy');
+  assert.strictEqual(core.tkDayLabel('2026-11-15', today), 'Mañana');
+  assert.strictEqual(core.tkDayLabel('2026-11-13', today), 'Ayer');
+  assert.strictEqual(core.tkDayLabel('2026-11-11', today), 'Miércoles, 11 nov');
+  assert.strictEqual(core.tkDayLabel('2026-11-16', today), 'Lunes, 16 nov');
+});
+
+caso('Mis tareas: tkPastDays lista días anteriores con tareas, del más reciente al más viejo', () => {
+  const t = {};
+  const today = '2026-11-14';
+  assert.deepStrictEqual(core.tkPastDays({ days: { '2026-11-10': [t], '2026-11-13': [t], '2026-11-12': [t, t] } }, today), ['2026-11-13', '2026-11-12', '2026-11-10']);
+  assert.deepStrictEqual(core.tkPastDays({ days: { '2026-11-14': [t], '2026-11-15': [t], '2026-11-13': [], '2026-11-11': [t] } }, today), ['2026-11-11'], 'Sin hoy, mañana ni vacíos');
+  assert.deepStrictEqual(core.tkPastDays({ days: { '2026-12-31': [t], '2027-01-01': [t] } }, '2027-01-02'), ['2027-01-01', '2026-12-31'], 'Cruza de año');
+  assert.deepStrictEqual(core.tkPastDays({ days: {} }, today), []);
+  assert.strictEqual(core.TK_HISTORY_DAYS, 5);
+  assert.strictEqual(core.TK_VERSION, 1);
+});
+
+caso('Mis tareas: tkDateLabel y tkShortDate', () => {
+  assert.strictEqual(core.tkDateLabel(new Date(2026, 10, 12)), 'Jueves, 12 nov');
+  assert.strictEqual(core.tkDateLabel(new Date(2026, 0, 4)), 'Domingo, 4 ene');
+  assert.strictEqual(core.tkDateLabel(new Date(2026, 8, 30)), 'Miércoles, 30 sep');
+  assert.strictEqual(core.tkDateLabel(new Date(2026, 11, 26)), 'Sábado, 26 dic');
+  assert.strictEqual(core.tkShortDate(new Date(2026, 10, 12)), 'Jue, 12 nov');
+  assert.strictEqual(core.tkShortDate(new Date(2026, 10, 20)), 'Vie, 20 nov');
+  const days = [15, 16, 17, 18, 19, 20, 21].map((d) => core.tkShortDate(new Date(2026, 10, d)).split(',')[0]);
+  assert.deepStrictEqual(days, ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']);
+  assert.strictEqual(core.tkShortDate(new Date(2026, 0, 4)), 'Dom, 4 ene');
+  assert.strictEqual(core.tkShortDate(new Date(2026, 8, 30)), 'Mié, 30 sep');
+});
+
+caso('Mis tareas: tkIsHour y tkParseHour', () => {
+  for (const h of [0, 9, 23]) assert.strictEqual(core.tkIsHour(h), true, String(h));
+  for (const h of [-1, 24, 8.5, '8', null, undefined, NaN]) assert.strictEqual(core.tkIsHour(h), false, String(h));
+  assert.strictEqual(core.tkParseHour(''), undefined);
+  assert.strictEqual(core.tkParseHour('   '), undefined);
+  assert.strictEqual(core.tkParseHour('0'), 0);
+  assert.strictEqual(core.tkParseHour(' 8 '), 8);
+  assert.strictEqual(core.tkParseHour('09'), 9);
+  assert.strictEqual(core.tkParseHour('23'), 23);
+  for (const s of ['24', '25', '-1', '8.5', 'a', '100', '1e1']) assert.strictEqual(core.tkParseHour(s), null, s);
+});
+
+// Comandos (port de note-operations.test.ts). tkAdd recibe { hour, text }, id y now.
+const TKD = '2026-11-12';
+const tkAt = (hour, minute = 0) => new Date(2026, 10, 12, hour, minute);
+const tkT = (note, day = TKD) => core.tkTasksOf(note, day);
+const tkProg = (note) => core.tkProgress(tkT(note));
+const tkIds = (note, day = TKD) => tkT(note, day).map((t) => t.id);
+const tkAdd = (note, text, id, now, hour, day = TKD) => core.tkAdd(note, day, { hour, text }, id, now);
+const tkBase = () => {
+  let n = core.tkEmpty();
+  n = tkAdd(n, 'Comprar pan', 't1', tkAt(13, 40));
+  n = tkAdd(n, 'Llamar al banco', 't2', tkAt(9));
+  n = core.tkAddSub(n, 't1', 'Integral', 's1');
+  return core.tkAddSub(n, 't1', 'Sin sal', 's2');
+};
+const tkOf = (...ids) => ids.reduce((n, id, i) => tkAdd(n, id, id, tkAt(8 + i)), core.tkEmpty());
+
+caso('Mis tareas: tkEmpty y tkTasksOf', () => {
+  assert.deepStrictEqual(core.tkEmpty(), { days: {} });
+  assert.deepStrictEqual(core.tkTasksOf(core.tkEmpty(), TKD), []);
+});
+
+caso('Mis tareas: tkAdd agrega al final con la hora del reloj o la indicada', () => {
+  const n = tkAdd(core.tkEmpty(), 'Comprar pan', 't1', tkAt(13, 40));
+  assert.deepStrictEqual(tkT(n), [{ id: 't1', hour: 13, text: 'Comprar pan', done: false, subtasks: [], createdAt: tkAt(13, 40).toISOString() }]);
+  assert.deepStrictEqual(tkIds(tkBase()), ['t1', 't2'], 'Orden de inserción');
+  assert.strictEqual(tkT(tkAdd(core.tkEmpty(), '  hola  ', 't1', tkAt(8)))[0].text, 'hola', 'Recorta');
+  const empty = core.tkEmpty();
+  for (const text of ['', '   ', '\t\n']) assert.strictEqual(tkAdd(empty, text, 't1', tkAt(8)), empty, 'Texto vacío: ' + JSON.stringify(text));
+  let m = tkAdd(core.tkEmpty(), 'a', 'a', tkAt(0, 5));
+  m = tkAdd(m, 'b', 'b', tkAt(23, 59));
+  assert.deepStrictEqual(tkT(m).map((t) => t.hour), [0, 23]);
+  tkAdd(empty, 'x', 't1', tkAt(8));
+  assert.deepStrictEqual(tkT(empty), [], 'No muta');
+  assert.strictEqual(tkT(tkAdd(core.tkEmpty(), 'pan', 't1', tkAt(13, 40), 9))[0].hour, 9, 'Hora manual');
+  let x = tkAdd(core.tkEmpty(), 'a', 'a', tkAt(12), 0);
+  x = tkAdd(x, 'b', 'b', tkAt(12), 23);
+  assert.deepStrictEqual(tkT(x).map((t) => t.hour), [0, 23], 'Extremos 0 y 23');
+  for (const h of [24, -1, 9.5, NaN, null]) assert.strictEqual(tkAdd(empty, 'x', 't1', tkAt(8), h), empty, 'Hora inválida: ' + h);
+});
+
+caso('Mis tareas: tkSetAll marca o desmarca todo el día', () => {
+  const all = core.tkSetAll(tkBase(), TKD, true);
+  assert.ok(tkT(all).every((t) => t.done && t.subtasks.every((s) => s.done)));
+  assert.deepStrictEqual(tkProg(all), { done: 4, total: 4, percent: 100 });
+  let mix = core.tkToggle(tkBase(), 't2');
+  mix = core.tkToggleSub(mix, 't1', 's1');
+  assert.deepStrictEqual(tkProg(core.tkSetAll(mix, TKD, false)), { done: 0, total: 4, percent: 0 });
+  const part = core.tkSetAll(core.tkToggle(tkBase(), 't1'), TKD, true);
+  assert.deepStrictEqual(tkIds(part), ['t1', 't2']);
+  assert.strictEqual(tkProg(part).done, 4);
+  const n = tkBase();
+  assert.strictEqual(core.tkSetAll(n, TKD, false), n, 'Nada cambia: misma referencia');
+  assert.strictEqual(core.tkSetAll(all, TKD, true), all);
+  assert.strictEqual(core.tkSetAll(n, '2026-11-13', true), n, 'Día vacío');
+  const other = tkAdd(tkBase(), 'Otro', 'x', tkAt(10), undefined, '2026-11-13');
+  const next = core.tkSetAll(other, TKD, true);
+  assert.strictEqual(tkT(next, '2026-11-13'), tkT(other, '2026-11-13'), 'No toca otros días');
+  assert.ok(!tkT(other).some((t) => t.done), 'No muta');
+});
+
+caso('Mis tareas: tkMove reordena dentro del día y limita el índice', () => {
+  assert.deepStrictEqual(tkIds(core.tkMove(tkOf('a', 'b', 'c', 'd'), 'a', 2)), ['b', 'c', 'a', 'd']);
+  assert.deepStrictEqual(tkIds(core.tkMove(tkOf('a', 'b', 'c', 'd'), 'd', 1)), ['a', 'd', 'b', 'c']);
+  const n = tkOf('a', 'b', 'c');
+  assert.deepStrictEqual(tkIds(core.tkMove(n, 'c', 0)), ['c', 'a', 'b']);
+  assert.deepStrictEqual(tkIds(core.tkMove(n, 'a', 2)), ['b', 'c', 'a']);
+  assert.deepStrictEqual(tkIds(core.tkMove(n, 'b', 99)), ['a', 'c', 'b']);
+  assert.deepStrictEqual(tkIds(core.tkMove(n, 'b', -5)), ['b', 'a', 'c']);
+  assert.strictEqual(core.tkMove(n, 'b', 1), n);
+  assert.strictEqual(core.tkMove(n, 'c', 99), n);
+  assert.strictEqual(core.tkMove(n, 'a', -1), n);
+  const two = tkOf('a', 'b');
+  assert.strictEqual(core.tkMove(two, 'zzz', 0), two);
+  assert.strictEqual(core.tkMove(two, 'a', 0.5), two);
+  assert.strictEqual(core.tkMove(two, 'a', NaN), two);
+  const one = tkOf('a');
+  assert.strictEqual(core.tkMove(one, 'a', 3), one);
+  const b = tkBase();
+  const before = JSON.stringify(b);
+  const moved = core.tkMove(b, 't1', 1);
+  assert.strictEqual(JSON.stringify(b), before, 'No muta');
+  assert.deepStrictEqual(tkIds(moved), ['t2', 't1']);
+  assert.deepStrictEqual(tkT(moved)[1].subtasks.map((s) => s.id), ['s1', 's2'], 'Conserva subtareas');
+  let d = tkOf('a', 'b');
+  d = tkAdd(d, 'x', 'x', tkAt(8), undefined, '2026-11-13');
+  d = tkAdd(d, 'y', 'y', tkAt(9), undefined, '2026-11-13');
+  const md = core.tkMove(d, 'a', 1);
+  assert.deepStrictEqual(tkIds(md), ['b', 'a']);
+  assert.strictEqual(tkT(md, '2026-11-13'), tkT(d, '2026-11-13'), 'Solo su día');
+  assert.deepStrictEqual(tkIds(core.tkSetHour(n, 'c', 0)), ['a', 'b', 'c'], 'Cambiar hora no mueve');
+  assert.deepStrictEqual(tkIds(core.tkToggle(n, 'a')), ['a', 'b', 'c'], 'Marcar no mueve');
+});
+
+caso('Mis tareas: tkMoveSub reordena dentro de su tarea y limita el índice', () => {
+  let n = tkOf('a', 'b');
+  for (const s of ['x', 'y', 'z']) n = core.tkAddSub(n, 'a', s.toUpperCase(), s);
+  n = core.tkAddSub(n, 'b', 'Otra', 'w');
+  const subs = (note, id = 'a') => tkT(note).find((t) => t.id === id).subtasks.map((s) => s.id);
+  assert.deepStrictEqual(subs(core.tkMoveSub(n, 'a', 'x', 2)), ['y', 'z', 'x']);
+  assert.deepStrictEqual(subs(core.tkMoveSub(n, 'a', 'z', 0)), ['z', 'x', 'y']);
+  assert.deepStrictEqual(subs(core.tkMoveSub(n, 'a', 'y', 99)), ['x', 'z', 'y'], 'Índice alto → al final');
+  assert.deepStrictEqual(subs(core.tkMoveSub(n, 'a', 'y', -5)), ['y', 'x', 'z'], 'Índice negativo → al principio');
+  const before = JSON.stringify(n);
+  const moved = core.tkMoveSub(n, 'a', 'x', 1);
+  assert.strictEqual(JSON.stringify(n), before, 'No muta');
+  assert.strictEqual(tkT(moved).find((t) => t.id === 'b'), tkT(n).find((t) => t.id === 'b'), 'Las otras tareas no cambian');
+  assert.deepStrictEqual(tkIds(moved), ['a', 'b'], 'No reordena tareas');
+  const t = tkT(moved)[0];
+  assert.deepStrictEqual(t.subtasks.map((s) => s.text), ['Y', 'X', 'Z'], 'Conserva texto');
+  // Sin cambios: misma nota.
+  assert.strictEqual(core.tkMoveSub(n, 'a', 'y', 1), n, 'Misma posición');
+  assert.strictEqual(core.tkMoveSub(n, 'a', 'z', 99), n, 'Ya al final');
+  assert.strictEqual(core.tkMoveSub(n, 'a', 'nope', 0), n, 'Subtarea inexistente');
+  assert.strictEqual(core.tkMoveSub(n, 'nope', 'x', 0), n, 'Tarea inexistente');
+  assert.strictEqual(core.tkMoveSub(n, 'b', 'x', 0), n, 'Subtarea de otra tarea');
+  assert.strictEqual(core.tkMoveSub(n, 'a', 'x', 0.5), n, 'Índice no entero');
+  assert.strictEqual(core.tkMoveSub(n, 'b', 'w', 3), n, 'Una sola subtarea');
+});
+
+caso('Mis tareas: tkSetHour', () => {
+  assert.strictEqual(tkT(core.tkSetHour(tkBase(), 't1', 7))[0].hour, 7);
+  const n = tkBase();
+  for (const [id, h] of [['t1', 24], ['t1', 2.5], ['t1', 13], ['nope', 5]]) assert.strictEqual(core.tkSetHour(n, id, h), n, `${id} ${h}`);
+});
+
+caso('Mis tareas: tkAddSub y tkToggleCollapsed', () => {
+  const n = tkBase();
+  assert.deepStrictEqual(tkT(n)[0].subtasks, [{ id: 's1', text: 'Integral', done: false }, { id: 's2', text: 'Sin sal', done: false }]);
+  assert.strictEqual(core.tkAddSub(n, 't1', '  ', 's9'), n, 'Texto vacío');
+  assert.strictEqual(core.tkAddSub(n, 'nope', 'x', 's9'), n, 'Tarea inexistente');
+  const c = core.tkToggleCollapsed(n, 't1');
+  assert.strictEqual(tkT(c)[0].collapsed, true);
+  assert.strictEqual(tkT(core.tkToggleCollapsed(c, 't1'))[0].collapsed, false);
+  assert.strictEqual(core.tkToggleCollapsed(n, 't2'), n, 'Sin subtareas no cambia');
+  assert.strictEqual(core.tkToggleCollapsed(n, 'nope'), n);
+  const e = core.tkAddSub(c, 't1', 'Otra', 's3');
+  assert.strictEqual(tkT(e)[0].collapsed, false, 'Añadir subtarea expande');
+  assert.strictEqual(tkT(e)[0].subtasks.length, 3);
+  assert.deepStrictEqual(tkProg(c), tkProg(n), 'Contraer no cambia el progreso');
+});
+
+caso('Mis tareas: tkToggle y tkToggleSub', () => {
+  const n = core.tkToggle(tkBase(), 't1');
+  assert.strictEqual(tkT(n)[0].done, true);
+  assert.ok(tkT(n)[0].subtasks.every((s) => !s.done), 'Marcar la tarea no marca sus subtareas');
+  assert.strictEqual(tkT(core.tkToggle(n, 't1'))[0].done, false);
+  let s = core.tkToggleSub(tkBase(), 't1', 's1');
+  s = core.tkToggleSub(s, 't1', 's2');
+  assert.ok(tkT(s)[0].subtasks.every((x) => x.done));
+  assert.strictEqual(tkT(s)[0].done, false, 'Todas las subtareas no marcan la tarea');
+  const b = tkBase();
+  assert.strictEqual(core.tkToggle(b, 'nope'), b);
+  assert.strictEqual(core.tkToggleSub(b, 't1', 'nope'), b);
+  assert.strictEqual(core.tkToggleSub(b, 'nope', 's1'), b);
+});
+
+caso('Mis tareas: tkEdit y tkEditSub', () => {
+  assert.strictEqual(tkT(core.tkEdit(tkBase(), 't1', '  Pan y leche '))[0].text, 'Pan y leche');
+  assert.strictEqual(tkT(core.tkEditSub(tkBase(), 't1', 's1', ' Centeno '))[0].subtasks[0].text, 'Centeno');
+  const n = tkBase();
+  assert.strictEqual(core.tkEdit(n, 't1', '   '), n, 'Vacío conserva');
+  assert.strictEqual(core.tkEditSub(n, 't1', 's1', ''), n, 'Vacío conserva');
+  assert.strictEqual(core.tkEdit(n, 't1', 'Comprar pan'), n, 'Igual: misma referencia');
+  assert.strictEqual(tkT(core.tkEdit(tkBase(), 't1', 'Nuevo'))[1].text, 'Llamar al banco');
+});
+
+caso('Mis tareas: tkDelete y tkDeleteSub', () => {
+  assert.deepStrictEqual(tkIds(core.tkDelete(tkBase(), 't1')), ['t2'], 'Se lleva sus subtareas');
+  const d = core.tkDeleteSub(tkBase(), 't1', 's1');
+  assert.deepStrictEqual(tkT(d)[0].subtasks.map((s) => s.id), ['s2']);
+  assert.strictEqual(tkT(d).length, 2);
+  const n = tkBase();
+  assert.strictEqual(core.tkDelete(n, 'nope'), n);
+  assert.strictEqual(core.tkDeleteSub(n, 't1', 'nope'), n);
+});
+
+caso('Mis tareas: tkProgress cuenta tareas y subtareas y redondea', () => {
+  assert.deepStrictEqual(tkProg(core.tkEmpty()), { done: 0, total: 0, percent: 0 });
+  let n = tkAdd(core.tkEmpty(), 'T', 't', tkAt(8));
+  n = core.tkAddSub(n, 't', 'a', 'a');
+  n = core.tkAddSub(n, 't', 'b', 'b');
+  n = core.tkToggleSub(n, 't', 'a');
+  assert.deepStrictEqual(tkProg(n), { done: 1, total: 3, percent: 33 });
+  let r = tkOf('a', 'b', 'c');
+  r = core.tkToggle(core.tkToggle(r, 'a'), 'b');
+  assert.strictEqual(tkProg(r).percent, 67);
+  assert.deepStrictEqual(tkProg(core.tkToggle(tkOf('a'), 'a')), { done: 1, total: 1, percent: 100 });
+});
+
+caso('Mis tareas: listas por día', () => {
+  const D2 = '2026-11-13';
+  const two = () => core.tkAddSub(tkAdd(tkAdd(core.tkEmpty(), 'Hoy', 'a', tkAt(8)), 'Mañana', 'b', tkAt(8), undefined, D2), 'b', 'Sub', 'sb');
+  assert.deepStrictEqual(tkIds(two()), ['a']);
+  assert.deepStrictEqual(tkIds(two(), D2), ['b']);
+  let n = core.tkToggle(two(), 'b');
+  n = core.tkEdit(n, 'b', 'Otra');
+  n = core.tkSetHour(n, 'b', 20);
+  n = core.tkToggleSub(n, 'b', 'sb');
+  const b = tkT(n, D2)[0];
+  assert.deepStrictEqual([b.done, b.text, b.hour, b.subtasks[0].done], [true, 'Otra', 20, true], 'Por id en cualquier día');
+  const before = two();
+  assert.strictEqual(core.tkToggle(before, 'b').days[TKD], before.days[TKD], 'No toca otro día');
+  const del = core.tkDelete(two(), 'b');
+  assert.deepStrictEqual(tkT(del, D2), []);
+  assert.deepStrictEqual(tkIds(del), ['a']);
+  const p = core.tkToggle(two(), 'a');
+  assert.deepStrictEqual(core.tkProgress(tkT(p)), { done: 1, total: 1, percent: 100 });
+  assert.deepStrictEqual(core.tkProgress(tkT(p, D2)), { done: 0, total: 2, percent: 0 });
+});
+
+// Paso de los días y traer de ayer (port de roll-over.test.ts y carry-over.test.ts).
+const TKH = '2026-11-14';
+const TKY = '2026-11-13';
+const tkTask = (id, done = false, subtasks = []) => ({ id, hour: 9, text: `texto ${id}`, done, subtasks, collapsed: true, createdAt: '2026-11-13T09:00:00.000Z' });
+const tkNote = (days, lastCarryOver) => (lastCarryOver === undefined ? { days } : { days, lastCarryOver });
+const tkCounter = () => { let n = 0; return () => `n${++n}`; };
+
+caso('Mis tareas: tkRollOver solo poda, no mueve', () => {
+  const R = core.tkRollOver;
+  const b1 = tkNote({ [TKY]: [tkTask('p1'), tkTask('h1', true), tkTask('p2')] });
+  const a1 = R(b1, TKH);
+  assert.strictEqual(a1, b1, 'Ayer conserva hechas y pendientes');
+  assert.deepStrictEqual(tkIds(a1, TKY), ['p1', 'h1', 'p2']);
+  assert.strictEqual(a1.days[TKH], undefined, 'Hoy queda como estaba');
+  const a2 = R(tkNote({ [TKY]: [tkTask('p')], [TKH]: [tkTask('hoy')] }), TKH);
+  assert.deepStrictEqual(tkIds(a2, TKH), ['hoy']);
+  assert.deepStrictEqual(tkIds(a2, TKY), ['p']);
+  const a3 = R(tkNote({ '2026-11-09': [tkTask('a')], '2026-11-11': [tkTask('b')] }), TKH);
+  assert.deepStrictEqual(tkIds(a3, '2026-11-09'), ['a'], 'Pendiente de hace 5 días sigue en su día');
+  assert.deepStrictEqual(tkIds(a3, '2026-11-11'), ['b']);
+  assert.deepStrictEqual(tkT(a3, TKH), []);
+  const orig = tkTask('p', false, [{ id: 's1', text: 'a', done: true }, { id: 's2', text: 'b', done: false }]);
+  const b4 = tkNote({ [TKY]: [orig], '2026-11-12': [] });
+  const a4 = R(b4, TKH);
+  assert.strictEqual(a4.days[TKY], b4.days[TKY], 'Tareas y subtareas intactas');
+  const b5 = tkNote({ [TKH]: [tkTask('m')] });
+  assert.strictEqual(R(b5, TKH), b5, 'Mañana pasa a Hoy sin copiar');
+  const fut = [tkTask('futura')];
+  assert.strictEqual(R(tkNote({ '2026-11-15': fut, '2026-11-12': [] }), TKH).days['2026-11-15'], fut, 'Futuros intactos');
+  assert.deepStrictEqual(Object.keys(R(tkNote({ '2026-11-08': [tkTask('viejo')], '2026-11-09': [tkTask('limite', true)] }), TKH).days), ['2026-11-09'], 'Borra antes de hoy − 5');
+  const a8 = R(tkNote({ '2026-11-12': [], [TKY]: [tkTask('p')], [TKH]: [], '2026-11-15': [] }), TKH);
+  assert.deepStrictEqual(Object.keys(a8.days).sort(), [TKY, TKH, '2026-11-15'], 'Borra pasados vacíos, no hoy ni mañana vacíos');
+  const b9 = tkNote({ [TKY]: [tkTask('h', true), tkTask('p')], [TKH]: [tkTask('hoy')], '2026-11-15': [] });
+  assert.strictEqual(R(b9, TKH), b9, 'Sin nada que podar: misma referencia');
+  const e = tkNote({});
+  assert.strictEqual(R(e, TKH), e);
+  const b10 = tkNote({ '2026-11-01': [tkTask('x', true)], '2026-11-12': [tkTask('a'), tkTask('b', true)], [TKY]: [] });
+  const once = R(b10, TKH);
+  assert.notStrictEqual(once, b10);
+  assert.strictEqual(R(once, TKH), once, 'Idempotente');
+  const b11 = tkNote({ [TKY]: [tkTask('p'), tkTask('h', true)], '2026-11-01': [tkTask('v')] });
+  const snap = JSON.stringify(b11);
+  R(b11, TKH);
+  assert.strictEqual(JSON.stringify(b11), snap, 'No muta');
+  assert.strictEqual(R(tkNote({ '2026-11-01': [tkTask('x')] }, TKH), TKH).lastCarryOver, TKH, 'Conserva lastCarryOver');
+});
+
+caso('Mis tareas: tkCarrySource y tkCanCarry', () => {
+  assert.strictEqual(core.tkCarrySource(tkNote({ '2026-11-10': [tkTask('a')], '2026-11-12': [tkTask('b')], [TKH]: [tkTask('c')] }), TKH), '2026-11-12');
+  assert.strictEqual(core.tkCarrySource(tkNote({ '2026-11-11': [tkTask('a')], [TKY]: [] }), TKH), '2026-11-11', 'Salta días vacíos');
+  assert.strictEqual(core.tkCarrySource(tkNote({ [TKH]: [tkTask('a')], '2026-11-15': [tkTask('b')] }), TKH), null, 'Ignora hoy y futuros');
+  assert.strictEqual(core.tkCarrySource(tkNote({}), TKH), null);
+  assert.strictEqual(core.tkCarrySource(tkNote({ [TKY]: [] }), TKH), null);
+  assert.strictEqual(core.tkCanCarry(tkNote({ [TKY]: [tkTask('a')] }), TKH), true);
+  assert.strictEqual(core.tkCanCarry(tkNote({ [TKY]: [tkTask('a')], [TKH]: [] }), TKH), true);
+  assert.strictEqual(core.tkCanCarry(tkNote({ [TKY]: [tkTask('a')], [TKH]: [tkTask('b')] }), TKH), false, 'Hoy con tareas');
+  assert.strictEqual(core.tkCanCarry(tkNote({ [TKY]: [tkTask('a')] }, TKH), TKH), false, 'Ya se usó hoy');
+  assert.strictEqual(core.tkCanCarry(tkNote({ [TKY]: [tkTask('a')] }, TKY), TKH), true, 'Usado otro día');
+  assert.strictEqual(core.tkCanCarry(tkNote({ [TKY]: [tkTask('a')] }, '2026-11-20'), TKH), true, 'Reloj atrasado');
+  assert.strictEqual(core.tkCanCarry(tkNote({}), TKH), false, 'Sin origen');
+});
+
+caso('Mis tareas: tkCarry copia sin marcar, con ids nuevos y una vez por día', () => {
+  const subs = [{ id: 's1', text: 'a', done: true }, { id: 's2', text: 'b', done: false }];
+  const source = () => tkNote({ [TKY]: [tkTask('p'), tkTask('h', true, subs)] });
+  const after = core.tkCarry(source(), TKH, tkCounter());
+  const copies = tkT(after, TKH);
+  assert.deepStrictEqual(copies.map((t) => t.id), ['n1', 'n2']);
+  assert.ok(copies.every((t) => !t.done));
+  assert.deepStrictEqual(copies[1].subtasks.map((s) => s.id), ['n3', 'n4']);
+  assert.ok(copies[1].subtasks.every((s) => !s.done));
+  assert.deepStrictEqual([copies[1].hour, copies[1].text, copies[1].collapsed, copies[1].createdAt], [9, 'texto h', true, '2026-11-13T09:00:00.000Z']);
+  assert.deepStrictEqual(copies[1].subtasks.map((s) => s.text), ['a', 'b']);
+  assert.deepStrictEqual(core.tkProgress(copies), { done: 0, total: 4, percent: 0 });
+  const at = (id, hour) => ({ ...tkTask(id), hour });
+  const ord = tkT(core.tkCarry(tkNote({ [TKY]: [at('a', 15), at('b', 8), at('c', 12)] }), TKH, tkCounter()), TKH);
+  assert.deepStrictEqual(ord.map((t) => t.hour), [15, 8, 12], 'Orden manual, no por hora');
+  const all = Object.values(after.days).flatMap((ts) => ts.flatMap((t) => [t.id, ...t.subtasks.map((s) => s.id)]));
+  assert.strictEqual(new Set(all).size, all.length, 'Ids únicos en la nota');
+  const before = source();
+  const snap = JSON.stringify(before);
+  const a2 = core.tkCarry(before, TKH, tkCounter());
+  assert.strictEqual(a2.days[TKY], before.days[TKY], 'El origen no cambia');
+  assert.strictEqual(a2.lastCarryOver, TKH);
+  assert.strictEqual(JSON.stringify(before), snap, 'No muta');
+  assert.deepStrictEqual(tkT(core.tkCarry(tkNote({ '2026-11-11': [tkTask('a')], [TKY]: [] }), TKH, tkCounter()), TKH).map((t) => t.text), ['texto a'], 'Ayer vacío: trae del último con tareas');
+  let c = core.tkCarry(source(), TKH, tkCounter());
+  const o = c.days[TKY];
+  c = core.tkDelete(core.tkEdit(core.tkToggle(c, 'n1'), 'n2', 'otro'), 'n1');
+  assert.strictEqual(c.days[TKY], o, 'Cambiar una copia no toca el original');
+  let d = core.tkCarry(source(), TKH, tkCounter());
+  d = core.tkDelete(core.tkDelete(d, 'n1'), 'n2');
+  assert.deepStrictEqual(tkT(d, TKH), []);
+  assert.strictEqual(core.tkCanCarry(d, TKH), false, 'Una vez por día');
+  assert.strictEqual(core.tkCarry(d, TKH, tkCounter()), d);
+  const hoy = tkNote({ [TKY]: [tkTask('a')], [TKH]: [tkTask('b')] });
+  assert.strictEqual(core.tkCarry(hoy, TKH, tkCounter()), hoy);
+  const sin = tkNote({});
+  assert.strictEqual(core.tkCarry(sin, TKH, tkCounter()), sin);
+});
+
+// Carga de pyl-tasks (validador adaptado de validate-stored-data.test.ts: solo la nota; sin ventana ni migraciones).
+const tkRawTask = () => ({ id: 't1', hour: 13, text: 'Comprar pan', done: false, createdAt: '2026-11-12T18:40:00.000Z', subtasks: [{ id: 's1', text: 'Integral', done: true }] });
+const tkValid = () => ({ v: 1, note: { days: { [TKH]: [tkRawTask()] } }, collapsed: false });
+const tkLoadOf = (data) => core.tkLoad(JSON.stringify(data), TKH);
+const tkBad = (data, msg) => assert.deepStrictEqual(tkLoadOf(data), { ok: false, note: { days: {} }, collapsed: false }, msg);
+const tkPatch = (patch) => { const d = tkValid(); d.note.days[TKH][0] = { ...d.note.days[TKH][0], ...patch }; return d; };
+
+caso('Mis tareas: tkLoad acepta datos válidos y arranca vacía sin clave', () => {
+  assert.deepStrictEqual(core.tkLoad(null, TKH), { ok: true, note: { days: {} }, collapsed: false }, 'Sin clave');
+  assert.deepStrictEqual(core.tkLoad(undefined, TKH), { ok: true, note: { days: {} }, collapsed: false });
+  const d = tkValid();
+  assert.deepStrictEqual(tkLoadOf(d), { ok: true, note: d.note, collapsed: false });
+  assert.strictEqual(tkLoadOf({ ...tkValid(), collapsed: true }).collapsed, true);
+  for (const c of [undefined, 'yes', 1, null]) {
+    const r = tkLoadOf({ ...tkValid(), collapsed: c });
+    assert.deepStrictEqual([r.ok, r.collapsed], [true, false], 'collapsed raro → false: ' + c);
+  }
+  const t = tkValid();
+  t.note.title = 'viejo';
+  assert.deepStrictEqual(tkLoadOf(t).note, { days: { [TKH]: [tkRawTask()] } }, 'Claves sobrantes de la nota se descartan');
+  assert.ok(!('lastCarryOver' in tkLoadOf(tkValid()).note), 'lastCarryOver ausente es válido');
+  const l = tkValid();
+  l.note = { days: {}, lastCarryOver: TKY };
+  assert.deepStrictEqual(tkLoadOf(l).note, { days: {}, lastCarryOver: TKY });
+  const e = tkValid();
+  e.note = { days: { [TKY]: [] } };
+  assert.strictEqual(tkLoadOf(e).ok, true, 'Día vacío es válido');
+  for (const c of [true, false]) assert.strictEqual(tkLoadOf(tkPatch({ collapsed: c })).ok, true, 'Tarea con collapsed ' + c);
+  const o = [{ ...tkRawTask(), id: 'a', hour: 15 }, { ...tkRawTask(), id: 'b', hour: 8 }];
+  const ord = tkValid();
+  ord.note.days[TKH] = o;
+  assert.deepStrictEqual(tkLoadOf(ord).note.days[TKH].map((x) => x.id), ['a', 'b'], 'Respeta el orden guardado');
+});
+
+caso('Mis tareas: tkLoad rechaza datos rotos y devuelve la nota vacía', () => {
+  for (const raw of ['{', 'hola', '', 'null', '[]', '"x"', '{}']) {
+    assert.deepStrictEqual(core.tkLoad(raw, TKH), { ok: false, note: { days: {} }, collapsed: false }, 'Crudo: ' + JSON.stringify(raw));
+  }
+  tkBad({ ...tkValid(), v: 2 }, 'v distinta');
+  tkBad({ ...tkValid(), v: '1' }, 'v como texto');
+  const sinV = tkValid();
+  delete sinV.v;
+  tkBad(sinV, 'sin v');
+  const sinNota = tkValid();
+  delete sinNota.note;
+  tkBad(sinNota, 'sin nota');
+  for (const [name, note] of [['days ausente', {}], ['days array', { days: [] }], ['clave de día mal formada', { days: { '14/11/2026': [] } }], ['lista no array', { days: { [TKH]: null } }]]) {
+    tkBad({ ...tkValid(), note }, name);
+  }
+  for (const value of [null, 20261113, '13/11/2026', '']) {
+    tkBad({ ...tkValid(), note: { days: {}, lastCarryOver: value } }, 'lastCarryOver ' + JSON.stringify(value));
+  }
+  for (const [name, patch] of [
+    ['hora 24', { hour: 24 }], ['hora negativa', { hour: -1 }], ['hora decimal', { hour: 9.5 }], ['hora texto', { hour: '13' }],
+    ['sin texto', { text: '   ' }], ['texto no string', { text: 5 }], ['done no booleano', { done: 'yes' }], ['id no texto', { id: 7 }],
+    ['sin createdAt', { createdAt: undefined }], ['subtareas no array', { subtasks: null }],
+    ['subtarea vacía', { subtasks: [{ id: 's', text: '', done: false }] }], ['collapsed raro', { collapsed: 'yes' }],
+  ]) tkBad(tkPatch(patch), name);
 });
 
 let fallos = 0;

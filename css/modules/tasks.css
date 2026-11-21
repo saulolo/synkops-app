@@ -1,0 +1,190 @@
+/* Mis tareas (SPEC 19, js/modules/tasks): nota adhesiva de Inicio, port de My Sticky Notes. Se carga antes de themes.css.
+   Solo tokens del tema (--b, --on-b, --card, --line, --muted, --ink...): sigue los 7 temas. Formas y medidas del original,
+   reducidas para caber en 210 px. Los fondos suaves salen de --ink mezclado, así sirven en temas claros y oscuros. */
+.tk{--tk-hover:color-mix(in srgb,var(--ink) 7%,transparent);--tk-soft:color-mix(in srgb,var(--ink) 4%,transparent);
+  --tk-track:color-mix(in srgb,var(--ink) 9%,transparent);
+  position:relative;display:flex;flex-direction:column;padding:0;max-height:520px}
+.tk>*{flex:none}
+
+/* Botón de ícono. */
+.tk-ib{display:inline-flex;align-items:center;justify-content:center;flex:none;width:26px;height:26px;padding:0;border:0;border-radius:7px;
+  background:transparent;color:var(--muted);cursor:pointer;transition:background .15s,color .15s}
+.tk-ib:hover{background:var(--tk-hover);color:var(--ink)}
+.tk-ib:focus-visible{outline:2px solid var(--b);outline-offset:2px}
+.tk-ib.is-on{background:rgba(var(--b-rgb),.14);color:var(--b)}
+.tk-ib[hidden]{display:none}
+.tk-sm{width:22px;height:22px}
+
+/* Cabecera: título «Mis tareas» (el h2 de tarjeta de la app, con la barrita de acento de base.css) y el engranaje en el extremo derecho.
+   Con #v-dash #tk-root para ganarle a «:is(#v-dash,…) .card h2»; el título ocupa el ancho libre y empuja al engranaje. */
+.tk-top{display:flex;align-items:center;gap:6px;padding:12px 10px 8px 14px;border-bottom:1px solid var(--line)}
+#v-dash #tk-root .tk-title{flex:1;margin:0;min-width:0}
+.tk-wrap{position:relative;flex:none;display:flex}
+
+/* Fila de días: «+» a la izquierda, pestañas centradas y reloj a la derecha (columnas laterales iguales). */
+.tk-days{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:2px;height:36px;padding:0 6px;border-bottom:1px solid var(--line)}
+.tk-days>:first-child{justify-self:start}
+.tk-wrap-end{justify-self:end}
+.tk-tabs{display:flex;gap:1px}
+.tk-tab{flex:none;height:26px;padding:0 6px;border:0;border-radius:7px;background:transparent;color:var(--muted);
+  font-family:inherit;font-size:11.5px;font-weight:600;line-height:16px;white-space:nowrap;cursor:pointer;transition:background .15s,color .15s}
+.tk-tab:hover{background:var(--tk-hover);color:var(--ink)}
+.tk-tab:focus-visible{outline:2px solid var(--b);outline-offset:2px}
+.tk-tab.is-on{background:rgba(var(--b-rgb),.14);color:var(--b)}
+
+/* Menús (engranaje y días anteriores): caen bajo su botón, sobre la lista, dentro de los 210 px. */
+.tk-menu{position:absolute;top:calc(100% + 6px);left:0;z-index:10;display:flex;flex-direction:column;gap:1px;min-width:168px;padding:4px;
+  border:1px solid var(--line-2);border-radius:10px;background:var(--card-2);box-shadow:0 12px 32px rgba(0,0,0,.45)}
+.tk-menu[hidden]{display:none}
+.tk-menu-end{left:auto;right:0}
+.tk-mi{height:30px;padding:0 10px;border:0;border-radius:7px;background:transparent;color:var(--ink);font-family:inherit;font-size:13px;
+  line-height:20px;text-align:left;white-space:nowrap;cursor:pointer;transition:background .15s,color .15s}
+.tk-mi:hover,.tk-mi:focus-visible{background:var(--tk-hover);outline:0}
+.tk-mi:focus-visible{box-shadow:inset 0 0 0 2px var(--b)}
+.tk-mi.is-on{color:var(--b)}
+.tk-menu-empty{padding:6px 10px;color:var(--muted);font-size:12.5px}
+
+/* Progreso: anillo (medidor, no spinner), «N de M hechas», doble check y barra de 3 px. */
+.tk-prog{display:flex;align-items:center;gap:6px;padding:10px 12px 6px 14px}
+.tk-ring{flex:none;transform:rotate(-90deg)}
+.tk-ring circle{fill:none;stroke-width:2.5}
+.tk-ring-track{stroke:var(--tk-track)}
+.tk-ring-fill{stroke:var(--b);stroke-dasharray:100;stroke-dashoffset:100;transition:stroke-dashoffset .3s ease}
+.tk-count{margin-left:auto;font-size:11px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+#tk-all{margin:-4px 0}
+.tk-bar{margin:0 14px 6px;height:3px;border-radius:2px;background:var(--tk-track);overflow:hidden}
+.tk-bar-fill{height:3px;width:0;border-radius:2px;background:var(--b);transition:width .3s ease}
+
+/* Lista: ocupa el alto que sobra y hace scroll adentro; cabecera, progreso y pie quedan fijos. */
+.tk>.tk-list{flex:1 1 auto;min-height:0;overflow-y:auto;padding:4px 6px 8px;display:flex;flex-direction:column;gap:2px}
+.tk-list::-webkit-scrollbar{width:6px}
+.tk-list::-webkit-scrollbar-thumb{background:var(--tk-track);border-radius:3px}
+
+/* Tareas. */
+.tk-task{display:flex;flex-direction:column}
+.tk-row{--tk-acts-bg:var(--card);position:relative;display:flex;align-items:flex-start;gap:8px;padding:7px 8px;border-radius:10px;
+  transition:background .15s,transform .15s,box-shadow .15s}
+.tk-row:hover{background:var(--tk-soft);--tk-acts-bg:color-mix(in srgb,var(--card) 96%,var(--ink))}
+/* Tarea con subtareas: al pasar el mouse se levanta 1 px (clic = mostrar u ocultar subtareas). */
+.tk-task-row.has-subs{cursor:pointer}
+.tk-task-row.has-subs:not(:has(input)):hover{background:var(--tk-hover);--tk-acts-bg:color-mix(in srgb,var(--card) 92%,var(--ink));transform:translateY(-1px);
+  box-shadow:0 4px 12px rgba(0,0,0,.28),inset 0 0 0 1px var(--tk-soft)}
+.tk-task-row.has-subs:not(:has(input)):hover:active{transform:none;box-shadow:none}
+.tk-check{flex:none;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-top:1px;padding:0;
+  border:1.5px solid var(--line-2);border-radius:6px;background:transparent;color:var(--on-b);cursor:pointer;transition:background .15s,border-color .15s}
+.tk-check:hover{border-color:var(--muted)}
+.tk-check:focus-visible{outline:2px solid var(--b);outline-offset:2px}
+.tk-check.is-on{background:var(--b);border-color:var(--b)}
+.tk-check-sm{width:16px;height:16px;margin-top:2px;border-radius:5px}
+/* Badge de hora (0–23). */
+.tk-hour{flex:none;margin-top:1px;padding:1px 6px;border-radius:5px;background:var(--tk-track);color:var(--muted);
+  font-size:11px;font-weight:600;line-height:16px;font-variant-numeric:tabular-nums;cursor:text;transition:opacity .2s}
+.tk-text,.tk-sub-text{flex:1;min-width:0;line-height:20px;overflow-wrap:anywhere;color:var(--ink);transition:opacity .2s}
+.tk-text{font-size:13.5px}
+.tk-sub-text{font-size:13px;color:color-mix(in srgb,var(--ink) 85%,var(--muted))}
+.tk-hour.is-done{opacity:.5}
+.tk-text.is-done,.tk-sub-text.is-done{text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--ink) 60%,transparent);opacity:.5}
+
+/* Arrastre: la fila sigue al puntero sobre las demás, con sombra y anillo de 1 px en acento. */
+.tk-task-row,.tk-sub-row{touch-action:none}
+.tk-list.is-dragging{cursor:grabbing;user-select:none}
+.tk-list.is-dragging .tk-acts{display:none}
+.tk-task.is-dragging,.tk-sub-row.is-dragging{position:relative;z-index:5;border-radius:8px;background:var(--card);
+  box-shadow:0 10px 24px rgba(0,0,0,.35),0 0 0 1px var(--b)}
+
+/* Campos que reemplazan al texto o a la hora al editar (doble clic). */
+.tk-edit-in{flex:1;min-width:0;margin:0 -6px;padding:0 6px;border:0;outline:0;border-radius:6px;background:var(--tk-track);
+  color:var(--ink);font-family:inherit;line-height:20px}
+.tk-edit-in.tk-text{font-size:13.5px}
+.tk-edit-in.tk-sub-text{font-size:13px}
+.tk-hour-edit{flex:none;width:22px;margin-top:1px;padding:1px 6px;border:0;outline:1px solid var(--b);border-radius:5px;background:var(--tk-track);
+  color:var(--ink);font-family:inherit;font-size:11px;font-weight:600;line-height:16px;font-variant-numeric:tabular-nums;text-align:center}
+
+/* Chip de subtareas: chevron + «hechas/total», relleno según las hechas; todas hechas = chip en acento. */
+.tk-sub-toggle{flex:none;display:inline-flex;align-items:center;gap:3px;height:20px;padding:0 7px 0 5px;border:0;border-radius:999px;
+  background-color:var(--tk-soft);background-image:linear-gradient(rgba(var(--b-rgb),.22),rgba(var(--b-rgb),.22));
+  background-repeat:no-repeat;background-position:left center;background-size:var(--sub-progress,0%) 100%;
+  box-shadow:inset 0 0 0 1px var(--tk-hover);color:var(--muted);font-family:inherit;font-size:11px;font-weight:600;line-height:16px;
+  font-variant-numeric:tabular-nums;cursor:pointer;transition:background-color .15s,background-size .25s,box-shadow .15s,color .15s}
+.tk-sub-toggle:hover{background-color:var(--tk-hover);color:var(--ink)}
+.tk-sub-toggle.is-complete,.tk-sub-toggle.is-complete:hover{background-color:rgba(var(--b-rgb),.14);box-shadow:inset 0 0 0 1px rgba(var(--b-rgb),.45);color:var(--b)}
+.tk-sub-toggle:focus-visible{outline:2px solid var(--b);outline-offset:2px}
+.tk-sub-toggle svg{transition:transform .15s}
+.tk-sub-toggle.is-collapsed svg{transform:rotate(-90deg)}
+
+/* Acciones al pasar el mouse (o con foco): flotan a la derecha sobre un degradado, sin mover la fila. */
+.tk-acts{position:absolute;top:5px;right:6px;display:flex;gap:1px;padding-left:16px;
+  background:linear-gradient(to right,transparent,var(--tk-acts-bg) 12px);opacity:0;pointer-events:none;transition:opacity .15s}
+.tk-sub-row .tk-acts{top:4px}
+.tk-row:hover .tk-acts,.tk-row:focus-within .tk-acts{opacity:1;pointer-events:auto}
+/* Chevron de la fila: abajo si están contraídas, arriba si se ven. */
+.tk-toggle-subs svg{transform:rotate(180deg);transition:transform .25s}
+.tk-toggle-subs.is-collapsed svg{transform:none}
+
+/* Subtareas (un solo nivel), con sangría y línea a la izquierda. */
+.tk-subs{display:flex;flex-direction:column;gap:1px;margin:0 0 4px 18px;padding-left:12px;border-left:1px solid var(--line)}
+.tk-sub-row,.tk-sub-add{padding:5px 8px}
+.tk-sub-in{flex:1;min-width:0;padding:0;border:0;outline:0;background:transparent;color:var(--ink);font-family:inherit;font-size:13px;line-height:20px}
+.tk-sub-in::placeholder{color:var(--soft)}
+
+/* Fila de añadir: «+» punteado, hora (vacía = actual) y texto. */
+.tk-add{display:flex;align-items:center;gap:8px;margin-top:4px;padding:7px 8px;border-radius:10px;cursor:text;transition:background .15s}
+.tk-add[hidden]{display:none}
+.tk-add:hover,.tk-add:focus-within{background:var(--tk-soft)}
+.tk-add-btn{flex:none;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;padding:0;border:1.5px dashed var(--line-2);
+  border-radius:6px;background:transparent;color:var(--muted);cursor:pointer;transition:border-color .15s,color .15s}
+.tk-add-btn:hover{border-color:var(--b);color:var(--b)}
+.tk-add-btn:focus-visible{outline:2px solid var(--b);outline-offset:2px}
+.tk-add-in{flex:1;min-width:0;padding:0;border:0;outline:0;background:transparent;color:var(--ink);font-family:inherit;font-size:13.5px;line-height:20px}
+.tk-add-in::placeholder,.tk-hour-in::placeholder{color:var(--soft)}
+.tk-hour-in{flex:none;width:22px;padding:1px 6px;border:0;outline:0;border-radius:5px;background:var(--tk-track);color:var(--ink);
+  font-family:inherit;font-size:11px;font-weight:600;line-height:16px;font-variant-numeric:tabular-nums;text-align:center}
+.tk-hour-in:focus{outline:1px solid var(--b)}
+.tk-hour-in.is-invalid{outline:1px solid var(--r)}
+.tk-kbd{flex:none;padding:1px 5px;border:1px solid var(--line-2);border-radius:4px;color:var(--soft);font-size:10.5px}
+
+/* «Acerca de»: capa sobre la tarjeta (fondo oscuro) con el panel centrado; si no cabe, hace scroll. */
+.tk-about-layer{position:absolute;inset:0;z-index:20;display:flex;padding:10px;border-radius:inherit;
+  background:color-mix(in srgb,var(--bg,#000) 55%,transparent)}
+.tk-about-layer[hidden]{display:none}
+.tk-about{position:relative;flex:1;align-self:center;max-height:100%;overflow-y:auto;padding:18px 14px 16px;
+  border:1px solid var(--line-2);border-radius:12px;background:var(--card-2);box-shadow:0 12px 32px rgba(0,0,0,.45);text-align:center}
+.tk-about-x{position:absolute;top:6px;right:6px}
+/* Dos ids para ganarle a «:is(#v-dash,…) .card h2» de base.css (título con barrita de las pestañas). */
+#tk-root #tk-about .tk-about-name{display:block;margin:0;color:var(--ink);font-size:15px;font-weight:700;letter-spacing:0;line-height:20px}
+#tk-root #tk-about .tk-about-name::before{display:none}
+.tk-about-lead{margin:10px 0 0;color:var(--ink);font-size:12.5px;line-height:18px}
+.tk-about-points{margin:8px 0 0;padding:0 0 0 16px;color:var(--muted);font-size:12px;line-height:17px;text-align:left}
+.tk-about-points li+li{margin-top:4px}
+
+/* «Traer tareas de ayer»: solo en Hoy vacío. */
+.tk-carry{display:flex;flex-direction:column;align-items:center;gap:12px;padding:24px 10px 14px;text-align:center}
+.tk-carry[hidden]{display:none}
+.tk-carry-text{margin:0;font-size:13px;color:var(--muted)}
+.tk-carry-btn{max-width:100%;padding:8px 14px;border:1px dashed var(--line-2);border-radius:8px;background:transparent;color:var(--ink);
+  font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,border-color .15s}
+.tk-carry-btn:hover{background:var(--tk-hover);border-color:var(--b)}
+.tk-carry-btn:focus-visible{outline:2px solid var(--b);outline-offset:2px}
+
+/* Pie de formato: inerte (no hace nada), compacto en una sola línea. */
+.tk-foot{display:flex;align-items:center;gap:1px;padding:6px 8px;border-top:1px solid var(--line);background:var(--tk-soft);border-radius:0 0 var(--rad) var(--rad)}
+.tk-tb{width:24px;height:24px;cursor:default}
+.tk-divider{flex:none;width:1px;height:14px;margin:0 4px;background:var(--line-2)}
+
+/* Pantallas anchas: espejo del Centro de mando en el margen izquierdo, columna de 210 px que me acompaña al bajar.
+   La tarjeta mide el alto de la pantalla. Más angosto, queda en el flujo bajo el hero. */
+@media (min-width:1680px){
+  #v-dash{position:relative}
+  .tk-rail{position:absolute;top:0;bottom:0;right:calc(100% + 14px);width:210px}
+  .tk-rail .tk{position:sticky;top:var(--tk-top,170px);margin-top:0;max-height:none;height:calc(100vh - var(--tk-top,170px) - 20px)}
+  /* Mismo tamaño que el título del Centro de mando en su columna. */
+  #v-dash #tk-root .tk-title{font-size:14.5px;gap:8px}
+  #v-dash #tk-root .tk-title::before{height:16px;width:4px}
+  /* En 210 px no cabe la etiqueta «Enter». */
+  .tk-rail .tk-kbd{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .tk-ring-fill,.tk-bar-fill,.tk-row,.tk-sub-toggle,.tk-sub-toggle svg,.tk-toggle-subs svg{transition:none}
+  .tk-task-row.has-subs:not(:has(input)):hover{transform:none}
+  .tk-task,.tk-sub-row{transition:none!important} /* sin deslizamiento FLIP al arrastrar */
+}

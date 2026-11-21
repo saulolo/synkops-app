@@ -24,6 +24,7 @@
 <link rel="stylesheet" href="css/modules/logistics.css">
 <link rel="stylesheet" href="css/modules/hub.css">
 <link rel="stylesheet" href="css/modules/home.css">
+<link rel="stylesheet" href="css/modules/tasks.css">
 <link rel="stylesheet" href="css/themes.css">
 <link rel="stylesheet" href="css/modules/pnl.css">
 <link rel="stylesheet" href="css/report.css">
@@ -164,9 +165,14 @@
     </svg>
   </div>
 
+  <!-- Mis tareas: nota adhesiva del día (la arma js/modules/tasks). En pantallas anchas vive en el margen izquierdo. -->
+  <aside class="tk-rail" id="tk-rail" aria-label="Mis tareas">
+  <div class="card mt tk card-side" id="tk-root"></div>
+  </aside>
+
   <!-- Centro de mando: accesos directos (los arma js/modules/hub). En pantallas anchas vive en el margen derecho. -->
   <aside class="hb-rail" id="hb-rail" aria-label="Centro de mando">
-  <div class="card mt hb" id="hb-root">
+  <div class="card mt hb card-side" id="hb-root">
     <h2>Centro de mando</h2>
     <div class="hb-grid" id="hb-grid"></div>
     <div id="hb-list" hidden></div>
@@ -1166,6 +1172,7 @@
 <script src="js/modules/hub/core/hub.js"></script>
 <script src="js/modules/home/core/quotes.js"></script>
 <script src="js/modules/home/core/home.js"></script>
+<script src="js/modules/tasks/core/tasks.js"></script>
 <!-- Services: archivos y almacenamiento del navegador -->
 <script src="js/shared/services/storage.js"></script>
 <script src="js/shared/services/files.js"></script>
@@ -1202,6 +1209,7 @@
 <script src="js/modules/logistics/ui/logistics.js"></script>
 <script src="js/modules/hub/ui/hub.js"></script>
 <script src="js/modules/home/ui/home.js"></script>
+<script src="js/modules/tasks/ui/tasks.js"></script>
 <!-- App: estado, casos de uso y arranque (main.js va al final) -->
 <script src="js/app/state.js"></script>
 <script src="js/modules/pnl/app/filters.js"></script>
@@ -1221,6 +1229,7 @@
 <script src="js/modules/logistics/app/logistics.js"></script>
 <script src="js/modules/hub/app/hub.js"></script>
 <script src="js/modules/home/app/home.js"></script>
+<script src="js/modules/tasks/app/tasks.js"></script>
 <script src="js/modules/trainer/app/trainer.js"></script>
 <script src="js/app/nav.js"></script>
 <script src="js/app/main.js"></script>
