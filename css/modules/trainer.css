@@ -1,10 +1,19 @@
 /* Entrenador de métricas (js/modules/trainer): Inicio, Costeo, Escalera y Creativos. Se carga después de base.css. */
 /* ---------- Dashboard ---------- */
 .hero{display:grid;grid-template-columns:1.1fr 1fr;gap:10px;align-items:center;padding:30px 34px;overflow:hidden;position:relative}
-.hero h1{font-size:38px}
+/* SPEC 20: bajo «Synkops», un pulso subrayado del ancho del título (como monitor cardíaco): línea tenue en el
+   degradado del acento y una luz que la recorre cada 2,4 s (1,2 s con el cursor sobre el título). */
+.hero h1{font-size:56px;letter-spacing:-.035em;display:inline-flex;flex-direction:column;align-items:stretch}
+.hero-pulse{display:block;width:100%;height:16px;margin-top:6px;overflow:visible}
+.hero-pulse path{vector-effect:non-scaling-stroke}
+.hero-pulse .hp-base{stroke-width:2;opacity:.4}
+.hero-pulse .hp-run{stroke-width:2.6;stroke-dasharray:16 100;stroke-dashoffset:16;filter:drop-shadow(0 0 4px rgba(var(--b-rgb),.85));animation:hp-run 2.4s linear infinite}
+.hero h1:hover .hp-run{animation-duration:1.2s}
+@keyframes hp-run{to{stroke-dashoffset:-100}}
+@media (prefers-reduced-motion:reduce){.hero-pulse .hp-run{display:none}.hero-pulse .hp-base{opacity:.8}}
 .hero .grad{background:linear-gradient(90deg,var(--b-ink),var(--b2-ink));-webkit-background-clip:text;background-clip:text;color:transparent}
 .hero .grad-line{display:block;font-size:.72em;white-space:nowrap;margin-top:4px;width:max-content;max-width:100%}
-/* SPEC 18: el eyebrow va entre «Synkops» y el slogan; el slogan sale del h1 con el mismo tamaño (.72 × 38px) y peso. */
+/* SPEC 18: el eyebrow va entre «Synkops» y el slogan; el slogan sale del h1 con el tamaño que tenía ahí (.72 × 38px = 27px) y su peso. */
 .hero .hero-eyebrow{display:flex;margin:8px 0 0}
 .hero .hero-slogan{font-size:27px;font-weight:900;line-height:1.12;letter-spacing:-.025em;margin:6px 0 0}
 .hero-art{width:100%;max-width:470px;justify-self:end}
@@ -194,7 +203,7 @@
 @media (max-width:900px){
   .hero{grid-template-columns:1fr;padding:24px}
   .hero-art{justify-self:center}
-  .hero h1{font-size:30px}
+  .hero h1{font-size:42px}
   .hero .hero-slogan{font-size:22px;white-space:normal}
   h1{font-size:26px}
   .top-in{padding:10px 14px}

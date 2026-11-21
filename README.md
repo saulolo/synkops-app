@@ -32,6 +32,7 @@ leer el testeo y medir la utilidad real cruzando **Dropi** con **Meta Ads**.
 - [🏠 Inicio: saludo y frase del día](#-inicio-saludo-y-frase-del-día)
 - [🏠 Centro de mando](#-centro-de-mando)
 - [📝 Mis tareas](#-mis-tareas)
+- [🕰️ Reloj de la barra](#️-reloj-de-la-barra)
 - [🔎 Buscar producto](#-buscar-producto)
 - [🛍️ Desarrollo de la landing](#️-desarrollo-de-la-landing)
 - [🎓 Entrenador de métricas](#-entrenador-de-métricas)
@@ -117,7 +118,7 @@ La tarjeta principal de **Inicio** recibe a Saúl y presenta la app:
 
 - **Saludo:** «Buenos días» (05:00 a 11:59), «Buenas tardes» (12:00 a 18:59) o «Buenas noches» (19:00 a 04:59), con el nombre debajo. Se calcula al abrir la página.
 - **Frase del día, dos por día:** una de 00:00 a 11:59 («Frase de la mañana:») y otra de 12:00 a 23:59 («FRASE DE HOY»; de noche se ve esa). Salen de una lista de 864 frases de libros de mentalidad y finanzas y de personajes célebres, sin repetir ninguna hasta usarlas todas. Recargar el mismo día muestra las mismas dos. Funciona sin internet.
-- **Presentación:** «Synkops», «Mi copiloto de ecommerce», el slogan «Cada peso medido, cada paso conectado», una descripción corta y dos botones: **Empezar por buscar producto** y **Costear producto**.
+- **Presentación:** «Synkops» en grande (es el nombre de la app; la barra superior ya no lo repite) con un pulso subrayado que late como un monitor cardíaco en el color del tema (más rápido con el cursor encima, quieto si el sistema pide reducir movimiento), «Mi copiloto de ecommerce», el slogan «Cada peso medido, cada paso conectado», una descripción corta y dos botones: **Empezar por buscar producto** y **Costear producto**.
 
 Para agregar o quitar frases se edita `js/modules/home/core/quotes.js`. Hay una copia de referencia de la lista en `docs/referencia/frases.json` (la app no la lee: con `file://` el navegador no deja cargar archivos `.json`). Tras cambiar la cantidad, ajusta el número que espera la prueba «Inicio: lista local de frases» en `tests/core.test.js`.
 
@@ -147,6 +148,21 @@ En **Inicio** tengo una nota adhesiva para organizar las tareas del día (port e
 - **Traer tareas de ayer:** con Hoy vacío, copia (sin marcar) las del último día con tareas; una vez por día.
 - **Engranaje:** «Acerca de Mis tareas».
 - Se guarda solo en este navegador (clave `pyl-tasks`, 300 ms después de cada cambio). Si lo guardado está roto, arranca vacía y el texto queda aparte en `pyl-tasks-corrupt`. El pie de formato (negrita, lista, imagen…) aún no hace nada.
+
+---
+
+## 🕰️ Reloj de la barra
+
+En pantalla ancha (1680 px o más), el margen izquierdo de la barra superior muestra un **reloj de pared** analógico, justo encima de la columna de Mis tareas y en todas las pestañas. Al lado dice el día y la fecha («VIERNES · 20 nov»).
+
+- **Esfera:** números 12, 3, 6 y 9 y rayitas en las demás horas; agujas de hora y minuto y un segundero que gira continuo. Marca la hora del PC.
+- **Colores:** salen del tema (esfera de tarjeta, agujas en color de texto, números y segundero en el acento).
+- **Solo decorativo:** no hace nada al hacer clic. Para lectores de pantalla dice la fecha y la hora completas («Viernes, 20 nov · 10:42 a. m.»).
+- **Ahorra trabajo:** se detiene con la pestaña del navegador en segundo plano o la ventana angosta, y al volver marca la hora correcta. A medianoche cambian solos el día y la fecha.
+- Si el sistema pide **reducir movimiento**, no hay segundero y las agujas se mueven una vez por minuto.
+- No guarda nada.
+
+Arriba, en el centro de la barra, queda la píldora del producto activo con sus zonas de CPA y, a la derecha de las pestañas, el botón de tema.
 
 ---
 
@@ -329,7 +345,7 @@ Tiene tres sub-pestañas: **📂 Lectura real · pronto** (subir el reporte de m
 
 El botón de tema de la barra superior cambia los colores de toda la app: **Dark** (por defecto), **Light**, **Gold** (negro y amarillo NovaSociety), **Ember**, **IntelliJ Dark**, **IntelliJ Gold** y **Nebula**. La app recuerda el que elegí.
 
-El logo es un pulso: en la pestaña del navegador (favicon) siempre sale dorado; en la barra superior sigue el tema y late como un monitor cardíaco (más rápido con el cursor encima, quieto si el sistema pide reducir movimiento).
+El logo es un pulso: en la pestaña del navegador (favicon) siempre sale dorado; bajo el título «Synkops» de Inicio sigue el tema y late como un monitor cardíaco (más rápido con el cursor encima, quieto si el sistema pide reducir movimiento).
 
 ---
 
@@ -628,10 +644,10 @@ docs/referencia/
   frases.json                    Las 864 frases de Inicio (copia de referencia; la app lee js/modules/home/core/quotes.js)
 
 css/
-  base.css            Sistema de diseño: tokens, barra superior, tarjetas (y .card-side, las tarjetas laterales de Inicio),
+  base.css            Sistema de diseño: tokens, barra superior (sin marca: píldora, tema y pestañas en .top-row), tarjetas (y .card-side, las tarjetas laterales de Inicio),
                       botones, campos, tablas, aviso, indicador de desplegable y alias de tokens del tablero
   modules/            Un CSS por módulo, en este orden de carga (la cascada depende de él):
-    trainer.css       Entrenador: Inicio, Costeo, escalera y pipeline
+    trainer.css       Entrenador: Inicio (con el título grande y su pulso subrayado), Costeo, escalera y pipeline
     search.css        Buscar producto, Mi candidato, bitácora y estadísticas
     quick.css         Guardado rápido (título del panel con barrita de acento)
     hub.css           Centro de mando: columna lateral desde 1680 px, panel de edición, halos de luz
@@ -644,13 +660,14 @@ css/
     logistics.css     Logística: contenedor de mensajes, rejilla de tarjetas, chip de etapa, botones y campo condicional
     home.css          Inicio: franja de saludo y frase de la tarjeta principal (SPEC 18)
     tasks.css         Mis tareas: columna lateral izquierda desde 1680 px, filas, subtareas, menús, arrastre y Acerca de (SPEC 19)
+    clock.css         Reloj de la barra: margen izquierdo desde 1680 px, esfera y texto, solo tokens (SPEC 20)
   themes.css          Selector de tema, modo claro, temas oscuros y SVG con colores fijos
   modules/pnl.css     Solo lo propio del Tablero P&L (acotado a #v-pyl)
   report.css          Informe PDF: documento claro en A4, visible solo al imprimir
 
 tests/
-  core.test.js        Núcleo en Node puro (Mis tareas, costeo, guardado rápido, prompt DropKiller, prompt buscar anuncios, simulador de testeo, mensajes de logística, P&L)
-  smoke.test.js       jsdom: claves de PYL.*, 11 pestañas, navegación, Mis tareas (añadir, editar, subtareas, días, guardado, medianoche, arrastre), paneles Prompt DropKiller y Prompt buscar anuncios, Simulador de testeo y consola limpia
+  core.test.js        Núcleo en Node puro (reloj de la barra, Mis tareas, costeo, guardado rápido, prompt DropKiller, prompt buscar anuncios, simulador de testeo, mensajes de logística, P&L)
+  smoke.test.js       jsdom: claves de PYL.*, barra sin marca y pulso del título, reloj de la barra (esfera, hora simulada, medianoche y bucle), 11 pestañas, navegación, Mis tareas (añadir, editar, subtareas, días, guardado, medianoche, arrastre), paneles Prompt DropKiller y Prompt buscar anuncios, Simulador de testeo y consola limpia
   fixtures/           CSV de prueba de Dropi (datos inventados) y claves de PYL.*
 
 js/
@@ -718,6 +735,10 @@ js/
       core/tasks.js   Días y etiquetas, hora, comandos inmutables (añadir, marcar, editar, mover tareas y subtareas…), poda de días, traer de ayer y carga (tkLoad); sin DOM
       ui/tasks.js     Cabecera con engranaje, fila de días, progreso, lista (filas, subtareas, edición, fila de añadir), menús y Acerca de
       app/tasks.js    Estado (app.state.tasks), autoguardado (pyl-tasks), medianoche, menús, arrastre de tareas y subtareas
+    clock/            Reloj de pared de la barra superior (SPEC 20)
+      core/clock.js   Ángulos de las agujas, día, fecha corta, hora en 12 horas y etiqueta; sin DOM
+      ui/clock.js     Arma la esfera SVG y el texto; pinta agujas y textos solo si cambian
+      app/clock.js    Pinta al cargar y repinta con requestAnimationFrame solo con la pestaña visible y 1680 px o más; un toque por minuto si se pide reducir movimiento
     trainer/
       app/trainer.js  Entrenador de métricas (fase 1: copiado del prototipo)
 
@@ -757,7 +778,7 @@ NODE_PATH=<carpeta>/node_modules node tests/smoke.test.js   # abre index.html en
 node --check archivo.js                                      # sintaxis de un archivo
 ```
 
-`smoke.test.js` necesita **jsdom** (`npm i jsdom@26` en una carpeta fuera del repo): revisa las claves de `PYL.*`, la tarjeta de Inicio (saludo, frase y botones), que las 11 pestañas abran, los eventos de navegación y que la consola esté limpia. Si agregas o quitas una clave de `PYL.*`, regenera `tests/fixtures/claves-pyl.json` con `node tests/smoke.test.js --claves`.
+`smoke.test.js` necesita **jsdom** (`npm i jsdom@26` en una carpeta fuera del repo): revisa las claves de `PYL.*`, la barra sin marca, el reloj de la barra (con la hora, la pestaña oculta y el ancho simulados), la tarjeta de Inicio (saludo, frase, botones y pulso del título), que las 11 pestañas abran, los eventos de navegación y que la consola esté limpia. Si agregas o quitas una clave de `PYL.*`, regenera `tests/fixtures/claves-pyl.json` con `node tests/smoke.test.js --claves`: genéralo en un archivo temporal y cópialo encima, porque redirigirlo directo vacía el archivo antes de que la prueba lo lea.
 
 ### Cómo se desarrolla (SDD)
 

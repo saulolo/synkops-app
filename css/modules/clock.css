@@ -1,0 +1,28 @@
+/* Reloj de pared en el margen izquierdo de la barra superior (SPEC 20). Solo tokens: sigue los 7 temas. */
+.ck-rail{display:none}
+
+/* Desde 1680 px, el mismo corte de Mis tareas: columna de 210 px cuyo borde derecho queda 14 px a la
+   izquierda del contenido, igual que .tk-rail. .top-in y main.main miden lo mismo y tienen 24 px de
+   padding lateral, así que el borde del contenido está a 24 px del borde de .top-in. */
+@media (min-width:1680px){
+  .ck-rail{position:absolute;top:0;bottom:0;right:calc(100% - 24px + 14px);width:210px;display:flex;align-items:center;justify-content:center;gap:14px;pointer-events:none}
+}
+
+.ck-face{width:84px;height:84px;flex:none;overflow:visible;filter:drop-shadow(0 4px 10px rgba(0,0,0,.22))}
+.ck-dial{fill:var(--card);stroke:var(--line-2);stroke-width:1.5}
+.ck-tick{stroke:var(--soft);stroke-width:2;stroke-linecap:round}
+.ck-num{fill:var(--b);font-size:13px;font-weight:800;font-family:inherit}
+.ck-h,.ck-m{stroke:var(--ink);stroke-linecap:round}
+.ck-h{stroke-width:4.2}
+.ck-m{stroke-width:2.8}
+.ck-s{stroke:var(--b);stroke-width:1.2;stroke-linecap:round}
+.ck-pin{fill:var(--b)}
+
+.ck-text{display:flex;flex-direction:column;gap:3px;min-width:0;line-height:1.15}
+.ck-day{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink)}
+.ck-date{font-size:12.5px;font-weight:600;color:var(--soft)}
+
+/* Con «reducir movimiento» no hay segundero: las agujas cambian una vez por minuto (app/clock.js). */
+@media (prefers-reduced-motion:reduce){
+  .ck-s{display:none}
+}

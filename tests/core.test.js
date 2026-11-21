@@ -11,7 +11,7 @@ const caso = (nombre, fn) => casos.push([nombre, fn]);
 
 caso('exporta todas las funciones del núcleo aplanadas', () => {
   const claves = Object.keys(core).sort().join(',');
-  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CH_CPA_READ,CH_HELP,CH_SIDES,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,HOME_EPOCH,HOME_NAME,HOME_QUOTES,HOME_SEED,HOME_SLOTS,HUB_DEFAULTS,HUB_VERSION,LADDER_BLOCKS,LANDING,LEVELS,LG_ACCOUNTS,LG_BANK,LG_CATALOG,LG_DAYS,LG_NEQUI,LG_PARTS,LG_STAGES,LG_STORE,LG_TEMPLATES,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TK_HISTORY_DAYS,TK_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,chChain,chHard,chPlat,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,homeDay,homeGreeting,homeHello,homeOrder,homePick,homeSlot,hubAdd,hubCheck,hubClean,hubDefaults,hubDomain,hubFavicon,hubInitials,hubLoad,hubOrder,hubRemove,hubSet,hubUrl,isDropi,isMetrics,key,kpis,lgForm,lgFromCand,lgMessage,lgMoney,lgMoneyText,lgPhone,lgPrefill,lgTemplate,lgValues,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,tkAdd,tkAddDays,tkAddSub,tkCanCarry,tkCarry,tkCarrySource,tkDateLabel,tkDayDate,tkDayKey,tkDayLabel,tkDelete,tkDeleteSub,tkEdit,tkEditSub,tkEmpty,tkIsHour,tkLoad,tkMove,tkMoveSub,tkParseHour,tkPastDays,tkProgress,tkRollOver,tkSetAll,tkSetHour,tkShortDate,tkTasksOf,tkToggle,tkToggleCollapsed,tkToggleSub,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
+  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CH_CPA_READ,CH_HELP,CH_SIDES,CK_DAYS,CK_MONTHS,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,HOME_EPOCH,HOME_NAME,HOME_QUOTES,HOME_SEED,HOME_SLOTS,HUB_DEFAULTS,HUB_VERSION,LADDER_BLOCKS,LANDING,LEVELS,LG_ACCOUNTS,LG_BANK,LG_CATALOG,LG_DAYS,LG_NEQUI,LG_PARTS,LG_STAGES,LG_STORE,LG_TEMPLATES,LIMITS,MARGIN,MISTAKES,MSP,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TK_HISTORY_DAYS,TK_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,chChain,chHard,chPlat,ckAngles,ckDate,ckDay,ckLabel,ckTime,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,homeDay,homeGreeting,homeHello,homeOrder,homePick,homeSlot,hubAdd,hubCheck,hubClean,hubDefaults,hubDomain,hubFavicon,hubInitials,hubLoad,hubOrder,hubRemove,hubSet,hubUrl,isDropi,isMetrics,key,kpis,lgForm,lgFromCand,lgMessage,lgMoney,lgMoneyText,lgPhone,lgPrefill,lgTemplate,lgValues,list,marginLevel,matchProduct,mspLevel,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,tkAdd,tkAddDays,tkAddSub,tkCanCarry,tkCarry,tkCarrySource,tkDateLabel,tkDayDate,tkDayKey,tkDayLabel,tkDelete,tkDeleteSub,tkEdit,tkEditSub,tkEmpty,tkIsHour,tkLoad,tkMove,tkMoveSub,tkParseHour,tkPastDays,tkProgress,tkRollOver,tkSetAll,tkSetHour,tkShortDate,tkTasksOf,tkToggle,tkToggleCollapsed,tkToggleSub,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
 });
 
 caso('Costeo: proveedor 30.000 da precio $99.900 y tope $21.617', () => {
@@ -2230,6 +2230,36 @@ caso('Mis tareas: tkLoad rechaza datos rotos y devuelve la nota vacía', () => {
     ['sin createdAt', { createdAt: undefined }], ['subtareas no array', { subtasks: null }],
     ['subtarea vacía', { subtasks: [{ id: 's', text: '', done: false }] }], ['collapsed raro', { collapsed: 'yes' }],
   ]) tkBad(tkPatch(patch), name);
+});
+
+// ---- Reloj de la barra (SPEC 20) ----
+const ckAt = (h, m, s = 0, ms = 0) => new Date(2026, 10, 20, h, m, s, ms);
+
+caso('Reloj: ckAngles en grados desde las 12, sentido horario', () => {
+  assert.deepStrictEqual(core.ckAngles(ckAt(3, 0, 0)), { h: 90, m: 0, s: 0 }, '3:00:00');
+  assert.deepStrictEqual(core.ckAngles(ckAt(12, 0, 0)), { h: 0, m: 0, s: 0 }, '12:00:00');
+  assert.deepStrictEqual(core.ckAngles(ckAt(0, 0, 0)), { h: 0, m: 0, s: 0 }, '00:00:00');
+  assert.deepStrictEqual(core.ckAngles(ckAt(10, 42, 30)), { h: 321.25, m: 255, s: 180 }, '10:42:30');
+  const late = core.ckAngles(ckAt(23, 59, 59));
+  assert.ok(Math.abs(late.h - 359.991666) < 1e-4, '23:59:59 h = ' + late.h);
+  assert.ok(Math.abs(late.m - 359.9) < 1e-9, '23:59:59 m = ' + late.m);
+  assert.ok(Math.abs(late.s - 354) < 1e-9, '23:59:59 s = ' + late.s);
+  assert.ok(Math.abs(core.ckAngles(ckAt(10, 0, 15, 500)).s - 93) < 1e-9, 'El segundero suma los milisegundos (continuo)');
+});
+
+caso('Reloj: día, fecha, hora y etiqueta', () => {
+  assert.deepStrictEqual(core.CK_DAYS, ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']);
+  assert.deepStrictEqual(core.CK_MONTHS, ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']);
+  assert.strictEqual(core.ckDay(ckAt(10, 42)), 'Viernes');
+  assert.strictEqual(core.ckDay(new Date(2026, 10, 22)), 'Domingo');
+  assert.strictEqual(core.ckDate(ckAt(10, 42)), '20 nov');
+  assert.strictEqual(core.ckDate(new Date(2027, 0, 3)), '3 ene');
+  assert.strictEqual(core.ckTime(ckAt(10, 42)), '10:42 a. m.');
+  assert.strictEqual(core.ckTime(ckAt(15, 5)), '3:05 p. m.');
+  assert.strictEqual(core.ckTime(ckAt(0, 5)), '12:05 a. m.');
+  assert.strictEqual(core.ckTime(ckAt(12, 0)), '12:00 p. m.');
+  assert.strictEqual(core.ckTime(ckAt(23, 59)), '11:59 p. m.');
+  assert.strictEqual(core.ckLabel(ckAt(10, 42, 30)), 'Viernes, 20 nov · 10:42 a. m.');
 });
 
 let fallos = 0;
