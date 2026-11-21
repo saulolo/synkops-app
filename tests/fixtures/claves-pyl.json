@@ -3,6 +3,7 @@
     "adprompt",
     "ads",
     "cheat",
+    "clock",
     "dates",
     "diagnostics",
     "dkprompt",
@@ -38,6 +39,7 @@
     "candidate",
     "cascade",
     "cheat",
+    "clock",
     "diagnosisPanel",
     "dkprompt",
     "dom",
@@ -65,6 +67,7 @@
     "uploadZones"
   ],
   "app": [
+    "clock",
     "dataLoader",
     "filters",
     "render",

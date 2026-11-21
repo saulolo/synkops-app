@@ -25,6 +25,7 @@
 <link rel="stylesheet" href="css/modules/hub.css">
 <link rel="stylesheet" href="css/modules/home.css">
 <link rel="stylesheet" href="css/modules/tasks.css">
+<link rel="stylesheet" href="css/modules/clock.css">
 <link rel="stylesheet" href="css/themes.css">
 <link rel="stylesheet" href="css/modules/pnl.css">
 <link rel="stylesheet" href="css/report.css">
@@ -36,34 +37,33 @@
 <!-- ================= TOP BAR ================= -->
 <header class="top">
   <div class="top-in">
-    <div class="brand">
-      <div class="brand-mark" aria-hidden="true">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path class="bm-base" d="M3 12.75H7.1L9.4 7.5L12.4 17.25L14.6 10.5L16.1 12.75H21"/><path class="bm-run" pathLength="100" d="M3 12.75H7.1L9.4 7.5L12.4 17.25L14.6 10.5L16.1 12.75H21"/></svg>
+    <!-- Reloj de pared (SPEC 20): solo desde 1680 px, en el margen izquierdo. Lo arma app/clock.js. -->
+    <div class="ck-rail" id="ck-root" role="img"></div>
+    <!-- Fila del contenido (SPEC 20): mide lo mismo que las pestañas; píldora centrada y tema a ras de su borde derecho. -->
+    <div class="top-row">
+      <div class="pill-prod" id="pillProd" aria-live="polite"></div>
+      <div class="theme-pick">
+        <button class="theme-btn" id="theme-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="theme-menu" title="Cambiar el tema de colores">
+          <span class="theme-sw" id="theme-sw" aria-hidden="true"></span>
+          <span id="theme-name">Tema</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="theme-menu" id="theme-menu" role="menu" aria-label="Temas" hidden></div>
       </div>
-      <div><b>Synkops</b><span>Mi operación en sincronía</span></div>
+      <nav class="tabs" id="tabs" aria-label="Módulos">
+        <button data-v="dash" aria-current="page">Inicio</button>
+        <button data-v="buscar">Buscar producto</button>
+        <button data-v="costeo">Costeo</button>
+        <button data-v="desarrollo">Desarrollo</button>
+        <button data-v="metricas">Métricas</button>
+        <button data-v="testeo">Testeo</button>
+        <button data-v="escalado">Escalado</button>
+        <button data-v="logistica">Logística</button>
+        <button data-v="escalera">Escalera</button>
+        <button data-v="creativos">Creativos</button>
+        <button data-v="pyl">Tablero P&amp;L</button>
+      </nav>
     </div>
-    <div class="pill-prod" id="pillProd" aria-live="polite"></div>
-    <div class="theme-pick">
-      <button class="theme-btn" id="theme-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="theme-menu" title="Cambiar el tema de colores">
-        <span class="theme-sw" id="theme-sw" aria-hidden="true"></span>
-        <span id="theme-name">Tema</span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-      </button>
-      <div class="theme-menu" id="theme-menu" role="menu" aria-label="Temas" hidden></div>
-    </div>
-    <nav class="tabs" id="tabs" aria-label="Módulos">
-      <button data-v="dash" aria-current="page">Inicio</button>
-      <button data-v="buscar">Buscar producto</button>
-      <button data-v="costeo">Costeo</button>
-      <button data-v="desarrollo">Desarrollo</button>
-      <button data-v="metricas">Métricas</button>
-      <button data-v="testeo">Testeo</button>
-      <button data-v="escalado">Escalado</button>
-      <button data-v="logistica">Logística</button>
-      <button data-v="escalera">Escalera</button>
-      <button data-v="creativos">Creativos</button>
-      <button data-v="pyl">Tablero P&amp;L</button>
-    </nav>
   </div>
 </header>
 
@@ -81,7 +81,7 @@
       </div>
     </div>
     <div>
-      <h1>Synkops</h1>
+      <h1>Synkops<svg class="hero-pulse" viewBox="0 0 200 18" preserveAspectRatio="none" fill="none" stroke="url(#home-pulse-g)" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><defs><linearGradient id="home-pulse-g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="200" y2="0"><stop offset="0" style="stop-color:var(--b)"/><stop offset="1" style="stop-color:var(--b2)"/></linearGradient></defs><path class="hp-base" d="M1 10H53L59 3L66 16L73 1L80 13L85 10H199"/><path class="hp-run" pathLength="100" d="M1 10H53L59 3L66 16L73 1L80 13L85 10H199"/></svg></h1>
       <div class="eyebrow hero-eyebrow">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
         Mi copiloto de ecommerce
@@ -1173,6 +1173,7 @@
 <script src="js/modules/home/core/quotes.js"></script>
 <script src="js/modules/home/core/home.js"></script>
 <script src="js/modules/tasks/core/tasks.js"></script>
+<script src="js/modules/clock/core/clock.js"></script>
 <!-- Services: archivos y almacenamiento del navegador -->
 <script src="js/shared/services/storage.js"></script>
 <script src="js/shared/services/files.js"></script>
@@ -1210,6 +1211,7 @@
 <script src="js/modules/hub/ui/hub.js"></script>
 <script src="js/modules/home/ui/home.js"></script>
 <script src="js/modules/tasks/ui/tasks.js"></script>
+<script src="js/modules/clock/ui/clock.js"></script>
 <!-- App: estado, casos de uso y arranque (main.js va al final) -->
 <script src="js/app/state.js"></script>
 <script src="js/modules/pnl/app/filters.js"></script>
@@ -1230,6 +1232,7 @@
 <script src="js/modules/hub/app/hub.js"></script>
 <script src="js/modules/home/app/home.js"></script>
 <script src="js/modules/tasks/app/tasks.js"></script>
+<script src="js/modules/clock/app/clock.js"></script>
 <script src="js/modules/trainer/app/trainer.js"></script>
 <script src="js/app/nav.js"></script>
 <script src="js/app/main.js"></script>

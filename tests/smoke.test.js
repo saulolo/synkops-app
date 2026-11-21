@@ -48,10 +48,18 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     const ico = document.querySelector('head link[rel="icon"]');
     assert.ok(ico && ico.getAttribute('href') === 'img/favicon.svg' && ico.getAttribute('type') === 'image/svg+xml', 'El <head> trae el favicon');
     assert.ok(require('fs').existsSync(path.join(__dirname, '..', 'img', 'favicon.svg')), 'El archivo del favicon existe');
-    const mark = document.querySelector('.brand-mark svg');
-    assert.ok(mark.querySelector('path').getAttribute('d') === 'M3 12.75H7.1L9.4 7.5L12.4 17.25L14.6 10.5L16.1 12.75H21' && mark.getAttribute('stroke') === 'currentColor', 'El logo de la barra es el mismo pulso y sigue el tema');
-    assert.deepStrictEqual([...mark.querySelectorAll('path')].map((p) => [p.getAttribute('class'), p.getAttribute('d')]), [['bm-base', mark.querySelector('path').getAttribute('d')], ['bm-run', mark.querySelector('path').getAttribute('d')]], 'Dos trazos del pulso: base tenue y luz que corre');
-    assert.strictEqual(mark.querySelector('.bm-run').getAttribute('pathLength'), '100');
+    // SPEC 20: la marca (logo, «Synkops» y lema) salió de la barra; bajo el título «Synkops» de Inicio va un pulso subrayado.
+    assert.ok(!document.querySelector('.brand-mark') && !document.querySelector('.brand'), 'Ya no existe la marca de la barra (.brand ni .brand-mark)');
+    assert.deepStrictEqual([...document.querySelector('header.top .top-in').children].map((n) => n.id || n.className), ['ck-root', 'top-row'], 'La barra: reloj y la fila del contenido');
+    assert.deepStrictEqual([...document.querySelector('.top-in > .top-row').children].map((n) => n.id || n.className), ['pillProd', 'theme-pick', 'tabs'], 'La fila: píldora del producto activo, tema y pestañas (mide lo mismo que las pestañas)');
+    const h1 = document.querySelector('#v-dash .hero h1');
+    const pulse = h1.querySelector('svg.hero-pulse');
+    assert.ok(pulse && pulse.getAttribute('aria-hidden') === 'true' && h1.lastElementChild === pulse && h1.firstChild.nodeType === 3, 'El pulso subrayado va dentro del <h1> del hero, después del texto');
+    assert.strictEqual(h1.textContent.trim(), 'Synkops', 'El título se sigue leyendo «Synkops»');
+    const d = pulse.querySelector('.hp-base').getAttribute('d');
+    assert.ok(d && pulse.querySelector('.hp-run').getAttribute('d') === d, 'Dos trazos del mismo pulso: base y luz que corre');
+    assert.strictEqual(pulse.querySelector('.hp-run').getAttribute('pathLength'), '100');
+    assert.deepStrictEqual([...pulse.querySelectorAll('stop')].map((s) => s.getAttribute('style')), ['stop-color:var(--b)', 'stop-color:var(--b2)'], 'Degradado del acento del tema');
   }
 
   // 1b. SPEC 14: services.storage.hub (clave pyl-hub). Sin localStorage (file://) no lanza: load da null y save da false.
@@ -61,6 +69,39 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   assert.strictEqual(PYL.services.storage.tasks.load(), null, 'tasks.load sin localStorage');
   assert.strictEqual(PYL.services.storage.tasks.save({ v: 1, note: { days: {} }, collapsed: false }), false, 'tasks.save sin localStorage avisa con false');
   assert.strictEqual(PYL.services.storage.tasks.corrupt('x'), false, 'tasks.corrupt sin localStorage no lanza');
+
+  // 1c. SPEC 20: reloj de pared en el margen izquierdo de la barra (paso 2: la esfera).
+  {
+    const ck = document.getElementById('ck-root');
+    assert.ok(ck && ck.parentElement === document.querySelector('header.top .top-in'), '#ck-root dentro de header.top .top-in');
+    assert.ok(ck.classList.contains('ck-rail') && ck.getAttribute('role') === 'img', '.ck-rail con role="img"');
+    assert.strictEqual(ck, ck.parentElement.firstElementChild, 'Es el primer hijo de la barra');
+    const face = document.getElementById('ck-face');
+    assert.ok(face && face.tagName.toLowerCase() === 'svg' && face.getAttribute('viewBox') === '0 0 100 100' && face.getAttribute('aria-hidden') === 'true', 'Esfera SVG 0 0 100 100, oculta al lector');
+    assert.strictEqual(face.querySelectorAll('.ck-tick').length, 8, '8 rayitas de hora');
+    assert.deepStrictEqual([...face.querySelectorAll('.ck-num')].map((n) => n.textContent), ['12', '3', '6', '9'], 'Números 12, 3, 6 y 9');
+    for (const c of ['ck-h', 'ck-m', 'ck-s']) assert.strictEqual(face.querySelectorAll('.' + c).length, 1, 'Aguja .' + c);
+    const text = ck.querySelector('.ck-text');
+    assert.ok(text && text.getAttribute('aria-hidden') === 'true' && text.contains(document.getElementById('ck-day')) && text.contains(document.getElementById('ck-date')), 'Texto con #ck-day y #ck-date, oculto al lector');
+    assert.strictEqual(typeof PYL.app.clock.tick, 'function', 'app.clock.tick publicado para las pruebas');
+    // Paso 3: al cargar ya pintó, y con la hora simulada (viernes 20 nov 2026, 10:42:30) marca justo eso.
+    assert.ok(document.getElementById('ck-day').textContent && document.getElementById('ck-date').textContent && ck.getAttribute('aria-label'), 'Al cargar ya pintó día, fecha y aria-label');
+    PYL.app.clock.tick(new window.Date(2026, 10, 20, 10, 42, 30));
+    assert.strictEqual(document.getElementById('ck-day').textContent, 'Viernes');
+    assert.strictEqual(document.getElementById('ck-date').textContent, '20 nov');
+    assert.strictEqual(ck.getAttribute('aria-label'), 'Viernes, 20 nov · 10:42 a. m.');
+    assert.strictEqual(ck.getAttribute('title'), 'Viernes, 20 nov · 10:42 a. m.');
+    assert.deepStrictEqual(['ck-h', 'ck-m', 'ck-s'].map((c) => face.querySelector('.' + c).getAttribute('transform')), ['rotate(321.25 50 50)', 'rotate(255 50 50)', 'rotate(180 50 50)'], 'Agujas giradas desde el centro');
+    // Los textos solo se reescriben si cambian: el mismo minuto deja el mismo nodo de texto.
+    const dayText = document.getElementById('ck-day').firstChild;
+    PYL.app.clock.tick(new window.Date(2026, 10, 20, 10, 42, 50));
+    assert.strictEqual(document.getElementById('ck-day').firstChild, dayText, 'Mismo día: no reescribe el texto');
+    assert.strictEqual(face.querySelector('.ck-s').getAttribute('transform'), 'rotate(300 50 50)', 'El segundero sí se mueve');
+    // Medianoche: cambian día y fecha solos.
+    PYL.app.clock.tick(new window.Date(2026, 10, 21, 0, 0, 5));
+    assert.deepStrictEqual([document.getElementById('ck-day').textContent, document.getElementById('ck-date').textContent, ck.getAttribute('aria-label')], ['Sábado', '21 nov', 'Sábado, 21 nov · 12:00 a. m.'], 'Pasada la medianoche');
+    PYL.app.clock.tick(new window.Date());
+  }
 
   // 1d. SPEC 19: Mis tareas · tarjeta y ubicación (paso 6).
   {
@@ -2237,6 +2278,89 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     delete store['pyl-hub'];
   };
 
+  // 8t. Reloj de la barra · bucle de pintado (SPEC 20, paso 5). Página aparte con matchMedia, requestAnimationFrame,
+  // document.hidden y Date simulados. Los fotogramas pendientes (también los de otros módulos) se corren a mano.
+  const ckPage = (o) => JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
+    runScripts: 'dangerously', resources: new Loader(), pretendToBeVisual: true, virtualConsole,
+    beforeParse(w) {
+      const mqs = {};
+      w.matchMedia = (q) => (mqs[q] = mqs[q] || { media: q, matches: /1680/.test(q) ? !!o.wide : /reduce/.test(q) ? !!o.reduce : false, ls: [], addEventListener(t, f) { if (t === 'change') this.ls.push(f); }, removeEventListener() {} });
+      let n = 0;
+      const frames = new Map();
+      w.requestAnimationFrame = (f) => { frames.set(++n, f); return n; };
+      w.cancelAnimationFrame = (id) => { frames.delete(id); };
+      let hidden = !!o.hidden;
+      Object.defineProperty(w.document, 'hidden', { configurable: true, get: () => hidden });
+      const RealDate = w.Date;
+      let fixed = null;
+      w.Date = class extends RealDate { constructor(...a) { if (a.length) super(...a); else super(fixed == null ? RealDate.now() : fixed); } static now() { return fixed == null ? RealDate.now() : fixed; } };
+      w.__ck = {
+        at: (ms) => { fixed = ms; },
+        frames: () => { const fs = [...frames.values()]; frames.clear(); fs.forEach((f) => f(0)); },
+        hide: (v) => { hidden = v; w.document.dispatchEvent(new w.Event('visibilitychange')); },
+        media: (q, v) => { const m = mqs[q]; m.matches = v; m.ls.forEach((f) => f({ matches: v, media: q })); },
+      };
+    },
+  }).then((d) => new Promise((ok) => { if (d.window.document.readyState === 'complete') ok(d); else d.window.addEventListener('load', () => ok(d)); }));
+
+  const ckTest = async () => {
+    const WIDE = '(min-width: 1680px)';
+    const T0 = new Date(2026, 10, 20, 10, 42, 30).getTime();
+    const seg = (W) => W.document.querySelector('#ck-face .ck-s').getAttribute('transform');
+    const day = (W) => W.document.getElementById('ck-day').textContent;
+
+    // Ancho y visible: cada fotograma pinta la hora real.
+    let d = await ckPage({ wide: true });
+    let W = d.window, K = W.__ck;
+    K.at(T0); K.frames();
+    assert.strictEqual(seg(W), 'rotate(180 50 50)', 'Bucle: el fotograma pinta 10:42:30');
+    K.at(T0 + 5000); K.frames();
+    assert.strictEqual(seg(W), 'rotate(210 50 50)', 'Bucle: 5 s después el segundero avanzó');
+    // Pestaña oculta: el bucle se detiene; al volver pinta la hora correcta al instante.
+    K.hide(true);
+    K.at(T0 + 10000); K.frames();
+    assert.strictEqual(seg(W), 'rotate(210 50 50)', 'Oculta: los fotogramas ya no pintan');
+    K.hide(false);
+    assert.strictEqual(seg(W), 'rotate(240 50 50)', 'Al volver pinta la hora del momento');
+    K.at(T0 + 15000); K.frames();
+    assert.strictEqual(seg(W), 'rotate(270 50 50)', 'Y el bucle sigue');
+    // Pantalla angosta: también se detiene; al ensanchar vuelve.
+    K.media(WIDE, false);
+    K.at(T0 + 20000); K.frames();
+    assert.strictEqual(seg(W), 'rotate(270 50 50)', 'Angosta: no pinta');
+    K.media(WIDE, true);
+    assert.strictEqual(seg(W), 'rotate(300 50 50)', 'Al ensanchar pinta y reanuda');
+    W.document.getElementById('ck-root').click();
+    assert.strictEqual(seg(W), 'rotate(300 50 50)', 'El clic no hace nada');
+    W.close();
+
+    // Angosta desde el arranque: pinta una vez al cargar y no corre el bucle.
+    d = await ckPage({ wide: false });
+    W = d.window; K = W.__ck;
+    const s0 = seg(W);
+    assert.ok(day(W) && s0, 'Angosta: pintó una vez al cargar');
+    K.at(T0 + 7000); K.frames();
+    assert.strictEqual(seg(W), s0, 'Angosta: sin bucle');
+    W.close();
+
+    // Oculta desde el arranque: igual, pinta una vez.
+    d = await ckPage({ wide: true, hidden: true });
+    W = d.window; K = W.__ck;
+    const s1 = seg(W);
+    assert.ok(day(W) && s1, 'Oculta: pintó una vez al cargar');
+    K.at(T0 + 7000); K.frames();
+    assert.strictEqual(seg(W), s1, 'Oculta: sin bucle');
+    W.close();
+
+    // Reducir movimiento: sin bucle por fotograma (un temporizador por minuto).
+    d = await ckPage({ wide: true, reduce: true });
+    W = d.window; K = W.__ck;
+    const s2 = seg(W);
+    K.at(T0 + 7000); K.frames();
+    assert.strictEqual(seg(W), s2, 'Reducir movimiento: los fotogramas no pintan');
+    W.close();
+  };
+
   // 8k. Mis tareas · persistencia (SPEC 19, paso 5). Async: usa un localStorage simulado.
   const tkTest1 = async () => {
     delete store['pyl-tasks']; delete store['pyl-tasks-corrupt'];
@@ -2872,7 +2996,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     delete store['pyl-tasks'];
   };
 
-  return lgTest().then(dkTest).then(apTest).then(chTest).then(chCadenaTest).then(chDurasTest).then(hubTest).then(hubTest2).then(hubTest3).then(hubTest4).then(hubTest5).then(tkTest1).then(tkTest2).then(tkTest3).then(tkTest4).then(tkTest5).then(tkTest6).then(tkTest7).then(tkTest8).then(tkTest9).then(fresca).then((d2) => {
+  return lgTest().then(dkTest).then(apTest).then(chTest).then(chCadenaTest).then(chDurasTest).then(hubTest).then(hubTest2).then(hubTest3).then(hubTest4).then(hubTest5).then(tkTest1).then(tkTest2).then(tkTest3).then(tkTest4).then(tkTest5).then(tkTest6).then(tkTest7).then(tkTest8).then(tkTest9).then(ckTest).then(fresca).then((d2) => {
     const doc2 = d2.window.document;
     assert.deepStrictEqual([...doc2.querySelectorAll('#b-strats .st-tab')].map((b) => b.textContent.length > 0), [true, true], 'Estrategias muestra solo 2 tarjetas');
     assert.deepStrictEqual([...d2.window.PYL.core.search.STRATEGIES.map((x) => x.k)], ['vdo', 'prov'], 'STRATEGIES = vdo y prov');
