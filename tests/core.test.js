@@ -11,7 +11,7 @@ const caso = (nombre, fn) => casos.push([nombre, fn]);
 
 caso('exporta todas las funciones del núcleo aplanadas', () => {
   const claves = Object.keys(core).sort().join(',');
-  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CH_CPA_READ,CH_HELP,CH_SIDES,CK_DAYS,CK_MONTHS,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,HOME_EPOCH,HOME_NAME,HOME_QUOTES,HOME_SEED,HOME_SLOTS,HUB_DEFAULTS,HUB_VERSION,LADDER_BLOCKS,LANDING,LEVELS,LG_ACCOUNTS,LG_BANK,LG_CATALOG,LG_DAYS,LG_NEQUI,LG_PARTS,LG_STAGES,LG_STORE,LG_TEMPLATES,LIMITS,MARGIN,MISTAKES,MSP,MW_API,MW_EVERY,MW_PI_TYPES,MW_SALE_TYPES,MW_VERSION,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TK_HISTORY_DAYS,TK_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,chChain,chHard,chPlat,ckAngles,ckDate,ckDay,ckLabel,ckTime,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,homeDay,homeGreeting,homeHello,homeOrder,homePick,homeSlot,hubAdd,hubCheck,hubClean,hubDefaults,hubDomain,hubFavicon,hubInitials,hubLoad,hubOrder,hubRemove,hubSet,hubUrl,isDropi,isMetrics,key,kpis,lgForm,lgFromCand,lgMessage,lgMoney,lgMoneyText,lgPhone,lgPrefill,lgTemplate,lgValues,list,marginLevel,matchProduct,mspLevel,mwAction,mwAlerts,mwCut,mwError,mwK,mwLoad,mwRow,mwRows,mwVerdict,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,tkAdd,tkAddDays,tkAddSub,tkCanCarry,tkCarry,tkCarrySource,tkDateLabel,tkDayDate,tkDayKey,tkDayLabel,tkDelete,tkDeleteSub,tkEdit,tkEditSub,tkEmpty,tkIsHour,tkLoad,tkMove,tkMoveSub,tkParseHour,tkPastDays,tkProgress,tkRollOver,tkSetAll,tkSetHour,tkShortDate,tkTasksOf,tkToggle,tkToggleCollapsed,tkToggleSub,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
+  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CH_CPA_READ,CH_HELP,CH_SIDES,CK_DAYS,CK_MONTHS,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,HOME_EPOCH,HOME_NAME,HOME_QUOTES,HOME_SEED,HOME_SLOTS,HUB_DEFAULTS,HUB_VERSION,IX_VERSION,LADDER_BLOCKS,LANDING,LEVELS,LG_ACCOUNTS,LG_BANK,LG_CATALOG,LG_DAYS,LG_NEQUI,LG_PARTS,LG_STAGES,LG_STORE,LG_TEMPLATES,LIMITS,MARGIN,MISTAKES,MSP,MW_API,MW_EVERY,MW_PI_TYPES,MW_SALE_TYPES,MW_VERSION,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TK_HISTORY_DAYS,TK_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,chChain,chHard,chPlat,ckAngles,ckDate,ckDay,ckLabel,ckTime,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,homeDay,homeGreeting,homeHello,homeOrder,homePick,homeSlot,hubAdd,hubCheck,hubClean,hubDefaults,hubDomain,hubFavicon,hubInitials,hubLoad,hubOrder,hubRemove,hubSet,hubUrl,isDropi,isMetrics,ixFunnel,ixLoad,ixPnl,ixTasks,ixTesting,key,kpis,lgForm,lgFromCand,lgMessage,lgMoney,lgMoneyText,lgPhone,lgPrefill,lgTemplate,lgValues,list,marginLevel,matchProduct,mspLevel,mwAction,mwAlerts,mwCut,mwError,mwK,mwLoad,mwPhoto,mwRow,mwRows,mwTotals,mwVerdict,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,tkAdd,tkAddDays,tkAddSub,tkCanCarry,tkCarry,tkCarrySource,tkDateLabel,tkDayDate,tkDayKey,tkDayLabel,tkDelete,tkDeleteSub,tkEdit,tkEditSub,tkEmpty,tkIsHour,tkLoad,tkMove,tkMoveSub,tkParseHour,tkPastDays,tkProgress,tkRollOver,tkSetAll,tkSetHour,tkShortDate,tkTasksOf,tkToggle,tkToggleCollapsed,tkToggleSub,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
 });
 
 caso('Costeo: proveedor 30.000 da precio $99.900 y tope $21.617', () => {
@@ -2296,7 +2296,7 @@ caso('Cortes Meta: mwAction toma el primer tipo presente y no suma duplicados', 
 
 caso('Cortes Meta: mwRow y mwRows (orden por creación, C1…Cn, sin gasto = 0)', () => {
   const row = core.mwRow(mwIns('a', '21500.5', 4, 1), mwSet('a', '2026-11-19T05:00:00-0500', 'PAUSED', 'Plant · video 1'));
-  assert.deepStrictEqual(row, { id: 'a', name: 'Plant · video 1', short: '', active: false, spend: 21500.5, pi: 4, sales: 1, created: '2026-11-19T05:00:00-0500' });
+  assert.deepStrictEqual(row, { id: 'a', name: 'Plant · video 1', short: '', active: false, spend: 21500.5, impressions: 0, pi: 4, sales: 1, created: '2026-11-19T05:00:00-0500' });
   const sets = [mwSet('c', '2026-11-19T05:02:00-0500'), mwSet('a', '2026-11-19T05:00:00-0500'), mwSet('d', '2026-11-19T05:03:00-0500', 'CAMPAIGN_PAUSED'), mwSet('b', '2026-11-19T05:01:00-0500')];
   const rows = core.mwRows([mwIns('b', 12000, 2), mwIns('a', 31250, 6, 1), mwIns('zz', 999)], sets);
   assert.deepStrictEqual(rows.map((r) => r.id), ['a', 'b', 'c', 'd'], 'Orden por created_time');
@@ -2304,6 +2304,33 @@ caso('Cortes Meta: mwRow y mwRows (orden por creación, C1…Cn, sin gasto = 0)'
   assert.deepStrictEqual(rows.map((r) => r.spend), [31250, 12000, 0, 0], 'Conjunto sin insights = gasto 0; insight sin conjunto se ignora');
   assert.deepStrictEqual(rows.map((r) => r.active), [true, true, true, false]);
   assert.deepStrictEqual(core.mwRows(undefined, []), []);
+});
+
+caso('Cortes Meta: mwTotals da CPM con semáforo y CPA contra el tope', () => {
+  const rows = [{ spend: 30000, impressions: 2000, sales: 2 }, { spend: 10000, impressions: 1000, sales: 0 }];
+  const t = core.mwTotals(rows, 15000);
+  assert.strictEqual(t.spend, 40000);
+  assert.strictEqual(t.sales, 2);
+  assert.ok(Math.abs(t.cpm - 13333.33) < 0.01 && t.cpmLight === 'g', 'CPM 13.333 dentro del límite de Meta');
+  assert.strictEqual(t.cpa, 20000);
+  assert.strictEqual(t.cpaLight, 'y', 'CPA 20.000 sobre el tope 15.000 y bajo el apaga (20.000)');
+  assert.ok(Math.abs(t.topeAt - 0.75) < 1e-9 && t.cpaFill === 1);
+  assert.strictEqual(core.mwTotals([{ spend: 5000, impressions: 100, sales: 1 }], 15000).cpmLight, 'r', 'CPM 50.000 sobre el límite');
+  assert.strictEqual(core.mwTotals([{ spend: 5000, impressions: 400, sales: 1 }], 15000).cpaLight, 'g');
+  const none = core.mwTotals([{ spend: 5000, impressions: 0, sales: 0 }], 15000);
+  assert.deepStrictEqual([none.cpm, none.cpa, none.cpmLight, none.cpaLight, none.cpaFill], [null, null, null, null, 0], 'Sin impresiones ni ventas no hay CPM ni CPA');
+  assert.deepStrictEqual([t.income, t.result], [30000, -10000], '2 ventas × tope 15.000 − 40.000 gastados');
+  assert.deepStrictEqual([core.mwTotals([], 0).topeAt, core.mwTotals([], 0).result], [null, null]);
+});
+
+caso('Cortes Meta: mwPhoto busca la foto del producto por nombre', () => {
+  const img = 'data:image/jpeg;base64,AAAA';
+  const items = [{ name: 'Otro', photo: 'data:image/png;base64,BBBB' }, { name: 'Plant Pwr Calma Pánico Pólvora Mascotas', photo: img }, { name: 'Sin foto' }];
+  assert.strictEqual(core.mwPhoto('plant  pwr calma panico polvora mascotas', items), img, 'Sin importar mayúsculas, tildes ni espacios');
+  assert.strictEqual(core.mwPhoto('Sin foto', items), '', 'Sin foto → vacío');
+  assert.strictEqual(core.mwPhoto('Otro producto', items), '', 'Nombre distinto → vacío');
+  assert.strictEqual(core.mwPhoto('X', [{ name: 'X', photo: 'https://ejemplo.com/a.jpg' }]), '', 'Solo imágenes embebidas');
+  assert.strictEqual(core.mwPhoto('', items) + core.mwPhoto('X', undefined), '');
 });
 
 caso('Cortes Meta: mwCut por gasto acumulado', () => {
@@ -2383,6 +2410,94 @@ caso('Cortes Meta: mwLoad valida pyl-meta', () => {
 
 caso('Cortes Meta: mwK en miles hacia abajo', () => {
   for (const [n, t] of [[31250, '31K'], [19999, '19K'], [20000, '20K'], [850, '0K'], [0, '0K'], [100000, '100K']]) assert.strictEqual(core.mwK(n), t, String(n));
+});
+
+// ---------- Inicio: indicadores (SPEC 22) ----------
+const ixSnap = (patch = {}) => ({ v: 1, at: new Date(2026, 10, 20, 10, 0).getTime(), prod: 'Todos', from: '2026-11-01', to: '2026-11-20', util: 1250000, fact: 6400000, margen: 0.195, roas: 3.4, roasEq: 2.1, efect: 0.72, ...patch });
+
+caso('Indicadores: ixLoad valida pyl-pnl-snap', () => {
+  const ok = ixSnap();
+  assert.deepStrictEqual(core.ixLoad(JSON.stringify(ok)), ok);
+  assert.deepStrictEqual(core.ixLoad(JSON.stringify(ixSnap({ from: null, to: null, margen: null, roas: null, efect: null }))), ixSnap({ from: null, to: null, margen: null, roas: null, efect: null }));
+  for (const [name, raw] of [
+    ['vacío', null], ['no JSON', '{roto'], ['otra v', JSON.stringify(ixSnap({ v: 2 }))], ['sin at', JSON.stringify(ixSnap({ at: 'hoy' }))],
+    ['sin prod', JSON.stringify(ixSnap({ prod: '' }))], ['from raro', JSON.stringify(ixSnap({ from: '1 nov' }))],
+    ['util raro', JSON.stringify(ixSnap({ util: '1' }))], ['margen raro', JSON.stringify(ixSnap({ margen: 'x' }))], ['arreglo', '[]'],
+  ]) assert.strictEqual(core.ixLoad(raw), null, name);
+});
+
+caso('Indicadores: ixPnl tono de utilidad y color del margen por MARGIN', () => {
+  assert.strictEqual(core.ixPnl(null), null);
+  assert.strictEqual(core.ixPnl(ixSnap()).tone, 'g');
+  assert.strictEqual(core.ixPnl(ixSnap({ util: 0 })).tone, 'g');
+  assert.strictEqual(core.ixPnl(ixSnap({ util: -5000 })).tone, 'r');
+  const M = core.MARGIN;
+  for (const [m, lv] of [[M.healthy, 'g'], [M.healthy - 0.001, 'y'], [M.even, 'y'], [M.even - 0.001, 'r'], [-0.1, 'r'], [null, null]]) assert.strictEqual(core.ixPnl(ixSnap({ margen: m })).level, lv, String(m));
+  const p = core.ixPnl(ixSnap({ margen: 0.4 }));
+  assert.strictEqual(p.marginFill, 1, 'tope del medidor');
+  assert.strictEqual(core.ixPnl(ixSnap({ margen: -0.1 })).marginFill, 0);
+  assert.strictEqual(p.marginMark, M.healthy / M.ideal);
+  // Semáforo de ROAS (contra su equilibrio) y de efectividad (meta 70 %), las reglas de diagnostics.kpis.
+  const lv = (o) => { const p = core.ixPnl(ixSnap(o)); return [p.roasLevel, p.efectLevel]; };
+  assert.deepStrictEqual(lv({}), ['g', 'g']);
+  assert.deepStrictEqual(lv({ roas: 2.2, efect: 0.65 }), ['y', 'y'], 'En el límite y bajo la meta');
+  assert.deepStrictEqual(lv({ roas: 1.5, efect: 0.5 }), ['r', 'r'], 'Bajo equilibrio y efectividad baja');
+  assert.deepStrictEqual(lv({ roas: null, efect: null }), [null, null]);
+  assert.strictEqual(core.ixPnl(ixSnap({ roasEq: null })).roasLevel, null, 'Sin equilibrio no hay semáforo de ROAS');
+  assert.strictEqual(core.ixLoad(JSON.stringify({ ...ixSnap(), roasEq: undefined })).roasEq, null, 'Foto sin roasEq sigue siendo válida');
+  assert.strictEqual(core.ixLoad(JSON.stringify(ixSnap({ roasEq: 'x' }))), null, 'roasEq raro invalida');
+  assert.strictEqual(core.ixPnl(ixSnap()).label, 'Todos · 1 nov – 20 nov · dato del 20 nov');
+  assert.strictEqual(core.ixPnl(ixSnap({ prod: 'Omega', from: null, to: null })).label, 'Omega · Todo el periodo · dato del 20 nov');
+});
+
+caso('Indicadores: ixFunnel por estado y descartados aparte', () => {
+  assert.strictEqual(core.ixFunnel([], core.STATUS), null);
+  const log = [{ status: 'evaluando' }, { status: 'evaluando' }, { status: 'evaluando' }, { status: 'evaluando' }, { status: 'testeo' }, { status: 'testeo' }, { status: 'ganador' }, { status: 'descartado' }, { status: 'descartado' }, { status: '' }];
+  const f = core.ixFunnel(log, core.STATUS);
+  assert.deepStrictEqual(f.rows.map((r) => [r.k, r.n, r.pct]), [['evaluando', 4, 100], ['testeo', 2, 50], ['activo', 0, 0], ['ganador', 1, 25]]);
+  assert.strictEqual(f.rows[0].t, 'Evaluando');
+  assert.strictEqual(f.dropped, 2);
+  assert.strictEqual(f.total, 10);
+  const solo = core.ixFunnel([{ status: 'descartado' }], core.STATUS);
+  assert.deepStrictEqual(solo.rows.map((r) => r.pct), [0, 0, 0, 0], 'sin máximo no divide por 0');
+  assert.strictEqual(solo.dropped, 1);
+});
+
+caso('Indicadores: ixTesting sin conjuntos, con activos y con OFF', () => {
+  assert.deepStrictEqual(core.ixTesting(null, null), { best: null, cut: -1, set: '', active: 0 });
+  assert.deepStrictEqual(core.ixTesting(80, []), { best: 80, cut: -1, set: '', active: 0 });
+  assert.strictEqual(core.ixTesting(80, [mwR('C1', 5000)]).cut, -1, 'antes del corte 1');
+  const rows = [mwR('C1', 22000), mwR('C2', 31000), mwR('C3', 45000, false), mwR('C4', 8000)];
+  assert.deepStrictEqual(core.ixTesting(60, rows), { best: 60, cut: 1, set: 'C2', active: 3 }, 'el OFF (C3 a 45K) no cuenta');
+  assert.strictEqual(core.ixTesting(0, [mwR('C1', 41000)]).cut, 2);
+  assert.strictEqual(core.ixTesting(0, [mwR('C1', 31000, false)]).active, 0);
+});
+
+caso('Indicadores: ixTasks conteo, 5 días y racha', () => {
+  const D = '2026-11-14';
+  const dia = (key, estados) => [key, estados.map((d, i) => tkTask(`${key}-${i}`, d))];
+  const mk = (...pares) => tkNote(Object.fromEntries(pares));
+  const vacio = core.ixTasks(core.tkEmpty(), D);
+  assert.deepStrictEqual([vacio.done, vacio.total, vacio.streak, vacio.days.length], [0, 0, 0, 5]);
+  assert.deepStrictEqual(vacio.days.map((d) => d.key), ['2026-11-10', '2026-11-11', '2026-11-12', '2026-11-13', '2026-11-14']);
+  assert.strictEqual(vacio.days[4].fill, 0);
+  // hoy cumplido + ayer y anteayer cumplidos → 3
+  const a = core.ixTasks(mk(dia('2026-11-14', [true, true]), dia('2026-11-13', [true]), dia('2026-11-12', [true])), D);
+  assert.strictEqual(a.streak, 3);
+  assert.deepStrictEqual([a.done, a.total], [2, 2]);
+  // hoy a medias → cuenta desde ayer
+  const b = core.ixTasks(mk(dia('2026-11-14', [true, false]), dia('2026-11-13', [true]), dia('2026-11-12', [true])), D);
+  assert.strictEqual(b.streak, 2);
+  assert.strictEqual(b.days[4].fill, 0.5);
+  // un día sin tareas corta la racha
+  const c = core.ixTasks(mk(dia('2026-11-14', [true]), dia('2026-11-12', [true])), D);
+  assert.strictEqual(c.streak, 1);
+  // máximo 5
+  const d = core.ixTasks(mk(...[10, 11, 12, 13, 14].map((n) => dia(`2026-11-${n}`, [true])), dia('2026-11-09', [true])), D);
+  assert.strictEqual(d.streak, 5);
+  // subtareas cuentan: tarea hecha con subtarea pendiente = día no cumplido
+  const e = core.ixTasks(tkNote({ [D]: [tkTask('x', true, [{ id: 's', text: 's', done: false }])] }), D);
+  assert.deepStrictEqual([e.done, e.total, e.streak], [1, 2, 0]);
 });
 
 let fallos = 0;

@@ -1,0 +1,136 @@
+/* Franja de indicadores de Inicio (SPEC 22). Solo tokens: sin reglas en themes.css.
+   Las tarjetas llevan .card.card-side (relieve neutro, base.css) como Mis tareas y el Centro de mando. */
+.ix-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:16px}
+@media (max-width:899px){.ix-strip{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:519px){.ix-strip{grid-template-columns:minmax(0,1fr)}}
+
+/* La tarjeta es un botón: se quita el aspecto nativo y se conserva el de .card */
+button.ix-card{appearance:none;font:inherit;color:var(--ink);text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:12px;min-width:0;padding:16px 18px}
+button.ix-card:focus-visible{outline:2px solid var(--b);outline-offset:3px}
+button.ix-card > span{display:block}
+.ix-top{display:flex!important;align-items:center;justify-content:space-between;gap:8px}
+.ix-title{font-size:12.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--soft)}
+.ix-go{font-size:15px;font-weight:800;color:var(--soft);transition:transform .18s,color .18s}
+button.ix-card:hover .ix-go,button.ix-card:focus-visible .ix-go{transform:translateX(3px);color:var(--b)}
+.ix-body{display:flex!important;flex-direction:column;gap:9px;min-width:0;flex:1}
+
+.ix-big{font-size:25px;font-weight:800;letter-spacing:-.02em;line-height:1.1;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.ix-unit{font-size:12.5px;font-weight:700;letter-spacing:0;color:var(--soft)}
+.ix-t-g{color:var(--g-ink)}.ix-t-r{color:var(--r-ink)}.ix-t-n{color:var(--soft)}
+.ix-strong{font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+.ix-line{font-size:13px;font-weight:600;color:var(--muted)}
+.ix-sub{font-size:12px;font-weight:600;color:var(--soft);line-height:1.35}
+.ix-chips{display:flex;flex-wrap:wrap;gap:6px}
+.ix-chip{display:inline-flex;align-items:baseline;gap:6px;font-size:12.5px;padding:3px 9px;border-radius:999px;background:color-mix(in srgb,var(--ink) 7%,transparent);border:1px solid var(--line-2)}
+.ix-chip-l{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--soft)}
+
+/* Medidor y barras: el relleno crece con transform (la animación vive en app/indicators.js) */
+.ix-track{position:relative;display:block;height:8px;border-radius:999px;background:color-mix(in srgb,var(--ink) 9%,transparent)}
+.ix-fill{position:absolute;inset:0;border-radius:inherit;background:var(--b);transform-origin:left center;transform:scaleX(var(--ix-v,0))}
+.ix-fill.ix-o{background:var(--o)}.ix-fill.ix-g{background:var(--g)}.ix-fill.ix-y{background:var(--y)}.ix-fill.ix-r{background:var(--r)}.ix-fill.ix-b{background:linear-gradient(90deg,var(--b),var(--b2))}
+.ix-mark{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;border-radius:1px;background:var(--ink);opacity:.75}
+
+/* Embudo */
+.ix-rows{display:flex!important;flex-direction:column;gap:7px}
+.ix-row{display:grid!important;grid-template-columns:minmax(0,92px) minmax(0,1fr) 22px;align-items:center;gap:8px;font-size:12.5px}
+.ix-row-t{font-weight:700;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ix-row-n{text-align:right}
+.ix-row-t{display:flex;align-items:center;gap:7px}
+.ix-ico{display:inline-flex;flex:none;color:var(--b)}
+.ix-ico svg{display:block}
+
+/* Testeo: dos bloques (Práctica y En Meta) separados por una raya. La escalera de cortes usa los colores de la alerta de la barra:
+   amarillo, naranja y rojo; el último corte alcanzado lleva un halo. */
+.ix-sec{display:flex;flex-direction:column;gap:7px}
+.ix-sec-h{font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--b)}
+.ix-sep{display:block;height:1px;background:linear-gradient(90deg,var(--line-2),transparent)}
+.ix-steps{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;margin:2px 0 1px}
+.ix-rail{position:absolute;top:6px;left:var(--ix-half,16.66%);right:var(--ix-half,16.66%);height:3px;border-radius:2px;background:color-mix(in srgb,var(--ink) 12%,transparent)}
+.ix-rail .ix-fill{background:linear-gradient(90deg,var(--y),var(--o))}
+.ix-step{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:5px}
+.ix-dot{display:block;width:15px;height:15px;box-sizing:border-box;border-radius:50%;background:var(--card);border:2px solid var(--line-2)}
+.ix-s0{--tone:var(--y)}.ix-s1{--tone:var(--o)}.ix-s2{--tone:var(--r)}
+.ix-on .ix-dot{border-color:var(--tone);background:var(--tone)}
+.ix-cur .ix-dot{box-shadow:0 0 0 4px color-mix(in srgb,var(--tone) 28%,transparent)}
+.ix-step-l{font-size:11px;font-weight:800;color:var(--soft);font-variant-numeric:tabular-nums}
+.ix-on .ix-step-l{color:var(--ink)}
+
+/* Pulso de tareas: anillo con el avance de hoy y el porcentaje al centro */
+.ix-center{align-items:center;justify-content:center;text-align:center}
+.ix-center-t{text-align:center}
+.ix-ring{position:relative;display:block;width:116px;height:116px;flex:none}
+.ix-ring svg{display:block;width:100%;height:100%}
+.ix-ring-bg{stroke:color-mix(in srgb,var(--ink) 10%,transparent)}
+.ix-ring-fill.ix-done{stroke:var(--g)}
+.ix-ring-c{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:1px;font-weight:800;font-variant-numeric:tabular-nums}
+.ix-ring-n{font-size:27px;letter-spacing:-.02em;line-height:1}
+.ix-ring-p{font-size:13px;color:var(--soft);margin-top:4px}
+
+/* Estado vacío: atenuada, con la invitación */
+.ix-empty{opacity:.62}
+.ix-empty:hover,.ix-empty:focus-visible{opacity:.9}
+.ix-invite{margin:auto 0;font-size:13.5px;font-weight:700;line-height:1.4;color:var(--muted)}
+
+/* Animación de entrada (app/indicators.js pone .ix-play en la primera pintada y al volver a Inicio; no en los repintados por dato).
+   Solo transform y opacity: tarjetas escalonadas 60 ms, barras y medidores de 0 a su valor en 500 ms. El conteo de números va en JS. */
+.ix-card:nth-child(1){--ix-d:0ms}.ix-card:nth-child(2){--ix-d:60ms}.ix-card:nth-child(3){--ix-d:120ms}.ix-card:nth-child(4){--ix-d:180ms}
+@keyframes ix-in{from{opacity:0;transform:translateY(8px)}}
+@keyframes ix-grow{from{transform:scaleX(0)}}
+@keyframes ix-ring{from{stroke-dashoffset:100}}
+.ix-play .ix-card{animation:ix-in .45s ease-out backwards;animation-delay:var(--ix-d,0ms)}
+.ix-play .ix-fill{animation:ix-grow .5s ease-out backwards;animation-delay:calc(var(--ix-d,0ms) + 150ms)}
+.ix-play .ix-ring-fill{animation:ix-ring .6s ease-out backwards;animation-delay:calc(var(--ix-d,0ms) + 150ms)}
+
+/* ---------- Efectos: línea de color por tarjeta, semáforo en chips y barras, anillo con degradado ----------
+   --tone lo fija cada tarjeta (.ix-tone-*): verde o rojo según la utilidad en Mini P&L, verde con todo hecho en Pulso, el acento en el resto. */
+.ix-tone-g{--tone:var(--g);--tone-ink:var(--g-ink)}.ix-tone-r{--tone:var(--r);--tone-ink:var(--r-ink)}.ix-tone-b{--tone:var(--b);--tone-ink:var(--b)}
+button.ix-card{position:relative;overflow:hidden;isolation:isolate;transition:transform .2s ease,border-color .2s,box-shadow .2s}
+button.ix-card > *{position:relative;z-index:1}
+button.ix-card::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;z-index:2;background:linear-gradient(90deg,transparent,var(--tone) 35%,var(--tone) 65%,transparent);opacity:.85}
+button.ix-card:hover,button.ix-card:focus-visible{transform:translateY(-3px)}
+#v-dash button.ix-card:hover{box-shadow:var(--shadow),inset 0 1px 0 color-mix(in srgb,var(--ink) 12%,transparent),0 18px 40px rgba(0,0,0,.34),0 0 26px -6px color-mix(in srgb,var(--tone) 55%,transparent)}
+button.ix-empty::before{display:none}
+.ix-title{color:color-mix(in srgb,var(--tone) 70%,var(--soft))}
+.ix-big{text-shadow:0 0 22px color-mix(in srgb,var(--tone) 40%,transparent)}
+
+/* Chips con semáforo: punto con brillo, fondo y borde del color y el número en su tono */
+.ix-chip{position:relative;align-items:center}
+.ix-chip-l:empty{display:none}
+.ix-chip.ix-g{--c:var(--g);--c-ink:var(--g-ink)}.ix-chip.ix-y{--c:var(--y);--c-ink:var(--y-ink)}.ix-chip.ix-r{--c:var(--r);--c-ink:var(--r-ink)}
+.ix-chip.ix-g,.ix-chip.ix-y,.ix-chip.ix-r{background:color-mix(in srgb,var(--c) 15%,transparent);border-color:color-mix(in srgb,var(--c) 55%,transparent);box-shadow:0 0 14px -5px var(--c)}
+.ix-chip.ix-g::before,.ix-chip.ix-y::before,.ix-chip.ix-r::before{content:"";width:7px;height:7px;border-radius:50%;flex:none;background:var(--c);box-shadow:0 0 7px var(--c)}
+.ix-chip.ix-g .ix-strong,.ix-chip.ix-y .ix-strong,.ix-chip.ix-r .ix-strong{color:var(--c-ink)}
+.ix-chip.ix-g .ix-chip-l,.ix-chip.ix-y .ix-chip-l,.ix-chip.ix-r .ix-chip-l{color:color-mix(in srgb,var(--c-ink) 75%,var(--soft))}
+
+/* Barras y medidores: brillo del color y un destello que las recorre */
+.ix-fill{overflow:hidden;box-shadow:0 0 10px -1px var(--glow,rgba(var(--b-rgb),.55))}
+.ix-fill.ix-g{--glow:var(--g)}.ix-fill.ix-y{--glow:var(--y)}.ix-fill.ix-o{--glow:var(--o)}.ix-fill.ix-r{--glow:var(--r)}
+.ix-track .ix-fill::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.38) 50%,transparent 70%);transform:translateX(-120%);animation:ix-sheen 4.2s ease-in-out 1.2s infinite}
+@keyframes ix-sheen{0%{transform:translateX(-120%)}38%,100%{transform:translateX(120%)}}
+
+/* Embudo: cada etapa con su color (ícono, barra y número) */
+.ix-row{--tone:var(--b)}
+.ix-row[data-tone="y"]{--tone:var(--y)}.ix-row[data-tone="o"]{--tone:var(--o)}.ix-row[data-tone="g"]{--tone:var(--g)}
+.ix-row .ix-row-n{color:var(--tone)}
+
+/* Escalera de Testeo: el corte actual late */
+.ix-cur .ix-dot{position:relative}
+.ix-cur .ix-dot::after{content:"";position:absolute;inset:-2px;border-radius:50%;border:2px solid var(--tone);animation:ix-ping 2s ease-out infinite}
+@keyframes ix-ping{0%{transform:scale(1);opacity:.8}100%{transform:scale(2.1);opacity:0}}
+.ix-on .ix-dot{box-shadow:0 0 10px -1px var(--tone)}
+
+/* Pulso de tareas: anillo con degradado, brillo y porcentaje con degradado */
+.ix-ring svg{position:relative}
+.ix-ring-fill{filter:drop-shadow(0 0 5px color-mix(in srgb,var(--tone) 75%,transparent))}
+.ix-ring-fill.ix-done{stroke:var(--g)}
+.ix-ring-c{z-index:1}
+.ix-ring-n{background:linear-gradient(140deg,var(--ink) 20%,var(--tone-ink));-webkit-background-clip:text;background-clip:text;color:transparent}
+
+@media (prefers-reduced-motion:reduce){
+  .ix-go{transition:none}
+  .ix-play .ix-card,.ix-play .ix-fill,.ix-play .ix-ring-fill{animation:none}
+  button.ix-card{transition:none}
+  button.ix-card:hover,button.ix-card:focus-visible{transform:none}
+  .ix-track .ix-fill::after,.ix-cur .ix-dot::after{animation:none}
+  .ix-track .ix-fill::after,.ix-cur .ix-dot::after{display:none}
+}

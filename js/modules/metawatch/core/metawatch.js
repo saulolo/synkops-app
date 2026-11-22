@@ -35,6 +35,7 @@
       short: '',
       active: adset.effective_status === 'ACTIVE',
       spend: num(ins.spend),
+      impressions: num(ins.impressions),
       pi: mwAction(ins.actions, MW_PI_TYPES),
       sales: mwAction(ins.actions, MW_SALE_TYPES),
       created: String(adset.created_time || ''),
@@ -125,8 +126,44 @@
     return s;
   };
 
+  // Totales de la campaña para las tarjetas del teléfono de Inicio: CPM de Meta con su semáforo (límite de
+  // HARD_METRICS) y CPA contra el tope (zonas de cpaZones). Suma todos los conjuntos, también los apagados.
+  // Luz 'g'/'y'/'r' o null si falta dato (sin impresiones no hay CPM; sin ventas no hay CPA).
+  const mwTotals = (rows, tope) => {
+    let spend = 0, impressions = 0, sales = 0;
+    for (const r of rows || []) {
+      spend += num(r.spend);
+      impressions += num(r.impressions);
+      sales += num(r.sales);
+    }
+    const lim = core.metrics.HARD_METRICS.find((r) => r.k === 'cpm').view.meta.lim;
+    const cpm = impressions > 0 ? (spend / impressions) * 1000 : null;
+    const cpmLight = cpm === null ? null : (lim.op === '<=' ? cpm <= lim.max : cpm < lim.max) ? 'g' : 'r';
+    const cpa = sales > 0 ? spend / sales : null;
+    const z = tope > 0 ? core.testing.cpaZones(tope) : null;
+    const cpaLight = cpa === null || !z ? null : cpa <= z.tope ? 'g' : cpa <= z.apaga ? 'y' : 'r';
+    // Estimado si se entregan todos los pedidos: cada entrega deja el tope (precio − proveedor − flete) antes de publicidad.
+    const income = z ? sales * z.tope : null;
+    return {
+      spend, impressions, sales, cpm, cpmLight, cpa, cpaLight, tope: z ? z.tope : null,
+      income, result: income === null ? null : income - spend,
+      cpaFill: cpa !== null && z ? Math.min(cpa / z.apaga, 1) : 0,
+      topeAt: z ? z.tope / z.apaga : null,
+    };
+  };
+
+  // Foto del producto activo para el teléfono de Inicio: la del candidato (o bitácora) cuyo nombre coincide con el
+  // del producto, sin importar mayúsculas, tildes ni espacios. Solo imágenes embebidas (data:image/); si no hay: ''.
+  const flat = (s) => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().split(/\s+/).filter(Boolean).join(' ');
+  const mwPhoto = (name, items) => {
+    const n = flat(name);
+    if (!n) return '';
+    const hit = (items || []).find((p) => p && typeof p.photo === 'string' && p.photo.startsWith('data:image/') && flat(p.name) === n);
+    return hit ? hit.photo : '';
+  };
+
   // 31250 → '31K'. Hacia abajo: 19.999 no se ve como 20K antes del corte.
   const mwK = (n) => Math.floor(num(n) / 1000) + 'K';
 
-  core.metawatch = { MW_VERSION, MW_API, MW_EVERY, MW_PI_TYPES, MW_SALE_TYPES, mwAction, mwRow, mwRows, mwCut, mwAlerts, mwVerdict, mwError, mwLoad, mwK };
+  core.metawatch = { MW_VERSION, MW_API, MW_EVERY, MW_PI_TYPES, MW_SALE_TYPES, mwAction, mwRow, mwRows, mwCut, mwAlerts, mwVerdict, mwError, mwLoad, mwK, mwTotals, mwPhoto };
 })();

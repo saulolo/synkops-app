@@ -41,13 +41,34 @@ if(S.generic){ S = GENERIC; } // un genérico guardado antes toma el nombre actu
 var PLAT = { meta: { name: "Meta Ads", cpm: 20000 }, tiktok: { name: "TikTok Ads", cpm: 6000 } };
 var ESCALERA = [100000,120000,144000,173000,207000,249000,299000,358000,430000,516000,619000,743000,892000,1070000,1280000];
 
-function renderPill(){
-  $("#pillProd").innerHTML =
-    '<span class="soft">Activo:</span> <b>' + S.name + '</b>' +
-    '<span class="z"><span style="background:var(--g-bg);color:var(--g-ink)">&lt;' + fmt(S.escala) + '</span>' +
-    '<span style="background:var(--y-bg);color:var(--y-ink)">' + fmt(S.tope) + '</span>' +
-    '<span style="background:var(--r-bg);color:var(--r-ink)">&gt;' + fmt(S.apaga) + '</span></span>';
+// CPA real de la campaña de Cortes (gasto ÷ ventas, todos los conjuntos) o null si no hay dato. Lo trae metawatch.
+function pillCpa(){
+  var P = globalThis.PYL, st = P.app.state && P.app.state.metawatch;
+  if(!st || !st.saved || !st.saved.campaign || !st.rows.length || (st.status && st.status.k === "token") || !(S.tope > 0)){ return null; }
+  return P.core.metawatch.mwTotals(st.rows, S.tope).cpa;
 }
+// Píldora del producto activo: nombre, barra de zonas del CPA (escala · tope · apaga) con una aguja en el CPA
+// actual de la campaña y, debajo, lo que ganas o pierdes por pedido a ese CPA. Sin campaña: solo las zonas.
+function renderPill(){
+  var total = S.apaga * 1.25;
+  var pos = function(v){ return Math.max(0, Math.min(100, v / total * 100)); };
+  var cpa = pillCpa(), z = "", phrase = "", needle = "";
+  if(cpa !== null){
+    z = cpa < S.escala ? "g" : cpa <= S.tope ? "y" : cpa <= S.apaga ? "o" : "r";
+    var gan = S.tope - cpa;
+    phrase = '<div class="pp-cpa ' + z + '" title="Por pedido entregado: tope menos CPA de la campaña">CPA actual ' + money(cpa) + " · " +
+      (Math.round(gan) === 0 ? "en equilibrio" : gan > 0 ? "ganas " + money(gan) + " por pedido" : "pierdes " + money(-gan) + " por pedido") + "</div>";
+    needle = '<i class="pp-needle ' + z + '" style="left:' + pos(cpa) + '%"></i>';
+  }
+  $("#pillProd").innerHTML =
+    '<div class="pp-top"><span class="soft">Activo:</span> <b>' + S.name + "</b>" + phrase + "</div>" +
+    '<div class="pp-bar"><span class="pp-g" style="flex:' + S.escala + '"></span><span class="pp-y" style="flex:' + (S.tope - S.escala) + '"></span>' +
+    '<span class="pp-o" style="flex:' + (S.apaga - S.tope) + '"></span><span class="pp-r" style="flex:' + (total - S.apaga) + '"></span>' + needle + "</div>" +
+    '<div class="pp-lab"><span style="left:' + pos(S.escala) + '%">&lt;' + fmt(S.escala) + '</span><span style="left:' + pos(S.tope) + '%">' + fmt(S.tope) +
+    '</span><span style="left:' + pos(S.apaga) + '%">&gt;' + fmt(S.apaga) + "</span></div>";
+}
+// Cada consulta a Meta trae un CPA nuevo: la aguja se mueve.
+document.addEventListener("meta:dato", renderPill);
 function setProduct(p){
   S = p; store.set("ns_prod", S);
   renderPill(); renderLevel(); runPanel(); wiz(0); chain(chainK);

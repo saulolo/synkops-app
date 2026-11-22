@@ -12,10 +12,44 @@
 .mw-btn:hover,.mw-btn[aria-expanded="true"]{background:var(--card);border-color:var(--line-2)}
 .mw-btn:focus-visible{outline:2px solid var(--b);outline-offset:2px}
 
+/* Botón ACTUALIZAR del teléfono de Inicio (SVG): gira un destello mientras consulta */
+.mh-btn{cursor:pointer;outline:none}
+.mh-btn:hover rect{filter:brightness(1.08)}
+.mh-btn:focus-visible rect{stroke:var(--ink);stroke-width:2}
+.mh-btn.mh-busy{cursor:progress;opacity:.7}
+.mh-drop{opacity:0;animation:mh-rise 3s ease-out both}
+@keyframes mh-rise{0%{transform:translate(0,0);opacity:0}12%{opacity:1}85%{opacity:1}100%{transform:translate(var(--dx),-290px);opacity:0}}
+.mh-bob{animation:mh-bob 3.6s ease-in-out infinite}
+.mh-bob.d2{animation-delay:-1.8s}
+@keyframes mh-bob{50%{transform:translateY(-4px)}}
+.mh-ic-spin{transform-box:fill-box;transform-origin:center}
+.mh-btn.mh-busy .mh-ic-spin{animation:mh-spin .9s linear infinite}
+@keyframes mh-spin{to{transform:rotate(360deg)}}
+/* Estimado de la campaña (arriba del tema, desde 1680 px): lo invertido, pedidos × tope y el resultado. Mide lo mismo
+   que el botón del tema (138 px): el margen hasta Cortes (.mw-rail) es justo y más ancho se le superpone. */
+.mw-sum{display:none}
+@media (min-width:1680px){
+  .mw-sum:not([hidden]){display:flex;flex-direction:column;gap:2px;grid-column:2;grid-row:1;justify-self:start;align-self:stretch;justify-content:center;width:138px;box-sizing:border-box;padding:6px 9px;border-radius:12px;background:var(--card);border:1px solid rgba(var(--b-rgb),.24);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);font-size:11px;line-height:1.35;color:var(--ink)}
+}
+.mw-sum-cap,.mw-sum-row{overflow:hidden}
+.mw-sum-cap{font-size:8.5px;font-weight:800;letter-spacing:.05em;color:var(--soft);white-space:nowrap}
+.mw-sum-row{display:flex;justify-content:space-between;gap:6px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.mw-sum-k{color:var(--muted);font-weight:600}
+.mw-sum-v{font-weight:800}
+.mw-sum-row.g .mw-sum-v{color:var(--g-ink)}
+.mw-sum-row.r .mw-sum-v{color:var(--r-ink)}
+/* Mismo estilo que la píldora del CPA (.pill-prod en base.css): fondo de tarjeta, borde con un tono del acento y un
+   reflejo arriba; con el cursor sube 1 px, se enciende un halo y un destello le da la vuelta al borde (--pp-a y
+   pp-spin se definen en base.css). Lo comparten el estimado y el bloque de Cortes. */
+.mw-sum,.mw-btn{position:relative;background:var(--card);border:1px solid rgba(var(--b-rgb),.24);border-radius:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 8px 20px -14px rgba(0,0,0,.6);transition:border-color .25s,box-shadow .25s,transform .25s}
+.mw-sum::before,.mw-btn::before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;pointer-events:none;opacity:0;transition:opacity .3s;
+  background:conic-gradient(from var(--pp-a),transparent 0 62%,rgba(var(--b-rgb),.95) 80%,rgba(var(--b2-rgb),.95) 88%,transparent 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+.mw-sum:hover,.mw-btn:hover,.mw-btn[aria-expanded="true"]{transform:translateY(-1px);background:var(--card);border-color:rgba(var(--b-rgb),.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 0 22px -8px rgba(var(--b-rgb),.6),0 10px 24px -14px rgba(0,0,0,.7)}
+.mw-sum:hover::before,.mw-btn:hover::before,.mw-btn[aria-expanded="true"]::before{opacity:1;animation:pp-spin 3.2s linear infinite}
 .mw-head{display:flex;align-items:baseline;gap:4px;min-width:0;font-size:11px;line-height:1.2;white-space:nowrap}
 .mw-head b{font-weight:800;letter-spacing:.08em;color:var(--ink)}
 .mw-sub{min-width:0;overflow:hidden;text-overflow:ellipsis;font-weight:600;color:var(--muted)}
-.mw-time{margin-left:auto;flex:none;font-size:10.5px;font-weight:600;color:var(--soft);font-variant-numeric:tabular-nums}
 .mw-msg{font-size:12px;font-weight:600;line-height:1.3;color:var(--soft)}
 
 .mw-sets{display:flex;flex-direction:column;gap:2px}
@@ -78,5 +112,9 @@
 /* Con «reducir movimiento» no late: solo queda el color del corte. */
 @media (prefers-reduced-motion:reduce){
   .mw-set.mw-alert::after{animation:none}
-  .mw-btn{transition:none}
+  .mw-btn,.mw-sum{transition:none}
+  .mw-sum:hover,.mw-btn:hover,.mw-btn[aria-expanded="true"]{transform:none}
+  .mw-sum:hover::before,.mw-btn:hover::before,.mw-btn[aria-expanded="true"]::before{animation:none;background:linear-gradient(90deg,rgba(var(--b-rgb),.7),rgba(var(--b2-rgb),.7))}
+  .mh-ic-spin{animation:none!important}
+  .mh-bob{animation:none}
 }

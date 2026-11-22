@@ -50,6 +50,7 @@
     S.note = next;
     render();
     scheduleSave();
+    document.dispatchEvent(new CustomEvent('tareas:cambio')); // la franja de Inicio (SPEC 22) repinta
     return true;
   };
 
@@ -345,7 +346,7 @@
     if (currentDay === previous) return;
     if (S.day === previous || S.day === C.tkAddDays(previous, 1)) S.day = currentDay;
     const rolled = C.tkRollOver(S.note, currentDay);
-    if (rolled !== S.note) { S.note = rolled; scheduleSave(); }
+    if (rolled !== S.note) { S.note = rolled; scheduleSave(); document.dispatchEvent(new CustomEvent('tareas:cambio')); }
     render(); // etiquetas y pestañas al día aunque la poda no cambie nada
   };
   // Milisegundos hasta las próximas 00:00 locales (se recalcula en cada disparo: horario de verano).

@@ -8,6 +8,8 @@
   if (!root) return;
   const btn = root.querySelector('.mw-btn');
   const panelNode = document.getElementById('mw-panel');
+  const heroNode = document.querySelector('svg.hero-art'); // ilustración del teléfono en Inicio
+  const sumNode = document.getElementById('mw-sum'); // estimado junto al tema (desde 1680 px)
 
   const saved0 = C.mwLoad(S.load());
   const st = (PYL.app.state.metawatch = {
@@ -56,6 +58,14 @@
   };
   const pulsing = (r) => r.active && st.pulse.includes(r.id);
 
+  // Subtítulo de la card: el primer nombre del producto; con el cursor encima, el nombre de la campaña.
+  // Si solo hay uno de los dos, muestra ese.
+  let showCampaign = false;
+  const subName = (p, sv) => {
+    const prod = p ? p.name.trim().split(' ')[0] : '', camp = sv && sv.campaign ? sv.campaign.name : '';
+    return prod && camp ? (showCampaign ? camp : prod) : prod || camp;
+  };
+
   const railView = () => {
     const sv = st.saved, msg = message();
     const tokenBad = st.status && st.status.k === 'token';
@@ -69,9 +79,49 @@
     const p = product();
     return {
       head: 'CORTES',
-      sub: p ? p.name.trim().split(/\s+/)[0] : sv && sv.campaign ? sv.campaign.name : '',
-      time: sv && sv.last && !tokenBad ? '↻ ' + hhmm(sv.last.at) : '',
+      sub: subName(p, sv),
       msg, rows, marks: CUTS.map((c) => c / TOP), label,
+    };
+  };
+
+  // Tarjetas del teléfono de Inicio: CPM de Meta, ventas (Resultados), CPA actual y CPA contra el tope.
+  // Sin campaña, con token inválido o sin dato: rayas y sin semáforo (nunca números de ejemplo).
+  // Foto del producto activo: la del candidato o de la bitácora de Buscar producto con el mismo nombre.
+  const photo = () => {
+    const p = product(), s = PYL.app.state.search;
+    return p && s ? C.mwPhoto(p.name, [s.draft, ...(s.log || [])]) : '';
+  };
+
+  const heroView = () => {
+    const sv = st.saved, tokenBad = st.status && st.status.k === 'token';
+    if (!sv || !sv.campaign || !sv.last || tokenBad) return { photo: photo(), label: 'Ilustración: teléfono con un anuncio. Conecta Meta en Cortes para ver CPM, CPA y ventas de la campaña' };
+    const t = C.mwTotals(st.rows, tope());
+    const pesos = (n) => M.copText(Math.round(n));
+    return {
+      photo: photo(),
+      cpm: t.cpm === null ? '' : pesos(t.cpm), cpmLight: t.cpmLight,
+      sales: t.sales, bars: st.rows.map((r) => r.sales),
+      cpa: t.cpa === null ? '' : pesos(t.cpa), cpaLight: t.cpaLight, cpaFill: t.cpaFill, topeAt: t.topeAt,
+      note: t.tope ? (t.cpa === null ? 'Tope $ ' : '$ ' + pesos(t.cpa) + ' · tope $ ') + pesos(t.tope) : '',
+      label: 'Campaña ' + sv.campaign.name + ': CPM Meta ' + (t.cpm === null ? 'sin dato' : '$ ' + pesos(t.cpm)) + ', ' + t.sales + ' ventas, CPA ' + (t.cpa === null ? 'sin dato' : '$ ' + pesos(t.cpa)) + (t.tope ? ' y tope $ ' + pesos(t.tope) : ''),
+    };
+  };
+
+  // Estimado de la campaña: lo invertido, lo que dejarían los pedidos si se entregan todos (pedidos × tope) y el resultado.
+  // El tope sale del producto activo. Sin campaña, con token inválido o sin tope: se oculta.
+  const sumView = () => {
+    const sv = st.saved, tokenBad = st.status && st.status.k === 'token';
+    if (!sv || !sv.campaign || !sv.last || tokenBad) return null;
+    const t = C.mwTotals(st.rows, tope());
+    if (t.result === null) return null;
+    const pesos = (n) => '$' + M.copText(Math.round(Math.abs(n)));
+    const signed = (n) => (Math.round(n) < 0 ? '−' : '+') + pesos(n);
+    const tone = Math.round(t.result) < 0 ? 'r' : 'g';
+    const orders = t.sales + (t.sales === 1 ? ' pedido' : ' pedidos');
+    return {
+      rows: [['Invertido', pesos(t.spend)], [orders, signed(t.income), 'g'], ['Resultado', signed(t.result), tone]],
+      label: 'Estimado de la campaña: invertido ' + pesos(t.spend) + ', ' + orders + ' que dejarían ' + pesos(t.income) + ' si se entregan todos, resultado ' + (tone === 'r' ? 'pérdida de ' : 'ganancia de ') + pesos(t.result),
+      hint: 'Estimado si se entregan todos: pedidos × tope (lo que deja cada entrega antes de publicidad) menos lo invertido. No descuenta devoluciones ni cancelaciones.',
     };
   };
 
@@ -173,10 +223,28 @@
     } catch (e) { /* sin audio */ }
   };
 
-  const paint = () => {
+  // Barra de la card, estimado y teléfono (todo menos el panel, para no pisar lo que se esté escribiendo en él).
+  const paintBar = () => {
     U.rail(btn, railView());
+    if (sumNode) U.sum(sumNode, sumView());
+    if (heroNode) {
+      U.hero(heroNode, heroView());
+      const hb = heroNode.querySelector('#mw-hero-refresh');
+      if (hb) { // botón ACTUALIZAR del teléfono: mientras consulta se atenúa y dice ACTUALIZANDO…
+        hb.classList.toggle('mh-busy', st.busy);
+        hb.setAttribute('aria-disabled', st.busy ? 'true' : 'false');
+        hb.querySelector('.mh-btn-t').textContent = st.busy ? 'Actualizando…' : 'Actualizar';
+      }
+    }
+  };
+  const paint = () => {
+    paintBar();
     U.panel(panelNode, panelView(), on); // también cerrado: aria-labelledby apunta a su título
   };
+  // El producto activo (Costeo) y su foto (Buscar producto) cambian en otras pestañas: al volver a Inicio, y cuando
+  // cargó todo (trainer.js va después), se repintan la card, el estimado y el teléfono.
+  document.addEventListener('nav:vista', (e) => { if (e.detail && e.detail.v === 'dash') paintBar(); });
+  window.addEventListener('load', paintBar);
 
   // ---- Abrir y cerrar el panel ----
   const open = () => {
@@ -195,6 +263,19 @@
   }
 
   btn.addEventListener('click', () => (st.open ? close() : open()));
+
+  // Botón ACTUALIZAR del teléfono de Inicio: igual que Actualizar del panel. Sin campaña elegida no hay qué
+  // consultar: abre el panel de Cortes para conectar y elegir.
+  const heroGo = () => {
+    if (st.busy) return;
+    if (st.saved && st.saved.campaign) refresh();
+    else if (!st.open) open();
+  };
+  const heroBtn = heroNode && heroNode.querySelector('#mw-hero-refresh');
+  if (heroBtn) {
+    heroBtn.addEventListener('click', heroGo);
+    heroBtn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); heroGo(); } });
+  }
   document.addEventListener('keydown', (e) => { if (st.open && e.key === 'Escape') close(); });
   document.addEventListener('pointerdown', (e) => { if (st.open && !root.contains(e.target)) close(); });
 
@@ -288,7 +369,7 @@
     const sv = st.saved;
     if (!sv || !sv.campaign) { schedule(); return; }
     const my = ++seq, id = sv.campaign.id;
-    let rang = false;
+    let rang = false, sold = false;
     st.busy = true;
     paint();
     try {
@@ -297,6 +378,9 @@
       const rows = C.mwRows(ins, sets);
       const a = C.mwAlerts(rows, sv.seen, sv.rung, quiet);
       sv.rung = a.rung;
+      // Venta nueva desde la consulta anterior (no al elegir campaña): lluvia de bolitas Shopify en el teléfono.
+      const total = (list) => list.reduce((n, r) => n + r.sales, 0);
+      sold = !quiet && !!sv.last && total(rows) > total(st.rows);
       st.pulse = a.pulse;
       st.rows = rows;
       sv.last = { at: Date.now(), rows };
@@ -309,6 +393,8 @@
     }
     st.busy = false;
     paint();
+    document.dispatchEvent(new CustomEvent('meta:dato')); // la franja de Inicio (SPEC 22) repinta
+    if (sold && heroNode) U.rain(heroNode);
     if (rang) ring();
     schedule();
   }
@@ -319,6 +405,18 @@
   if (st.saved && st.rows.length) st.pulse = C.mwAlerts(st.rows, st.saved.seen, st.saved.rung, true).pulse;
   paint();
   PYL.app.metawatch = { refresh, tick };
+
+  // Con el cursor (o el foco) sobre la card el subtítulo pasa al nombre de la campaña; al salir vuelve al producto.
+  // Repinta solo la card (no el panel, para no pisar lo que se esté escribiendo).
+  const peek = (on) => {
+    if (showCampaign === on) return;
+    showCampaign = on;
+    U.rail(btn, railView());
+  };
+  btn.addEventListener('mouseenter', () => peek(true));
+  btn.addEventListener('mouseleave', () => peek(false));
+  btn.addEventListener('focus', () => peek(true));
+  btn.addEventListener('blur', () => peek(false));
 
   if (st.saved) {
     (async () => {
