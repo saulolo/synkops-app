@@ -27,6 +27,7 @@
 <link rel="stylesheet" href="css/modules/tasks.css">
 <link rel="stylesheet" href="css/modules/clock.css">
 <link rel="stylesheet" href="css/modules/metawatch.css">
+<link rel="stylesheet" href="css/modules/indicators.css">
 <link rel="stylesheet" href="css/themes.css">
 <link rel="stylesheet" href="css/modules/pnl.css">
 <link rel="stylesheet" href="css/report.css">
@@ -43,6 +44,8 @@
     <!-- Fila del contenido (SPEC 20): mide lo mismo que las pestañas; píldora centrada y tema a ras de su borde derecho. -->
     <div class="top-row">
       <div class="pill-prod" id="pillProd" aria-live="polite"></div>
+      <!-- Estimado de la campaña (Cortes): solo desde 1680 px, a la derecha de la píldora. Lo arma app/metawatch.js. -->
+      <div class="mw-sum" id="mw-sum" hidden></div>
       <div class="theme-pick">
         <button class="theme-btn" id="theme-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="theme-menu" title="Cambiar el tema de colores">
           <span class="theme-sw" id="theme-sw" aria-hidden="true"></span>
@@ -112,6 +115,8 @@
         <linearGradient id="hg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1B2535"/><stop offset="1" stop-color="#0F1520"/></linearGradient>
         <linearGradient id="hg3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2A3B66"/><stop offset="1" stop-color="#16203A"/></linearGradient>
         <linearGradient id="bottle" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8FA0FF"/><stop offset=".5" stop-color="#C7D0FF"/><stop offset="1" stop-color="#7486F5"/></linearGradient>
+        <clipPath id="mh-clip"><rect x="182" y="58" width="126" height="148" rx="12"/></clipPath>
+        <clipPath id="mh-screen"><rect x="172" y="36" width="146" height="272" rx="18"/></clipPath>
         <filter id="glow"><feGaussianBlur stdDeviation="18"/></filter>
       </defs>
       <circle cx="250" cy="170" r="120" fill="url(#hg1)" opacity=".18" filter="url(#glow)"/>
@@ -119,58 +124,74 @@
         <rect x="160" y="22" width="170" height="300" rx="28" fill="url(#hg2)" stroke="#2E3B50" stroke-width="2"/>
         <rect x="172" y="36" width="146" height="272" rx="18" fill="#0B1019"/>
         <rect x="222" y="44" width="46" height="6" rx="3" fill="#1E2836"/>
-        <circle cx="190" cy="68" r="9" fill="url(#hg1)"/>
-        <rect x="205" y="62" width="62" height="6" rx="3" fill="#2A3546"/>
-        <rect x="205" y="72" width="38" height="5" rx="2.5" fill="#1E2836"/>
         <rect x="182" y="88" width="126" height="118" rx="12" fill="url(#hg3)"/>
-        <ellipse cx="245" cy="192" rx="34" ry="6" fill="#0B1019" opacity=".6"/>
-        <rect x="233" y="116" width="24" height="14" rx="4" fill="#E8EDF4" opacity=".9"/>
-        <rect x="229" y="128" width="32" height="62" rx="9" fill="url(#bottle)"/>
-        <rect x="235" y="146" width="20" height="22" rx="4" fill="#0F1520" opacity=".55"/>
-        <rect x="238" y="152" width="14" height="3" rx="1.5" fill="#7DE6F6"/>
-        <rect x="238" y="158" width="10" height="3" rx="1.5" style="fill:var(--b-ink)"/>
-        <circle cx="205" cy="110" r="5" fill="#7DE6F6" opacity=".7"/>
-        <circle cx="288" cy="176" r="4" style="fill:var(--b-ink)" opacity=".7"/>
+        <g id="mw-hero-art">
+          <rect x="205" y="62" width="62" height="6" rx="3" fill="#2A3546"/>
+          <rect x="205" y="72" width="38" height="5" rx="2.5" fill="#1E2836"/>
+          <ellipse cx="245" cy="192" rx="34" ry="6" fill="#0B1019" opacity=".6"/>
+          <rect x="233" y="116" width="24" height="14" rx="4" fill="#E8EDF4" opacity=".9"/>
+          <rect x="229" y="128" width="32" height="62" rx="9" fill="url(#bottle)"/>
+          <rect x="235" y="146" width="20" height="22" rx="4" fill="#0F1520" opacity=".55"/>
+          <rect x="238" y="152" width="14" height="3" rx="1.5" fill="#7DE6F6"/>
+          <rect x="238" y="158" width="10" height="3" rx="1.5" style="fill:var(--b-ink)"/>
+        </g>
+        <image id="mw-hero-photo" x="182" y="58" width="126" height="148" preserveAspectRatio="xMidYMid slice" clip-path="url(#mh-clip)" visibility="hidden"/>
+        <!-- Adornos de móvil: carrito y estrella flotando sobre la pantalla (siempre visibles, también sobre la foto) -->
+        <g class="mh-bob"><g transform="translate(196 84)">
+          <circle r="11.5" fill="#131B27" stroke="#263243"/>
+          <g transform="translate(-6.6 -6.6) scale(.55)" fill="none" stroke="#7DE6F6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h3l2.4 11.5h9.4l2.2-8.5H6"/><circle cx="9.5" cy="19.5" r="1.6"/><circle cx="17" cy="19.5" r="1.6"/></g>
+        </g></g>
+        <g class="mh-bob d2"><g transform="translate(294 190)">
+          <circle r="11.5" fill="#131B27" stroke="#263243"/>
+          <polygon transform="translate(-6.6 -6.6) scale(.55)" points="12 2.5 14.8 9 21.8 9.6 16.5 14.2 18.1 21 12 17.4 5.9 21 7.5 14.2 2.2 9.6 9.2 9" fill="#EAB308"/>
+        </g></g>
+        <!-- Lluvia de bolitas Shopify: sube por la pantalla cuando una consulta trae una venta nueva (lo arma ui.metawatch.rain) -->
+        <g id="mw-hero-rain" clip-path="url(#mh-screen)" pointer-events="none"></g>
         <rect x="182" y="216" width="110" height="7" rx="3.5" fill="#2A3546"/>
         <rect x="182" y="229" width="80" height="6" rx="3" fill="#1E2836"/>
-        <rect x="182" y="250" width="126" height="34" rx="10" fill="url(#hg1)"/>
-        <rect x="220" y="263" width="50" height="8" rx="4" fill="#fff" opacity=".9"/>
+        <g id="mw-hero-refresh" class="mh-btn" role="button" tabindex="0" aria-label="Actualizar datos de Meta">
+          <rect x="182" y="250" width="126" height="34" rx="10" fill="url(#hg1)"/>
+          <rect x="185" y="252" width="120" height="13" rx="6.5" fill="#fff" opacity=".14"/>
+          <g transform="translate(210 262)"><g class="mh-ic-spin"><path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6" transform="scale(.42)" style="stroke:var(--on-b)" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></g>
+          <text class="mh-btn-t" x="226" y="270.6" font-size="11" font-weight="800" font-family="Inter,sans-serif" style="fill:var(--on-b)">Actualizar</text>
+        </g>
       </g>
-      <g class="float d2">
+      <g class="float d2" id="mw-hero-cpm">
         <rect x="14" y="70" width="140" height="74" rx="16" fill="#131B27" stroke="#263243"/>
-        <circle cx="36" cy="94" r="6" fill="#22C55E"/>
+        <circle class="mh-dot" cx="36" cy="94" r="6" fill="#3A475A"/>
         <text x="50" y="98" fill="#9AA6B8" font-size="11" font-weight="700" font-family="Inter,sans-serif">CPM META</text>
-        <text x="28" y="128" fill="#E8EDF4" font-size="22" font-weight="900" font-family="Inter,sans-serif">14.200</text>
-        <rect x="114" y="116" width="26" height="14" rx="7" fill="rgba(34,197,94,.18)"/>
-        <text x="119" y="126" fill="#6EE7A0" font-size="9" font-weight="800" font-family="Inter,sans-serif">OK</text>
+        <text class="mh-val" x="28" y="128" fill="#E8EDF4" font-size="22" font-weight="900" font-family="Inter,sans-serif">—</text>
+        <rect class="mh-badge" x="108" y="116" width="34" height="14" rx="7" fill="rgba(34,197,94,.18)" visibility="hidden"/>
+        <text class="mh-badge-t" x="125" y="126" text-anchor="middle" fill="#6EE7A0" font-size="9" font-weight="800" font-family="Inter,sans-serif" visibility="hidden"></text>
       </g>
-      <g class="float d3">
+      <g class="float d3" id="mw-hero-sales">
         <rect x="318" y="52" width="130" height="96" rx="16" fill="#131B27" stroke="#263243"/>
-        <text x="334" y="76" fill="#9AA6B8" font-size="11" font-weight="700" font-family="Inter,sans-serif">VENTAS / DÍA</text>
-        <rect x="334" y="114" width="12" height="20" rx="3" fill="#263243"/>
-        <rect x="352" y="104" width="12" height="30" rx="3" fill="#2E3D59"/>
-        <rect x="370" y="96" width="12" height="38" rx="3" fill="#4A5DCC"/>
-        <rect x="388" y="88" width="12" height="46" rx="3" style="fill:var(--b)"/>
-        <rect x="406" y="84" width="12" height="50" rx="3" fill="#22D3EE"/>
-        <path d="M336 112 L358 102 L376 94 L394 86 L414 80" stroke="#7DE6F6" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <text x="334" y="76" fill="#9AA6B8" font-size="11" font-weight="700" font-family="Inter,sans-serif">VENTAS</text>
+        <text class="mh-val" x="334" y="118" fill="#E8EDF4" font-size="32" font-weight="900" font-family="Inter,sans-serif">—</text>
+        <text x="334" y="136" fill="#9AA6B8" font-size="10" font-weight="600" font-family="Inter,sans-serif">en la campaña</text>
+        <g class="mh-bars"></g>
       </g>
-      <g class="float">
-        <rect x="300" y="218" width="150" height="70" rx="16" fill="#131B27" stroke="#263243"/>
-        <circle cx="322" cy="242" r="6" fill="#EAB308"/>
-        <text x="336" y="246" fill="#9AA6B8" font-size="11" font-weight="700" font-family="Inter,sans-serif">CPA vs TOPE</text>
-        <rect x="316" y="260" width="118" height="10" rx="5" fill="#1E2836"/>
-        <rect x="316" y="260" width="70" height="10" rx="5" fill="#22C55E"/>
-        <rect x="386" y="260" width="22" height="10" fill="#EAB308"/>
+      <g class="float" id="mw-hero-cpa">
+        <rect x="300" y="212" width="150" height="78" rx="16" fill="#131B27" stroke="#263243"/>
+        <circle class="mh-dot" cx="322" cy="236" r="6" fill="#3A475A"/>
+        <text x="336" y="240" fill="#9AA6B8" font-size="11" font-weight="700" font-family="Inter,sans-serif">CPA vs TOPE</text>
+        <rect x="316" y="252" width="118" height="10" rx="5" fill="#1E2836"/>
+        <rect class="mh-fill" x="316" y="252" width="0" height="10" rx="5" fill="#22C55E"/>
+        <rect class="mh-mark" x="316" y="249" width="2" height="16" rx="1" fill="#E8EDF4" opacity=".8" visibility="hidden"/>
+        <text class="mh-note" x="316" y="280" fill="#9AA6B8" font-size="9.5" font-weight="700" font-family="Inter,sans-serif"></text>
       </g>
-      <g class="float d2">
+      <g class="float d2" id="mw-hero-cpa-now">
         <rect x="24" y="214" width="124" height="62" rx="16" fill="#131B27" stroke="#263243"/>
-        <text x="40" y="238" fill="#9AA6B8" font-size="11" font-weight="700" font-family="Inter,sans-serif">CPPI</text>
-        <text x="40" y="262" fill="#E8EDF4" font-size="19" font-weight="900" font-family="Inter,sans-serif">3.790</text>
-        <circle cx="126" cy="246" r="9" fill="rgba(34,197,94,.18)"/>
-        <path d="M121 246l4 4 6-7" stroke="#6EE7A0" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="40" y="238" fill="#9AA6B8" font-size="11" font-weight="700" font-family="Inter,sans-serif">CPA ACTUAL</text>
+        <text class="mh-val" x="40" y="262" fill="#E8EDF4" font-size="18" font-weight="900" font-family="Inter,sans-serif">—</text>
+        <circle class="mh-ic" cx="130" cy="250" r="9" fill="rgba(148,163,184,.18)" visibility="hidden"/>
+        <text class="mh-ic-t" x="130" y="254" text-anchor="middle" fill="#6EE7A0" font-size="12" font-weight="900" font-family="Inter,sans-serif" visibility="hidden"></text>
       </g>
     </svg>
   </div>
+
+  <!-- Franja de indicadores (SPEC 22): Mini P&L, Embudo, Testeo y Pulso de tareas. La arma js/modules/indicators. -->
+  <section class="ix-strip" id="ix-root" aria-label="Indicadores"></section>
 
   <!-- Mis tareas: nota adhesiva del día (la arma js/modules/tasks). En pantallas anchas vive en el margen izquierdo. -->
   <aside class="tk-rail" id="tk-rail" aria-label="Mis tareas">
@@ -1182,6 +1203,7 @@
 <script src="js/modules/tasks/core/tasks.js"></script>
 <script src="js/modules/clock/core/clock.js"></script>
 <script src="js/modules/metawatch/core/metawatch.js"></script>
+<script src="js/modules/indicators/core/indicators.js"></script>
 <!-- Services: archivos y almacenamiento del navegador -->
 <script src="js/shared/services/storage.js"></script>
 <script src="js/shared/services/files.js"></script>
@@ -1222,6 +1244,7 @@
 <script src="js/modules/tasks/ui/tasks.js"></script>
 <script src="js/modules/clock/ui/clock.js"></script>
 <script src="js/modules/metawatch/ui/metawatch.js"></script>
+<script src="js/modules/indicators/ui/indicators.js"></script>
 <!-- App: estado, casos de uso y arranque (main.js va al final) -->
 <script src="js/app/state.js"></script>
 <script src="js/modules/pnl/app/filters.js"></script>
@@ -1244,6 +1267,7 @@
 <script src="js/modules/tasks/app/tasks.js"></script>
 <script src="js/modules/clock/app/clock.js"></script>
 <script src="js/modules/metawatch/app/metawatch.js"></script>
+<script src="js/modules/indicators/app/indicators.js"></script>
 <script src="js/modules/trainer/app/trainer.js"></script>
 <script src="js/app/nav.js"></script>
 <script src="js/app/main.js"></script>

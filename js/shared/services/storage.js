@@ -1,4 +1,4 @@
-// Persistencia en el navegador: asignaciones campaña → producto, búsqueda de productos, guardado rápido y Mis tareas (localStorage)
+// Persistencia en el navegador: asignaciones campaña → producto, búsqueda de productos, guardado rápido y Mis tareas y la foto del P&L (localStorage)
 // y el acceso al archivo consolidado (IndexedDB, porque localStorage no guarda handles).
 (() => {
   const services = (globalThis.PYL.services ??= {});
@@ -93,6 +93,16 @@
     clear: () => { try { localStorage.removeItem(META_KEY); return true; } catch { return false; } },
   };
 
+  // Inicio → Mini P&L (SPEC 22): foto de los números clave del último cálculo del Tablero P&L. Clave propia.
+  // load devuelve el texto guardado tal cual (o null): quien lo valida es core.indicators.ixLoad.
+  const PNL_SNAP_KEY = 'pyl-pnl-snap';
+  const pnlSnap = {
+    load: () => { try { return localStorage.getItem(PNL_SNAP_KEY); } catch { return null; } },
+    // false si no cupo: quien llama sigue sin avisar (la foto es opcional).
+    save: (s) => { try { localStorage.setItem(PNL_SNAP_KEY, JSON.stringify(s)); return true; } catch { return false; } },
+    clear: () => { try { localStorage.removeItem(PNL_SNAP_KEY); return true; } catch { return false; } },
+  };
+
   // Limpieza única: la SPEC 08 (búsqueda automática, descartada) guardaba en pyl-auto; ya nadie la lee.
   try { localStorage.removeItem('pyl-auto'); } catch { /* sin almacenamiento */ }
 
@@ -112,5 +122,5 @@
     return { get: (k) => tx('readonly', (s) => s.get(k)), set: (k, v) => tx('readwrite', (s) => s.put(v, k)) };
   })();
 
-  services.storage = { campaignMap, search, landing, ads, testing, scaling, quick, hub, tasks, meta, idb };
+  services.storage = { campaignMap, search, landing, ads, testing, scaling, quick, hub, tasks, meta, pnlSnap, idb };
 })();

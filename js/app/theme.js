@@ -28,6 +28,8 @@
     const name = document.getElementById('theme-name');
     if (!name) return;
     name.textContent = t.name;
+    const tb = document.getElementById('theme-btn');
+    if (tb) tb.title = 'Tema: ' + t.name + ' (clic para cambiar)';
     swatch(document.getElementById('theme-sw'), t);
     document.querySelectorAll('#theme-menu [data-id]').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.id === t.id)));
   }

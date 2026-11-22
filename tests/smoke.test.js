@@ -51,7 +51,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     // SPEC 20: la marca (logo, «Synkops» y lema) salió de la barra; bajo el título «Synkops» de Inicio va un pulso subrayado.
     assert.ok(!document.querySelector('.brand-mark') && !document.querySelector('.brand'), 'Ya no existe la marca de la barra (.brand ni .brand-mark)');
     assert.deepStrictEqual([...document.querySelector('header.top .top-in').children].map((n) => n.id || n.className), ['ck-root', 'top-row', 'mw-root', 'mw-audio'], 'La barra: reloj, la fila del contenido y los cortes de testeo (SPEC 21)');
-    assert.deepStrictEqual([...document.querySelector('.top-in > .top-row').children].map((n) => n.id || n.className), ['pillProd', 'theme-pick', 'tabs'], 'La fila: píldora del producto activo, tema y pestañas (mide lo mismo que las pestañas)');
+    assert.deepStrictEqual([...document.querySelector('.top-in > .top-row').children].map((n) => n.id || n.className), ['pillProd', 'mw-sum', 'theme-pick', 'tabs'], 'La fila: píldora del producto activo, estimado de la campaña, tema y pestañas (mide lo mismo que las pestañas)');
     const h1 = document.querySelector('#v-dash .hero h1');
     const pulse = h1.querySelector('svg.hero-pulse');
     assert.ok(pulse && pulse.getAttribute('aria-hidden') === 'true' && h1.lastElementChild === pulse && h1.firstChild.nodeType === 3, 'El pulso subrayado va dentro del <h1> del hero, después del texto');
@@ -1511,8 +1511,8 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     const dash = document.querySelector('#v-dash'), kids = [...dash.children];
     const iHb = kids.findIndex((k) => k.id === 'hb-rail'), iHero = kids.findIndex((k) => k.classList.contains('hero'));
     const iChain = kids.findIndex((k) => /La cadena que decide todo/.test(k.textContent) && k.id !== 'hb-rail');
-    // SPEC 19: entre el hero y el Centro de mando va Mis tareas (#tk-rail).
-    assert.ok(iHero >= 0 && kids[iHero + 1].id === 'tk-rail' && iHb === iHero + 2 && iChain > iHb, 'Bajo el hero: Mis tareas, luego el Centro de mando y después la cadena');
+    // SPEC 19: entre el hero y el Centro de mando va Mis tareas (#tk-rail); SPEC 22: la franja #ix-root va justo bajo el hero.
+    assert.ok(iHero >= 0 && kids[iHero + 1].id === 'ix-root' && kids[iHero + 2].id === 'tk-rail' && iHb === iHero + 3 && iChain > iHb, 'Bajo el hero: Mis tareas, luego el Centro de mando y después la cadena');
     assert.strictEqual(document.querySelectorAll('#hb-root').length, 1, '#hb-root único');
     assert.strictEqual(document.querySelector('#hb-root').parentElement.id, 'hb-rail', 'La tarjeta va dentro del aside #hb-rail');
     const tiles = [...document.querySelectorAll('#hb-grid .hb-tile')];
@@ -2380,7 +2380,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     next.push(resp(200, { data: [] }));
     await S.insights(TK, '120');
     ({ u, p } = last());
-    assert.deepStrictEqual([u.pathname, p.level, p.date_preset, p.fields], ['/v27.0/120/insights', 'adset', 'maximum', 'adset_id,adset_name,spend,actions']);
+    assert.deepStrictEqual([u.pathname, p.level, p.date_preset, p.fields], ['/v27.0/120/insights', 'adset', 'maximum', 'adset_id,adset_name,spend,impressions,actions']);
     noToken();
 
     const falla = async (r, k, msg) => {
@@ -2458,7 +2458,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     $('#mw-campaign').dispatchEvent(new window.Event('change', { bubbles: true }));
     await mwWait();
     assert.ok(/TEST 21\/11 Plant/.test(btn.querySelector('.mw-head').textContent), 'Cabecera con la campaña');
-    assert.ok(/↻ \d{1,2}:\d{2}/.test(btn.querySelector('.mw-time').textContent), 'Hora del último dato');
+    assert.ok(!btn.querySelector('.mw-time'), 'La card ya no muestra la hora del último dato');
     const sets = [...btn.querySelectorAll('.mw-set')];
     assert.deepStrictEqual(sets.map((s) => [s.dataset.id, s.querySelector('.mw-short').textContent, s.querySelector('.mw-k').textContent]),
       [['s1', 'C1', '31K'], ['s2', 'C2', '12K'], ['s3', 'C3', '18K'], ['s4', 'C4', '22K']]);
@@ -3350,7 +3350,147 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     delete store['pyl-tasks'];
   };
 
-  return lgTest().then(dkTest).then(apTest).then(chTest).then(chCadenaTest).then(chDurasTest).then(hubTest).then(hubTest2).then(hubTest3).then(hubTest4).then(hubTest5).then(tkTest1).then(tkTest2).then(tkTest3).then(tkTest4).then(tkTest5).then(tkTest6).then(tkTest7).then(tkTest8).then(tkTest9).then(ckTest).then(mwTest1).then(mwTest2).then(mwTest3).then(mwTest4).then(fresca).then((d2) => {
+  // 8u. Inicio · franja de indicadores (SPEC 22, paso 8). Página aparte con localStorage simulado.
+  const IX_KEYS = ['pyl-pnl-snap', 'pyl-search', 'pyl-testing', 'pyl-tasks', 'pyl-meta'];
+  const ixConClaves = async (claves, fn) => {
+    const guardado = {};
+    IX_KEYS.forEach((k) => { if (k in store) guardado[k] = store[k]; delete store[k]; });
+    Object.assign(store, claves);
+    try { await fn(); } finally { IX_KEYS.forEach((k) => delete store[k]); Object.assign(store, guardado); }
+  };
+  const ixCards = (D) => [...D.querySelectorAll('#ix-root .ix-card')];
+
+  const ixTest1 = () => ixConClaves({}, async () => {
+    const d = await fresca(), W = d.window, D = W.document;
+    const kids = [...D.querySelector('#v-dash').children];
+    const iHero = kids.findIndex((k) => k.classList.contains('hero'));
+    assert.strictEqual(kids[iHero + 1].id, 'ix-root', 'La franja va justo bajo la tarjeta principal');
+    assert.strictEqual(kids[iHero + 1].tagName, 'SECTION');
+    assert.strictEqual(kids[iHero + 1].getAttribute('aria-label'), 'Indicadores');
+    assert.strictEqual(D.querySelectorAll('[id^="ix-"]').length, 1, 'Un solo id #ix- en la página');
+    const cards = ixCards(D);
+    assert.deepStrictEqual(cards.map((c) => c.dataset.k), ['pnl', 'funnel', 'testing', 'tasks'], 'Cuatro tarjetas, en orden');
+    assert.ok(cards.every((c) => c.tagName === 'BUTTON' && c.type === 'button' && c.classList.contains('card-side') && c.classList.contains('ix-empty')), 'Botones, .card-side y todas atenuadas');
+    assert.deepStrictEqual(cards.map((c) => c.querySelector('.ix-invite').textContent), ['Sube tus reportes en el Tablero P&L', 'Guarda tu primer candidato', 'Practica en Testeo o conecta Meta', 'Anota tu primera tarea']);
+    assert.deepStrictEqual(cards.map((c) => c.querySelector('.ix-title').textContent), ['Mini P&L', 'Embudo de productos', 'Testeo', 'Pulso de tareas']);
+    assert.ok(cards.every((c) => /: /.test(c.getAttribute('aria-label'))), 'Cada tarjeta tiene aria-label');
+    // Foto rota o de otra versión: Mini P&L queda vacía sin errores.
+    for (const raw of ['{roto', JSON.stringify({ v: 2, at: 1, prod: 'Todos', from: null, to: null, util: 1, fact: 1, margen: null, roas: null, efect: null })]) {
+      store['pyl-pnl-snap'] = raw;
+      W.PYL.app.indicators.paint();
+      assert.ok(D.querySelector('#ix-root [data-k="pnl"]').classList.contains('ix-empty'), 'Foto inválida = vacía');
+    }
+    W.close();
+  });
+
+  const ixTest2 = () => {
+    const snap = (o = {}) => ({ v: 1, at: new Date(2026, 10, 20, 9).getTime(), prod: 'Todos', from: '2026-11-01', to: '2026-11-20', util: 1250000, fact: 6400000, margen: 0.195, roas: 3.4, roasEq: 2.1, efect: 0.72, ...o });
+    return ixConClaves({
+      'pyl-pnl-snap': JSON.stringify(snap()),
+      'pyl-search': JSON.stringify({ log: [{ id: 'a', status: 'evaluando' }, { id: 'b', status: 'evaluando' }, { id: 'c', status: 'testeo' }, { id: 'd', status: 'ganador' }, { id: 'e', status: 'descartado' }] }),
+      'pyl-testing': JSON.stringify({ v: 3, part: 'test', best: 70 }),
+    }, async () => {
+      const d = await fresca(), W = d.window, D = W.document, P = W.PYL;
+      const card = (k) => D.querySelector(`#ix-root [data-k="${k}"]`);
+      const txt = (k) => card(k).textContent;
+      P.app.indicators.paint(); // la primera pintada cuenta de 0 a su valor: se repinta sin animar para leer los valores finales
+      // Mini P&L
+      assert.ok(!card('pnl').classList.contains('ix-empty'));
+      assert.ok(/1\.250\.000/.test(txt('pnl')) && /19,5/.test(txt('pnl')) && /3,40x/.test(txt('pnl')) && /72,0/.test(txt('pnl')), 'Utilidad, margen, ROAS y efectividad: ' + txt('pnl'));
+      assert.ok(/Todos · 1 nov – 20 nov · dato del 20 nov/.test(txt('pnl')), 'Producto, periodo y fecha del dato');
+      assert.ok(card('pnl').querySelector('.ix-big').classList.contains('ix-t-g') && card('pnl').querySelector('.ix-track .ix-g'), 'Utilidad y margen sanos en verde');
+      assert.ok(card('pnl').querySelector('.ix-mark'), 'Marca en MARGIN.healthy');
+      const chips = () => [...card('pnl').querySelectorAll('.ix-chip')].map((c) => c.classList.contains('ix-g') ? 'g' : c.classList.contains('ix-y') ? 'y' : c.classList.contains('ix-r') ? 'r' : '-');
+      assert.deepStrictEqual(chips(), ['g', 'g'], 'ROAS y efectividad sanos en verde');
+      assert.ok(card('pnl').classList.contains('ix-tone-g'), 'La tarjeta toma el tono de la utilidad');
+      const pintaSnap = (o) => { store['pyl-pnl-snap'] = JSON.stringify(snap(o)); P.app.indicators.paint(); };
+      pintaSnap({ util: -50000, margen: -0.03 });
+      assert.ok(card('pnl').querySelector('.ix-big').classList.contains('ix-t-r') && card('pnl').querySelector('.ix-track .ix-r'), 'Utilidad negativa y margen bajo en rojo');
+      assert.ok(card('pnl').classList.contains('ix-tone-r'), 'Con pérdida la tarjeta se tiñe de rojo');
+      pintaSnap({ roas: 1.5, efect: 0.5 });
+      assert.deepStrictEqual(chips(), ['r', 'r'], 'ROAS bajo equilibrio y efectividad baja en rojo');
+      pintaSnap({ roas: 2.2, efect: 0.65 });
+      assert.deepStrictEqual(chips(), ['y', 'y'], 'En el límite en amarillo');
+      pintaSnap({ margen: 0.12 });
+      assert.ok(card('pnl').querySelector('.ix-track .ix-y'), 'Margen entre equilibrio y sano en amarillo');
+      // Embudo
+      assert.deepStrictEqual([...card('funnel').querySelectorAll('.ix-row')].map((r) => r.dataset.k + ':' + r.querySelector('.ix-row-n').textContent), ['evaluando:2', 'testeo:1', 'activo:0', 'ganador:1']);
+      assert.ok(/1 descartado/.test(txt('funnel')) && /5 en la bitácora/.test(txt('funnel')));
+      assert.deepStrictEqual([...card('funnel').querySelectorAll('.ix-row')].map((r) => r.dataset.tone), ['y', 'o', 'g', 'b'], 'Cada etapa con su color de semáforo');
+      assert.ok(card('funnel').querySelector('.ix-chip.ix-r'), 'Los descartados van en un chip rojo');
+      P.app.state.search.log.pop(); // borrar un producto y volver a Inicio cambia el número
+      D.querySelector('#tabs [data-v="buscar"]').click();
+      D.querySelector('#tabs [data-v="dash"]').click();
+      assert.ok(/0 descartados/.test(txt('funnel')) && /4 en la bitácora/.test(txt('funnel')), 'Volver a Inicio relee la bitácora');
+      assert.ok(!card('funnel').querySelector('.ix-chip.ix-r'), 'Sin descartados el chip no es rojo');
+      P.app.indicators.paint(); // al volver a Inicio la animación cuenta de 0: se repinta sin animar
+      // Testeo: sin Meta solo el puntaje; con Meta, el corte más alto de un conjunto activo (el OFF no cuenta).
+      assert.ok(/70/.test(txt('testing')) && /Meta sin dato de cortes/.test(txt('testing')) && !/Corte/.test(txt('testing')), 'Sin Meta: solo puntaje: ' + txt('testing'));
+      P.app.state.metawatch.rows = [
+        { id: '1', name: 'a', short: 'C1', active: true, spend: 22000, pi: 3, sales: 0, created: '' },
+        { id: '2', name: 'b', short: 'C2', active: true, spend: 31000, pi: 5, sales: 1, created: '' },
+        { id: '3', name: 'c', short: 'C3', active: false, spend: 45000, pi: 9, sales: 2, created: '' },
+      ];
+      D.dispatchEvent(new W.CustomEvent('meta:dato'));
+      assert.ok(/Corte 30K · C2/.test(txt('testing')) && /2 conjuntos activos/.test(txt('testing')), 'Corte 30K · C2, el OFF no cuenta: ' + txt('testing'));
+      const pasos = [...card('testing').querySelectorAll('.ix-step')];
+      assert.deepStrictEqual(pasos.map((x) => x.querySelector('.ix-step-l').textContent), ['20K', '30K', '40K'], 'Escalera con los 3 cortes');
+      assert.deepStrictEqual(pasos.map((x) => x.classList.contains('ix-on')), [true, true, false], 'Alcanzados: 20K y 30K');
+      assert.deepStrictEqual(pasos.map((x) => x.classList.contains('ix-cur')), [false, true, false], 'El actual es 30K');
+      assert.strictEqual(card('testing').querySelector('.ix-rail .ix-fill').style.getPropertyValue('--ix-v'), '0.5', 'El riel llega a la mitad');
+      assert.ok(!D.querySelector('#ix-root').classList.contains('ix-play'), 'Un repintado por dato no anima');
+      // Sin puntaje ni corte, vacía.
+      P.app.state.testing.best = null; P.app.state.metawatch.rows = [];
+      D.dispatchEvent(new W.CustomEvent('meta:dato'));
+      assert.ok(card('testing').classList.contains('ix-empty'), 'Sin puntaje ni Meta: vacía');
+      // Pulso de tareas: se actualiza al marcar una tarea con Inicio abierto.
+      assert.ok(card('tasks').classList.contains('ix-empty'));
+      const nueva = (t) => {
+        D.querySelector('#tk-new').click();
+        const h = D.querySelector('#tk-add-hour'), x = D.querySelector('#tk-add-text');
+        h.value = '9'; h.dispatchEvent(new W.Event('input', { bubbles: true }));
+        x.value = t; x.dispatchEvent(new W.Event('input', { bubbles: true }));
+        x.dispatchEvent(new W.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+      };
+      nueva('Uno'); nueva('Dos');
+      D.querySelector('#tk-add-text').dispatchEvent(new W.KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+      assert.ok(/0 de 2 hechas hoy/.test(txt('tasks')) && /^0%/.test(card('tasks').querySelector('.ix-ring-c').textContent) && /2 por hacer/.test(txt('tasks')), 'Tareas nuevas repintan la franja: ' + txt('tasks'));
+      assert.ok(!card('tasks').querySelector('.ix-days') && !/Racha/.test(txt('tasks')), 'Solo el avance de hoy: sin barras de días ni racha');
+      assert.strictEqual(card('tasks').querySelector('.ix-ring-fill').style.strokeDashoffset, '100', 'Anillo vacío con 0 %');
+      D.querySelector('#tk-list .tk-task .tk-check').click();
+      assert.ok(/1 de 2 hechas hoy/.test(txt('tasks')) && /^50%/.test(card('tasks').querySelector('.ix-ring-c').textContent), 'Marcar una tarea actualiza sin recargar');
+      assert.strictEqual(card('tasks').querySelector('.ix-ring-fill').style.strokeDashoffset, '50', 'Anillo a la mitad');
+      assert.strictEqual(D.querySelector('#tk-count').textContent.replace(' hechas', ''), '1 de 2', 'Igual que Mis tareas');
+      D.querySelector('#tk-all').click();
+      assert.ok(/2 de 2 hechas hoy/.test(txt('tasks')) && /^100%/.test(card('tasks').querySelector('.ix-ring-c').textContent) && card('tasks').querySelector('.ix-ring-fill.ix-done') && /Todo hecho/.test(txt('tasks')), 'Todo hecho: 100 % y anillo en verde');
+      // Clic: cada tarjeta abre su pestaña; la de tareas baja a Mis tareas y enfoca «+».
+      const vista = () => [...D.querySelectorAll('.view.on')].map((v) => v.id).join();
+      for (const [k, v] of [['pnl', 'v-pyl'], ['funnel', 'v-buscar'], ['testing', 'v-testeo']]) {
+        D.querySelector('#tabs [data-v="dash"]').click();
+        card(k).click();
+        assert.strictEqual(vista(), v, `La tarjeta ${k} abre ${v}`);
+      }
+      D.querySelector('#tabs [data-v="dash"]').click();
+      let bajo = 0;
+      D.querySelector('#tk-root').scrollIntoView = () => { bajo += 1; };
+      card('tasks').click();
+      assert.strictEqual(vista(), 'v-dash', 'Pulso de tareas se queda en Inicio');
+      assert.strictEqual(bajo, 1, 'Baja a #tk-root');
+      assert.strictEqual(D.activeElement.id, 'tk-new', 'Enfoca #tk-new');
+      // Animación: al volver a Inicio se repite; sin animación con reduced motion.
+      D.querySelector('#tabs [data-v="buscar"]').click();
+      assert.strictEqual(P.app.state.indicators.played, false, 'Al salir de Inicio se rearma');
+      D.querySelector('#tabs [data-v="dash"]').click();
+      assert.ok(D.querySelector('#ix-root').classList.contains('ix-play') && P.app.state.indicators.played, 'Al volver, anima otra vez');
+      W.matchMedia = () => ({ matches: true });
+      P.app.indicators.paint(true);
+      assert.ok(!D.querySelector('#ix-root').classList.contains('ix-play'), 'Con prefers-reduced-motion no hay animación');
+      assert.ok(/1\.250\.000/.test(txt('pnl')), 'Y el valor aparece final');
+      W.close();
+    });
+  };
+
+  return lgTest().then(dkTest).then(apTest).then(chTest).then(chCadenaTest).then(chDurasTest).then(hubTest).then(hubTest2).then(hubTest3).then(hubTest4).then(hubTest5).then(tkTest1).then(tkTest2).then(tkTest3).then(tkTest4).then(tkTest5).then(tkTest6).then(tkTest7).then(tkTest8).then(tkTest9).then(ckTest).then(mwTest1).then(mwTest2).then(mwTest3).then(mwTest4).then(ixTest1).then(ixTest2).then(fresca).then((d2) => {
     const doc2 = d2.window.document;
     assert.deepStrictEqual([...doc2.querySelectorAll('#b-strats .st-tab')].map((b) => b.textContent.length > 0), [true, true], 'Estrategias muestra solo 2 tarjetas');
     assert.deepStrictEqual([...d2.window.PYL.core.search.STRATEGIES.map((x) => x.k)], ['vdo', 'prov'], 'STRATEGIES = vdo y prov');

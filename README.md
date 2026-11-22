@@ -33,6 +33,7 @@ leer el testeo y medir la utilidad real cruzando **Dropi** con **Meta Ads**.
 - [🏠 Centro de mando](#-centro-de-mando)
 - [📝 Mis tareas](#-mis-tareas)
 - [🕰️ Reloj de la barra](#️-reloj-de-la-barra)
+- [📊 Franja de indicadores en Inicio](#-franja-de-indicadores-en-inicio)
 - [⏱️ Cortes de testeo en la barra](#️-cortes-de-testeo-en-la-barra)
 - [🔎 Buscar producto](#-buscar-producto)
 - [🛍️ Desarrollo de la landing](#️-desarrollo-de-la-landing)
@@ -163,7 +164,19 @@ En pantalla ancha (1680 px o más), el margen izquierdo de la barra superior mue
 - Si el sistema pide **reducir movimiento**, no hay segundero y las agujas se mueven una vez por minuto.
 - No guarda nada.
 
-Arriba, en el centro de la barra, queda la píldora del producto activo con sus zonas de CPA y, a la derecha de las pestañas, el botón de tema.
+Arriba queda la píldora del producto activo, alargada a lo ancho de las pestañas: nombre, una barra de colores con las zonas de CPA (verde escala, amarillo sostiene hasta el tope, naranja baja, rojo apaga) y, si Meta está conectado, una aguja con el CPA actual de la campaña y lo que ganas o pierdes por pedido. Con el cursor encima, un destello le da la vuelta al borde. El botón de tema va arriba a la derecha de la píldora y, en pantalla ancha (1680 px o más), baja y queda pegado a la derecha de las pestañas.
+
+---
+
+## 📊 Franja de indicadores en Inicio
+
+Bajo la tarjeta principal hay cuatro tarjetas pequeñas con los números clave de mi negocio. Cada una es un botón que me lleva a la pestaña de donde sale el dato.
+
+- **Mini P&L:** utilidad (verde si gano, roja si pierdo), medidor de margen, ROAS y efectividad con semáforo, y de qué producto, periodo y fecha es el dato. El tablero guarda una foto de sus números clave cada vez que calcula, así Inicio la muestra al abrir sin volver a subir archivos.
+- **Embudo de productos:** cuántos productos de la bitácora hay en Evaluando, En testeo, Activo y Ganador, y cuántos descartados.
+- **Testeo:** mi mejor puntaje de práctica y la escalera de cortes (20K, 30K, 40K) con el corte más alto de un conjunto activo en Meta.
+- **Pulso de tareas:** un anillo con el avance de hoy y «N de M hechas hoy»; al tocarlo bajo a Mis tareas.
+- Una tarjeta sin dato se ve atenuada con una invitación (nunca desaparece). Entran con una animación suave al cargar y al volver a Inicio; con «reducir movimiento» no hay animación.
 
 ---
 
@@ -171,10 +184,12 @@ Arriba, en el centro de la barra, queda la píldora del producto activo con sus 
 
 En pantalla ancha (1680 px o más), el margen derecho de la barra superior muestra el gasto real de los conjuntos de tu campaña de testeo de Meta y avisa cuando uno llega a un corte de 20.000, 30.000 o 40.000. Es la primera conexión directa de Synkops: lee la Marketing API de Meta con un token de solo lectura.
 
-- **Bloque:** «CORTES · <producto>», hora del último dato y una fila por conjunto (C1…C4 por orden de creación) con barrita, marcas en 20K, 30K y 40K y gasto acumulado de toda la vida del conjunto. Un conjunto pausado o apagado sale atenuado con **OFF**.
+- **Bloque:** «CORTES · <producto>» (con el cursor encima cambia al nombre de la campaña) y una fila por conjunto (C1…C4 por orden de creación) con barrita, marcas en 20K, 30K y 40K y gasto acumulado de toda la vida del conjunto. Un conjunto pausado o apagado sale atenuado con **OFF**.
 - **Panel** (clic en el bloque): token, cuenta publicitaria y campaña activa; por conjunto, gasto, pagos iniciados, ventas, CPPI, corte y el veredicto del testeo con el tope del producto activo (15.000 sin producto). Botones Actualizar, 🔔/🔕 y Desconectar.
 - **Alerta:** al pasar un corte nuevo la fila late con el color del corte y suena `sounds/corte.mp3` una vez; sigue latiendo hasta tocar **Revisado**. Al elegir una campaña con cortes ya pasados laten sin sonar.
 - **Cuándo lee:** al abrir la app, cada 15 minutos (también en segundo plano) y con Actualizar. Gratis y liviano: dos consultas pequeñas cada 15 minutos, solo con la app abierta.
+- **Estimado de campaña:** sobre el botón del tema (1680 px o más), una tarjeta con lo **invertido** en publicidad, los **pedidos** con lo que dejarían si se entregan todos (pedidos × tope del producto activo) y el **resultado**, verde si gano y rojo si pierdo. Es un estimado optimista: no descuenta devoluciones ni cancelaciones.
+- **Teléfono de Inicio:** las tarjetas de la ilustración ya son reales: CPM de Meta con semáforo, ventas de la campaña (con una barrita por conjunto), CPA actual y CPA contra el tope. En la pantalla del teléfono va la foto del producto activo (la de Mi candidato o la bitácora con el mismo nombre). El botón amarillo **Actualizar** consulta Meta y repinta todo, igual que el del panel. Cuando una actualización trae una venta nueva, baja una lluvia de bolitas de Shopify por la pantalla (sin animación si pido reducir movimiento).
 - **Token:** usuario del sistema de Meta con solo `ads_read` y sin vencimiento. Se guarda en este navegador (`pyl-meta`), viaja en un encabezado (nunca en la URL) y no puede gastar ni editar. Para anularlo: Configuración del negocio → Usuarios del sistema → Revocar tokens.
 
 ## 🔎 Buscar producto
@@ -672,13 +687,14 @@ css/
     home.css          Inicio: franja de saludo y frase de la tarjeta principal (SPEC 18)
     tasks.css         Mis tareas: columna lateral izquierda desde 1680 px, filas, subtareas, menús, arrastre y Acerca de (SPEC 19)
     clock.css         Reloj de la barra: margen izquierdo desde 1680 px, esfera y texto, solo tokens (SPEC 20)
-    metawatch.css     Cortes de testeo: margen derecho desde 1680 px, filas con barrita, latido por corte, panel; solo tokens (SPEC 21)
+    metawatch.css     Cortes de testeo: margen derecho desde 1680 px, filas con barrita, latido por corte, panel, estimado, botón y lluvia del teléfono; solo tokens (SPEC 21)
+    indicators.css    Franja de indicadores de Inicio: rejilla de 4 tarjetas, barras, medidores, anillo y animaciones; solo tokens (SPEC 22)
   themes.css          Selector de tema, modo claro, temas oscuros y SVG con colores fijos
   modules/pnl.css     Solo lo propio del Tablero P&L (acotado a #v-pyl)
   report.css          Informe PDF: documento claro en A4, visible solo al imprimir
 
 tests/
-  core.test.js        Núcleo en Node puro (reloj de la barra, cortes de testeo de Meta, Mis tareas, costeo, guardado rápido, prompt DropKiller, prompt buscar anuncios, simulador de testeo, mensajes de logística, P&L)
+  core.test.js        Núcleo en Node puro (reloj de la barra, cortes de testeo de Meta (totales y foto del producto), indicadores de Inicio, Mis tareas, costeo, guardado rápido, prompt DropKiller, prompt buscar anuncios, simulador de testeo, mensajes de logística, P&L)
   smoke.test.js       jsdom: claves de PYL.*, barra sin marca y pulso del título, reloj de la barra (esfera, hora simulada, medianoche y bucle), cortes de testeo (fetch, temporizadores y audio simulados: conectar, alertas, Revisado, 🔕, Desconectar, recarga), 11 pestañas, navegación, Mis tareas (añadir, editar, subtareas, días, guardado, medianoche, arrastre), paneles Prompt DropKiller y Prompt buscar anuncios, Simulador de testeo y consola limpia
   fixtures/           CSV de prueba de Dropi (datos inventados) y claves de PYL.*
 
@@ -752,10 +768,14 @@ js/
       ui/clock.js     Arma la esfera SVG y el texto; pinta agujas y textos solo si cambian
       app/clock.js    Pinta al cargar y repinta con requestAnimationFrame solo con la pestaña visible y 1680 px o más; un toque por minuto si se pide reducir movimiento
     metawatch/        Cortes de testeo en la barra: gasto de los conjuntos de Meta y alerta en 20K, 30K y 40K (SPEC 21)
-      core/metawatch.js      Filas C1…Cn, corte alcanzado, alertas (latir/sonar), veredicto, errores de Meta y validación de pyl-meta; sin DOM
+      core/metawatch.js      Filas C1…Cn, corte alcanzado, alertas (latir/sonar), veredicto, totales (CPM, CPA, estimado), foto del producto, errores de Meta y validación de pyl-meta; sin DOM
       services/metawatch.js  Consultas a la Marketing API (token en encabezado) y guardado en pyl-meta
-      ui/metawatch.js        Pinta el bloque de la barra y el panel (token, cuenta, campaña, conjuntos, 🔔/🔕, Desconectar)
-      app/metawatch.js       Estado, consulta al abrir y cada 15 min, sonido, Revisado y Desconectar
+      ui/metawatch.js        Pinta el bloque de la barra, el panel (token, cuenta, campaña, conjuntos, 🔔/🔕, Desconectar), el estimado, las tarjetas del teléfono y la lluvia de bolitas
+      app/metawatch.js       Estado, consulta al abrir y cada 15 min, sonido, Revisado, Desconectar y el botón Actualizar del teléfono
+    indicators/       Franja de indicadores de Inicio: Mini P&L, Embudo, Testeo y Pulso de tareas (SPEC 22)
+      core/indicators.js     Reglas de cada tarjeta (ixPnl, ixFunnel, ixTesting, ixTasks) y validación de la foto del P&L (ixLoad); sin DOM
+      ui/indicators.js       Pinta la franja y las cuatro tarjetas (barras, medidor, escalera, anillo, estado vacío)
+      app/indicators.js      Lee los datos reales, repinta con nav:vista, tareas:cambio y meta:dato, anima la entrada y conecta el clic de cada tarjeta
     trainer/
       app/trainer.js  Entrenador de métricas (fase 1: copiado del prototipo)
 

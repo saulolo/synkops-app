@@ -25,7 +25,7 @@
   const accounts = (token) => get(token, 'me/adaccounts', { fields: 'id,name,currency,account_status' });
   const campaigns = (token, account) => get(token, account + '/campaigns', { fields: 'id,name,effective_status', effective_status: '["ACTIVE"]' });
   const adsets = (token, campaign) => get(token, campaign + '/adsets', { fields: 'id,name,effective_status,created_time' });
-  const insights = (token, campaign) => get(token, campaign + '/insights', { level: 'adset', date_preset: 'maximum', fields: 'adset_id,adset_name,spend,actions' });
+  const insights = (token, campaign) => get(token, campaign + '/insights', { level: 'adset', date_preset: 'maximum', fields: 'adset_id,adset_name,spend,impressions,actions' });
 
   services.metawatch = { accounts, campaigns, adsets, insights, load: store.load, save: store.save, clear: store.clear };
 })();

@@ -20,6 +20,7 @@
     const weeks = core.insights.weeks(lines, meta, f, mx);
     const prodRows = productRows(f, mx);
     S.current = { a, x, f, weeks, prev, products: prodRows.filter((r) => r.key !== '__all') };
+    saveSnap(a, f);
 
     ui.notices.render(a, S);
     app.filters.showAutoValues(a);
@@ -46,6 +47,16 @@
       onAssign: app.dataLoader.assignCampaign,
     });
     ui.presets.draw(app.filters.presetList(), f, (p) => app.filters.selectProduct(p.prod, p.from, p.to));
+  }
+
+  // Foto de los números clave para Inicio → Mini P&L (SPEC 22). Sin espacio o sin localStorage no pasa nada.
+  function saveSnap(a, f) {
+    const n = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : null);
+    if (n(a.util) === null || n(a.fact) === null) return;
+    PYL.services.storage.pnlSnap.save({
+      v: core.indicators.IX_VERSION, at: Date.now(), prod: f.prod === '__all' ? 'Todos' : f.prod, from: f.from || null, to: f.to || null,
+      util: a.util, fact: a.fact, margen: n(a.margen), roas: n(a.roas), roasEq: n(a.roasEq), efect: n(a.efect),
+    });
   }
 
   // Una fila por producto más el consolidado, siempre con la inversión automática.
