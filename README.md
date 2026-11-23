@@ -144,7 +144,7 @@ En **Inicio** tengo una nota adhesiva para organizar las tareas del día (port e
 
 - **Días:** pestañas **Ayer**, **Hoy** y **Mañana**; el reloj abre los días anteriores con tareas (se conservan los últimos 5 días). Siempre arranca en Hoy y a medianoche pasa sola al día nuevo.
 - **Tareas:** «+» abre la fila de añadir: hora (0–23; vacía = la actual) y texto, Enter crea. Cada tarea muestra su hora; la casilla la tacha; doble clic edita el texto o la hora; la papelera la borra sin preguntar.
-- **Subtareas:** el «+» de la fila agrega varias seguidas; el chip `hechas/total` se rellena en proporción y, con un clic en la fila, se contraen o expanden.
+- **Subtareas:** el «+» de la fila agrega varias seguidas; un chevron sin contador (en acento con todas hechas; «N de M hechas» en el tooltip) y un clic en la fila las contraen o expanden.
 - **Reordenar:** mantengo presionada una tarea, o una subtarea dentro de su tarea, y la arrastro; Esc devuelve el orden.
 - **Progreso:** `N de M hechas` cuenta tareas y subtareas; el doble check marca o desmarca todo el día.
 - **Traer tareas de ayer:** con Hoy vacío, copia (sin marcar) las del último día con tareas; una vez por día.

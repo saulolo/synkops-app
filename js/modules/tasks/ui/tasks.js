@@ -182,7 +182,7 @@
     return t.content.firstElementChild;
   };
 
-  // Chip de subtareas: chevron + «hechas/total»; el fondo se rellena en proporción (--sub-progress).
+  // Chevron de subtareas (sin contador): «N de M hechas» solo en aria-label/title; en acento con todas hechas.
   const subChip = (task) => {
     const total = task.subtasks.length;
     if (!total) return '';
@@ -190,22 +190,19 @@
     const collapsed = task.collapsed === true;
     const label = `${collapsed ? 'Expandir' : 'Contraer'} subtareas (${done} de ${total} hechas)`;
     const cls = `tk-sub-toggle${collapsed ? ' is-collapsed' : ''}${done === total ? ' is-complete' : ''}`;
-    return `<button class="${cls}" style="--sub-progress:${Math.round((done / total) * 100)}%" type="button" aria-expanded="${!collapsed}" aria-label="${label}" title="${label}">${ICON.chevronDown(10)}<span>${done}/${total}</span></button>`;
+    return `<button class="${cls}" type="button" aria-expanded="${!collapsed}" aria-label="${label}" title="${label}">${ICON.chevronDown(12)}</button>`;
   };
 
-  // Acciones flotantes: contraer/expandir (solo con subtareas), añadir subtarea y eliminar.
-  const acts = (del, delLabel, subs) => {
-    const tLabel = subs && subs.collapsed ? 'Expandir subtareas' : 'Contraer subtareas';
-    return `<span class="tk-acts">${subs ? `<button class="tk-ib tk-sm tk-toggle-subs${subs.collapsed ? ' is-collapsed' : ''}" type="button" aria-expanded="${!subs.collapsed}" aria-label="${tLabel}" title="${tLabel}">${ICON.chevronDown(14)}</button>` : ''}`
+  // Acciones flotantes: añadir subtarea y eliminar (contraer/expandir va en el chevron de la fila).
+  const acts = (del, delLabel) => `<span class="tk-acts">`
       + `<button class="tk-ib tk-sm tk-add-sub" type="button" aria-label="Añadir subtarea" title="Añadir subtarea">${ICON.plus(14)}</button>`
       + `<button class="tk-ib tk-sm ${del}" type="button" aria-label="${delLabel}" title="${delLabel}">${ICON.trash(14)}</button></span>`;
-  };
 
   const check = (done, sm) => `<button class="tk-check${sm ? ' tk-check-sm' : ''}${done ? ' is-on' : ''}" type="button" aria-label="${sm ? 'Marcar subtarea' : 'Marcar tarea'}" aria-pressed="${done}">${done ? ICON.check(sm ? 10 : 12) : ''}</button>`;
 
   const subRow = (task, sub, edit) => {
     const editing = edit.sub && edit.sub.id === task.id && edit.sub.sub === sub.id;
-    const row = node(`<div class="tk-row tk-sub-row">${check(sub.done, true)}<span class="tk-sub-text${sub.done ? ' is-done' : ''}"></span>${editing ? '' : acts('tk-del-sub', 'Eliminar subtarea', null)}</div>`);
+    const row = node(`<div class="tk-row tk-sub-row">${check(sub.done, true)}<span class="tk-sub-text${sub.done ? ' is-done' : ''}"></span>${editing ? '' : acts('tk-del-sub', 'Eliminar subtarea')}</div>`);
     row.dataset.sub = sub.id;
     const text = row.querySelector('.tk-sub-text');
     if (editing) text.replaceWith(editInput('tk-edit-in tk-sub-text', sub.text, 'Editar texto', edit.finishSub));
@@ -259,7 +256,7 @@
     const done = task.done ? ' is-done' : '';
     const has = task.subtasks.length > 0;
     const editing = edit.text === task.id;
-    const wrap = node(`<div class="tk-task"><div class="tk-row tk-task-row${has ? ' has-subs' : ''}">${check(task.done, false)}<span class="tk-hour${done}"></span><span class="tk-text${done}"></span>${subChip(task)}${editing ? '' : acts('tk-del', 'Eliminar tarea', has ? { collapsed: task.collapsed === true } : null)}</div></div>`);
+    const wrap = node(`<div class="tk-task"><div class="tk-row tk-task-row${has ? ' has-subs' : ''}">${check(task.done, false)}<span class="tk-hour${done}"></span><span class="tk-text${done}"></span>${subChip(task)}${editing ? '' : acts('tk-del', 'Eliminar tarea')}</div></div>`);
     wrap.dataset.id = task.id;
     wrap.firstElementChild.dataset.id = task.id;
     const hourEl = wrap.querySelector('.tk-hour');
@@ -394,7 +391,7 @@
       const sub = subRowEl && subRowEl.dataset.sub;
       if (t.closest('.tk-task-row > .tk-check')) on.toggle(id);
       else if (t.closest('.tk-sub-row > .tk-check') && sub) on.toggleSub(id, sub);
-      else if (t.closest('.tk-sub-toggle, .tk-toggle-subs')) on.collapse(id);
+      else if (t.closest('.tk-sub-toggle')) on.collapse(id);
       else if (t.closest('.tk-add-sub')) {
         // Si estaban contraídas, se expanden para ver dónde cae la nueva subtarea.
         const task = taskOf(id);
