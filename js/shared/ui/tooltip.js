@@ -20,7 +20,7 @@
     place(t, ev);
   }
 
-  // tip: { h, p?, li?, warn?, table?, cls? } (warn = línea de advertencia ⚠) con li: [antes, palabra resaltada, clase, después] y
+  // tip: { h, icon?, p?, li?, warn?, table?, cls? } (icon = nombre de PYL.ui.icons antes del título; warn = línea de advertencia con el ícono alert) con li: [antes, palabra resaltada, clase, después] y
   // table: { head: [col1, col2], rows: [{ k, cells: [[viñetas…], [viñetas…]] }], on: k } (cada celda es una lista de viñetas; on = fila resaltada).
   // Solo se reconstruye al cambiar de concepto, para no reiniciar la animación con cada movimiento.
   function showInfo(ev, tip) {
@@ -28,14 +28,19 @@
     const key = tip.h + '|' + (tip.p || '') + '|' + JSON.stringify(tip.li || '') + '|' + (tip.warn || '') + '|' + (tip.table ? tip.table.on : ''); // avisos con el mismo título pero distinto contenido
     if (t.dataset.k !== key || t.style.display !== 'block') {
       t.textContent = ''; t.className = 'tip wide' + (tip.table ? ' tbl' : '') + (tip.cls ? ' ' + tip.cls : ''); // cls: estilo propio de un módulo t.dataset.k = key;
-      if (!tip.table) t.append(el('div', 'h', tip.h)); // el aviso con tabla va sin título
+      if (!tip.table) { // el aviso con tabla va sin título
+        const hd = el('div', 'h');
+        if (tip.icon) hd.append(PYL.ui.icons.el(tip.icon, 14));
+        hd.append(tip.h);
+        t.append(hd);
+      }
       if (tip.p) t.append(el('p', null, tip.p));
       if (tip.li) {
         const ul = el('ul');
         tip.li.forEach(([pre, word, cls, post]) => { const l = el('li', null, pre); l.append(el('b', cls, word), post); ul.appendChild(l); });
         t.appendChild(ul);
       }
-      if (tip.warn) t.append(el('p', 'hm-warn', '⚠ ' + tip.warn));
+      if (tip.warn) { const w = el('p', 'hm-warn'); w.append(PYL.ui.icons.el('alert', 14), tip.warn); t.append(w); }
       if (tip.table) t.appendChild(tableNode(tip.table));
       t.style.display = 'block';
     }

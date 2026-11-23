@@ -131,11 +131,6 @@
 
   // ---- Modo Editar ----
 
-  const ICON_DEL = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>';
-
-  const ICON_UP = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>';
-  const ICON_NOIMG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 20L21 4"/></svg>';
-
   const factory = (id) => C.HUB_DEFAULTS.find((d) => d.id === id) || null;
   const rowOf = (node, id) => [...node.querySelectorAll('.hb-row')].find((r) => r.dataset.id === id) || null;
 
@@ -222,16 +217,16 @@
     // Tres botones pequeños en una línea: subir ícono propio (o pegarlo con Ctrl+V con el foco en esta fila), quitarlo y quitar el acceso.
     // Reordenar se hace arrastrando en la vista normal.
     const ctl = el('div', 'hb-ctl');
-    const upLab = el('label', 'hb-ib hb-icon-up'); upLab.innerHTML = ICON_UP; upLab.title = 'Subir ícono (o pega con Ctrl+V)';
+    const upLab = el('label', 'hb-ib hb-icon-up'); upLab.innerHTML = PYL.ui.icons.svg('upload', 15); upLab.title = 'Subir ícono (o pega con Ctrl+V)';
     upLab.tabIndex = 0; upLab.setAttribute('role', 'button'); upLab.setAttribute('aria-label', 'Subir ícono de ' + it.name);
     const file = el('input'); file.type = 'file'; file.accept = 'image/*'; file.hidden = true; file.className = 'hb-file';
     file.addEventListener('change', () => { if (file.files[0]) on.icon(it.id, file.files[0]); file.value = ''; });
     upLab.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); file.click(); } });
     upLab.append(file);
-    const rmIcon = el('button', 'hb-ib hb-icon-rm'); rmIcon.type = 'button'; rmIcon.innerHTML = ICON_NOIMG; rmIcon.hidden = !it.icon;
+    const rmIcon = el('button', 'hb-ib hb-icon-rm'); rmIcon.type = 'button'; rmIcon.innerHTML = PYL.ui.icons.svg('image-off', 15); rmIcon.hidden = !it.icon;
     rmIcon.title = 'Quitar ícono'; rmIcon.setAttribute('aria-label', 'Quitar ícono de ' + it.name);
     rmIcon.addEventListener('click', () => on.iconClear(it.id));
-    const del = el('button', 'cd-act del hb-del'); del.type = 'button'; del.innerHTML = ICON_DEL; del.setAttribute('aria-label', 'Quitar ' + it.name); del.title = 'Quitar';
+    const del = el('button', 'cd-act del hb-del'); del.type = 'button'; del.innerHTML = PYL.ui.icons.svg('trash', 16); del.setAttribute('aria-label', 'Quitar ' + it.name); del.title = 'Quitar';
     del.addEventListener('click', () => on.del(it.id));
     ctl.append(upLab, rmIcon, del);
 

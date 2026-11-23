@@ -4,24 +4,8 @@
 (() => {
   const PYL = globalThis.PYL;
 
-  // Íconos estilo Lucide, como en el original.
-  const svg = (size, stroke, body) => `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${stroke}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
-  const ICON = {
-    plus: (s = 16) => svg(s, 2, '<path d="M5 12h14"/><path d="M12 5v14"/>'),
-    chevronDown: (s = 12) => svg(s, 2.5, '<path d="m6 9 6 6 6-6"/>'),
-    checkCheck: (s = 14) => svg(s, 2.5, '<path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/>'),
-    check: (s = 12) => svg(s, 3, '<path d="M20 6 9 17l-5-5"/>'),
-    trash: (s = 14) => svg(s, 2, '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/>'),
-    history: (s = 15) => svg(s, 2, '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>'),
-    settings: (s = 15) => svg(s, 2, '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>'),
-    close: (s = 15) => svg(s, 2, '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'),
-    bold: (s = 14) => svg(s, 2.25, '<path d="M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8"/>'),
-    italic: (s = 14) => svg(s, 2, '<line x1="19" x2="10" y1="4" y2="4"/><line x1="14" x2="5" y1="20" y2="20"/><line x1="15" x2="9" y1="4" y2="20"/>'),
-    underline: (s = 14) => svg(s, 2, '<path d="M6 4v6a6 6 0 0 0 12 0V4"/><line x1="4" x2="20" y1="20" y2="20"/>'),
-    strike: (s = 14) => svg(s, 2, '<path d="M16 4H9a3 3 0 0 0-2.83 4"/><path d="M14 12a4 4 0 0 1 0 8H6"/><line x1="4" x2="20" y1="12" y2="12"/>'),
-    list: (s = 14) => svg(s, 2, '<path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M8 6h13"/>'),
-    image: (s = 14) => svg(s, 2, '<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>'),
-  };
+  // Íconos del set propio (SPEC 24, js/shared/ui/icons.js).
+  const I = (name, size) => PYL.ui.icons.svg(name, size);
 
   // Pie de formato: inerte, como en el original (texto enriquecido e imágenes irían en otra spec).
   const tool = (label, icon) => `<button class="tk-ib tk-tb" type="button" aria-label="${label}" title="${label}" aria-disabled="true">${icon}</button>`;
@@ -31,21 +15,21 @@
     <header class="tk-top">
       <h2 class="tk-title" id="tk-title">Mis tareas</h2>
       <div class="tk-wrap">
-        <button class="tk-ib" type="button" id="tk-gear" data-act="gear" aria-label="Configuración" title="Configuración" aria-haspopup="menu" aria-expanded="false">${ICON.settings()}</button>
+        <button class="tk-ib" type="button" id="tk-gear" data-act="gear" aria-label="Configuración" title="Configuración" aria-haspopup="menu" aria-expanded="false">${I('settings', 15)}</button>
         <div class="tk-menu" id="tk-gear-menu" role="menu" aria-label="Configuración" hidden>
           <button class="tk-mi" type="button" role="menuitem" data-act="about">Acerca de Mis tareas</button>
         </div>
       </div>
     </header>
     <div class="tk-days">
-      <button class="tk-ib" type="button" id="tk-new" data-act="newTask" aria-label="Nueva tarea" title="Nueva tarea">${ICON.plus()}</button>
+      <button class="tk-ib" type="button" id="tk-new" data-act="newTask" aria-label="Nueva tarea" title="Nueva tarea">${I('plus', 16)}</button>
       <div class="tk-tabs" id="tk-tabs" role="group" aria-label="Día">
         <button class="tk-tab" type="button" data-act="day" aria-pressed="false">Ayer</button>
         <button class="tk-tab" type="button" data-act="day" aria-pressed="false">Hoy</button>
         <button class="tk-tab" type="button" data-act="day" aria-pressed="false">Mañana</button>
       </div>
       <div class="tk-wrap tk-wrap-end">
-        <button class="tk-ib" type="button" id="tk-history" data-act="history" aria-label="Días anteriores" title="Días anteriores" aria-haspopup="menu" aria-expanded="false">${ICON.history()}</button>
+        <button class="tk-ib" type="button" id="tk-history" data-act="history" aria-label="Días anteriores" title="Días anteriores" aria-haspopup="menu" aria-expanded="false">${I('history', 15)}</button>
         <div class="tk-menu tk-menu-end" id="tk-history-menu" role="menu" aria-label="Días anteriores" hidden></div>
       </div>
     </div>
@@ -55,18 +39,18 @@
         <circle class="tk-ring-fill" cx="7" cy="7" r="5.5" pathLength="100"/>
       </svg>
       <span class="tk-count" id="tk-count"></span>
-      <button class="tk-ib tk-sm" type="button" id="tk-all" data-act="all">${ICON.checkCheck()}</button>
+      <button class="tk-ib tk-sm" type="button" id="tk-all" data-act="all">${I('check-check', 14)}</button>
     </div>
     <div class="tk-bar"><div class="tk-bar-fill" id="tk-bar"></div></div>
     <div class="tk-list" id="tk-list"></div>
     <footer class="tk-foot" id="tk-foot">
-      ${tool('Negrita', ICON.bold())}${tool('Cursiva', ICON.italic())}${tool('Subrayado', ICON.underline())}${tool('Tachado', ICON.strike())}
+      ${tool('Negrita', I('bold', 14))}${tool('Cursiva', I('italic', 14))}${tool('Subrayado', I('underline', 14))}${tool('Tachado', I('strike', 14))}
       <span class="tk-divider" aria-hidden="true"></span>
-      ${tool('Lista con viñetas', ICON.list())}${tool('Adjuntar imagen', ICON.image())}
+      ${tool('Lista con viñetas', I('list', 14))}${tool('Adjuntar imagen', I('image', 14))}
     </footer>
     <div class="tk-about-layer" id="tk-about" hidden>
       <div class="tk-about" role="dialog" aria-modal="true" aria-labelledby="tk-about-title">
-        <button class="tk-ib tk-about-x" type="button" data-act="aboutClose" aria-label="Cerrar" title="Cerrar">${ICON.close()}</button>
+        <button class="tk-ib tk-about-x" type="button" data-act="aboutClose" aria-label="Cerrar" title="Cerrar">${I('close', 15)}</button>
         <h2 class="tk-about-name" id="tk-about-title">Mis tareas</h2>
         <p class="tk-about-lead">Mis tareas es tu nota adhesiva dentro de Synkops para organizar las tareas del día.</p>
         <ul class="tk-about-points">
@@ -190,15 +174,15 @@
     const collapsed = task.collapsed === true;
     const label = `${collapsed ? 'Expandir' : 'Contraer'} subtareas (${done} de ${total} hechas)`;
     const cls = `tk-sub-toggle${collapsed ? ' is-collapsed' : ''}${done === total ? ' is-complete' : ''}`;
-    return `<button class="${cls}" type="button" aria-expanded="${!collapsed}" aria-label="${label}" title="${label}">${ICON.chevronDown(12)}</button>`;
+    return `<button class="${cls}" type="button" aria-expanded="${!collapsed}" aria-label="${label}" title="${label}">${I('chevron-down', 12)}</button>`;
   };
 
   // Acciones flotantes: añadir subtarea y eliminar (contraer/expandir va en el chevron de la fila).
   const acts = (del, delLabel) => `<span class="tk-acts">`
-      + `<button class="tk-ib tk-sm tk-add-sub" type="button" aria-label="Añadir subtarea" title="Añadir subtarea">${ICON.plus(14)}</button>`
-      + `<button class="tk-ib tk-sm ${del}" type="button" aria-label="${delLabel}" title="${delLabel}">${ICON.trash(14)}</button></span>`;
+      + `<button class="tk-ib tk-sm tk-add-sub" type="button" aria-label="Añadir subtarea" title="Añadir subtarea">${I('plus', 14)}</button>`
+      + `<button class="tk-ib tk-sm ${del}" type="button" aria-label="${delLabel}" title="${delLabel}">${I('trash', 14)}</button></span>`;
 
-  const check = (done, sm) => `<button class="tk-check${sm ? ' tk-check-sm' : ''}${done ? ' is-on' : ''}" type="button" aria-label="${sm ? 'Marcar subtarea' : 'Marcar tarea'}" aria-pressed="${done}">${done ? ICON.check(sm ? 10 : 12) : ''}</button>`;
+  const check = (done, sm) => `<button class="tk-check${sm ? ' tk-check-sm' : ''}${done ? ' is-on' : ''}" type="button" aria-label="${sm ? 'Marcar subtarea' : 'Marcar tarea'}" aria-pressed="${done}">${done ? I('check', sm ? 10 : 12) : ''}</button>`;
 
   const subRow = (task, sub, edit) => {
     const editing = edit.sub && edit.sub.id === task.id && edit.sub.sub === sub.id;
@@ -280,7 +264,7 @@
   // on.add(texto, hora), que responde 'hour' (hora inválida), 'text' (texto vacío) o true (creada).
   const addRow = (on) => {
     const row = node(`<div class="tk-add" id="tk-add" hidden>
-      <button class="tk-add-btn" type="button" aria-label="Añadir tarea">${ICON.plus(12)}</button>
+      <button class="tk-add-btn" type="button" aria-label="Añadir tarea">${I('plus', 12)}</button>
       <input class="tk-hour-in" id="tk-add-hour" aria-label="Hora de la tarea (0 a 23)" title="Hora (0–23). Vacío = hora actual" inputmode="numeric" maxlength="2" autocomplete="off">
       <input class="tk-add-in" id="tk-add-text" aria-label="Nueva tarea" placeholder="Añadir nueva tarea…" autocomplete="off">
       <span class="tk-kbd">Enter</span>
@@ -425,5 +409,5 @@
     return { render, openAdd: add.open, closeAdd: add.close, carry: (visible) => { carryEl.hidden = !visible; } };
   };
 
-  PYL.ui.tasks = { ICON, shell, days, progress, historyItems, menuShow, menuMove, menuHas, about, createList };
+  PYL.ui.tasks = { shell, days, progress, historyItems, menuShow, menuMove, menuHas, about, createList };
 })();

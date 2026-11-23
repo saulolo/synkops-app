@@ -254,7 +254,8 @@
       rf.id = 'mw-refresh'; rf.type = 'button';
       rf.disabled = !!view.busy || !view.campaign;
       rf.addEventListener('click', () => on.refresh());
-      const snd = el('button', 'btn ghost sm mw-sound', view.sound ? '🔔 Sonido' : '🔕 Sin sonido');
+      const snd = el('button', 'btn ghost sm mw-sound', view.sound ? 'Sonido' : 'Sin sonido');
+      snd.prepend(PYL.ui.icons.el(view.sound ? 'bell' : 'bell-off', 14, 'ic-solo')); // .btn ya pone gap
       snd.id = 'mw-sound'; snd.type = 'button';
       snd.setAttribute('aria-pressed', String(!!view.sound));
       snd.title = view.sound ? 'Suena al llegar a un corte. Toca para silenciar.' : 'Silenciado. Toca para que suene al llegar a un corte.';

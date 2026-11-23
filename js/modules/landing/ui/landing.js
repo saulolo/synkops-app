@@ -15,19 +15,23 @@
   // Al copiar, el mismo botón avisa: pasa a ✓ en verde un momento y vuelve (sin mensaje flotante).
   // onCopy(texto, etiqueta) devuelve true si copió; si falla, quien copia avisa con el toast de error.
   function copyFeedback(b, get, label, onCopy, doneText) {
-    const idle = b.textContent;
+    const idle = [...b.childNodes]; // con su ícono (SPEC 24): se devuelve tal cual
     b.addEventListener('click', async () => {
       if (!(await onCopy(get(), label))) return;
       clearTimeout(b._t);
       b.textContent = doneText; b.classList.add('copied');
-      b._t = setTimeout(() => { b.textContent = idle; b.classList.remove('copied'); }, 1400);
+      b._t = setTimeout(() => { b.replaceChildren(...idle); b.classList.remove('copied'); }, 1400);
     });
     return b;
   }
 
+  // Ícono del set propio al inicio de un botón (SPEC 24); .btn ya pone gap.
+  const withIcon = (b, name) => { b.prepend(PYL.ui.icons.el(name, 14, 'ic-solo')); return b; };
+  const IC = PYL.ui.icons;
+
   // Botón copiar: copia el valor crudo del nodo (precio sin puntos) o su texto.
   const copyBtn = (node, label, onCopy) =>
-    copyFeedback(button('btn ghost sm ld-copy', '📋 Copiar'), () => node.dataset.raw || node.textContent, label, onCopy, '✓ Copiado');
+    copyFeedback(withIcon(button('btn ghost sm ld-copy', 'Copiar'), 'clipboard'), () => node.dataset.raw || node.textContent, label, onCopy, '✓ Copiado');
 
   // Fila "etiqueta · valor · copiar".
   function valRow(label, k, onCopy, hint) {
@@ -176,7 +180,7 @@
       const dd = el('dd');
       dd.append(el('span', null, v));
       if (!only || only.includes(k)) {
-        const b = copyFeedback(button('ld-mini', '📋'), () => String(raw ?? v), k, onCopy, '✓');
+        const b = copyFeedback(withIcon(button('ld-mini', null), 'clipboard'), () => String(raw ?? v), k, onCopy, '✓');
         b.title = 'Copiar'; b.setAttribute('aria-label', 'Copiar ' + k);
         dd.append(b);
       }
@@ -196,10 +200,11 @@
     const top = el('div', 'row between');
     top.append(el('span', 'tag tb', `Paso ${i + 1} de ${total}`), el('span', 'small', s.where));
     box.append(top, el('h3', 'mt-s fl-h', s.t));
+    const note = (cls, icon, segs) => { const n = seg('div', cls, segs); n.prepend(IC.el(icon, 14)); return n; }; // nota con su ícono al inicio
     if (s.level && ctx.levels) box.append(el('span', 'tag tv', 'Nivel: ' + ctx.levels[s.level]));
     if (s.src) box.append(el('span', 'tag tv', s.src));
     if (s.p) box.append(seg('p', 'fl-p', s.p));
-    if (s.warn) box.append(seg('div', 'note ny mt-s', ['⚠️ ', ...s.warn]));
+    if (s.warn) box.append(note('note ny mt-s', 'alert', s.warn));
     if (s.fields) box.append(fieldTable(s.fields, on.copy, s.copyOnly));
 
     const list = el(s.ordered ? 'ol' : 'ul', 'ld-checks mt-s');
@@ -229,7 +234,8 @@
       ps.append(el('h4', null, 'Prompts para la IA'));
       s.prompts.forEach((p) => {
         const c = el('div', 'ld-prompt'), t = el('p', null, ctx.fill(p.text));
-        const hd = el('div', 'row between'); hd.append(el('b', null, p.t), copyBtn(t, p.t, on.copy));
+        const pt = el('b'); if (p.icon) pt.append(IC.el(p.icon, 14)); pt.append(p.t); // título del prompt con su ícono (ej. star en la imagen principal)
+        const hd = el('div', 'row between'); hd.append(pt, copyBtn(t, p.t, on.copy));
         // p.ask: dato que pide el prompt. El campo lo guarda (on.field) y "Generar prompt" (o Enter) vuelve a armar el texto.
         if (p.ask) {
           const a = el('div', 'ld-ask'), f = input(p.ask.k, p.ask.label, ctx.st[p.ask.k], on, { ph: p.ask.ph });
@@ -238,13 +244,13 @@
           a.append(f, button('btn sm', 'Generar prompt', gen));
           c.append(hd, a, t);
         } else c.append(hd, t);
-        if (p.tip) c.append(seg('div', 'ld-prompt-tip', ['💡 ', ...p.tip]));
+        if (p.tip) c.append(note('ld-prompt-tip', 'bulb', p.tip));
         ps.append(c);
       });
       box.append(ps);
     }
     (s.tool || []).forEach((k) => { const t = tools[k](on, ctx.st, ctx.v); t.classList.add('mt'); box.append(t); });
-    if (s.tip) box.append(seg('div', 'note nn mt', ['💡 ', ...s.tip]));
+    if (s.tip) box.append(note('note nn mt', 'bulb', s.tip));
 
     const nav = el('div', 'row mt');
     if (i > 0) nav.append(button('btn ghost sm', '← Anterior', on.prev));

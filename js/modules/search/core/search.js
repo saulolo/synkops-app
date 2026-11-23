@@ -97,8 +97,8 @@
   // Estrategias de búsqueda: dos caminos para llegar a un candidato. La VDO arranca por las ventas
   // en validación; la de proveedor arranca por el catálogo de proveedores confiables.
   const STRATEGIES = [
-    { k: 'vdo', t: 'Estrategia VDO', icon: '🎯', d: 'Parto de productos que ya están en validación y reviso que no estén saturados.' },
-    { k: 'prov', t: 'Estrategia por proveedor', icon: '🏭', d: 'Parto de proveedores confiables y busco productos que casi nadie está vendiendo.' },
+    { k: 'vdo', t: 'Estrategia VDO', icon: 'target', d: 'Parto de productos que ya están en validación y reviso que no estén saturados.' },
+    { k: 'prov', t: 'Estrategia por proveedor', icon: 'factory', d: 'Parto de proveedores confiables y busco productos que casi nadie está vendiendo.' },
   ];
 
   // Estrategia por proveedor: 4 fases. out = lo que me queda al terminar la fase (embudo).
@@ -110,9 +110,9 @@
     ],
     allies: [{ t: 'Goldbox' }],
     steps: [
-      { k: 'filtrar', icon: '🏭', t: 'Filtrar por proveedor', where: 'DropKiller → Productos → Proveedor', out: 'Un proveedor',
+      { k: 'filtrar', icon: 'factory', t: 'Filtrar por proveedor', where: 'DropKiller → Productos → Proveedor', out: 'Un proveedor',
         p: ['Entro a ', { b: 'DropKiller' }, ', en la sección de ', { b: 'Productos' }, ', y escribo uno de estos proveedores. Veo todo su catálogo.'] },
-      { k: 'analizar', icon: '🔎', t: 'Analizar productos', where: 'Catálogo del proveedor en DropKiller', out: `${BP.analyze.min} a ${BP.analyze.max} productos`,
+      { k: 'analizar', icon: 'search', t: 'Analizar productos', where: 'Catálogo del proveedor en DropKiller', out: `${BP.analyze.min} a ${BP.analyze.max} productos`,
         p: ['Busco productos ', { b: 'de interés' }, ' que casi nadie está vendiendo todavía. Me quedo con una lista corta.'],
         rules: [
           { big: '0', unit: 'ventas', t: 'Sin ventas, pero de interés', d: ['Productos que ', { b: 'nadie ha empezado a vender' }, ' y que me llaman la atención.'] },
@@ -120,16 +120,16 @@
           { big: `< ${n(BP.v30)}`, unit: 'en 30 días', t: 'Cuando voy a testear', d: ['Y menos de ', { b: `${n(BP.v30)} ventas` }, ' en los últimos 30 días.'] },
         ],
         note: ['Analizo de ', { b: `${BP.analyze.min} a ${BP.analyze.max} productos` }, ' antes de pasar a validar.'] },
-      { k: 'validar', icon: '🌎', t: 'Validar en otros países', where: 'FastMoss · TikTok Shop en más de 20 países', out: 'Los validados afuera',
+      { k: 'validar', icon: 'globe', t: 'Validar en otros países', where: 'FastMoss · TikTok Shop en más de 20 países', out: 'Los validados afuera',
         p: ['De mi lista, miro cuáles ', { b: 'ya se venden en otros países' }, ' (Estados Unidos, México, Reino Unido…). En ', { a: 'FastMoss', href: FASTMOSS }, ' veo sus ventas, creativos, contenido y métricas.'],
         link: { t: 'Abrir FastMoss ↗', href: FASTMOSS },
         chain: [
-          { k: 'pais', icon: '📍', t: 'Seleccionar país objetivo', d: ['Configuro el panel de FastMoss con el ', { b: 'país específico' }, ' que quiero mirar.'] },
-          { k: 'demanda', icon: '📈', t: 'Analizar volumen de ventas', d: ['Busco el producto o la categoría. ¿La ', { b: 'curva de ventas está subiendo' }, '? ¿El precio de allá contra mi costo deja margen?'] },
-          { k: 'saturacion', icon: '🏪', t: 'Estudiar competencia local', d: ['¿Cuántas tiendas lo venden? ', { b: 'Ventas altas y pocos competidores' }, ' = ventana de oportunidad.'] },
-          { k: 'marketing', icon: '🎬', t: 'Revisar anuncios y creadores', d: ['Miro los ', { b: 'videos y anuncios populares' }, ' de ese mercado: me dan la pauta para replicar o mejorar mis creativos.'] },
+          { k: 'pais', icon: 'pin', t: 'Seleccionar país objetivo', d: ['Configuro el panel de FastMoss con el ', { b: 'país específico' }, ' que quiero mirar.'] },
+          { k: 'demanda', icon: 'trend-up', t: 'Analizar volumen de ventas', d: ['Busco el producto o la categoría. ¿La ', { b: 'curva de ventas está subiendo' }, '? ¿El precio de allá contra mi costo deja margen?'] },
+          { k: 'saturacion', icon: 'store', t: 'Estudiar competencia local', d: ['¿Cuántas tiendas lo venden? ', { b: 'Ventas altas y pocos competidores' }, ' = ventana de oportunidad.'] },
+          { k: 'marketing', icon: 'clapper', t: 'Revisar anuncios y creadores', d: ['Miro los ', { b: 'videos y anuncios populares' }, ' de ese mercado: me dan la pauta para replicar o mejorar mis creativos.'] },
         ] },
-      { k: 'testear', icon: '🧪', t: 'Testear', where: 'DropKiller → buscar por nombre', out: 'Mi candidato',
+      { k: 'testear', icon: 'flask', t: 'Testear', where: 'DropKiller → buscar por nombre', out: 'Mi candidato',
         p: ['Con el producto validado, vuelvo a ', { b: 'DropKiller' }, ' y lo busco ', { b: 'por nombre' }, '.'],
         list: [
           ['Cuento ', { b: 'cuántos proveedores' }, ' lo tienen.'],
@@ -146,17 +146,17 @@
     { k: 'asp', t: 'Aspectos importantes' },
   ];
   const WINNER = [
-    { k: 'valor', group: 'car', icon: '💎', t: 'Alta percepción de valor',
+    { k: 'valor', group: 'car', icon: 'gem', t: 'Alta percepción de valor',
       d: ['Que no sea un producto que la gente ', { b: 'consiga muy barato' }, ' en cualquier lado. Se ve caro y vale lo que cobro.'] },
-    { k: 'wow', group: 'car', icon: '🤩', t: 'Efecto wow',
+    { k: 'wow', group: 'car', icon: 'eye', t: 'Efecto wow',
       d: ['Que sea ', { b: 'llamativo' }, ': frena el scroll y dan ganas de verlo funcionar.'] },
-    { k: 'problema', group: 'car', icon: '🩹', t: 'Resuelve un problema',
+    { k: 'problema', group: 'car', icon: 'bandage', t: 'Resuelve un problema',
       d: ['Le quita un dolor real a la gente. Por ejemplo, los nichos de ', { b: 'belleza, salud y bienestar' }, '.'] },
-    { k: 'validado', group: 'asp', icon: '✅', t: 'Producto validado', must: true,
+    { k: 'validado', group: 'asp', icon: 'check-circle', t: 'Producto validado', must: true,
       d: ['Que ', { b: 'ya se esté vendiendo' }, ', sea en USA, Colombia u otro país.'] },
-    { k: 'dropi', group: 'asp', icon: '📦', t: 'Está en Dropi y con stock', must: true,
+    { k: 'dropi', group: 'asp', icon: 'package', t: 'Está en Dropi y con stock', must: true,
       d: ['Si no está en Dropi ', { b: 'no lo puedo vender' }, '. Más adelante puedo desarrollar marca propia con un laboratorio.'] },
-    { k: 'creativos', group: 'asp', icon: '🎬', t: 'Disponibilidad creativa',
+    { k: 'creativos', group: 'asp', icon: 'clapper', t: 'Disponibilidad creativa',
       d: ['Que haya ', { b: 'videos en internet' }, ' que pueda bajar y personalizar para mi tienda y pautarlo.'] },
   ];
 
@@ -252,17 +252,17 @@
     { k: 'PA', t: 'Panamá' }, { k: 'PY', t: 'Paraguay' }, { k: 'CR', t: 'Costa Rica' }, { k: 'US', t: 'USA' },
   ];
   const STATUS = [
-    { k: 'evaluando', t: 'Evaluando', icon: '🔍', tone: 'n' },
-    { k: 'testeo', t: 'En testeo', icon: '🧪', tone: 'b' },
-    { k: 'activo', t: 'Activo', icon: '🚀', tone: 'g' },
-    { k: 'descartado', t: 'Descartado', icon: '❌', tone: 'r' },
-    { k: 'ganador', t: 'Ganador', icon: '🏆', tone: 'y' },
+    { k: 'evaluando', t: 'Evaluando', icon: 'search', tone: 'n' },
+    { k: 'testeo', t: 'En testeo', icon: 'flask', tone: 'b' },
+    { k: 'activo', t: 'Activo', icon: 'rocket', tone: 'g' },
+    { k: 'descartado', t: 'Descartado', icon: 'x-circle', tone: 'r' },
+    { k: 'ganador', t: 'Ganador', icon: 'trophy', tone: 'y' },
   ];
   // MSP en 3 niveles. Equivalencia con la escala 1–5 de NovaSociety: bajo = 1–2, medio = 3, alto = 4–5.
-  const MSP = [{ k: 'bajo', t: 'Bajo', icon: '🔸' }, { k: 'medio', t: 'Medio', icon: '🔶' }, { k: 'alto', t: 'Alto', icon: '🔥' }];
+  const MSP = [{ k: 'bajo', t: 'Bajo', icon: 'signal-low' }, { k: 'medio', t: 'Medio', icon: 'signal-mid' }, { k: 'alto', t: 'Alto', icon: 'flame' }];
   // Acepta el nivel o un número 1–5 (productos guardados antes del cambio).
   const mspLevel = (v) => { const x = Number(v); if (v === '' || v == null) return null; if (!isFinite(x)) return MSP.some((m) => m.k === v) ? v : null; return x >= 4 ? 'alto' : x === 3 ? 'medio' : x >= 1 ? 'bajo' : null; };
-  const VALUE = [{ k: 'baja', t: 'Baja', icon: '🍃' }, { k: 'media', t: 'Media', icon: '💰' }, { k: 'alta', t: 'Alta', icon: '💎' }];
+  const VALUE = [{ k: 'baja', t: 'Baja', icon: 'leaf' }, { k: 'media', t: 'Media', icon: 'coins' }, { k: 'alta', t: 'Alta', icon: 'gem' }];
   const SATURATION = [{ k: 'g', t: 'Verde', tone: 'g' }, { k: 'y', t: 'Amarillo', tone: 'y' }, { k: 'r', t: 'Rojo', tone: 'r' }];
   // Costos por defecto = costeo genérico de NovaSociety: 25% devoluciones y 25% cancelaciones
   // (50% de entrega efectiva y 75% sobre despachado, los mismos de la pestaña Costeo).
@@ -341,10 +341,10 @@
   }
   const score = (p) => scoreParts(p).reduce((a, x) => a + x.pts, 0);
   const SCORE_LEVELS = [
-    { k: 'alto', min: 7, tone: 'g', icon: '🔥', t: 'Alto potencial' },
-    { k: 'bueno', min: 5, tone: 'b', icon: '✅', t: 'Buen potencial' },
-    { k: 'bajo', min: 3, tone: 'o', icon: '⚠️', t: 'Potencial bajo' },
-    { k: 'sin', min: 0, tone: 'r', icon: '❌', t: 'Sin potencial' },
+    { k: 'alto', min: 7, tone: 'g', icon: 'flame', t: 'Alto potencial' },
+    { k: 'bueno', min: 5, tone: 'b', icon: 'check-circle', t: 'Buen potencial' },
+    { k: 'bajo', min: 3, tone: 'o', icon: 'alert', t: 'Potencial bajo' },
+    { k: 'sin', min: 0, tone: 'r', icon: 'x-circle', t: 'Sin potencial' },
   ];
   const scoreLevel = (s) => SCORE_LEVELS.find((l) => s >= l.min);
 
@@ -398,11 +398,11 @@
   // Filtros de la bitácora.
   const FILTERS = [
     { k: 'todos', t: 'Todos', test: () => true },
-    { k: 'alto', t: 'Alto potencial', icon: '🔥', test: (p) => score(p) >= 7 },
-    { k: 'poco', t: 'Poco competidos', icon: '🟢', test: (p) => { const c = competition(p.sales7); return !!c && c.tone === 'g'; } },
-    { k: 'testeo', t: 'En testeo', icon: '🧪', test: (p) => p.status === 'testeo' },
-    { k: 'ganador', t: 'Ganadores', icon: '🏆', test: (p) => p.status === 'ganador' },
-    { k: 'activo', t: 'Activos', icon: '🚀', test: (p) => p.status === 'activo' },
+    { k: 'alto', t: 'Alto potencial', icon: 'flame', test: (p) => score(p) >= 7 },
+    { k: 'poco', t: 'Poco competidos', icon: 'dot', tone: 'g', test: (p) => { const c = competition(p.sales7); return !!c && c.tone === 'g'; } },
+    { k: 'testeo', t: 'En testeo', icon: 'flask', test: (p) => p.status === 'testeo' },
+    { k: 'ganador', t: 'Ganadores', icon: 'trophy', test: (p) => p.status === 'ganador' },
+    { k: 'activo', t: 'Activos', icon: 'rocket', test: (p) => p.status === 'activo' },
   ];
 
   // Lista filtrada, buscada y ordenada. sort: 'score-desc' | 'score-asc' | 'comp-asc' | 'comp-desc' | null.
@@ -425,7 +425,7 @@
     const winners = products.filter((p) => p.status === 'ganador').length;
     const byStatus = STATUS.map((s) => ({ t: s.t, icon: s.icon, tone: s.tone, n: products.filter((p) => p.status === s.k).length }));
     const noStatus = products.filter((p) => !p.status).length;
-    if (noStatus) byStatus.push({ t: 'Sin estado', icon: '⚪', tone: 'n', n: noStatus });
+    if (noStatus) byStatus.push({ t: 'Sin estado', icon: 'dot', tone: 'n', n: noStatus });
     const mk = {};
     products.forEach((p) => { if (p.market) mk[p.market] = (mk[p.market] || 0) + 1; });
     return {
@@ -436,7 +436,7 @@
       byScore: SCORE_LEVELS.map((l) => ({ icon: l.icon, t: `${l.t} (${l.min === 0 ? '0–2' : l.min + '–' + (l.min === 7 ? 8 : l.min + 1)})`, tone: l.tone, n: scores.filter((s) => scoreLevel(s).k === l.k).length })).filter((x) => x.n),
       byStatus: byStatus.filter((s) => s.n),
       byMarket: Object.entries(mk).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([k, c]) => ({ code: k, t: (COUNTRIES.find((x) => x.k === k) || { t: k }).t, n: c, tone: 'b' })),
-      byComp: [['g', 'Poco competido', '🟢'], ['y', 'Casi no se mueve', '🟡'], ['r', 'Masificado', '🔴']]
+      byComp: [['g', 'Poco competido', 'dot'], ['y', 'Casi no se mueve', 'dot'], ['r', 'Masificado', 'dot']] // la ui pinta icons.dot(tone)
         .map(([tone, t, icon]) => ({ t, tone, icon, n: products.filter((p) => { const c = competition(p.sales7); return c && c.tone === tone; }).length }))
         .filter((c) => c.n),
     };

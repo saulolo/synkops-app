@@ -10,6 +10,8 @@ var $ = function(s, r){ return (r || document).querySelector(s); };
 var $$ = function(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
 var fmt = function(n){ return (typeof n === "number" && isFinite(n)) ? Math.round(n).toLocaleString("es-CO") : "—"; };
 var money = function(n){ return (typeof n === "number" && isFinite(n)) ? "$" + fmt(n) : "—"; };
+// Ícono del set propio (SPEC 24) como HTML, para los marcadores al inicio de las notas (toma el color de la nota).
+var ic = function(name){ return '<span class="ic" aria-hidden="true">' + PYL.ui.icons.svg(name, 14) + '</span>'; };
 var val = function(id){ var el = document.getElementById(id); var v = parseFloat(el ? el.value : ""); return isNaN(v) ? 0 : v; };
 var store = {
   get: function(k, d){ try { var v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch(e){ return d; } },
@@ -392,21 +394,21 @@ function runPanel(){
   var venianBien = cpaPrev <= S.tope, ayerPeor = cpaDay[2] > cpaPrev;
 
   if(v[2] === 0 && pi3 === 0 && g[2] >= 2 * S.apaga){
-    cls = "nr"; txt = "🛑 <b>APAGA.</b> Ayer: cero ventas, cero pagos iniciados y " + money(g[2]) + " gastados, el doble de la zona de apagar (" + money(2 * S.apaga) + ").";
+    cls = "nr"; txt = ic("stop") + "<b>APAGA.</b> Ayer: cero ventas, cero pagos iniciados y " + money(g[2]) + " gastados, el doble de la zona de apagar (" + money(2 * S.apaga) + ").";
   } else if(cpaDay[1] > S.apaga && cpaDay[2] > S.apaga){
-    cls = "nr"; txt = "🛑 <b>APAGA.</b> Regla dura: dos días seguidos por encima de la zona de apagar (anteayer " + money(cpaDay[1]) + ", ayer " + money(cpaDay[2]) + ").";
+    cls = "nr"; txt = ic("stop") + "<b>APAGA.</b> Regla dura: dos días seguidos por encima de la zona de apagar (anteayer " + money(cpaDay[1]) + ", ayer " + money(cpaDay[2]) + ").";
   } else if(venianBien && ayerPeor && pct !== null && pct >= 50){
     cls = "ny"; txt = "↓ <b>BAJA UN ESCALÓN" + (down ? " a " + money(down) : "") + ".</b> Venían bien (" + money(cpaPrev) + ") y ayer fue " + Math.round(pct) + "% más caro: se devuelve el 20%.";
   } else if(venianBien && ayerPeor && cpaWin >= S.escala){
     cls = "ny"; txt = "= <b>SOSTÉN " + money(cur) + ".</b> Ayer fue " + (pct !== null ? Math.round(pct) + "% " : "") + "más caro, menos del 50%: fue un día flojo.";
   } else if(cpaWin < S.escala){
-    cls = "ng"; txt = "🚀 <b>SUBE UN ESCALÓN: " + money(up) + ".</b> CPA de la ventana " + money(cpaWin) + ", por debajo de la zona de escala (" + money(S.escala) + ")." + (venianBien && ayerPeor ? " Ojo: ayer fue algo más caro, pero menos del 50%." : "");
+    cls = "ng"; txt = ic("rocket") + "<b>SUBE UN ESCALÓN: " + money(up) + ".</b> CPA de la ventana " + money(cpaWin) + ", por debajo de la zona de escala (" + money(S.escala) + ")." + (venianBien && ayerPeor ? " Ojo: ayer fue algo más caro, pero menos del 50%." : "");
   } else if(cpaWin <= S.tope){
     cls = "ny"; txt = "= <b>SOSTÉN " + money(cur) + ".</b> CPA de la ventana " + money(cpaWin) + ", entre la zona de escala y el tope (" + money(S.tope) + ").";
   } else if(cpaWin <= S.apaga){
     cls = "ny"; txt = "↓ <b>BAJA UN ESCALÓN" + (down ? " a " + money(down) : " (ya estoy en el escalón base)") + ".</b> CPA de la ventana " + money(cpaWin) + ", por encima del tope (" + money(S.tope) + ").";
   } else {
-    cls = "nr"; txt = "⚠️ <b>ZONA DE APAGAR.</b> CPA de la ventana " + money(cpaWin) + ". Nada se apaga por un solo día: baja un escalón" + (down ? " (" + money(down) + ")" : "") + " y si mañana vuelve a quedar en zona de apagar, son dos días seguidos y se apaga.";
+    cls = "nr"; txt = ic("alert") + "<b>ZONA DE APAGAR.</b> CPA de la ventana " + money(cpaWin) + ". Nada se apaga por un solo día: baja un escalón" + (down ? " (" + money(down) + ")" : "") + " y si mañana vuelve a quedar en zona de apagar, son dos días seguidos y se apaga.";
   }
   $("#lOut").className = "note mt " + cls; $("#lOut").innerHTML = txt;
   $("#lKpis").innerHTML =
@@ -418,8 +420,8 @@ function runPanel(){
 ["l-nivel","l-g1","l-v1","l-g2","l-v2","l-g3","l-v3","l-pi3"].forEach(function(id){ $("#" + id).addEventListener("input", runPanel); $("#" + id).addEventListener("change", runPanel); });
 
 var WIZ = [
-  { q: "Ayer: ¿cero ventas, cero pagos iniciados y gastó el doble de la zona de apagar ({2A})?", yes: { c: "nr", t: "🛑 <b>APAGA.</b> Es la única excepción en la que se apaga por un solo día." }, no: 1 },
-  { q: "¿Es el segundo día seguido con CPA por encima de la zona de apagar ({A})?", yes: { c: "nr", t: "🛑 <b>APAGA.</b> Regla dura: dos días seguidos en zona de apagar." }, no: 2 },
+  { q: "Ayer: ¿cero ventas, cero pagos iniciados y gastó el doble de la zona de apagar ({2A})?", yes: { c: "nr", t: ic("stop") + "<b>APAGA.</b> Es la única excepción en la que se apaga por un solo día." }, no: 1 },
+  { q: "¿Es el segundo día seguido con CPA por encima de la zona de apagar ({A})?", yes: { c: "nr", t: ic("stop") + "<b>APAGA.</b> Regla dura: dos días seguidos en zona de apagar." }, no: 2 },
   { q: "¿Venías bien y ayer fue 50% o más caro que los días anteriores?", yes: { c: "ny", t: "↓ <b>BAJA UN ESCALÓN:</b> se devuelve el 20%. No apagues." }, no: 3 },
   { q: "¿El CPA de la ventana de 3 días está por encima del tope ({T})?", yes: { c: "ny", t: "↓ <b>BAJA UN ESCALÓN (−20%).</b> Está por encima del tope, pero no son dos días seguidos en zona de apagar." }, no: { c: "ng", t: "= <b>SOSTÉN.</b> Fue un día flojo, no la tendencia. Recorre la cadena: si el CPM subió por encima del máximo, toca creativos nuevos con el gancho en los primeros tres segundos." } }
 ];
@@ -463,9 +465,9 @@ function renderKanban(){
     list.forEach(function(c){
       var days = Math.floor((Date.now() - c.d) / 86400000);
       html += '<div class="kc"><div>' + c.t.replace(/</g, "&lt;") + '</div><div class="meta">' + (days === 0 ? "Hoy" : "Hace " + days + " día" + (days === 1 ? "" : "s")) + (st.k === "win" && days >= 7 ? ' · <span style="color:var(--y-ink)">prepara el reemplazo</span>' : "") + '</div><div class="acts">' +
-        (si > 0 ? '<button data-mv="-1" data-id="' + c.id + '" aria-label="Mover atrás"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>' : "") +
-        (si < STAGES.length - 1 ? '<button data-mv="1" data-id="' + c.id + '" aria-label="Mover adelante"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>' : "") +
-        '<button class="del" data-del="' + c.id + '" aria-label="Eliminar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></div></div>';
+        (si > 0 ? '<button data-mv="-1" data-id="' + c.id + '" aria-label="Mover atrás">' + PYL.ui.icons.svg('chevron-left', 15) + '</button>' : "") +
+        (si < STAGES.length - 1 ? '<button data-mv="1" data-id="' + c.id + '" aria-label="Mover adelante">' + PYL.ui.icons.svg('chevron-right', 15) + '</button>' : "") +
+        '<button class="del" data-del="' + c.id + '" aria-label="Eliminar">' + PYL.ui.icons.svg('trash', 14) + '</button></div></div>';
     });
     if(!list.length){ html += '<div class="small" style="padding:6px 2px">Vacío</div>'; }
     html += '</div>';

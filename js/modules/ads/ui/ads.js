@@ -7,6 +7,9 @@
   const L = PYL.ui.landing;
   const { button, out, valRow, input, seg } = L;
   const fmt = (v) => PYL.core.format.fmt(v, 'cop');
+  // Etiqueta con ícono del set propio (SPEC 24).
+  const maK = (icon, text) => { const s = el('span', 'ma-k'); s.append(PYL.ui.icons.el(icon, 14), text); return s; };
+  const video = (text, tag = 'small') => { const s = el(tag); s.append(PYL.ui.icons.el('clapper', 13), text); return s; };
 
   // ---------- Mapa de la campaña ----------
   // Solo informativo: se dibuja el conjunto 1 con su anuncio; los otros son copias, y el bloque "Duplico" muestra cuáles ya hice.
@@ -16,14 +19,15 @@
     const box = (cls, kids) => { const d = el('div', 'ma-node ' + cls); d.append(...kids); return d; };
     const name = out('cname', 'ma-name');
     const camp = el('div', 'ma-camp-w');
-    const cp = L.copyFeedback(button('btn ghost sm ld-copy ma-camp-copy', '📋 Copiar'), () => name.textContent, 'Nombre de la campaña', onCopy, '✓ Copiado');
-    camp.append(box('ma-camp', [el('span', 'ma-k', '📁 Campaña'), name, el('small', null, 'Ventas · Subasta · ABO')]), cp);
+    const cpb = button('btn ghost sm ld-copy ma-camp-copy', 'Copiar'); cpb.prepend(PYL.ui.icons.el('clipboard', 14, 'ic-solo'));
+    const cp = L.copyFeedback(cpb, () => name.textContent, 'Nombre de la campaña', onCopy, '✓ Copiado');
+    camp.append(box('ma-camp', [maK('folder', 'Campaña'), name, el('small', null, 'Ventas · Subasta · ABO')]), cp);
 
     const sets = el('div', 'ma-sets');
     const col = el('div', 'ma-col ma-stack');
     col.append(
       box('ma-set', [el('span', 'ma-k', '▦ Conjunto 1'), el('small', null, `${fmt(A.daily)} al día`)]),
-      box('ma-ad', [el('span', 'ma-k', '▭ Anuncio 1'), el('small', null, '🎬 Video 1')]),
+      box('ma-ad', [el('span', 'ma-k', '▭ Anuncio 1'), video('Video 1')]),
     );
     const n = A.sets - 1, made = Object.values(copies).filter(Boolean).length;
     const dup = box('ma-dupbox', [
@@ -84,7 +88,7 @@
       for (let n = 1; n <= A.sets; n++) {
         const ok = n === 1 || st.done['dup.s' + n];
         const c = el('div', 'ma-card' + (ok ? ' ok' : ''));
-        c.append(el('b', null, ok ? '✓' : String(n)), el('span', null, `Conjunto ${n}`), el('span', null, `Anuncio ${n}`), el('span', null, `🎬 Video ${n}`));
+        c.append(el('b', null, ok ? '✓' : String(n)), el('span', null, `Conjunto ${n}`), el('span', null, `Anuncio ${n}`), video(`Video ${n}`, 'span'));
         g.append(c);
       }
       w.append(g);
@@ -123,7 +127,8 @@
   function soon(node, s, ready, onPick) {
     node.textContent = '';
     const w = el('div', 'ma-soon');
-    w.append(el('span', 'ma-soon-ic', s.icon), el('span', 'tag tn', 'Pronto'), el('h3', 'st-h mt-s', s.h), el('p', 'muted', s.d));
+    const sic = el('span', 'ma-soon-ic'); sic.append(PYL.ui.icons.el(s.icon, 26, 'ic-solo'));
+    w.append(sic, el('span', 'tag tn', 'Pronto'), el('h3', 'st-h mt-s', s.h), el('p', 'muted', s.d));
     w.append(seg('p', 'small', ['Cuando documente sus pasos, quedan aquí con el mismo formato: mapa, casillas y ', { b: 'qué pongo en cada campo' }, '.']));
     if (ready) w.append(button('btn sm mt-s', `Ver el paso a paso ${ready.k.toUpperCase()} →`, () => onPick(ready.k)));
     node.append(w);

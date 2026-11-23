@@ -12,19 +12,8 @@
     tasks: 'Anota tu primera tarea',
   };
 
-  // Íconos del embudo: líneas de un solo color (el acento del tema) en lugar de los emojis de STATUS.
-  const ICONS = {
-    evaluando: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
-    testeo: '<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3M7.5 14h9"/>',
-    activo: '<path d="M12 15l-3-3a22 22 0 0 1 2-4 12 12 0 0 1 11-5c0 3-1 8-5 12a22 22 0 0 1-4 2zM9 12H4s.5-3 2-4c1.5-1 5-.5 5-.5M12 15v5s3-.5 4-2c1-1.5.5-5 .5-5"/>',
-    ganador: '<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/>',
-  };
-  const icon = (k) => {
-    const s = el('span', 'ix-ico');
-    s.setAttribute('aria-hidden', 'true');
-    s.innerHTML = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">${ICONS[k] || ''}</svg>`; // constante propia, sin datos del usuario
-    return s;
-  };
+  // Íconos del embudo: el nombre viene de STATUS (core.search) y se pinta con el set propio (SPEC 24).
+  const icon = (name) => PYL.ui.icons.el(name || '', 15, 'ix-ico ic-solo');
 
   const el = (tag, cls, text) => PYL.ui.dom.el(tag, cls, text);
   const fmt = (v, k) => PYL.core.format.fmt(v, k);
@@ -73,7 +62,7 @@
       row.dataset.k = r.k;
       row.dataset.tone = FUNNEL_TONE[r.k] || 'b';
       const name = el('span', 'ix-row-t');
-      name.append(icon(r.k), r.t);
+      name.append(icon(r.icon), r.t);
       row.append(name, track(r.pct / 100, FUNNEL_TONE[r.k] || 'b'), num('ix-strong ix-row-n', r.n, 'int'));
       rows.append(row);
     }

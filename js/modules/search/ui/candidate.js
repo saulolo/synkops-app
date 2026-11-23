@@ -12,6 +12,10 @@
   const COLOR = { g: '#22C55E', y: '#FBBF24', o: '#F97316', r: '#EF4444', b: '#818CF8', n: '#64748B' };
   const tag = (tone, text) => el('span', 'tag ' + (TAG[tone] || 'tn'), text);
   const dash = () => el('span', 'soft', '—');
+  // Íconos del set propio (SPEC 24): 'dot' = punto de semáforo con su tono; el resto, ícono dorado.
+  const ic = (name, tone, cls) => (name === 'dot' ? PYL.ui.icons.dot(tone) : PYL.ui.icons.el(name, 14, cls));
+  const icTag = (tone, icon, text) => { const t = tag(tone, ''); if (icon) t.append(ic(icon, tone)); t.append(text); return t; };
+  const head = ([icon, text]) => { const h = el('h3'); h.append(PYL.ui.icons.el(icon, 16), text); return h; }; // título de gráfica con ícono
 
   // ---------- Formulario ----------
   const group = (title, hint) => {
@@ -38,18 +42,17 @@
 
   // Botón para copiar un valor (nombre, ID Dropi) sin tener que seleccionarlo.
   // get() devuelve el texto al momento del clic; cls = variante ('inline' en la bitácora).
-  const ICON_COPY = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
-  const ICON_OK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-11"/></svg>';
+  const ICON_COPY = () => PYL.ui.icons.svg('copy', 16), ICON_OK = () => PYL.ui.icons.svg('check', 16); // set propio (SPEC 24)
   function copyBtn(get, label, cls) {
     const b = el('button', 'cd-copy' + (cls ? ' ' + cls : '')); b.type = 'button';
-    b.title = 'Copiar ' + label.toLowerCase(); b.setAttribute('aria-label', b.title); b.innerHTML = ICON_COPY;
+    b.title = 'Copiar ' + label.toLowerCase(); b.setAttribute('aria-label', b.title); b.innerHTML = ICON_COPY();
     const tip = el('span', 'cd-copy-tip'); b.append(tip);
     let t;
     b.addEventListener('click', async () => {
       const v = String(get() || '').trim(), ok = v && (await copy(v));
-      b.classList.toggle('ok', !!ok); b.innerHTML = ok ? ICON_OK : ICON_COPY; b.append(tip);
+      b.classList.toggle('ok', !!ok); b.innerHTML = ok ? ICON_OK() : ICON_COPY(); b.append(tip);
       tip.textContent = !v ? 'Vacío' : ok ? '¡Copiado!' : 'No se pudo copiar'; b.classList.add('show');
-      clearTimeout(t); t = setTimeout(() => { b.classList.remove('show', 'ok'); b.innerHTML = ICON_COPY; b.append(tip); }, 1400);
+      clearTimeout(t); t = setTimeout(() => { b.classList.remove('show', 'ok'); b.innerHTML = ICON_COPY(); b.append(tip); }, 1400);
     });
     return b;
   }
@@ -62,7 +65,7 @@
       const b = el('button', 'cd-chip' + (it.tone ? ' t-' + it.tone : ''));
       b.type = 'button'; b.dataset.v = String(it.k); b.setAttribute('aria-pressed', 'false');
       if (it.n != null) b.append(el('b', null, String(it.n)));
-      if (it.icon) b.append(el('span', 'cd-ic', it.icon));
+      if (it.icon) b.append(ic(it.icon, it.tone, 'cd-ic'));
       b.append(el('span', null, it.t));
       row.append(b);
     });
@@ -240,7 +243,7 @@
   function filters(node, items, active, onPick) {
     node.textContent = '';
     items.forEach((f) => {
-      const b = el('button', 'cd-filter', (f.icon ? f.icon + ' ' : '') + f.t); b.type = 'button';
+      const b = el('button', 'cd-filter'); if (f.icon) b.append(ic(f.icon, f.tone)); b.append(f.t); b.type = 'button';
       b.setAttribute('aria-pressed', String(f.k === active));
       b.addEventListener('click', () => onPick(f.k)); node.append(b);
     });
@@ -248,9 +251,9 @@
 
   function counts(node, st, poco) {
     node.textContent = '';
-    const c = (icon, l, v, cls) => { const s = el('span', 'cd-count ' + (cls || '')); s.title = l; s.append(icon + ' ', el('b', null, String(v))); return s; };
+    const c = (icon, l, v, cls) => { const s = el('span', 'cd-count ' + (cls || '')); s.title = l; s.append(ic(icon, cls), el('b', null, String(v))); return s; };
     const total = el('span', 'cd-count'); total.append('Total ', el('b', null, String(st.total)));
-    node.append(total, c('🔥', 'Alto potencial', st.high, 'o'), c('🟢', 'Poco competidos', poco, 'g'), c('🏆', 'Ganadores', st.winners, 'y'));
+    node.append(total, c('flame', 'Alto potencial', st.high, 'o'), c('dot', 'Poco competidos', poco, 'g'), c('trophy', 'Ganadores', st.winners, 'y'));
   }
 
   const ago = (id) => {
@@ -260,12 +263,6 @@
     const x = new Date(t); return `${x.getDate()} ${['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'][x.getMonth()]}`;
   };
 
-  // Íconos fijos (lápiz y papelera); trazo con currentColor para que tomen el color del botón.
-  const svg = (d) => `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
-  const ICON = {
-    edit: svg('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>'),
-    del: svg('<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/>'),
-  };
   function iconBtn(cls, icon, label, onClick) {
     const b = el('button', cls); b.type = 'button'; b.title = label; b.setAttribute('aria-label', label);
     b.innerHTML = icon; b.addEventListener('click', onClick);
@@ -293,7 +290,7 @@
       const p = r.p, tr = el('tr', 'cd-tr' + (p.id === editingId ? ' editing' : '') + (p.status === 'ganador' ? ' win' : p.status === 'activo' ? ' act' : ''));
 
       const ph = el('td');
-      if (p.photo) { const im = el('img', 'cd-thumb'); im.src = p.photo; im.alt = ''; ph.append(im); } else ph.append(el('span', 'cd-thumb cd-thumb-empty', '📦'));
+      if (p.photo) { const im = el('img', 'cd-thumb'); im.src = p.photo; im.alt = ''; ph.append(im); } else { const e = el('span', 'cd-thumb cd-thumb-empty'); e.append(PYL.ui.icons.el('package', 18, 'ic-solo')); ph.append(e); }
       const sup = (p.suppliers || []).filter((s) => s.name).map((s) => s.name);
       // Nombre e ID Dropi con su botón de copiar al lado.
       const pn = el('td'), nl = el('div', 'cd-pline'), ml = el('small', 'cd-pmeta cd-pline');
@@ -303,22 +300,22 @@
       const rest = [p.market, sup.length ? sup[0] + (sup.length > 1 ? ` +${sup.length - 1}` : '') : '', ago(p.id)].filter(Boolean).join(' · ');
       if (rest) ml.append(el('span', 'cd-prest', (p.dropi ? '· ' : '') + rest));
       pn.append(nl, ml);
-      const st = el('td'); st.append(r.status ? tag(r.status.tone, `${r.status.icon} ${r.status.t}`) : dash());
+      const st = el('td'); st.append(r.status ? icTag(r.status.tone, r.status.icon, r.status.t) : dash());
       const pr = el('td');
       if (r.util) {
         if (r.util.costo) pr.append(el('small', 'cd-pmeta', 'Prov: ' + money(r.util.costo)));
         if (r.util.complete) { const v = el('div', 'cd-price'); v.append(money(r.util.venta), ' ', tag(r.ml.tone, `${money(r.util.utilidad)} (${pct(r.util.margen)})`)); pr.append(v); }
         else if (r.util.venta) pr.append(el('div', 'cd-price', money(r.util.venta)));
       } else pr.append(dash());
-      const msp = el('td'); msp.append(r.msp ? tag(r.msp.k === 'alto' ? 'g' : r.msp.k === 'medio' ? 'y' : 'n', `${r.msp.icon} ${r.msp.t}`) : dash());
+      const msp = el('td'); msp.append(r.msp ? icTag(r.msp.k === 'alto' ? 'g' : r.msp.k === 'medio' ? 'y' : 'n', r.msp.icon, r.msp.t) : dash());
       const cp = el('td');
       if (r.comp) { cp.append(tag(r.comp.tone, r.comp.t), el('small', 'cd-pmeta', `${nf(Number(p.sales7))} ventas`)); } else cp.append(dash());
       const va = el('td'); if ((p.validated || []).length) { const f = el('span', 'cd-flags'); p.validated.forEach((c) => f.append(el('span', null, c))); va.append(f); } else va.append(dash());
       const sc = el('td'); sc.append(el('span', 'cd-badge t-' + r.level.tone, `${r.score}/8`));
       // Acciones de la fila como íconos: Editar (lo carga en Mi candidato) y Eliminar.
       const ac = el('td'), acts = el('div', 'cd-acts'), name = p.name || 'este producto';
-      acts.append(iconBtn('cd-act edit', ICON.edit, `Editar ${name} en Mi candidato`, () => on.open(p.id)),
-        iconBtn('cd-act del', ICON.del, `Eliminar ${name} de la bitácora`, () => on.del(p.id)));
+      acts.append(iconBtn('cd-act edit', PYL.ui.icons.svg('edit', 16), `Editar ${name} en Mi candidato`, () => on.open(p.id)),
+        iconBtn('cd-act del', PYL.ui.icons.svg('trash', 16), `Eliminar ${name} de la bitácora`, () => on.del(p.id)));
       ac.append(acts);
       tr.append(ph, pn, st, pr, msp, cp, va, sc, ac);
       tb.append(tr);
@@ -328,7 +325,7 @@
 
   // ---------- Estadísticas ----------
   function donut(title, data, total) {
-    const c = el('div', 'card cd-chart'); c.append(el('h3', null, title));
+    const c = el('div', 'card cd-chart'); c.append(head(title));
     if (!total || !data.length) { c.append(el('p', 'muted', 'Sin datos aún.')); return c; }
     let acc = 0;
     const stops = data.map((d) => { const a = acc; acc += (d.n / total) * 100; return `${COLOR[d.tone] || 'var(--b)'} ${a.toFixed(1)}% ${acc.toFixed(1)}%`; });
@@ -338,14 +335,15 @@
     const leg = el('div', 'cd-leg');
     data.forEach((d) => {
       const r = el('div', 'cd-leg-row'); r.style.setProperty('--c', COLOR[d.tone]);
-      r.append(el('i'), el('span', 'cd-leg-t', (d.icon ? d.icon + ' ' : '') + d.t), el('b', null, String(d.n)), el('small', null, pct(d.n / total)));
+      const lt = el('span', 'cd-leg-t'); if (d.icon) lt.append(ic(d.icon, d.tone)); lt.append(d.t);
+      r.append(el('i'), lt, el('b', null, String(d.n)), el('small', null, pct(d.n / total)));
       leg.append(r);
     });
     w.append(ring, leg); c.append(w); return c;
   }
 
   function bars(title, data) {
-    const c = el('div', 'card cd-chart'); c.append(el('h3', null, title));
+    const c = el('div', 'card cd-chart'); c.append(head(title));
     if (!data.length) { c.append(el('p', 'muted', 'Sin datos aún.')); return c; }
     const max = Math.max(...data.map((d) => d.n), 1);
     data.forEach((d) => {
@@ -353,7 +351,7 @@
       r.style.setProperty('--c', COLOR[d.tone] || COLOR.b);
       f.style.width = Math.max(4, (d.n / max) * 100) + '%';
       const lb = el('span', 'cd-bar-l');
-      if (d.code) lb.append(el('span', 'cd-code', d.code), ' ' + d.t); else lb.textContent = (d.icon ? d.icon + ' ' : '') + d.t;
+      if (d.code) lb.append(el('span', 'cd-code', d.code), ' ' + d.t); else { if (d.icon) lb.append(ic(d.icon, d.tone)); lb.append(d.t); }
       tr.append(f); r.append(lb, tr, el('b', null, String(d.n))); c.append(r);
     });
     return c;
@@ -364,17 +362,17 @@
     const k = el('div', 'cd-kpis');
     const kpi = (icon, l, v, s, tone) => {
       const d = el('div', 'cd-kpi'); d.style.setProperty('--c', COLOR[tone]);
-      const h = el('div', 'cd-kpi-l'); h.append(el('span', 'cd-kpi-ic', icon), l);
+      const h = el('div', 'cd-kpi-l'); const ki = el('span', 'cd-kpi-ic'); ki.append(PYL.ui.icons.el(icon, 16, 'ic-solo')); h.append(ki, l);
       d.append(h, el('div', 'cd-kpi-v', v), el('div', 'cd-kpi-s', s)); return d;
     };
     const u = st.avgUtil;
-    k.append(kpi('📦', 'Productos evaluados', String(st.total), `${st.high} con alto potencial`, 'b'),
-      kpi('🔥', 'Tasa de alto potencial', st.highRate == null ? '—' : pct(st.highRate), 'Score de 7 o más', 'o'),
-      kpi('💵', 'Utilidad neta promedio', money(u), `${st.withCost} con cálculo completo`, u != null && u < 0 ? 'r' : 'g'),
-      kpi('🏆', 'Ganadores', String(st.winners), `${st.winnersRate == null ? '0%' : pct(st.winnersRate)} del total`, 'y'));
+    k.append(kpi('package', 'Productos evaluados', String(st.total), `${st.high} con alto potencial`, 'b'),
+      kpi('flame', 'Tasa de alto potencial', st.highRate == null ? '—' : pct(st.highRate), 'Score de 7 o más', 'o'),
+      kpi('cash', 'Utilidad neta promedio', money(u), `${st.withCost} con cálculo completo`, u != null && u < 0 ? 'r' : 'g'),
+      kpi('trophy', 'Ganadores', String(st.winners), `${st.winnersRate == null ? '0%' : pct(st.winnersRate)} del total`, 'y'));
     const g = el('div', 'cd-charts mt');
-    g.append(donut('🎯 Distribución por score', st.byScore, st.total), donut('📌 Distribución por estado', st.byStatus, st.total),
-      bars('🌎 Top mercados', st.byMarket), bars('⚔️ Nivel de competencia', st.byComp));
+    g.append(donut(['target', 'Distribución por score'], st.byScore, st.total), donut(['pin', 'Distribución por estado'], st.byStatus, st.total),
+      bars(['globe', 'Top mercados'], st.byMarket), bars(['swords', 'Nivel de competencia'], st.byComp));
     node.append(k, g);
   }
 

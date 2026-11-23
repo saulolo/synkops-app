@@ -193,6 +193,44 @@ details.acc .bd{padding:0 0 16px;color:var(--muted);font-size:14px}
 /* Enlace dentro de un texto con segmentos ({ a, href } en js/shared/ui/dom.js#rich). */
 .lnk{color:var(--b-ink);font-weight:800;text-decoration:underline;text-underline-offset:3px}
 .lnk:hover{color:var(--b)}
+
+/* ---------- Íconos propios (SPEC 24, js/shared/ui/icons.js) ----------
+   Dorado fijo (no sigue --b) con brillo tenue; el tema claro lo oscurece en themes.css. */
+:root{--ic-gold:#D4AF37}
+.ic{display:inline-flex;align-items:center;justify-content:center;flex:none;vertical-align:-.15em;color:var(--ic-gold);filter:drop-shadow(0 0 2px rgba(212,175,55,.35));transition:filter .2s}
+.ic{margin-inline-end:.4em}
+.ic.ic-solo{margin:0} /* ícono solo o dentro de un contenedor que ya pone gap */
+:where(button,a,summary,label,[role="button"]):is(:hover,:focus-visible) .ic{filter:drop-shadow(0 0 4px rgba(212,175,55,.65))}
+.ic-svg{display:block;overflow:visible}
+/* Dentro de botones de color y notas semánticas el ícono toma el color del contenedor (contraste y significado). */
+.btn:not(.ghost) .ic,.btn-report .ic,.qk-btn .ic,.dk-btn .ic,.ap-btn .ic,.cd-act.del .ic,.ts-go .ic,
+.note.ny .ic,.note.nr .ic,.note.ng .ic,.hm-warn .ic{color:inherit;filter:none}
+/* Semáforo: punto de color semántico, nunca dorado. */
+.ic-dot{display:inline-block;flex:none;width:8px;height:8px;border-radius:50%;vertical-align:.05em;background:var(--muted)}
+.ic-dot[data-tone="g"]{background:var(--g)}
+.ic-dot[data-tone="y"]{background:var(--y)}
+.ic-dot[data-tone="r"]{background:var(--r)}
+/* Dibujos de dos tonos (movidos de logistics.css): relleno suave y partes que se animan al pasar el mouse por el botón. */
+.ic-fill{fill:currentColor;fill-opacity:.2}
+.ic-a,.ic-b,.ic-d{transform-box:fill-box;transform-origin:center;transition:transform .28s cubic-bezier(.3,1.6,.5,1),opacity .2s}
+.ic-sweep{transform-box:view-box;transform-origin:20px 4px}
+.ic-d{opacity:0}
+.ic-d2{transition-delay:.08s}
+@keyframes ic-bob{0%,100%{transform:translateY(-.5px)}50%{transform:translateY(2.4px)}}
+@keyframes ic-sweep{0%,100%{transform:rotate(0)}50%{transform:rotate(-17deg)}}
+@keyframes ic-pulse{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.16) rotate(12deg)}}
+@keyframes ic-twinkle{0%{transform:scale(.55);opacity:.5}100%{transform:scale(1.25);opacity:1}}
+@keyframes ic-dust{0%{transform:translate(0,0);opacity:0}40%{opacity:1}100%{transform:translate(-2px,2px);opacity:0}}
+:where(button,a,label,[role="button"]):hover .ic-download .ic-a{animation:ic-bob .7s ease-in-out infinite}
+:where(button,a,label,[role="button"]):hover .ic-broom .ic-a{animation:ic-sweep .55s ease-in-out infinite}
+:where(button,a,label,[role="button"]):hover .ic-broom .ic-d{animation:ic-dust .55s ease-out infinite}
+:where(button,a,label,[role="button"]):hover .ic-copy .ic-a{transform:translate(1.6px,1.6px)}
+:where(button,a,label,[role="button"]):hover .ic-copy .ic-b{transform:translate(-1.4px,-1.4px)}
+:where(button,a,label,[role="button"]):hover .ic-sparkles .ic-a{animation:ic-pulse .9s ease-in-out infinite}
+:where(button,a,label,[role="button"]):hover .ic-sparkles .ic-b{animation:ic-twinkle .6s ease-in-out infinite alternate}
+:where(button,a,label,[role="button"]):hover .ic-sparkles .ic-d{opacity:1;animation:ic-twinkle .6s .2s ease-in-out infinite alternate}
+:where(button,a,label,[role="button"]):active .ic:has(.ic-download,.ic-broom,.ic-copy,.ic-sparkles){transform:scale(.88)}
+@media (prefers-reduced-motion:reduce){.ic,.ic *{animation:none!important;transition:none!important}}
 /* Alias de los tokens que usa el tablero P&L (css/modules/pnl.css, gráficas en js/modules/pnl/ui y report.css). */
 :root{
   --panel:var(--card); --panel-2:var(--bg-2); --fg:var(--ink); --faint:var(--soft);
