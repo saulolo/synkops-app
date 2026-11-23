@@ -100,14 +100,11 @@
 .tk-hour-edit{flex:none;width:22px;margin-top:1px;padding:1px 6px;border:0;outline:1px solid var(--b);border-radius:5px;background:var(--tk-track);
   color:var(--ink);font-family:inherit;font-size:11px;font-weight:600;line-height:16px;font-variant-numeric:tabular-nums;text-align:center}
 
-/* Chip de subtareas: chevron + «hechas/total», relleno según las hechas; todas hechas = chip en acento. */
-.tk-sub-toggle{flex:none;display:inline-flex;align-items:center;gap:3px;height:20px;padding:0 7px 0 5px;border:0;border-radius:999px;
-  background-color:var(--tk-soft);background-image:linear-gradient(rgba(var(--b-rgb),.22),rgba(var(--b-rgb),.22));
-  background-repeat:no-repeat;background-position:left center;background-size:var(--sub-progress,0%) 100%;
-  box-shadow:inset 0 0 0 1px var(--tk-hover);color:var(--muted);font-family:inherit;font-size:11px;font-weight:600;line-height:16px;
-  font-variant-numeric:tabular-nums;cursor:pointer;transition:background-color .15s,background-size .25s,box-shadow .15s,color .15s}
+/* Chevron de subtareas (sin contador): botón de ícono redondo; todas hechas = chevron en acento. */
+.tk-sub-toggle{flex:none;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;padding:0;border:0;border-radius:50%;
+  background:transparent;color:var(--muted);cursor:pointer;transition:background-color .15s,color .15s}
 .tk-sub-toggle:hover{background-color:var(--tk-hover);color:var(--ink)}
-.tk-sub-toggle.is-complete,.tk-sub-toggle.is-complete:hover{background-color:rgba(var(--b-rgb),.14);box-shadow:inset 0 0 0 1px rgba(var(--b-rgb),.45);color:var(--b)}
+.tk-sub-toggle.is-complete,.tk-sub-toggle.is-complete:hover{color:var(--b)}
 .tk-sub-toggle:focus-visible{outline:2px solid var(--b);outline-offset:2px}
 .tk-sub-toggle svg{transition:transform .15s}
 .tk-sub-toggle.is-collapsed svg{transform:rotate(-90deg)}
@@ -117,9 +114,6 @@
   background:linear-gradient(to right,transparent,var(--tk-acts-bg) 12px);opacity:0;pointer-events:none;transition:opacity .15s}
 .tk-sub-row .tk-acts{top:4px}
 .tk-row:hover .tk-acts,.tk-row:focus-within .tk-acts{opacity:1;pointer-events:auto}
-/* Chevron de la fila: abajo si están contraídas, arriba si se ven. */
-.tk-toggle-subs svg{transform:rotate(180deg);transition:transform .25s}
-.tk-toggle-subs.is-collapsed svg{transform:none}
 
 /* Subtareas (un solo nivel), con sangría y línea a la izquierda. */
 .tk-subs{display:flex;flex-direction:column;gap:1px;margin:0 0 4px 18px;padding-left:12px;border-left:1px solid var(--line)}
@@ -184,7 +178,7 @@
   .tk-rail .tk-kbd{display:none}
 }
 @media (prefers-reduced-motion:reduce){
-  .tk-ring-fill,.tk-bar-fill,.tk-row,.tk-sub-toggle,.tk-sub-toggle svg,.tk-toggle-subs svg{transition:none}
+  .tk-ring-fill,.tk-bar-fill,.tk-row,.tk-sub-toggle,.tk-sub-toggle svg{transition:none}
   .tk-task-row.has-subs:not(:has(input)):hover{transform:none}
   .tk-task,.tk-sub-row{transition:none!important} /* sin deslizamiento FLIP al arrastrar */
 }

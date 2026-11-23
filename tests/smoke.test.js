@@ -2913,25 +2913,31 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.ok(inp && D.activeElement === inp && inp.value === 'Sin sal', 'Doble clic edita la subtarea');
     inp.value = ' Baja en sal '; key(inp, 'Enter');
     assert.deepStrictEqual(subs(0), ['Integral', 'Baja en sal']);
-    // Chip 0/2 → 1/2 con relleno proporcional; todas hechas → chip completo.
-    assert.strictEqual(chip().textContent, '0/2');
+    // Chevron sin contador: «N de M hechas» solo en aria-label/title; todas hechas → .is-complete.
+    assert.ok(chip().textContent === '' && chip().querySelector('svg'), 'Chevron sin texto, solo el SVG');
+    assert.ok(!chip().hasAttribute('style') && chip().style.getPropertyValue('--sub-progress') === '', 'Chevron sin --sub-progress');
+    assert.ok(chip().getAttribute('aria-label').includes('0 de 2 hechas') && !chip().classList.contains('is-complete'), 'Chevron 0 de 2');
+    assert.ok(!$$('#tk-list .tk-toggle-subs').length, 'Sin chevron en las acciones flotantes');
+    assert.deepStrictEqual([...fila(0).querySelectorAll('.tk-task-row > .tk-acts > button')].map((b) => b.getAttribute('aria-label')), ['Añadir subtarea', 'Eliminar tarea'], 'Acciones flotantes: + subtarea y papelera');
     assert.ok(fila(0).querySelector('.tk-task-row').classList.contains('has-subs'), 'Con subtareas la fila es clicable');
     fila(0).querySelector('.tk-sub-row .tk-check').click();
-    assert.ok(chip().textContent === '1/2' && chip().style.getPropertyValue('--sub-progress') === '50%', 'Chip 1/2 relleno al 50 %');
+    assert.ok(chip().getAttribute('aria-label') === 'Contraer subtareas (1 de 2 hechas)' && chip().getAttribute('title') === 'Contraer subtareas (1 de 2 hechas)', 'aria-label y title: 1 de 2 hechas');
+    assert.ok(!chip().classList.contains('is-complete') && chip().textContent === '', 'Con 1 de 2 sin .is-complete ni texto');
     assert.ok(fila(0).querySelector('.tk-sub-row .tk-check').classList.contains('is-on') && fila(0).querySelector('.tk-sub-text').classList.contains('is-done'), 'Subtarea marcada y tachada');
     assert.ok(!fila(0).querySelector('.tk-task-row > .tk-check').classList.contains('is-on'), 'Marcar subtarea no marca la tarea');
     assert.strictEqual($('#tk-count').textContent, '1 de 4 hechas', 'El progreso cuenta tareas y subtareas');
     fila(0).querySelectorAll('.tk-sub-row .tk-check')[1].click();
-    assert.ok(chip().textContent === '2/2' && chip().classList.contains('is-complete'), 'Todas hechas: chip en acento');
+    assert.ok(chip().getAttribute('aria-label').includes('2 de 2 hechas') && chip().classList.contains('is-complete'), 'Todas hechas: chevron en acento');
     // Marcar la tarea no marca sus subtareas.
     fila(0).querySelectorAll('.tk-sub-row .tk-check')[1].click();
     fila(0).querySelector('.tk-task-row > .tk-check').click();
-    assert.strictEqual(chip().textContent, '1/2', 'Marcar la tarea no toca las subtareas');
-    // Chip y chevron alternan contraer/expandir.
+    assert.ok(chip().getAttribute('aria-label').includes('1 de 2 hechas'), 'Marcar la tarea no toca las subtareas');
+    // El chevron alterna contraer/expandir.
     chip().click();
-    assert.ok(!fila(0).querySelector('.tk-subs') && chip().classList.contains('is-collapsed') && chip().getAttribute('aria-expanded') === 'false', 'Chip contrae');
-    fila(0).querySelector('.tk-toggle-subs').click();
-    assert.ok(fila(0).querySelector('.tk-subs') && !chip().classList.contains('is-collapsed'), 'Chevron expande');
+    assert.ok(!fila(0).querySelector('.tk-subs') && chip().classList.contains('is-collapsed') && chip().getAttribute('aria-expanded') === 'false', 'Chevron contrae');
+    assert.ok(chip().getAttribute('aria-label').startsWith('Expandir subtareas'), 'Contraído dice Expandir');
+    chip().click();
+    assert.ok(fila(0).querySelector('.tk-subs') && !chip().classList.contains('is-collapsed') && chip().getAttribute('aria-expanded') === 'true', 'Chevron expande');
     // Clic simple en la fila: contrae tras 250 ms (temporizador simulado); doble clic lo cancela.
     const realSet = W.setTimeout, realClear = W.clearTimeout;
     let timers = [];
