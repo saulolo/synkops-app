@@ -150,7 +150,8 @@
         const b = el('button', 'b-win-c' + (on ? ' on' : ''));
         b.type = 'button'; b.setAttribute('aria-pressed', String(on));
         const head = el('div', 'b-win-h');
-        head.append(el('span', 'b-win-ic', x.icon), el('span', 'b-win-ck', on ? '✓' : ''));
+        const wic = el('span', 'b-win-ic'); wic.append(PYL.ui.icons.el(x.icon, 20, 'ic-solo'));
+        head.append(wic, el('span', 'b-win-ck', on ? '✓' : ''));
         b.append(head, el('b', 'b-win-t', x.t), seg('b-win-d', x.d));
         const foot = el('div', 'b-win-f');
         foot.append(el('span', null, on ? 'Lo cumple' : '¿Lo cumple? Toco aquí'));
@@ -234,7 +235,8 @@
       const b = el('button', 'st-tab' + (on ? ' on' : ''));
       b.type = 'button'; b.setAttribute('aria-pressed', String(on));
       const tx = el('span', 'st-tx'); tx.append(el('b', null, s.t), el('small', null, s.d));
-      b.append(el('span', 'st-ic', s.icon), tx);
+      const sic = el('span', 'st-ic'); sic.append(PYL.ui.icons.el(s.icon, 22, 'ic-solo'));
+      b.append(sic, tx);
       b.addEventListener('click', () => onSelect(s.k));
       node.append(b);
     });
@@ -251,7 +253,7 @@
       const li = el('li', 'ps-st' + (j === i ? ' on' : '') + (j < i ? ' past' : ''));
       const b = el('button', 'ps-node');
       b.type = 'button'; b.setAttribute('aria-pressed', String(j === i));
-      const ic = el('span', 'ps-ic', x.icon); ic.append(el('span', 'ps-n', String(j + 1)));
+      const ic = el('span', 'ps-ic'); ic.append(PYL.ui.icons.el(x.icon, 18, 'ic-solo'), el('span', 'ps-n', String(j + 1)));
       b.append(ic, el('b', null, x.t), el('small', 'ps-out', x.out));
       b.addEventListener('click', () => on.select(j));
       li.append(b); ol.append(li);
@@ -261,7 +263,8 @@
     const box = el('div', 'ps-det pop');
     const top = el('div', 'row between');
     top.append(el('span', 'tag tb', `Fase ${i + 1} de ${steps.length}`), el('span', 'small', s.where));
-    box.append(top, el('h3', 'mt-s fl-h', s.icon + ' ' + s.t), seg('fl-p', s.p));
+    const fh = el('h3', 'mt-s fl-h'); fh.append(PYL.ui.icons.el(s.icon, 18), s.t);
+    box.append(top, fh, seg('fl-p', s.p));
 
     if (s.k === 'filtrar') {
       const group = (title, list, ally) => {
@@ -294,7 +297,8 @@
       const ch = el('ol', 'ps-chain');
       s.chain.forEach((c, j) => {
         const li = el('li', 'ps-cs');
-        const h = el('div', 'ps-csh'); h.append(el('span', 'ps-ci', c.icon), el('small', null, 'Paso ' + (j + 1)));
+        const h = el('div', 'ps-csh'); const ci = el('span', 'ps-ci'); ci.append(PYL.ui.icons.el(c.icon, 16, 'ic-solo'));
+        h.append(ci, el('small', null, 'Paso ' + (j + 1)));
         li.append(h, el('b', null, c.t), seg('ps-cd', c.d));
         ch.append(li);
       });

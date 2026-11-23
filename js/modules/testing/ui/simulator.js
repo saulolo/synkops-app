@@ -5,10 +5,17 @@
   const PYL = globalThis.PYL;
   const { el, rich } = PYL.ui.dom;
   const T = PYL.ui.testing;
-  const { seg, stat, money, ICON, bar } = T;
+  const { seg, stat, money, ICON, bar, withIc } = T;
+  const IC = PYL.ui.icons;
+  const note = (text, icon) => withIc(el('div', 'note ny'), icon, text); // nota amarilla con su ícono (hereda el color de la nota)
+  // Botón de control: ícono + texto. Solo repinta si cambió (el bucle lo llama en cada tic).
+  const playLabel = (b, icon, text) => {
+    if (b.dataset.ic === icon && b.textContent === text) return;
+    b.dataset.ic = icon; b.textContent = ''; b.append(IC.el(icon, 14, 'ic-solo'), text);
+  };
   const copText = PYL.core.metrics.copText;
 
-  const MODES = [{ k: 'chain', t: '🔗 Cadena' }, { k: 'manual', t: '🎛️ Números a mano' }];
+  const MODES = [{ k: 'chain', icon: 'link', t: 'Cadena' }, { k: 'manual', icon: 'sliders', t: 'Números a mano' }];
 
   // Armazón del Simulador: título, línea de ayuda, selector de modos (#ts-sx-modes) y panel (#ts-sx-panel).
   // st = { mode }; on.mode(k) cambia de modo. El panel y el mapa los llena la app según el modo.
@@ -18,7 +25,7 @@
       el('p', 'muted', 'Configuro la cadena y veo qué decide el Lab en cada corte. Es para aprender: no es una campaña real.'));
     const modes = el('div', 'seg'); modes.id = 'ts-sx-modes'; modes.setAttribute('role', 'group'); modes.setAttribute('aria-label', 'Modo del simulador');
     for (const m of MODES) {
-      const b = el('button', null, m.t); b.type = 'button'; b.dataset.mode = m.k; b.setAttribute('aria-pressed', String(m.k === st.mode));
+      const b = withIc(el('button'), m.icon, m.t); b.type = 'button'; b.dataset.mode = m.k; b.setAttribute('aria-pressed', String(m.k === st.mode));
       b.addEventListener('click', () => on.mode(m.k));
       modes.append(b);
     }
@@ -32,7 +39,7 @@
     if (r.branch) card.dataset.branch = r.branch; // la rama del veredicto (las pruebas la leen de aquí)
     card.append(el('small', 'ts-ex-h', head || (r.cut ? 'Así lo califica el Lab de NovaSociety' : 'Todavía no hay corte')));
     const vr = el('p', 'ts-ex-v');
-    vr.append(el('span', null, (r.action ? ICON[r.action] : '⏳') + ' '), el('b', null, r.toca), el('span', null, ' · ' + r.veredicto));
+    vr.append(IC.el(r.action ? ICON[r.action] : 'hourglass', 15), el('b', null, r.toca), el('span', null, ' · ' + r.veredicto));
     card.append(vr, seg('p', 'small', r.detalle));
     if (r.cut) card.append(seg('p', 'small muted', ['Los números que deciden: ', ...r.senales]));
     return card;
@@ -95,8 +102,8 @@
     const out = node.querySelector('#ts-free-out');
     out.textContent = '';
     const r = v.verdict, st = el('div', 'ts-stats');
-    if (v.err) out.append(el('div', 'note ny', '⚠️ ' + v.err));
-    else if (v.scaling) out.append(el('div', 'note ny', '🚀 ' + PYL.core.testing.TEST_SCALE_NOTE + ' Pasa a la pestaña Escalado.'));
+    if (v.err) out.append(note(v.err, 'alert'));
+    else if (v.scaling) out.append(note(PYL.core.testing.TEST_SCALE_NOTE + ' Pasa a la pestaña Escalado.', 'rocket'));
     else {
       out.append(verdictCard(r));
       st.append(stat('Corte alcanzado', r.cut ? 'Corte ' + r.cut + ' · ' + copText(PYL.core.metrics.NS_TEST.cuts[r.cut - 1]) : 'Antes del corte 1'));
@@ -140,7 +147,7 @@
     scen.append(el('small', 'muted', 'Escenarios: cargan una cadena de ejemplo y una corrida nueva. Con azar puede variar; prueba otra corrida.'));
     const sb = el('div', 'row');
     for (const sc of PYL.core.simulator.SIM_SCENARIOS) {
-      const b = el('button', 'btn ghost sm', sc.t); b.type = 'button'; b.dataset.scen = sc.k;
+      const b = el('button', 'btn ghost sm'); b.append(IC.el(sc.icon, 15, 'ic-solo'), sc.t); b.type = 'button'; b.dataset.scen = sc.k;
       b.addEventListener('click', () => on.scen(sc.k));
       sb.append(b);
     }
@@ -170,10 +177,10 @@
     sr.type = 'range'; sr.id = 'ts-sx-spend'; sr.min = '0'; sr.step = '1000'; sr.value = '0'; sl.htmlFor = sr.id;
     sr.addEventListener('input', () => on.spend(Number(sr.value)));
     sf.append(sl, sr, el('span', 'hint', 'Muevo el punto de la corrida y veo su estado.'));
-    // Controles de la corrida: ▶ Correr / Continuar (alterna con ⏸ Pausa), ⏮ volver a 0 y 🎲 otra corrida.
+    // Controles de la corrida (íconos play/pause, skip-back y dice): Correr / Continuar (alterna con Pausa), volver a 0 y otra corrida.
     const ctl = el('div', 'row ts-sx-ctl');
-    const btn = (id, label, fn, cls) => { const b = el('button', cls || 'btn ghost sm', label); b.type = 'button'; b.id = id; b.addEventListener('click', fn); return b; };
-    ctl.append(btn('ts-sx-play', '▶ Correr', on.play, 'btn sm'), btn('ts-sx-reset', '⏮ Volver a 0', on.reset), btn('ts-sx-again', '🎲 Otra corrida', on.again));
+    const btn = (id, icon, label, fn, cls) => { const b = el('button', cls || 'btn ghost sm'); playLabel(b, icon, label); b.type = 'button'; b.id = id; b.addEventListener('click', fn); return b; };
+    ctl.append(btn('ts-sx-play', 'play', 'Correr', on.play, 'btn sm'), btn('ts-sx-reset', 'skip-back', 'Volver a 0', on.reset), btn('ts-sx-again', 'dice', 'Otra corrida', on.again));
     const der = el('div', 'ts-stats'); der.id = 'ts-sx-derived';
     const out = el('div', 'ts-free-out'); out.id = 'ts-sx-out'; out.setAttribute('aria-live', 'polite');
     const chn = el('div', 'ts-sx-chain'); chn.id = 'ts-sx-chain';
@@ -183,7 +190,6 @@
 
   // Cadena con semáforo del punto actual (simChain) y, si hay eslabón roto, su lectura Si… / Solución…
   const LINK = { cpm: 'CPM', ctr: 'CTR', cpc: 'CPC', cppi: 'CPPI', cpa: 'CPA' };
-  const LIGHT_DOT = { r: '🔴', y: '🟡', g: '🟢' };
   function chainLinks(node, a) {
     const row = el('div', 'ts-flow');
     a.chain.forEach((c, i) => {
@@ -192,7 +198,7 @@
       n.dataset.link = c.k;
       const value = c.value == null ? '—' : c.k === 'ctr' ? fmt(c.value) + ' %' : money(c.value);
       n.append(el('small', null, LINK[c.k]), el('b', null, value));
-      if (c.light) n.append(el('span', 'ts-dot', LIGHT_DOT[c.light]));
+      if (c.light) { const d = el('span', 'ts-dot'); d.append(IC.dot(c.light)); n.append(d); }
       if (c.ideal) n.append(el('em', 'ts-ideal', 'ideal'));
       if (c.note) n.append(el('em', 'ts-nodec', c.note));
       row.append(n);
@@ -208,10 +214,10 @@
       const c = el('div', 'ts-h-c ts-' + h.state);
       c.dataset.hist = h.end ? 'end' : String(h.at);
       c.append(el('small', null, h.label));
-      let t = '—';
+      let t = '—', icon = null;
       if (h.state === 'stopped') t = 'Apagado';
-      else if (h.state === 'done') t = ICON[h.verdict.action] + ' ' + h.verdict.toca + ' · ' + h.pi + ' PI · ' + h.sales + ' ventas';
-      c.append(el('span', 'ts-h-t', t));
+      else if (h.state === 'done') { icon = ICON[h.verdict.action]; t = h.verdict.toca + ' · ' + h.pi + ' PI · ' + h.sales + ' ventas'; }
+      c.append(withIc(el('span', 'ts-h-t'), icon, t));
       row.append(c);
     }
     node.append(row);
@@ -232,12 +238,12 @@
     const sr = node.querySelector('#ts-sx-spend'), play = node.querySelector('#ts-sx-play');
     sr.disabled = !!v.err;
     play.disabled = !!v.err || v.spend >= v.max;
-    play.textContent = v.playing ? '⏸ Pausa' : v.spend > 0 ? 'Continuar ▶' : '▶ Correr';
+    if (v.playing) playLabel(play, 'pause', 'Pausa'); else playLabel(play, 'play', v.spend > 0 ? 'Continuar' : 'Correr');
     if (!v.err) { sr.max = String(v.max); sr.value = String(v.spend); }
     const der = node.querySelector('#ts-sx-derived'), out = node.querySelector('#ts-sx-out');
     const chn = node.querySelector('#ts-sx-chain'), hist = node.querySelector('#ts-sx-hist');
     der.textContent = ''; out.textContent = ''; chn.textContent = ''; hist.textContent = '';
-    if (v.err) { out.append(el('div', 'note ny', '⚠️ Revisa los campos marcados: sin números válidos no hay veredicto.')); return; }
+    if (v.err) { out.append(note('Revisa los campos marcados: sin números válidos no hay veredicto.', 'alert')); return; }
     const a = v.a, p = a.point, val = (k) => a.chain.find((c) => c.k === k).value;
     const n = (x) => copText(Math.floor(x));
     der.append(stat('CPC', money(val('cpc'))), stat('Impresiones', n(p.impr)), stat('Clics', n(p.clicks)), stat('Pagos iniciados', String(p.pi)),
@@ -248,7 +254,7 @@
       const card = verdictCard(a.verdict, 'Apagado en el corte ' + v.stop);
       if (a.broken) card.append(el('p', 'small ts-ex-h', 'Qué revisar'), read(a.broken));
       out.append(card);
-    } else if (a.scaling) out.append(el('div', 'note ny', '🚀 ' + PYL.core.testing.TEST_SCALE_NOTE + ' Pasa a la pestaña Escalado.'));
+    } else if (a.scaling) out.append(note(PYL.core.testing.TEST_SCALE_NOTE + ' Pasa a la pestaña Escalado.', 'rocket'));
     else out.append(verdictCard(a.verdict));
   }
 

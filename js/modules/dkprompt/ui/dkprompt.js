@@ -3,10 +3,8 @@
 (() => {
   const PYL = globalThis.PYL;
   const { el } = PYL.ui.dom;
-
-  // Logo de DropKiller (hexágono de esquinas redondeadas con dos chevrones hacia arriba), sin el cuadrado de fondo.
-  // currentColor = texto sobre el acento del botón, así sigue los temas.
-  const ICON_DK = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12,2.5 20.5,7.25 20.5,16.75 12,21.5 3.5,16.75 3.5,7.25"/><path d="M8.5 11.5L12 8.5l3.5 3"/><path d="M8.5 15.5l3.5-3 3.5 3"/></svg>';
+  // Ícono del set propio al inicio de un botón (SPEC 24); .btn ya pone gap.
+  const withIcon = (b, name) => { b.prepend(PYL.ui.icons.el(name, 15, 'ic-solo')); return b; };
 
   // Id de cada campo y grupo (mensaje de error) al que pertenece.
   const ID = { totMin: 'tot-min', totMax: 'tot-max', recMin: 'rec-min', recMax: 'rec-max', stockMin: 'stock-min', stockMax: 'stock-max', provMax: 'prov-max', restMin: 'rest-min', restMax: 'rest-max', categoria: 'cat' };
@@ -60,7 +58,7 @@
     const btn = el('button', 'dk-btn'); btn.type = 'button'; btn.id = 'dk-btn';
     btn.title = 'Prompt DropKiller'; btn.setAttribute('aria-label', btn.title);
     btn.setAttribute('aria-haspopup', 'dialog'); btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-controls', 'dk-panel');
-    btn.innerHTML = ICON_DK;
+    btn.innerHTML = PYL.ui.icons.svg('dropkiller', 24); // logo del set propio; currentColor = texto del botón
     btn.addEventListener('click', on.toggle);
 
     const panel = el('div', 'dk-panel'); panel.id = 'dk-panel'; panel.hidden = true;
@@ -96,9 +94,9 @@
     const lab = el('label', null, 'Prompt'); lab.htmlFor = 'dk-prompt';
     const ta = el('textarea'); ta.id = 'dk-prompt'; ta.readOnly = true; ta.rows = 5;
     ta.placeholder = 'Toca «Generar prompt» para armarlo con estos filtros.';
-    const gen = el('button', 'btn sm dk-gen', '✨ Generar prompt'); gen.type = 'button'; gen.id = 'dk-gen';
+    const gen = withIcon(el('button', 'btn sm dk-gen', 'Generar prompt'), 'sparkles'); gen.type = 'button'; gen.id = 'dk-gen';
     gen.addEventListener('click', on.generate);
-    const copy = el('button', 'btn ghost sm dk-copy', '📋 Copiar prompt'); copy.type = 'button'; copy.id = 'dk-copy';
+    const copy = withIcon(el('button', 'btn ghost sm dk-copy', 'Copiar prompt'), 'copy'); copy.type = 'button'; copy.id = 'dk-copy';
     copy.addEventListener('click', on.copy);
     const acts = el('div', 'dk-acts'); acts.append(gen, copy);
     out.append(lab, ta, acts);

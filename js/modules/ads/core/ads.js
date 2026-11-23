@@ -177,10 +177,10 @@
   // Estrategias para montar la campaña (selector de la sub-pestaña). steps = null → "pronto": aún no está documentada.
   // map = muestra el mapa 1 campaña → conjunto 1 → duplicados (propio de ABO).
   const AD_STRATEGIES = [
-    { k: 'abo', t: 'ABO · presupuesto por conjunto', icon: '🧪', map: true, steps: ABO_STEPS,
+    { k: 'abo', t: 'ABO · presupuesto por conjunto', icon: 'flask', map: true, steps: ABO_STEPS,
       d: `Yo decido cuánto recibe cada conjunto. 1 campaña → ${ADS.sets} conjuntos → 1 anuncio con su video en cada uno.`,
       h: 'Campaña de testeo ABO', sub: `${ADS.sets} conjuntos con ${money(ADS.daily)} al día cada uno. Toco un paso para ver qué pongo en cada campo.` },
-    { k: 'cbo', t: 'CBO · presupuesto de campaña', icon: '⚖️', map: false, steps: null,
+    { k: 'cbo', t: 'CBO · presupuesto de campaña', icon: 'scale', map: false, steps: null,
       d: 'Pongo un presupuesto para toda la campaña y Meta se lo da a los anuncios que mejor van.',
       h: 'Campaña CBO', sub: 'El paso a paso de esta estrategia todavía no está documentado.' },
   ];

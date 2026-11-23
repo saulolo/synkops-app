@@ -19,8 +19,8 @@ ${LG_NEQUI}
 ${LG_BANK}`;
 
   const LG_PARTS = [
-    { k: 'msgs', label: '💬 Plantillas de mensajes' },
-    { k: 'track', label: '📦 Seguimiento de pedidos · pronto', disabled: true },
+    { k: 'msgs', icon: 'message', label: 'Plantillas de mensajes' },
+    { k: 'track', icon: 'package', label: 'Seguimiento de pedidos · pronto', disabled: true },
   ];
 
   // Una plantilla = clave, rótulo y campos. `ph` = ejemplo que se ve en el campo vacío. `from` = dato de landing.prod que lo prellena; `def` = valor por defecto.

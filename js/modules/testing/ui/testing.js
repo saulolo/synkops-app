@@ -9,14 +9,17 @@
   const money = (v) => '$ ' + copText(v);
 
   const seg = (tag, cls, segments) => { const n = el(tag, cls); rich(n, segments); return n; };
-  const DOT = { r: '🔴', y: '🟡', g: '🟢' };
-  const ICON = Object.fromEntries(C.TEST_ACTIONS.map((a) => [a.k, a.icon]));
+  const IC = PYL.ui.icons;
+  const ICON = Object.fromEntries(C.TEST_ACTIONS.map((a) => [a.k, a.icon])); // acción → nombre del ícono (SPEC 24)
+  // Ícono + texto en un nodo; 'dot' = punto de semáforo con su tono.
+  const ic = (name, tone, size = 14) => (name === 'dot' ? IC.dot(tone) : IC.el(name, size));
+  const withIc = (node, name, text) => { if (name) node.append(ic(name)); node.append(text); return node; };
 
   // Sub-pestañas como las de Desarrollo (#d-parts): un botón por parte, la abierta con aria-pressed.
   function parts(node, list, current, onPick) {
     node.textContent = '';
     for (const p of list) {
-      const b = el('button', null, p.t);
+      const b = withIc(el('button'), p.icon, p.t);
       b.type = 'button';
       if (p.disabled) { b.disabled = true; b.title = 'Pronto'; }
       b.dataset.part = p.k;
@@ -32,7 +35,8 @@
     const w = el('div', 'ts-soon');
     const ul = el('ul', 'ts-soon-list');
     for (const it of s.items) { const li = el('li'); rich(li, it); ul.append(li); }
-    w.append(el('span', 'ts-soon-ic', s.icon), el('span', 'tag tn', 'Pronto'), el('h3', 'st-h mt-s', s.h), el('p', 'muted', s.d), ul);
+    const sic = el('span', 'ts-soon-ic'); sic.append(IC.el(s.icon, 26, 'ic-solo'));
+    w.append(sic, el('span', 'tag tn', 'Pronto'), el('h3', 'st-h mt-s', s.h), el('p', 'muted', s.d), ul);
     node.append(w);
   }
 
@@ -66,8 +70,9 @@
       if (br.group && br.group !== group) { group = br.group; box = el('div', 'ts-grp'); box.append(el('b', 'ts-grp-h', group)); card.append(box); }
       const row = el('div', 'ts-br ts-' + br.light + (lit === br.id ? ' ts-on' : ''));
       row.dataset.branch = br.id;
-      row.append(el('span', 'ts-dot', DOT[br.light]), seg('span', 'ts-cond', br.cond), el('span', 'ts-arrow', '→'), seg('span', 'ts-t', br.t));
-      const vd = el('span', 'ts-vd' + (br.own ? ' ts-own' : ''), (br.badgeIcon || ICON[br.verdict.action]) + ' ' + br.badge);
+      const dot = el('span', 'ts-dot'); dot.append(IC.dot(br.light));
+      row.append(dot, seg('span', 'ts-cond', br.cond), el('span', 'ts-arrow', '→'), seg('span', 'ts-t', br.t));
+      const vd = withIc(el('span', 'ts-vd' + (br.own ? ' ts-own' : '')), br.badgeIcon || ICON[br.verdict.action], br.badge);
       if (br.tip) PYL.ui.tooltip.attach(vd, br.tip.h, br.tip); // regla propia: la aclaración sale al pasar el mouse
       row.append(vd);
       box.append(row);
@@ -116,7 +121,8 @@
     donts.append(el('h4', 'ts-donts-h', 'Lo que no hago'));
     H.donts.forEach((d) => {
       const c = el('div', 'ts-dont');
-      c.append(el('span', 'ts-dont-ic', d.icon), seg('p', null, [{ b: d.b }, ...d.p]));
+      const dic = el('span', 'ts-dont-ic'); dic.append(IC.el(d.icon, 16, 'ic-solo'));
+      c.append(dic, seg('p', null, [{ b: d.b }, ...d.p]));
       donts.append(c);
     });
     w.append(list, donts);
@@ -168,7 +174,7 @@
     const decs = el('div', 'ts-decs');
     for (const a of C.TEST_ACTIONS) {
       const d = el('button', 'btn ghost ts-dec'); d.type = 'button'; d.dataset.action = a.k;
-      d.append(el('span', null, a.icon + ' '), el('b', null, a.t));
+      d.append(IC.el(a.icon, 15, 'ic-solo'), el('b', null, a.t)); // .btn ya pone gap
       if (v.last) {
         d.disabled = true;
         if (a.k === v.last.correct.k) d.classList.add('ts-right');
@@ -184,11 +190,11 @@
   function feedback(v, on) {
     const r = v.verdict, L = v.last, w = el('div', 'ts-fb ts-' + (L.ok ? 'g' : 'r'));
     w.id = 'ts-fb';
-    w.append(el('b', 'ts-fb-h', L.ok ? '✅ ¡Acertaste!' : '❌ No era esa'));
-    if (!L.ok) w.append(seg('p', 'small', ['Elegiste ', { b: L.chosen.icon + ' ' + L.chosen.t }, '; tocaba ', { b: L.correct.icon + ' ' + L.correct.t }, '.']));
+    w.append(withIc(el('b', 'ts-fb-h'), L.ok ? 'check-circle' : 'x-circle', L.ok ? '¡Acertaste!' : 'No era esa'));
+    if (!L.ok) w.append(seg('p', 'small', ['Elegiste ', { b: L.chosen.t }, '; tocaba ', { b: L.correct.t }, '.']));
     w.append(seg('p', null, ['Así lo califica el Lab de NovaSociety: ', { b: r.veredicto }, '. ', ...r.detalle]));
     w.append(seg('p', 'small muted', ['Los números que deciden: ', ...r.senales]));
-    if (v.note) w.append(seg('p', 'small', ['💡 ', ...v.note]));
+    if (v.note) { const n = seg('p', 'small', v.note); n.prepend(IC.el('bulb', 14)); w.append(n); }
     const row = el('div', 'row mt-s');
     const see = el('button', 'btn ghost sm', 'Ver el paso'); see.type = 'button'; see.id = 'ts-see';
     see.addEventListener('click', () => on.seeStep(r.step));
@@ -205,7 +211,9 @@
     w.id = 'ts-end';
     w.append(el('small', 'ts-ex-h', 'Ronda terminada'));
     w.append(seg('p', 'ts-ex-v', [{ b: `${v.score.hits} de ${v.score.total} decisiones acertadas` }, ` (${v.score.pct} %)`]));
-    w.append(el('p', 'small', 'Mejor puntaje: ' + (v.best == null ? '—' : v.best + ' %') + (v.best != null && v.score.pct >= v.best ? ' 🏆' : '')));
+    const bp = el('p', 'small', 'Mejor puntaje: ' + (v.best == null ? '—' : v.best + ' %'));
+    if (v.best != null && v.score.pct >= v.best) { bp.append(' '); bp.append(IC.el('trophy', 14)); }
+    w.append(bp);
     const again = el('button', 'btn sm mt-s', 'Otra ronda'); again.type = 'button'; again.id = 'ts-again';
     again.addEventListener('click', on.again);
     w.append(again);
@@ -257,5 +265,5 @@
     },
   };
 
-  PYL.ui.testing = { parts, soon, progress, light, practice, bar, cut, cuts, tope, chain, seg, stat, money, ICON, TOOLS };
+  PYL.ui.testing = { parts, soon, progress, light, practice, bar, cut, cuts, tope, chain, seg, stat, money, ICON, ic, withIc, TOOLS };
 })();

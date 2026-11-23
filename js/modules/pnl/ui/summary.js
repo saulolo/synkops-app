@@ -12,11 +12,11 @@
 
   // Explicación de cada tarjeta, enlazada por data-tip en index.html.
   const TIPS = {
-    util: { h: '💰 Utilidad neta real', p: 'El dinero líquido final que queda en mi bolsillo tras restar del recaudo en Dropi los costos de producto, fletes de entregas, fletes de devoluciones y toda la publicidad de Meta Ads.' },
-    margen: { h: '📊 Margen neto real', p: 'Qué porcentaje de cada $100 pesos cobrados en efectivo se convirtió en ganancia limpia. Meta saludable en NovaSociety: 15% a 20%.' },
-    efect: { h: '🚚 Efectividad de entrega', p: 'De los paquetes que salieron a carretera con guía y ya cerraron ciclo, qué porcentaje cobró la transportadora con éxito. Meta Nova: 70% a 75%+.' },
-    roas: { h: '📈 ROAS real (cobrado / ads)', p: 'Cuántos pesos en EFECTIVO cobrado me devolvió cada $1 peso invertido en anuncios. Si mi ROAS real es menor al "Equilibrio", estoy perdiendo dinero.' },
-    cpa: { h: '🎯 CPA real por entrega', p: 'Cuánto dinero en publicidad tuviste que gastar para lograr que 1 cliente reciba y pague en mano. Si supera el "Máximo sostenible", cada entrega pierde dinero.' },
+    util: { icon: 'coins', emoji: '💰', h: 'Utilidad neta real', p: 'El dinero líquido final que queda en mi bolsillo tras restar del recaudo en Dropi los costos de producto, fletes de entregas, fletes de devoluciones y toda la publicidad de Meta Ads.' },
+    margen: { icon: 'chart-bar', emoji: '📊', h: 'Margen neto real', p: 'Qué porcentaje de cada $100 pesos cobrados en efectivo se convirtió en ganancia limpia. Meta saludable en NovaSociety: 15% a 20%.' },
+    efect: { icon: 'truck', emoji: '🚚', h: 'Efectividad de entrega', p: 'De los paquetes que salieron a carretera con guía y ya cerraron ciclo, qué porcentaje cobró la transportadora con éxito. Meta Nova: 70% a 75%+.' },
+    roas: { icon: 'trend-up', emoji: '📈', h: 'ROAS real (cobrado / ads)', p: 'Cuántos pesos en EFECTIVO cobrado me devolvió cada $1 peso invertido en anuncios. Si mi ROAS real es menor al "Equilibrio", estoy perdiendo dinero.' },
+    cpa: { icon: 'target', emoji: '🎯', h: 'CPA real por entrega', p: 'Cuánto dinero en publicidad tuviste que gastar para lograr que 1 cliente reciba y pague en mano. Si supera el "Máximo sostenible", cada entrega pierde dinero.' },
   };
 
   // [clave en a, formato, ¿más alto es mejor?]
@@ -82,7 +82,7 @@
       node.textContent = dl ? dl.text + ' vs. periodo anterior' : '';
       node.title = dl ? dl.title : '';
       if (k === 'util') renderProjectedDelta(a, prev);
-      PYL.ui.trend.spark('#s-' + k, weeks.map((w) => ({ v: w.a[k], w })), kind, TIPS[k].h.replace(/^\S+\s/, ''));
+      PYL.ui.trend.spark('#s-' + k, weeks.map((w) => ({ v: w.a[k], w })), kind, TIPS[k].h);
     });
   }
 
@@ -99,9 +99,10 @@
     const box = $('#proj');
     box.classList.toggle('hidden', !p);
     if (!p) return;
-    rich(box, ['🚚 ', { b: `${nf(p.ruta)} pedidos en ruta.` }, ' Si cierran con mi efectividad actual (', { b: fmt(p.efect, 'pct') },
+    rich(box, [{ b: `${nf(p.ruta)} pedidos en ruta.` }, ' Si cierran con mi efectividad actual (', { b: fmt(p.efect, 'pct') },
       ') serían ≈', { b: nf(Math.round(p.ent)) }, ' entregas más y la utilidad pasaría a ', { b: fmt(p.util, 'cop') },
       ` (${p.extra >= 0 ? '+' : ''}${short(p.extra)}). La pauta de esos pedidos ya está pagada.`]);
+    box.prepend(PYL.ui.icons.el('truck', 16));
     box.className = 'proj ' + (p.util >= 0 ? 'ok' : 'bad');
   }
 

@@ -12,10 +12,10 @@
 
   // Escenarios: cargan la cadena (no tocan presupuesto ni tope). Sus valores esperados caen en la rama que dice la spec.
   const SIM_SCENARIOS = [
-    { k: 'cpm', t: '💸 CPM caro', v: { cpm: 30000, ctr: 2, toPi: 20, toSale: 30 } },
-    { k: 'cpc', t: '😐 Producto no interesa', v: { cpm: 12000, ctr: 0.6, toPi: 20, toSale: 30 } },
-    { k: 'page', t: '🧱 Página no convierte', v: { cpm: 12000, ctr: 2, toPi: 20, toSale: 0 } },
-    { k: 'win', t: '🏆 Ganador', v: { cpm: 12000, ctr: 2, toPi: 20, toSale: 30 } },
+    { k: 'cpm', icon: 'money-out', t: 'CPM caro', v: { cpm: 30000, ctr: 2, toPi: 20, toSale: 30 } },
+    { k: 'cpc', icon: 'face-meh', t: 'Producto no interesa', v: { cpm: 12000, ctr: 0.6, toPi: 20, toSale: 30 } },
+    { k: 'page', icon: 'wall', t: 'Página no convierte', v: { cpm: 12000, ctr: 2, toPi: 20, toSale: 0 } },
+    { k: 'win', icon: 'trophy', t: 'Ganador', v: { cpm: 12000, ctr: 2, toPi: 20, toSale: 30 } },
   ];
 
   // Generador reproducible en [0, 1) (mulberry32).

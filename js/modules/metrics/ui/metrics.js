@@ -66,7 +66,8 @@
     head.append(el('span', 'hm-pop-name', row.name), el('span', 'hm-pop-full', m.full), x);
     const simple = el('p', 'hm-pop-simple', m.simple);
     const analogy = el('div', 'hm-pop-analogy');
-    analogy.append(el('span', 'hm-pop-ico', '💡'), el('span', null, m.analogy));
+    const aic = el('span', 'hm-pop-ico'); aic.append(PYL.ui.icons.el('bulb', 16, 'ic-solo'));
+    analogy.append(aic, el('span', null, m.analogy));
     const sigs = el('div', 'hm-pop-sigs');
     sigs.append(el('div', 'hm-pop-h', 'Cómo leer sus señales'));
     m.signals.forEach((s, i) => {
@@ -89,7 +90,7 @@
     if (row.report) { const r = el('p', 'hm-pop-report', 'En el reporte de Meta: '); r.append(el('b', null, '«' + row.report + '»')); box.append(r); }
     if (m.unique) box.append(el('p', 'hm-pop-unique', m.unique));
     box.append(analogy, sigs);
-    if (m.warn) box.append(el('p', 'hm-warn', '⚠ ' + m.warn));
+    if (m.warn) { const w = el('p', 'hm-warn'); w.append(PYL.ui.icons.el('alert', 14), m.warn); box.append(w); }
     if (m.note) { const n = el('div', 'hm-pop-note'); n.append(el('b', null, 'Ojo · '), m.note); box.append(n); }
     return box;
   }

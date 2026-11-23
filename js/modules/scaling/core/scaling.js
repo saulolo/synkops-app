@@ -35,11 +35,11 @@
 
   // Las cinco decisiones. Cada veredicto cae en una.
   const SCALE_ACTIONS = [
-    { k: 'up', t: 'Subir un escalón', icon: '⬆️' },
-    { k: 'hold', t: 'Sostener', icon: '=' },
-    { k: 'down', t: 'Bajar un escalón', icon: '⬇️' },
-    { k: 'down2', t: 'Bajar dos escalones', icon: '⏬' },
-    { k: 'off', t: 'Apagar', icon: '🛑' },
+    { k: 'up', t: 'Subir un escalón', icon: 'arrow-up' },
+    { k: 'hold', t: 'Sostener', icon: 'equal' },
+    { k: 'down', t: 'Bajar un escalón', icon: 'arrow-down' },
+    { k: 'down2', t: 'Bajar dos escalones', icon: 'arrows-down' },
+    { k: 'off', t: 'Apagar', icon: 'stop' },
   ];
   const LIGHT_OF = { up: 'g', hold: 'y', down: 'r', down2: 'r', off: 'r' };
   const actionOf = (k) => SCALE_ACTIONS.find((a) => a.k === k);
@@ -235,8 +235,8 @@
   // ---------- Sub-pestañas y métodos ----------
   // Una parte con `disabled` se ve pero no se abre; su `soon` es la tarjeta "Pronto" que mostrará mientras tanto.
   const SCALING_PARTS = [
-    { k: 'real', t: '📂 Lectura real · pronto', disabled: true, soon: {
-      icon: '📂', h: 'Lectura real',
+    { k: 'real', icon: 'folder-open', t: 'Lectura real · pronto', disabled: true, soon: {
+      icon: 'folder-open', h: 'Lectura real',
       d: 'Subo el reporte de mis campañas y la app me dice qué hacer con cada conjunto al escalar. Esta parte llega en otra entrega.',
       items: [
         ['Subo mi reporte de Meta (el archivo del Administrador de anuncios).'],
@@ -245,8 +245,8 @@
         ['Avisa en qué escalón de la escalera está cada uno.'],
       ],
     } },
-    { k: 'scale', t: '📈 Fase de escalado' },
-    { k: 'sim', t: '⚠️ Simulador · revisar', disabled: true },
+    { k: 'scale', icon: 'trend-up', t: 'Fase de escalado' },
+    { k: 'sim', icon: 'alert', t: 'Simulador · revisar', disabled: true },
   ];
   const scalingPart = (k) => SCALING_PARTS.find((p) => p.k === k && !p.disabled) || SCALING_PARTS.find((p) => !p.disabled);
 
@@ -301,14 +301,14 @@
 
   // Métodos de escalado. Uno sin `steps` muestra su tarjeta "Pronto" (`soon`); al documentarlo se le ponen `steps` y aparece solo.
   const SCALE_METHODS = [
-    { k: 'surf', icon: '🏄', t: 'Surfing Scaling', d: 'Escalado vertical: +' + stepPct + ' % por escalón, protegiendo el capital', steps: SURF_STEPS },
-    { k: 'horiz', icon: '🔀', t: 'Escalado horizontal', d: 'Plan B: revivir o ampliar cuando el vertical se agota', soon: {
-      icon: '🔀', h: 'Escalado horizontal',
+    { k: 'surf', icon: 'wave', t: 'Surfing Scaling', d: 'Escalado vertical: +' + stepPct + ' % por escalón, protegiendo el capital', steps: SURF_STEPS },
+    { k: 'horiz', icon: 'shuffle', t: 'Escalado horizontal', d: 'Plan B: revivir o ampliar cuando el vertical se agota', soon: {
+      icon: 'shuffle', h: 'Escalado horizontal',
       d: 'Cuando subir el presupuesto ya no funciona, se amplía por otro lado. Esta parte llega en otra entrega.',
       items: [['Plan B cuando el escalado vertical se agota.'], ['Revivir conjuntos o abrir nuevos para llegar a más gente.']],
     } },
-    { k: 'refresh', icon: '🔄', t: 'Refresco de creativos', d: '4 a 5 anuncios nuevos por semana contra la fatiga', soon: {
-      icon: '🔄', h: 'Refresco de creativos',
+    { k: 'refresh', icon: 'refresh', t: 'Refresco de creativos', d: '4 a 5 anuncios nuevos por semana contra la fatiga', soon: {
+      icon: 'refresh', h: 'Refresco de creativos',
       d: 'Los anuncios se cansan: hay que renovarlos para sostener el CPA. Esta parte llega en otra entrega.',
       items: [['Cuántos anuncios nuevos entran por semana y cuándo.'], ['Cómo reconocer la fatiga antes de que suba el CPA.']],
     } },

@@ -90,27 +90,3 @@
 .lg-out .lg-acts .lg-gen:active{transform:none;filter:none;box-shadow:0 3px 10px rgba(var(--b-rgb),.3),inset 0 1px 0 rgba(255,255,255,.2)}
 .lg-out .lg-acts .lg-gen:focus-visible{outline:2px solid var(--b2);outline-offset:3px}
 @media (prefers-reduced-motion:reduce){.lg-out .lg-acts .lg-gen{transition:none}.lg-out .lg-acts .lg-gen:hover{transform:none}}
-
-/* ---------- Íconos de los botones: dos tonos y animación al pasar el mouse ---------- */
-.lg-ic{display:inline-flex;flex:none}
-.lg-ic svg{display:block;overflow:visible}
-.lg-i-fill{fill:currentColor;fill-opacity:.2}
-.lg-i-a,.lg-i-b,.lg-i-d{transform-box:fill-box;transform-origin:center;transition:transform .28s cubic-bezier(.3,1.6,.5,1),opacity .2s}
-.lg-i-sweep{transform-box:view-box;transform-origin:20px 4px}
-.lg-i-d{opacity:0}
-.lg-i-d2{transition-delay:.08s}
-@keyframes lg-bob{0%,100%{transform:translateY(-.5px)}50%{transform:translateY(2.4px)}}
-@keyframes lg-sweep{0%,100%{transform:rotate(0)}50%{transform:rotate(-17deg)}}
-@keyframes lg-pulse{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.16) rotate(12deg)}}
-@keyframes lg-twinkle{0%{transform:scale(.55);opacity:.5}100%{transform:scale(1.25);opacity:1}}
-@keyframes lg-dust{0%{transform:translate(0,0);opacity:0}40%{opacity:1}100%{transform:translate(-2px,2px);opacity:0}}
-.lg-import:hover .lg-i-a{animation:lg-bob .7s ease-in-out infinite}
-.lg-clear:hover .lg-i-a{animation:lg-sweep .55s ease-in-out infinite}
-.lg-clear:hover .lg-i-d{animation:lg-dust .55s ease-out infinite}
-.lg-copy:hover .lg-i-a{transform:translate(1.6px,1.6px)}
-.lg-copy:hover .lg-i-b{transform:translate(-1.4px,-1.4px)}
-.lg-gen:hover .lg-i-a{animation:lg-pulse .9s ease-in-out infinite}
-.lg-gen:hover .lg-i-b{animation:lg-twinkle .6s ease-in-out infinite alternate}
-.lg-gen:hover .lg-i-d{opacity:1;animation:lg-twinkle .6s .2s ease-in-out infinite alternate}
-.lg-import:active .lg-ic,.lg-clear:active .lg-ic,.lg-copy:active .lg-ic,.lg-gen:active .lg-ic{transform:scale(.88)}
-@media (prefers-reduced-motion:reduce){.lg-ic *{animation:none!important;transition:none!important}}

@@ -6,13 +6,6 @@
   const { el } = PYL.ui.dom;
   const { copyBtn } = PYL.ui.candidate;
 
-  const ICON_BOLT = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg>';
-
-  const ICON_SEND = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>';
-
-  // Misma papelera de la bitácora (modules/search/ui/candidate.js).
-  const ICON_DEL = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>';
-
   function field(id, label, ph) {
     const box = el('div', 'field');
     const lab = el('label', null, label); lab.htmlFor = id;
@@ -28,7 +21,7 @@
     const btn = el('button', 'qk-btn'); btn.type = 'button'; btn.id = 'qk-btn';
     btn.title = 'Guardado rápido de productos'; btn.setAttribute('aria-label', btn.title);
     btn.setAttribute('aria-haspopup', 'dialog'); btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-controls', 'qk-panel');
-    btn.innerHTML = ICON_BOLT;
+    btn.innerHTML = PYL.ui.icons.svg('bolt', 22);
     const count = el('span', 'qk-count'); count.id = 'qk-count'; count.hidden = true;
     btn.append(count);
     btn.addEventListener('click', on.toggle);
@@ -62,7 +55,7 @@
     photo.title = 'Pego la imagen con Ctrl+V o toco para elegir un archivo';
     const file = el('input'); file.type = 'file'; file.accept = 'image/*'; file.hidden = true;
     const img = el('img', 'qk-photo-img'); img.alt = ''; img.hidden = true;
-    const empty = el('span', 'qk-photo-empty'); empty.append(el('b', null, '🖼'), el('small', null, 'Ctrl+V'));
+    const empty = el('span', 'qk-photo-empty'); const eb = el('b'); eb.append(PYL.ui.icons.el('image', 20, 'ic-solo')); empty.append(eb, el('small', null, 'Ctrl+V'));
     photo.append(file, img, empty);
     file.addEventListener('change', () => { if (file.files[0]) on.photo(file.files[0]); file.value = ''; });
     const rm = el('button', 'qk-photo-rm', '✕'); rm.type = 'button'; rm.hidden = true;
@@ -90,7 +83,7 @@
 
     const bar = el('div', 'qk-bar');
     bar.append(el('b', null, 'Guardados'));
-    const clear = el('button', 'btn ghost sm', '🧹 Limpiar'); clear.type = 'button'; clear.id = 'qk-clear';
+    const clear = el('button', 'btn ghost sm', 'Limpiar'); clear.prepend(PYL.ui.icons.el('broom', 15, 'ic-solo')); clear.type = 'button'; clear.id = 'qk-clear';
     clear.title = 'Borra todos los productos guardados aquí';
     clear.addEventListener('click', on.clear);
     bar.append(clear);
@@ -105,7 +98,7 @@
   function row(it, on) {
     const r = el('div', 'qk-row');
     if (it.photo) { const im = el('img', 'qk-thumb'); im.src = it.photo; im.alt = ''; r.append(im); }
-    else r.append(el('span', 'qk-thumb qk-thumb-empty', '📦'));
+    else { const e = el('span', 'qk-thumb qk-thumb-empty'); e.append(PYL.ui.icons.el('package', 16, 'ic-solo')); r.append(e); }
 
     const info = el('div', 'qk-info');
     const nl = el('div', 'qk-line'); nl.append(el('span', 'qk-name', it.name), copyBtn(() => it.name, 'Nombre del producto', 'inline'));
@@ -114,12 +107,12 @@
     info.append(nl, dl);
 
     // Ícono a la derecha de cada producto: lo manda a Mi candidato.
-    const send = el('button', 'qk-send'); send.type = 'button'; send.innerHTML = ICON_SEND;
+    const send = el('button', 'qk-send'); send.type = 'button'; send.innerHTML = PYL.ui.icons.svg('send', 17);
     send.title = 'Enviar a Mi candidato'; send.setAttribute('aria-label', 'Enviar ' + it.name + ' a Mi candidato');
     send.addEventListener('click', () => on.send(it.id));
 
     // Papelera: quita solo este producto de la lista (mismo botón que la bitácora, `.cd-act.del` de search.css).
-    const del = el('button', 'cd-act del qk-del'); del.type = 'button'; del.innerHTML = ICON_DEL;
+    const del = el('button', 'cd-act del qk-del'); del.type = 'button'; del.innerHTML = PYL.ui.icons.svg('trash', 16); // misma papelera de la bitácora
     del.title = 'Eliminar del guardado rápido'; del.setAttribute('aria-label', 'Eliminar ' + it.name + ' del guardado rápido');
     del.addEventListener('click', () => on.del(it.id));
 

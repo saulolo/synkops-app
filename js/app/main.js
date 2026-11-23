@@ -77,6 +77,7 @@
   }
 
   function init() {
+    ui.icons.hydrate(document); // SPEC 24: íconos del HTML estático (<span class="ic" data-ic>)
     app.render = render;
     app.filters.init();
     app.dataLoader.init();

@@ -4,9 +4,8 @@
 (() => {
   const PYL = globalThis.PYL;
   const { el } = PYL.ui.dom;
-
-  // Megáfono (anuncio) con una lupa (buscar). currentColor = blanco sobre el verde del botón.
-  const ICON_AP = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 9.5v3l3 .7 8.5 3.8V5L5.5 8.8z"/><path d="M6 13.5l1 4.5h2.5l-.8-3.4"/><circle cx="18.5" cy="16.5" r="2.6"/><path d="M20.4 18.4l1.9 1.9"/><path d="M17 6.5l1.8-1.3M17.5 10h2.3"/></svg>';
+  // Ícono del set propio al inicio de un botón (SPEC 24); .btn ya pone gap.
+  const withIcon = (b, name) => { b.prepend(PYL.ui.icons.el(name, 15, 'ic-solo')); return b; };
 
   const ID = { name: 'name', dias: 'days', visto: 'seen', pais: 'country' };
   const LABEL = { name: 'Nombre del producto', dias: 'Días activos', visto: 'Última vez visto', pais: 'País a excluir' };
@@ -36,7 +35,7 @@
     const btn = el('button', 'dk-btn ap-btn'); btn.type = 'button'; btn.id = 'ap-btn';
     btn.title = TITLE; btn.setAttribute('aria-label', TITLE);
     btn.setAttribute('aria-haspopup', 'dialog'); btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-controls', 'ap-panel');
-    btn.innerHTML = ICON_AP;
+    btn.innerHTML = PYL.ui.icons.svg('ad-search', 24); // megáfono con lupa del set propio; currentColor = blanco sobre el verde
     btn.addEventListener('click', on.toggle);
 
     const panel = el('div', 'dk-panel ap-panel'); panel.id = 'ap-panel'; panel.hidden = true;
@@ -48,7 +47,7 @@
     x.addEventListener('click', on.close);
     head.append(title, x);
 
-    const imp = el('button', 'btn ghost sm ap-import', '📥 Importar'); imp.type = 'button'; imp.id = 'ap-import';
+    const imp = withIcon(el('button', 'btn ghost sm ap-import', 'Importar'), 'download'); imp.type = 'button'; imp.id = 'ap-import';
     imp.title = 'Trae el nombre y la imagen del producto abierto en Mi candidato (Buscar producto)';
     imp.addEventListener('click', on.importar);
 
@@ -62,7 +61,7 @@
     photo.title = 'Pego la imagen con Ctrl+V o toco para elegir un archivo. Es la que adjunto en Claude junto al prompt.';
     const file = el('input'); file.type = 'file'; file.accept = 'image/*'; file.hidden = true;
     const img = el('img', 'qk-photo-img'); img.alt = ''; img.hidden = true;
-    const empty = el('span', 'qk-photo-empty'); empty.append(el('b', null, '🖼'), el('small', null, 'Ctrl+V'));
+    const empty = el('span', 'qk-photo-empty'); const eb = el('b'); eb.append(PYL.ui.icons.el('image', 20, 'ic-solo')); empty.append(eb, el('small', null, 'Ctrl+V'));
     photo.append(file, img, empty);
     file.addEventListener('change', () => { if (file.files[0]) on.photo(file.files[0]); file.value = ''; });
     const rm = el('button', 'qk-photo-rm', '✕'); rm.type = 'button'; rm.hidden = true;
@@ -93,11 +92,11 @@
     const lab = el('label', null, 'Prompt'); lab.htmlFor = 'ap-prompt';
     const ta = el('textarea'); ta.id = 'ap-prompt'; ta.readOnly = true; ta.rows = 5;
     ta.placeholder = 'Toca «Generar prompt» para armarlo con estos datos.';
-    const gen = el('button', 'btn sm ap-gen', '✨ Generar prompt'); gen.type = 'button'; gen.id = 'ap-gen';
+    const gen = withIcon(el('button', 'btn sm ap-gen', 'Generar prompt'), 'sparkles'); gen.type = 'button'; gen.id = 'ap-gen';
     gen.addEventListener('click', on.generate);
-    const copy = el('button', 'btn ghost sm', '📋 Copiar prompt'); copy.type = 'button'; copy.id = 'ap-copy';
+    const copy = withIcon(el('button', 'btn ghost sm', 'Copiar prompt'), 'copy'); copy.type = 'button'; copy.id = 'ap-copy';
     copy.addEventListener('click', on.copy);
-    const clear = el('button', 'btn ghost sm', '🧹 Limpiar'); clear.type = 'button'; clear.id = 'ap-clear';
+    const clear = withIcon(el('button', 'btn ghost sm', 'Limpiar'), 'broom'); clear.type = 'button'; clear.id = 'ap-clear';
     clear.title = 'Deja el formulario, la imagen y el prompt en blanco';
     clear.addEventListener('click', on.clear);
     // Arriba, sobre el primer campo: Importar | Copiar. Abajo, tras el prompt: Limpiar | Generar.

@@ -62,6 +62,53 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.deepStrictEqual([...pulse.querySelectorAll('stop')].map((s) => s.getAttribute('style')), ['stop-color:var(--b)', 'stop-color:var(--b2)'], 'Degradado del acento del tema');
   }
 
+  // 1a'. SPEC 24: íconos propios (PYL.ui.icons).
+  {
+    const ic = PYL.ui.icons;
+    assert.ok(Array.isArray(ic.NAMES) && ic.NAMES.length > 60, 'icons.NAMES trae el conjunto');
+    assert.strictEqual(new Set(ic.NAMES).size, ic.NAMES.length, 'Sin nombres repetidos');
+    for (const n of ic.NAMES) {
+      assert.ok(/^[a-z]+(-[a-z]+)*$/.test(n), 'Nombre kebab-case: ' + n);
+      const box = document.createElement('div');
+      box.innerHTML = ic.svg(n);
+      const s = box.firstElementChild;
+      assert.ok(s && s.tagName.toLowerCase() === 'svg' && box.children.length === 1, 'svg() da un <svg>: ' + n);
+      assert.strictEqual(s.getAttribute('viewBox'), '0 0 24 24', n);
+      assert.strictEqual(s.getAttribute('stroke'), 'currentColor', n);
+      assert.strictEqual(s.getAttribute('stroke-width'), '1.8', n);
+      assert.strictEqual(s.getAttribute('aria-hidden'), 'true', n);
+      assert.strictEqual(s.getAttribute('focusable'), 'false', n);
+      assert.ok(s.classList.contains('ic-svg') && s.children.length > 0, 'Clase ic-svg y dibujo: ' + n);
+      assert.ok(!s.querySelector('[stroke-width]'), 'Trazo fijo, sin grosores propios: ' + n);
+    }
+    assert.strictEqual(ic.svg('no-existe'), '', 'Nombre desconocido → ""');
+    assert.strictEqual(ic.svg('toString'), '', 'Nombre heredado de Object → ""');
+    assert.ok(ic.svg('trash', 20).includes('width="20"'), 'Tamaño por parámetro');
+    const sp = ic.el('target', 14, 'x-cls');
+    assert.ok(sp.tagName === 'SPAN' && sp.className === 'ic x-cls' && sp.getAttribute('aria-hidden') === 'true' && sp.querySelector('svg.ic-svg[width="14"]'), 'el() da <span class="ic"> con el svg');
+    assert.strictEqual(ic.el('target').className, 'ic', 'el() sin clase extra');
+    assert.deepStrictEqual(['g', 'y', 'r', 'n', 'zz'].map((t) => ic.dot(t).dataset.tone), ['g', 'y', 'r', 'n', 'n'], 'dot(tone): tono desconocido → n');
+    assert.ok(ic.dot('g').className === 'ic-dot' && !ic.dot('g').querySelector('svg'), 'dot() es un punto CSS, no un SVG');
+    const root = document.createElement('div');
+    root.innerHTML = '<span class="ic" data-ic="broom"></span><button data-ic="copy">Copiar</button><span class="ic" data-ic="bell" data-ic-size="20"></span>';
+    ic.hydrate(root); ic.hydrate(root);
+    assert.strictEqual(root.querySelectorAll('[data-ic="broom"] svg').length, 1, 'hydrate es idempotente');
+    assert.ok(root.querySelector('[data-ic="bell"] svg[width="20"]'), 'hydrate respeta data-ic-size');
+    assert.ok(!root.querySelector('button svg'), 'hydrate no toca un [data-ic] con contenido');
+    assert.ok([...document.querySelectorAll('[data-ic]')].every((n) => n.childNodes.length), 'Al arrancar no queda ningún [data-ic] vacío');
+    // Paso 3: HTML estático con íconos del set; el tooltip pinta tip.icon y la línea warn con alert.
+    assert.ok(document.querySelector('#b-new > .ic svg.ic-broom') && document.querySelector('#b-new').textContent.trim() === 'Limpiar formulario', 'Limpiar formulario con escoba y sin emoji');
+    assert.ok(document.querySelector('#story-copy svg.ic-clipboard') && document.querySelector('#story-report svg.ic-file') && document.querySelector('#btn-report .ico svg.ic-file'), 'Botones del resumen e informe con su ícono');
+    const ev = { clientX: 10, clientY: 10 };
+    PYL.ui.tooltip.showInfo(ev, { icon: 'coins', h: 'Título de prueba', p: 'x', warn: 'Ojo' });
+    const tipN = document.querySelector('#tip');
+    assert.ok(tipN.querySelector('.h > .ic svg.ic-coins') && tipN.querySelector('.h').textContent === 'Título de prueba', 'tip.icon va antes del título');
+    assert.ok(tipN.querySelector('.hm-warn > .ic svg.ic-alert') && tipN.querySelector('.hm-warn').textContent === 'Ojo', 'warn con el ícono alert, sin ⚠');
+    PYL.ui.tooltip.hide();
+    const T = PYL.ui.summary.TIPS;
+    assert.ok(Object.values(T).every((t) => ic.NAMES.includes(t.icon) && t.emoji && !/\p{Extended_Pictographic}/u.test(t.h)), 'TIPS del P&L: icon del set, h sin emoji y emoji aparte para el informe PDF');
+  }
+
   // 1b. SPEC 14: services.storage.hub (clave pyl-hub). Sin localStorage (file://) no lanza: load da null y save da false.
   assert.strictEqual(PYL.services.storage.hub.load(), null, 'hub.load sin localStorage');
   assert.strictEqual(PYL.services.storage.hub.save({ v: 1, items: [] }), false, 'hub.save sin localStorage avisa con false');
@@ -298,16 +345,16 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   assert.strictEqual(document.querySelectorAll('.hm-pop').length, 0, 'Esc lo cierra');
   assert.strictEqual(document.querySelectorAll('#hm-map [aria-pressed="true"]').length, 0, 'Abrir la i no elige la métrica');
   // Nombre del reporte de Meta en la "i": CTR y CPPI sí; CPM, CPC y CPA no. El CTR trae además "por personas" y la advertencia.
-  const reporte = (k) => { info(k, 'l').click(); const pop = document.querySelector('.hm-pop'); const r = { t: text('.hm-pop .hm-pop-report'), unique: !!pop.querySelector('.hm-pop-unique'), warn: text('.hm-pop .hm-warn') }; info(k, 'l').click(); return r; };
+  const reporte = (k) => { info(k, 'l').click(); const pop = document.querySelector('.hm-pop'); const r = { t: text('.hm-pop .hm-pop-report'), unique: !!pop.querySelector('.hm-pop-unique'), warn: text('.hm-pop .hm-warn'), warnIc: !!pop.querySelector('.hm-warn .ic svg.ic-alert') }; info(k, 'l').click(); return r; };
   assert.strictEqual(reporte('ctr').t, 'En el reporte de Meta: «CTR único (porcentaje de clics en el enlace)»', 'La i del CTR dice el nombre del reporte');
   assert.strictEqual(reporte('cppi').t, 'En el reporte de Meta: «Costo x Checkout»', 'La i del CPPI dice el nombre del reporte');
-  for (const k of ['cpm', 'cpc', 'cpa']) assert.deepStrictEqual(reporte(k), { t: '', unique: false, warn: '' }, 'La i de ' + k + ' no trae la línea del reporte');
+  for (const k of ['cpm', 'cpc', 'cpa']) assert.deepStrictEqual(reporte(k), { t: '', unique: false, warn: '', warnIc: false }, 'La i de ' + k + ' no trae la línea del reporte');
   // Fórmula en el panel de la "i" de cada métrica.
   const formula = (k) => { info(k, 'l').click(); const t = text('.hm-pop .hm-pop-formula'); info(k, 'l').click(); return t; };
   assert.ok(formula('ctr').includes('Meta (CTR único)') && formula('ctr').includes('TikTok: clics ÷ impresiones × 100'), 'La i del CTR trae su fórmula por plataforma');
   assert.ok(formula('cpc').includes('Monto gastado ÷ Clics en el enlace') && formula('cpm').includes('× 1.000') && formula('cppi').includes('Pagos iniciados') && formula('cpa').includes('Resultados'), 'Cada i trae su fórmula');
   const ctrPop = reporte('ctr');
-  assert.ok(ctrPop.unique && ctrPop.warn.includes('⚠') && ctrPop.warn.includes('Límite por confirmar'), 'La i del CTR explica el CTR único y trae la advertencia');
+  assert.ok(ctrPop.unique && ctrPop.warnIc && ctrPop.warn.includes('Límite por confirmar'), 'La i del CTR explica el CTR único y trae la advertencia');
   assert.strictEqual(reporte('cppi').warn, '', 'Solo el CTR trae advertencia');
   // El aviso del número de Meta del CTR trae la advertencia; el de TikTok no.
   document.querySelector('#hm-map .m-ctr .hm-side.r .hm-main').dispatchEvent(new window.MouseEvent('mousemove', { bubbles: true }));
@@ -386,7 +433,8 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   assert.deepStrictEqual(tabs.map((b) => b.dataset.v).slice(4, 6), ['metricas', 'testeo'], 'Testeo va justo después de Métricas');
   const partes = [...document.querySelectorAll('#ts-parts [data-part]')];
   assert.deepStrictEqual(partes.map((b) => b.dataset.part), ['real', 'test', 'sim'], 'Lectura real, Fase de testeo y Simulador');
-  assert.deepStrictEqual(partes.map((b) => b.textContent), ['📂 Lectura real · pronto', '🧪 Fase de testeo', '🎛️ Simulador'], 'Sin Surfing Scaling; Simulador habilitado');
+  assert.deepStrictEqual(partes.map((b) => b.textContent), ['Lectura real · pronto', 'Fase de testeo', 'Simulador'], 'Sin Surfing Scaling; Simulador habilitado');
+  assert.deepStrictEqual(partes.map((b) => b.querySelector('svg').classList[1]), ['ic-folder-open', 'ic-flask', 'ic-sliders'], 'Sub-pestañas con su ícono del set');
   assert.ok(partes[0].disabled && !partes[1].disabled, 'Lectura real se ve pero no se puede abrir');
   assert.ok(partes[1].getAttribute('aria-pressed') === 'true' && !document.querySelector('#ts-test').hidden && document.querySelector('#ts-soon').hidden, 'Abre en Fase de testeo');
   partes[0].click();
@@ -414,7 +462,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   const esPartes = [...document.querySelectorAll('#es-parts [data-part]')];
   assert.strictEqual(document.querySelector('#es-parts').getAttribute('aria-label'), 'Parte del escalado');
   assert.deepStrictEqual(esPartes.map((b) => b.dataset.part), ['real', 'scale', 'sim'], 'Lectura real, Fase de escalado y Simulador');
-  assert.deepStrictEqual(esPartes.map((b) => b.textContent), ['📂 Lectura real · pronto', '📈 Fase de escalado', '⚠️ Simulador · revisar']);
+  assert.deepStrictEqual(esPartes.map((b) => b.textContent), ['Lectura real · pronto', 'Fase de escalado', 'Simulador · revisar']);
   assert.deepStrictEqual(esPartes.map((b) => b.disabled), [true, false, true], 'Solo la Fase de escalado está abierta');
   assert.ok(esPartes[1].getAttribute('aria-pressed') === 'true' && !document.querySelector('#es-scale').hidden && document.querySelector('#es-real-soon').hidden, 'Abre en Fase de escalado');
   esPartes[0].click(); esPartes[2].click();
@@ -422,7 +470,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   // Métodos: 3 tarjetas; Surfing Scaling abierto; los otros dos "pronto" abren su tarjeta.
   const metodos = [...document.querySelectorAll('#es-methods .st-tab')];
   assert.deepStrictEqual(metodos.map((b) => b.querySelector('b').textContent), ['Surfing Scaling', 'Escalado horizontal · pronto', 'Refresco de creativos · pronto']);
-  assert.deepStrictEqual(metodos.map((b) => b.querySelector('.st-ic').textContent), ['🏄', '🔀', '🔄']);
+  assert.deepStrictEqual(metodos.map((b) => b.querySelector('.st-ic svg').classList[1]), ['ic-wave', 'ic-shuffle', 'ic-refresh']);
   assert.ok(text('#es-methods .st-tab small').includes('+20 % por escalón'), 'El +20 % sale de NS_TEST.step');
   assert.ok(metodos[0].getAttribute('aria-pressed') === 'true' && !document.querySelector('#es-surf').hidden && document.querySelector('#es-soon').hidden, 'Surfing Scaling abierto');
   assert.deepStrictEqual(metodos.map((b) => b.disabled), [false, true, true], 'Los métodos "pronto" están deshabilitados');
@@ -496,7 +544,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   assert.ok(text('#es-mode').includes('Caso 1 de 3 · Conjunto 1') && text('#es-mode').includes('N2 · $ 120.000') && document.querySelectorAll('#es-mode .es-day').length === 3, 'Caso 1: escalón y 3 días');
   assert.ok(!document.querySelector('#es-fb') && !document.querySelector('#es-step .es-on'), 'Antes de decidir no hay veredicto ni rama iluminada');
   document.querySelector('#es-mode [data-action="hold"]').click();
-  assert.ok(text('#es-fb').includes('❌') && text('#es-fb').includes('Elegiste = Sostener') && text('#es-fb').includes('tocaba ⬆️ Subir un escalón'), 'Fallo: dice cuál era');
+  assert.ok(document.querySelector('#es-fb .es-fb-h svg.ic-x-circle') && text('#es-fb').includes('Elegiste Sostener') && text('#es-fb').includes('tocaba Subir un escalón'), 'Fallo: dice cuál era');
   assert.ok(document.querySelector('#es-mode [data-action="up"]').classList.contains('es-right') && document.querySelector('#es-mode [data-action="hold"]').classList.contains('es-wrong'), 'Marca la correcta y la elegida');
   assert.ok([...document.querySelectorAll('#es-mode .es-dec')].every((b) => b.disabled), 'No se decide dos veces');
   assert.strictEqual(document.querySelector('#es-step .es-on').dataset.branch, 'zone-up', 'Se ilumina la rama del caso');
@@ -505,11 +553,11 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   document.querySelector('#es-next').click();
   assert.ok(text('#es-mode').includes('Caso 2 de 3 · Conjunto 5') && !document.querySelector('#es-fb') && !document.querySelector('#es-step .es-on'), 'Caso 2 sin veredicto');
   document.querySelector('#es-mode [data-action="off"]').click();
-  assert.ok(text('#es-fb').includes('✅') && text('#es-fb').includes('REGLA DURA') && text('#es-fb').includes('Se apaga el conjunto') && document.querySelector('#es-step .es-on').dataset.branch === 'off-hard', 'Regla dura');
+  assert.ok(document.querySelector('#es-fb .es-fb-h svg.ic-check-circle') && text('#es-fb').includes('REGLA DURA') && text('#es-fb').includes('Se apaga el conjunto') && document.querySelector('#es-step .es-on').dataset.branch === 'off-hard', 'Regla dura');
   document.querySelector('#es-next').click();
   assert.ok(text('#es-mode').includes('Conjunto 9') && !document.querySelector('#es-mode .es-day') && text('#es-mode').includes('Acabas de subir'), 'Caso de protección: un momento del día');
   document.querySelector('#es-mode [data-action="down"]').click();
-  assert.ok(text('#es-fb').includes('✅') && text('#es-fb').includes('regla del curso') && text('#es-fb .tag') === 'Regla del curso' && document.querySelector('#es-step .es-on').dataset.branch === 'raise-down', 'Protección del curso');
+  assert.ok(document.querySelector('#es-fb .es-fb-h svg.ic-check-circle') && text('#es-fb').includes('regla del curso') && text('#es-fb .tag') === 'Regla del curso' && document.querySelector('#es-step .es-on').dataset.branch === 'raise-down', 'Protección del curso');
   assert.strictEqual(text('#es-next'), 'Ver el resultado →', 'El último caso lleva al resultado');
   document.querySelector('#es-next').click();
   assert.ok(text('#es-end').includes('2 de 3 decisiones acertadas (67 %)') && text('#es-end').includes('Mejor puntaje: 67 %'), 'Fin de ronda');
@@ -574,7 +622,8 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   assert.ok(text('#v-logistica .lead').includes('seguimiento') && text('#v-logistica .lead').includes('mensajes a clientes'), 'Lead de Logística');
   const lgPartes = [...document.querySelectorAll('#lg-parts [data-part]')];
   assert.deepStrictEqual(lgPartes.map((b) => b.dataset.part), ['msgs', 'track']);
-  assert.deepStrictEqual(lgPartes.map((b) => b.textContent), ['💬 Plantillas de mensajes', '📦 Seguimiento de pedidos · pronto']);
+  assert.deepStrictEqual(lgPartes.map((b) => b.textContent), ['Plantillas de mensajes', 'Seguimiento de pedidos · pronto']);
+  assert.deepStrictEqual(lgPartes.map((b) => b.querySelector('svg').classList[1]), ['ic-message', 'ic-package'], 'Sub-pestañas con su ícono del set');
   assert.deepStrictEqual(lgPartes.map((b) => b.disabled), [false, true], 'Seguimiento está deshabilitado');
   assert.strictEqual(lgPartes[0].getAttribute('aria-pressed'), 'true');
   assert.ok(!document.querySelector('#lg-msgs').hidden, 'Plantillas de mensajes abre al cargar');
@@ -676,7 +725,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.deepStrictEqual($$('#lg-pedido-form input').map((i) => i.placeholder), ['Ej: Eugenia', 'Ej: Omegaxl joint support', 'Ej: Colombia 20# 19 .30 - barrio Capri', 'Ej: PASTO', 'Ej: NARIÑO', 'Ej: 3214566677', 'Ej: $ 97.400']);
     assert.ok(campos.every((k) => $(P('err-' + k))), 'Cada campo trae su aviso');
     assert.deepStrictEqual($$('#lg-card-pedido .lg-acts button').map((b) => b.id), ['lg-pedido-gen', 'lg-pedido-clear', 'lg-pedido-copy'], 'Sus propios botones');
-    assert.ok($$('#lg-card-pedido [data-ic]').every((b) => b.querySelector('.lg-ic svg')), 'Con sus íconos');
+    assert.ok($$('#lg-pedido-gen, #lg-pedido-clear, #lg-pedido-copy').every((b) => b.querySelector('.ic svg.ic-svg')), 'Con sus íconos del set propio');
     // Producto viene de Desarrollo; el total no.
     escribe(P('f-product'), '');
     landing.prod = { name: 'Omegaxl joint support', price: 97400 };
@@ -1219,13 +1268,13 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
   paso(1);
   assert.ok(text('#ts-step').includes('Paso 2 de 6') && document.querySelectorAll('#ts-step .ts-cut').length === 1, 'El paso 2 muestra solo su tarjeta');
   assert.ok(!document.querySelector('#ts-step .ts-ex') && !document.querySelector('#ts-step .ts-on'), 'Sin tarjeta de ejemplo ni fila iluminada en los pasos 2 a 4');
-  assert.deepStrictEqual([...document.querySelectorAll('#ts-step .ts-br .ts-vd')].map((n) => n.textContent), ['✅ MARAVILLOSO', '🛑 Apagar', '⚠️ Mantener vigilando', '✅ Seguir sin tocar'], 'Cada fila del corte 1 muestra su veredicto');
+  assert.deepStrictEqual([...document.querySelectorAll('#ts-step .ts-br .ts-vd')].map((n) => n.querySelector('svg').classList[1] + ' ' + n.textContent), ['ic-check-circle MARAVILLOSO', 'ic-stop Apagar', 'ic-alert Mantener vigilando', 'ic-check-circle Seguir sin tocar'], 'Cada fila del corte 1 muestra su veredicto');
   assert.ok(text('#ts-step').includes('3 o 4 pagos iniciados · 0 ventas'), 'Corte 1: 0 ventas');
   paso(2);
   assert.deepStrictEqual([...document.querySelectorAll('#ts-step .ts-grp-h')].map((n) => n.textContent), ['Sin ventas', 'Con venta']);
   assert.ok(!document.querySelector('#ts-step .ts-on') && document.querySelectorAll('#ts-step .ts-br .ts-vd').length === 6, 'Corte 2: veredicto en sus 6 filas y sin fila iluminada');
   paso(3);
-  assert.ok(text('#ts-step .ts-own') === '❓ Preguntar' && !document.querySelector('#ts-step .tag.ts-own') && document.querySelectorAll('#ts-step .ts-cut .ts-br').length === 3, 'Corte 3 con Regla propia');
+  assert.ok(text('#ts-step .ts-own') === 'Preguntar' && document.querySelector('#ts-step .ts-own svg.ic-help') && !document.querySelector('#ts-step .tag.ts-own') && document.querySelectorAll('#ts-step .ts-cut .ts-br').length === 3, 'Corte 3 con Regla propia');
   { // La aclaración de la regla propia sale como tooltip al pasar el mouse por "Preguntar".
     const ow = document.querySelector('#ts-step .ts-own');
     ow.dispatchEvent(new window.MouseEvent('mousemove', { bubbles: true }));
@@ -1375,17 +1424,17 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     window.clearInterval = () => { limpiados++; tic = null; };
     window.matchMedia = () => ({ matches: false });
     conSemilla(1, () => document.querySelector('#ts-sx-scen [data-scen="win"]').click());
-    assert.strictEqual(play().textContent, '▶ Correr', 'Antes de correr dice Correr');
+    assert.strictEqual(play().textContent + '|' + play().dataset.ic, 'Correr|play', 'Antes de correr dice Correr con el ícono play');
     play().click();
-    assert.ok(TS.simRun.playing && periodo === 120 && play().textContent === '⏸ Pausa', 'Corre con tics de 120 ms y el botón pasa a Pausa');
+    assert.ok(TS.simRun.playing && periodo === 120 && play().textContent === 'Pausa' && play().dataset.ic === 'pause', 'Corre con tics de 120 ms y el botón pasa a Pausa');
     tic(); tic();
     assert.strictEqual(TS.simRun.spend, 2000, 'Cada tic suma 1.000');
     play().click();
-    assert.ok(!TS.simRun.playing && limpiados === 1 && play().textContent === 'Continuar ▶', '⏸ pausa a mitad');
+    assert.ok(!TS.simRun.playing && limpiados === 1 && play().textContent === 'Continuar' && play().dataset.ic === 'play', '⏸ pausa a mitad');
     play().click();
     for (let n = 0; n < 18; n++) tic();
     assert.ok(TS.simRun.spend === 20000 && !TS.simRun.playing, 'Se pausa en el corte 1 (20.000)');
-    assert.ok(text('#ts-sx-out').includes('Así lo califica el Lab') && play().textContent === 'Continuar ▶' && celdas()[0] !== '—', 'y muestra el veredicto de ese punto');
+    assert.ok(text('#ts-sx-out').includes('Así lo califica el Lab') && play().textContent === 'Continuar' && celdas()[0] !== '—', 'y muestra el veredicto de ese punto');
     play().click();
     for (let n = 0; n < 10; n++) tic();
     assert.ok(TS.simRun.spend === 30000 && !TS.simRun.playing, '"Continuar ▶" sigue hasta el corte 2 (30.000)');
@@ -1408,7 +1457,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     // ⏮ vuelve a 0 con la misma semilla; 🎲 otra semilla con las mismas entradas.
     const semilla = TS.simRun.seed, entradas = JSON.stringify(TS.sim);
     document.querySelector('#ts-sx-reset').click();
-    assert.ok(TS.simRun.spend === 0 && TS.simRun.seed === semilla && play().textContent === '▶ Correr', '⏮ vuelve a 0 con la misma semilla');
+    assert.ok(TS.simRun.spend === 0 && TS.simRun.seed === semilla && play().textContent === 'Correr', '⏮ vuelve a 0 con la misma semilla');
     conSemilla(9, () => document.querySelector('#ts-sx-again').click());
     assert.ok(TS.simRun.seed === 9 && TS.simRun.spend === 0 && JSON.stringify(TS.sim) === entradas, '🎲 cambia la semilla y deja las entradas');
     // Con prefers-reduced-motion, ▶ salta de corte en corte sin tics.
@@ -1555,7 +1604,8 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.deepStrictEqual($$('#lg-card-guia .lg-acts button').map((b) => b.id), ['lg-guia-gen', 'lg-guia-clear', 'lg-guia-copy'], 'Botones en .lg-acts');
     assert.ok($('#lg-head, .lg-head #lg-guia-import'), 'Traer de Desarrollo es un ícono junto al título');
     assert.deepStrictEqual($$('#lg-guia-clear, #lg-guia-copy, #lg-guia-gen').map((b) => b.textContent).sort(), ['Generar mensaje', 'Copiar mensaje', 'Limpiar'].sort());
-    assert.ok($$('#lg-guia-import, #lg-guia-clear, #lg-guia-copy, #lg-guia-gen').every((b) => b.querySelector('.lg-ic svg') && b.querySelectorAll('.lg-ic').length === 1), 'Cada botón trae su ícono dibujado (SVG), sin emojis');
+    assert.ok($$('#lg-guia-import, #lg-guia-clear, #lg-guia-copy, #lg-guia-gen').every((b) => b.querySelector('.ic svg.ic-svg') && b.querySelectorAll('.ic').length === 1), 'Cada botón trae su ícono dibujado (SVG), sin emojis');
+    assert.deepStrictEqual(['import', 'clear', 'copy', 'gen'].map((k) => $('#lg-guia-' + k + ' svg').classList[1]), ['ic-download', 'ic-broom', 'ic-copy', 'ic-sparkles'], 'Íconos de dos tonos del set: descargar, escoba, copiar y chispas');
     assert.strictEqual($('#lg-guia-import').textContent, '', 'Traer de Desarrollo es solo ícono');
     // Copiar sin mensaje avisa y no copia.
     $('#toast').textContent = '';
@@ -1939,7 +1989,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.ok(zona().includes('Límite máximo permitido') && zona().includes('0,5 %') && zona().includes('No se mira'), 'Zona del CTR en TikTok: límite y nota');
     assert.ok(!$('#ch-d-zone .hm-warn'), 'El CTR de TikTok no trae advertencia');
     cambiar('meta');
-    assert.ok($('#ch-d-zone .hm-warn') && $('#ch-d-zone .hm-warn').textContent.includes('⚠') && $('#ch-d-zone .hm-warn').textContent.includes(M.CTR_UNIQUE_WARN), 'El CTR de Meta trae ⚠ CTR_UNIQUE_WARN');
+    assert.ok($('#ch-d-zone .hm-warn') && $('#ch-d-zone .hm-warn .ic svg.ic-alert') && $('#ch-d-zone .hm-warn').textContent.includes(M.CTR_UNIQUE_WARN), 'El CTR de Meta trae ⚠ CTR_UNIQUE_WARN');
     // Rango ideal en CPM (Meta).
     disparar('#ch-d-rows [data-k="cpm"]', 'mouseenter'); disparar('#ch-d-rows [data-k="cpm"]', 'focus');
     assert.deepStrictEqual(marcado(), ['ctr'], 'mouseenter y focus no marcan');
@@ -2588,9 +2638,9 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     btn.click();
     // 🔔/🔕
     const snd = $('#mw-sound');
-    assert.ok(snd && snd.getAttribute('aria-pressed') === 'true' && /🔔/.test(snd.textContent), 'Sonido encendido por defecto');
+    assert.ok(snd && snd.getAttribute('aria-pressed') === 'true' && snd.querySelector('svg.ic-bell') && snd.textContent === 'Sonido', 'Sonido encendido por defecto');
     snd.click();
-    assert.ok($('#mw-sound').getAttribute('aria-pressed') === 'false' && /🔕/.test($('#mw-sound').textContent) && st.saved.sound === false, '🔕 apaga y se guarda');
+    assert.ok($('#mw-sound').getAttribute('aria-pressed') === 'false' && $('#mw-sound svg.ic-bell-off') && $('#mw-sound').textContent === 'Sin sonido' && st.saved.sound === false, '🔕 apaga y se guarda');
     mwFake.ins = [mwIns('s1', 41000, 8, 2), mwIns('s2', 12000, 2), mwIns('s3', 30500, 6), mwIns('s4', 22000, 3)];
     await W.refresh();
     assert.ok(btn.querySelector('.mw-set[data-id="s1"]').classList.contains('mw-alert'), 'Con 🔕 late igual');
@@ -3562,6 +3612,45 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.ok(lista.some((q) => q.text === esperada.text && q.author === esperada.author), 'La frase sale de la lista');
     assert.deepStrictEqual(JSON.parse(JSON.stringify(W5.PYL.app.state.home)), { slot: esperada.slot, text: esperada.text, author: esperada.author });
     W5.close();
+  }).then(() => fresca()).then((d6) => {
+    // SPEC 24: barrido. Ningún emoji visible fuera de las zonas permitidas (contenido que sale de la app:
+    // mensajes de Logística, narrativa y veredicto del P&L, informe PDF, prompts). Los símbolos tipográficos se quedan.
+    const W6 = d6.window, doc6 = W6.document;
+    const PERMITIDOS = new Set(['®', '©', '™', '↔', '↕', '↖', '↗', '↘', '↙', '▶', '◀']);
+    const FUERA = 'script, style, textarea, #report, [id^="story"], #verdict, .lg-out, .ld-prompt > p, #dk-prompt, #ap-prompt';
+    const hallados = new Map(); // texto → dónde apareció primero
+    let pasadas = 0;
+    const barre = (donde) => {
+      pasadas++;
+      const tw = doc6.createTreeWalker(doc6.body, W6.NodeFilter.SHOW_TEXT);
+      for (let n = tw.nextNode(); n; n = tw.nextNode()) {
+        if (n.parentElement && n.parentElement.closest(FUERA)) continue;
+        const t = n.data.trim().slice(0, 70);
+        if (!hallados.has(t) && (n.data.match(/\p{Extended_Pictographic}/gu) || []).some((ch) => !PERMITIDOS.has(ch))) hallados.set(t, donde);
+      }
+    };
+    // Recorre los botones de navegación interna de la vista (sub-pestañas, pasos, estrategias, fases, modos) uno a uno.
+    const INTERNOS = '[id$="-parts"] button:not([disabled]), [id$="-steps"] button, #b-strats button, #ma-strats button, .ps-node, [data-bview], #ts-sx-modes button, #es-modes button';
+    for (const t of [...doc6.querySelectorAll('#tabs button')]) {
+      t.click(); barre(t.dataset.v);
+      const vista = doc6.getElementById('v-' + t.dataset.v);
+      for (let i = 0; i < 80; i++) {
+        const bs = [...vista.querySelectorAll(INTERNOS)];
+        if (i >= bs.length) break;
+        bs[i].click(); barre(t.dataset.v + ' › ' + (bs[i].dataset.part || bs[i].dataset.mode || bs[i].dataset.bview || bs[i].textContent.trim().slice(0, 30)));
+      }
+    }
+    // Paneles flotantes, Cortes de testeo, Mis tareas (Acerca de) y el modo Editar del Centro de mando.
+    doc6.querySelector('#tabs [data-v="buscar"]').click();
+    for (const q of ['#qk-btn', '#dk-btn']) { const b = doc6.querySelector(q); if (b) { b.click(); barre(q); b.click(); } }
+    doc6.querySelector('#tabs [data-v="desarrollo"]').click();
+    { const b = doc6.querySelector('#ap-btn'); if (b) { b.click(); barre('#ap-btn'); b.click(); } }
+    doc6.querySelector('#tabs [data-v="dash"]').click();
+    for (const q of ['#mw-root .mw-btn', '#tk-gear', '#hb-edit']) { const b = doc6.querySelector(q); if (b) { b.click(); barre(q); } }
+    assert.ok(pasadas >= 40, 'El barrido recorrió pestañas, pasos y paneles (' + pasadas + ')');
+    const lista = [...hallados].map(([t, donde]) => donde + ': «' + t + '»');
+    assert.deepStrictEqual(lista, [], 'Emojis fuera de las zonas permitidas:\n' + lista.join('\n'));
+    W6.close();
   }).then(() => new Promise((ok) => setTimeout(ok, 200))).then(() => {
     // SPEC 18: en la página principal también hay frase (lista local, sin fetch).
     assert.ok(!document.getElementById('home-quote').hidden, 'La frase se ve');

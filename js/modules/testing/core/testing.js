@@ -21,10 +21,10 @@
 
   // Las cuatro decisiones de la práctica. Cada veredicto cae en una.
   const TEST_ACTIONS = [
-    { k: 'off', t: 'Apagar', icon: '🛑' },
-    { k: 'watch', t: 'Mantener vigilando', icon: '⚠️' },
-    { k: 'go', t: 'Seguir sin tocar', icon: '✅' },
-    { k: 'spend', t: 'Dejar gastar el día', icon: '🚀' },
+    { k: 'off', t: 'Apagar', icon: 'stop' },
+    { k: 'watch', t: 'Mantener vigilando', icon: 'alert' },
+    { k: 'go', t: 'Seguir sin tocar', icon: 'check-circle' },
+    { k: 'spend', t: 'Dejar gastar el día', icon: 'rocket' },
   ];
   const TOCA = { off: 'Apagar', watch: 'Mantener vigilando', go: 'Seguir sin tocar', spend: 'Dejar gastar el día' };
   const ACTION_OF = { off: 'off', weak: 'watch', hold: 'watch', own: 'off', good: 'go', great: 'go', spend: 'spend' };
@@ -135,8 +135,8 @@
   // Sub-pestañas de Testeo. Una parte con `disabled` se ve pero no se puede abrir (como TikTok Ads en Desarrollo);
   // su `soon` es la tarjeta "Pronto" que mostrará mientras tanto. Un valor guardado de una parte así cae en la primera abierta.
   const TESTING_PARTS = [
-    { k: 'real', t: '📂 Lectura real · pronto', disabled: true, soon: {
-      icon: '📂', h: 'Lectura real',
+    { k: 'real', icon: 'folder-open', t: 'Lectura real · pronto', disabled: true, soon: {
+      icon: 'folder-open', h: 'Lectura real',
       d: 'Subo el reporte de mis campañas y la app me dice qué hacer con cada conjunto. Esta parte llega en otra entrega.',
       items: [
         ['Subo mi reporte de Meta (el archivo del Administrador de anuncios).'],
@@ -145,8 +145,8 @@
         ['Si se apaga, qué revisar: el CPM, el CPC o la página, la oferta y el formulario.'],
       ],
     } },
-    { k: 'test', t: '🧪 Fase de testeo' },
-    { k: 'sim', t: '🎛️ Simulador' },
+    { k: 'test', icon: 'flask', t: 'Fase de testeo' },
+    { k: 'sim', icon: 'sliders', t: 'Simulador' },
   ];
   const testingPart = (k) => TESTING_PARTS.find((p) => p.k === k && !p.disabled) || TESTING_PARTS.find((p) => !p.disabled);
 
@@ -185,7 +185,7 @@
     const x = BRANCH[b.id], action = ACTION_OF[x.v];
     b.v = x.v; b.verdict = { action, toca: TOCA[action], veredicto: x.veredicto };
     b.badge = x.v === 'great' ? x.veredicto : TOCA[action]; // texto de la etiqueta: la acción, salvo MARAVILLOSO
-    if (b.own) { b.badge = 'Preguntar'; b.badgeIcon = '❓'; b.tip = { h: 'Regla propia', p: 'NovaSociety no define este caso. Con 1 venta a ' + copText(K3) + ' el CPA ya es ' + copText(K3) + ' o más: seguir es gastar con pérdida. Queda por aclarar.' }; } // regla propia: queda por aclarar con NovaSociety, no se presenta como acción
+    if (b.own) { b.badge = 'Preguntar'; b.badgeIcon = 'help'; b.tip = { h: 'Regla propia', p: 'NovaSociety no define este caso. Con 1 venta a ' + copText(K3) + ' el CPA ya es ' + copText(K3) + ' o más: seguir es gastar con pérdida. Queda por aclarar.' }; } // regla propia: queda por aclarar con NovaSociety, no se presenta como acción
   }
 
   // Si se apagó: la cadena que se revisa. Las soluciones son las del MCP (reglas_de_juan).
@@ -193,9 +193,9 @@
     flow: ['CPM', 'CPC', 'CPPI', 'CPA'],
     // Lo que no se hace durante el testeo. El 8.000 del ejemplo sale del corte 1 (K1 × 0,4), no se escribe a mano.
     donts: [
-      { icon: '⛔', b: 'No apagues antes de un corte.', p: [' Con ', money(Math.round(K1 * 0.4)), ' gastados los números todavía no dicen nada.'] },
-      { icon: '⛔', b: 'No toques el anuncio mientras está en testeo.', p: [' Si cambias el texto, el público o el presupuesto, la lectura se daña.'] },
-      { icon: '⛔', b: 'No decidas por el CTR.', p: [' Decide la cadena: CPM → CPC → CPPI → CPA.'] },
+      { icon: 'ban', b: 'No apagues antes de un corte.', p: [' Con ', money(Math.round(K1 * 0.4)), ' gastados los números todavía no dicen nada.'] },
+      { icon: 'ban', b: 'No toques el anuncio mientras está en testeo.', p: [' Si cambias el texto, el público o el presupuesto, la lectura se daña.'] },
+      { icon: 'ban', b: 'No decidas por el CTR.', p: [' Decide la cadena: CPM → CPC → CPPI → CPA.'] },
     ],
     reads: [
       { k: 'cpm', when: ['CPM caro (más de ', { b: cpmMax('meta') }, ' en Meta o ', { b: cpmMax('tiktok') }, ' en TikTok)'], fix: ['Creativos nuevos, con el hook en los primeros tres segundos.'] },

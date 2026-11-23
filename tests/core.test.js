@@ -342,7 +342,7 @@ caso('Escalado: 6 pasos en orden, tarjetas de corte y ramas que testVerdict devu
   assert.deepStrictEqual(core.TEST_CUTS[0].branches.map((b) => txt(b.cond).endsWith('0 ventas')), [false, true, true, true]);
   assert.deepStrictEqual(core.TEST_CUTS[0].branches.map((b) => b.badge), ['MARAVILLOSO', 'Apagar', 'Mantener vigilando', 'Seguir sin tocar']);
   assert.ok(core.TEST_CUTS.flatMap((c) => c.branches).filter((b) => !b.own).every((b) => b.badge === (b.v === 'great' ? b.verdict.veredicto : b.verdict.toca)), 'badge = acción, salvo great y la regla propia');
-  assert.deepStrictEqual([tc('c3-own').badge, tc('c3-own').badgeIcon, tc('c3-own').verdict.action], ['Preguntar', '❓', 'off'], 'Regla propia: etiqueta Preguntar; la acción sigue siendo apagar');
+  assert.deepStrictEqual([tc('c3-own').badge, tc('c3-own').badgeIcon, tc('c3-own').verdict.action], ['Preguntar', 'help', 'off'], 'Regla propia: etiqueta Preguntar; la acción sigue siendo apagar');
   assert.strictEqual(txt(core.TEST_CUTS[0].branches[2].cond), '3 o 4 pagos iniciados · 0 ventas');
   // Semáforo y marca de Regla propia.
   assert.deepStrictEqual(core.TEST_CUTS.flatMap((c) => c.branches).filter((b) => b.own).map((b) => b.id), ['c3-own']);
@@ -359,7 +359,7 @@ caso('Escalado: 6 pasos en orden, tarjetas de corte y ramas que testVerdict devu
   assert.ok(txt(D[0].p).includes('Con $ 8.000 gastados') && txt(D[0].p).includes('todavía no dicen nada'));   // 8.000 = corte 1 × 0,4
   assert.ok(txt(D[1].p).includes('el texto, el público o el presupuesto'));
   assert.ok(txt(D[2].p).includes('CPM → CPC → CPPI → CPA'));
-  assert.ok(D.every((d) => d.icon === '⛔'));
+  assert.ok(D.every((d) => d.icon === 'ban'));
   assert.ok(core.TEST_CHAIN.reads.every((r) => !('icon' in r)), 'las lecturas no llevan emoji');
   assert.strictEqual(S[4].where, 'Qué revisar y qué no hacer');
   assert.strictEqual(core.TEST_CHAIN.reads.length, 3);
@@ -378,7 +378,7 @@ caso('Escalado: 6 pasos en orden, tarjetas de corte y ramas que testVerdict devu
 
 caso('Testeo: partes en orden, Lectura real deshabilitada con su tarjeta Pronto y frase del paso 4', () => {
   assert.deepStrictEqual(core.TESTING_PARTS.map((p) => p.k), ['real', 'test', 'sim']);
-  assert.strictEqual(core.TESTING_PARTS[2].t, '🎛️ Simulador');
+  assert.deepStrictEqual([core.TESTING_PARTS[2].icon, core.TESTING_PARTS[2].t], ['sliders', 'Simulador']);
   assert.ok(!core.TESTING_PARTS[2].disabled && core.TESTING_PARTS[0].disabled, 'Simulador habilitado; Lectura real sigue pronto');
   assert.strictEqual(core.testingPart('sim').k, 'sim', 'Un sim guardado abre el Simulador');
   assert.ok(core.TESTING_PARTS[0].disabled && core.TESTING_PARTS[0].soon && !core.TESTING_PARTS[1].disabled, 'Solo Lectura real está deshabilitada');
@@ -549,12 +549,12 @@ caso('Escalado: scaleCheck y scaleFree (Juega con los números)', () => {
 
 caso('Escalado: sub-pestañas, métodos y 7 pasos de Surfing Scaling', () => {
   assert.deepStrictEqual(core.SCALING_PARTS.map((p) => [p.k, !!p.disabled]), [['real', true], ['scale', false], ['sim', true]]);
-  assert.deepStrictEqual(core.SCALING_PARTS.map((p) => p.t), ['📂 Lectura real · pronto', '📈 Fase de escalado', '⚠️ Simulador · revisar']);
+  assert.deepStrictEqual(core.SCALING_PARTS.map((p) => [p.icon, p.t]), [['folder-open', 'Lectura real · pronto'], ['trend-up', 'Fase de escalado'], ['alert', 'Simulador · revisar']]);
   assert.ok(core.SCALING_PARTS[0].soon.h && core.SCALING_PARTS[0].soon.items.length);
   assert.strictEqual(core.scalingPart('real').k, 'scale');
   assert.strictEqual(core.scalingPart('sim').k, 'scale');
   assert.strictEqual(core.scalingPart('x').k, 'scale');
-  assert.deepStrictEqual(core.SCALE_METHODS.map((m) => [m.k, m.icon, !!m.steps, !!m.soon]), [['surf', '🏄', true, false], ['horiz', '🔀', false, true], ['refresh', '🔄', false, true]]);
+  assert.deepStrictEqual(core.SCALE_METHODS.map((m) => [m.k, m.icon, !!m.steps, !!m.soon]), [['surf', 'wave', true, false], ['horiz', 'shuffle', false, true], ['refresh', 'refresh', false, true]]);
   assert.ok(core.SCALE_METHODS[0].d.includes('+20 %'), 'el +20 % sale de NS_TEST.step');
   assert.strictEqual(core.scaleMethod('refresh').k, 'surf', 'Un método sin pasos no se abre');
   assert.strictEqual(core.scaleMethod('x').k, 'surf');
@@ -580,7 +580,7 @@ caso('Escalado: sub-pestañas, métodos y 7 pasos de Surfing Scaling', () => {
 caso('Escalado: práctica, cada caso tiene respuesta y la califica scaleVerdict/scaleGuard', () => {
   const ids = core.SCALE_CASES.map((c) => c.id);
   assert.strictEqual(new Set(ids).size, ids.length);
-  assert.deepStrictEqual(core.SCALE_ACTIONS.map((a) => [a.k, a.icon]), [['up', '⬆️'], ['hold', '='], ['down', '⬇️'], ['down2', '⏬'], ['off', '🛑']]);
+  assert.deepStrictEqual(core.SCALE_ACTIONS.map((a) => [a.k, a.icon]), [['up', 'arrow-up'], ['hold', 'equal'], ['down', 'arrow-down'], ['down2', 'arrows-down'], ['off', 'stop']]);
   assert.strictEqual(core.SCALE_PRACTICE.tope, core.GENERIC_CPA.tope);
   const respuesta = (c) => (c.kind === 'guard'
     ? core.scaleGuard({ kind: c.guard, spend: c.spend, sales: c.sales, level: c.level, tope: 15000 })
@@ -717,7 +717,7 @@ caso('Escalado: la ronda de práctica (orden, decisiones, fin de caso y puntaje)
   r = core.practiceDecide(r, 'go');
   assert.deepStrictEqual(r.last, { chosen: 'go', correct: 'off', ok: false });
   const v = core.practiceView(r);
-  assert.deepStrictEqual([v.last.ok, v.last.chosen.icon, v.last.correct.t, v.ends, v.verdict.step, v.verdict.branch], [false, '✅', 'Apagar', true, 2, 'c1-off']);
+  assert.deepStrictEqual([v.last.ok, v.last.chosen.icon, v.last.correct.t, v.ends, v.verdict.step, v.verdict.branch], [false, 'check-circle', 'Apagar', true, 2, 'c1-off']);
   // Reglas: no se decide antes de avanzar ni dos veces; "Siguiente" sin decidir no hace nada.
   const nuevo = core.practiceNew(ids);
   assert.strictEqual(core.practiceDecide(nuevo, 'off'), nuevo);
@@ -2498,6 +2498,34 @@ caso('Indicadores: ixTasks conteo, 5 días y racha', () => {
   // subtareas cuentan: tarea hecha con subtarea pendiente = día no cumplido
   const e = core.ixTasks(tkNote({ [D]: [tkTask('x', true, [{ id: 's', text: 's', done: false }])] }), D);
   assert.deepStrictEqual([e.done, e.total, e.streak], [1, 2, 0]);
+});
+
+// SPEC 24: el emoji salió de los datos de core; queda el nombre de un ícono del set propio (js/shared/ui/icons.js,
+// capa ui: se carga aparte, no va en la lista de core de js/index.js) o 'dot' (punto de semáforo).
+caso('Íconos: todo campo icon de core es un nombre del set y ningún texto empieza con emoji', () => {
+  require('../js/shared/ui/icons.js'); // publica PYL.ui.icons sobre el PYL que ya creó js/index.js
+  const { NAMES } = globalThis.PYL.ui.icons;
+  const EMOJI = /^\s*\p{Extended_Pictographic}/u;
+  const iconos = [], textos = [];
+  const recorre = (x, ruta, vistos) => {
+    if (!x || typeof x !== 'object' || vistos.has(x)) return;
+    vistos.add(x);
+    for (const [k, v] of Object.entries(x)) {
+      if ((k === 'icon' || k === 'badgeIcon') && typeof v === 'string') iconos.push([ruta + '.' + k, v]);
+      if (['t', 'h', 'label', 'title'].includes(k) && typeof v === 'string') textos.push([ruta + '.' + k, v]);
+      if (typeof v === 'object') recorre(v, ruta + '.' + k, vistos);
+    }
+  };
+  const C = globalThis.PYL.core;
+  for (const m of ['search', 'testing', 'simulator', 'scaling', 'ads', 'landing', 'logistics']) recorre(C[m], m, new Set());
+  // Datos que arman las funciones: estadísticas de la bitácora (estado sin marcar, competencia) y mapa de los cortes.
+  const st = core.stats([{ id: '1', status: '', sales7: '5' }, { id: '2', status: 'ganador', sales7: '900' }]);
+  recorre(st, 'stats', new Set());
+  assert.ok(iconos.length > 60, 'Recorre los íconos de los datos (' + iconos.length + ')');
+  const malos = iconos.filter(([, v]) => v !== 'dot' && !NAMES.includes(v));
+  assert.deepStrictEqual(malos, [], 'Íconos que no están en icons.NAMES');
+  assert.ok(iconos.some(([, v]) => v === 'dot') && st.byComp.every((c) => c.icon === 'dot'), 'Semáforos como dot');
+  assert.deepStrictEqual(textos.filter(([, v]) => EMOJI.test(v)), [], 'Textos que empiezan con emoji');
 });
 
 let fallos = 0;

@@ -8,14 +8,14 @@
 
   // Explicación de cada concepto. li: [antes, palabra resaltada, clase, después].
   const TIPS = {
-    ticket: { h: '💵 Ticket promedio cobrado', p: 'Valor promedio que me pagó cada cliente en efectivo al recibir (incluye compras de 1 unidad y combos).' },
-    merc: { h: '📦 Mercancía', p: 'Lo que le pagué a la bodega o proveedor de Dropi por el producto (y obsequios) entregado.' },
-    fEnt: { h: '🚚 Fletes de entregas', p: 'Costo promedio de envío que cobró la transportadora por llevar el paquete al cliente que sí recibió.' },
-    fDev: { h: '⚠️ Fletes de devoluciones', p: 'Costo de los paquetes devueltos (ida + vuelta) repartido entre los entregados: cuánta ganancia le resta cada devolución a los que sí pagaron.' },
-    cpa: { h: '💡 Margen Máximo para Publicidad (CPA Sostenible)', p: 'Dinero limpio de cada venta para pagar anuncios tras cubrir producto y todos los fletes.',
+    ticket: { icon: 'cash', h: 'Ticket promedio cobrado', p: 'Valor promedio que me pagó cada cliente en efectivo al recibir (incluye compras de 1 unidad y combos).' },
+    merc: { icon: 'package', h: 'Mercancía', p: 'Lo que le pagué a la bodega o proveedor de Dropi por el producto (y obsequios) entregado.' },
+    fEnt: { icon: 'truck', h: 'Fletes de entregas', p: 'Costo promedio de envío que cobró la transportadora por llevar el paquete al cliente que sí recibió.' },
+    fDev: { icon: 'alert', h: 'Fletes de devoluciones', p: 'Costo de los paquetes devueltos (ida + vuelta) repartido entre los entregados: cuánta ganancia le resta cada devolución a los que sí pagaron.' },
+    cpa: { icon: 'bulb', h: 'Margen Máximo para Publicidad (CPA Sostenible)', p: 'Dinero limpio de cada venta para pagar anuncios tras cubrir producto y todos los fletes.',
       li: [['Meta Ads por entrega MENOR a este valor: ', 'GANANCIA', 'ok', '.'], ['Si lo SUPERA: estoy ', 'PERDIENDO', 'bad', ' dinero.']] },
-    ads: { h: '📢 Meta Ads', p: 'Inversión publicitaria real pagada a Meta para que un cliente efectivamente reciba y pague.' },
-    util: { h: '💰 Utilidad', p: 'Dinero líquido que me queda en el bolsillo por cada pedido entregado tras pagar producto, fletes, devoluciones y publicidad.' },
+    ads: { icon: 'megaphone', h: 'Meta Ads', p: 'Inversión publicitaria real pagada a Meta para que un cliente efectivamente reciba y pague.' },
+    util: { icon: 'coins', h: 'Utilidad', p: 'Dinero líquido que me queda en el bolsillo por cada pedido entregado tras pagar producto, fletes, devoluciones y publicidad.' },
   };
 
   function draw(a) {

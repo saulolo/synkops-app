@@ -323,7 +323,7 @@ Tiene tres sub-pestañas: **📂 Lectura real · pronto** (subir el reporte de m
 **🎛️ Simulador** es una sub-pestaña aparte: configuro un conjunto y la app corre el gasto con un poco de azar (como en Meta: dos corridas iguales pueden dar cortes distintos) y me dice qué decide el Lab en cada corte. Tiene dos modos:
 
 - **🔗 Cadena** (abre por defecto): elijo plataforma (Meta o TikTok, solo cambia las luces del semáforo), presupuesto diario, CPA tope, **CPM**, **CTR** (acepta coma: `1,5`), **% de clics que inician pago** y **% de pagos iniciados que compran**. El CPC, las impresiones, los clics, los pagos iniciados, las ventas, el CPPI y el CPA salen calculados: no se escriben.
-  - **▶ Correr** llena el gasto de a $ 1.000 cada 120 ms y se **pausa en cada corte** (20K, 30K, 40K) y al fin del día, con el veredicto del Lab. **Continuar ▶** sigue. También hay ⏸ pausa, ⏮ volver a 0, 🎲 otra corrida (mismas entradas, otro azar) y un deslizador para mover el punto a mano. Con movimiento reducido en el sistema, ▶ salta de corte en corte sin animar.
+  - **Correr** llena el gasto de a $ 1.000 cada 120 ms y se **pausa en cada corte** (20K, 30K, 40K) y al fin del día, con el veredicto del Lab. **Continuar** sigue. También hay pausa, volver a 0, otra corrida (mismas entradas, otro azar) y un deslizador para mover el punto a mano. Con movimiento reducido en el sistema, Correr salta de corte en corte sin animar.
   - Si un corte da **Apagar**, la corrida se detiene ahí y sale «Apagado en el corte N» con qué revisar.
   - **Cadena con semáforo:** CPM → CTR → CPC → CPPI → CPA, cada uno con su luz. El CTR va sin luz y dice «No decide» (NovaSociety no lo mira). Si un eslabón se rompe, debajo sale su lectura «Si… / Solución…».
   - **Historial de cortes:** 20K · 30K · 40K · Fin del día, con lo que dio la corrida en cada uno (— si aún no llega; «Apagado» si ya se apagó).
@@ -704,7 +704,7 @@ js/
   shared/             Lo que usan varios módulos
     core/             parse.js (texto, números, CSV, celdas de ExcelJS), dates.js (fechas ISO), format.js (es-CO)
     services/         storage.js (localStorage e IndexedDB), files.js (lectura de .xlsx/.csv, selector, descarga)
-    ui/               dom.js, tooltip.js, feedback.js
+    ui/               dom.js, icons.js (íconos propios), tooltip.js, feedback.js
 
   modules/            Una carpeta por parte de la app, con sus capas adentro
     pnl/              Tablero P&L
@@ -770,7 +770,7 @@ js/
     metawatch/        Cortes de testeo en la barra: gasto de los conjuntos de Meta y alerta en 20K, 30K y 40K (SPEC 21)
       core/metawatch.js      Filas C1…Cn, corte alcanzado, alertas (latir/sonar), veredicto, totales (CPM, CPA, estimado), foto del producto, errores de Meta y validación de pyl-meta; sin DOM
       services/metawatch.js  Consultas a la Marketing API (token en encabezado) y guardado en pyl-meta
-      ui/metawatch.js        Pinta el bloque de la barra, el panel (token, cuenta, campaña, conjuntos, 🔔/🔕, Desconectar), el estimado, las tarjetas del teléfono y la lluvia de bolitas
+      ui/metawatch.js        Pinta el bloque de la barra, el panel (token, cuenta, campaña, conjuntos, Sonido/Sin sonido, Desconectar), el estimado, las tarjetas del teléfono y la lluvia de bolitas
       app/metawatch.js       Estado, consulta al abrir y cada 15 min, sonido, Revisado, Desconectar y el botón Actualizar del teléfono
     indicators/       Franja de indicadores de Inicio: Mini P&L, Embudo, Testeo y Pulso de tareas (SPEC 22)
       core/indicators.js     Reglas de cada tarjeta (ixPnl, ixFunnel, ixTesting, ixTasks) y validación de la foto del P&L (ixLoad); sin DOM
@@ -795,6 +795,7 @@ js/
 - **Solo la capa `app` modifica el estado.** Los componentes de `ui` reciben datos y callbacks (`onSelect`, `onAssign`).
 - **Los diagnósticos devuelven datos, no HTML.** El texto con formato se representa como segmentos: un string es texto plano, `{ b: '...' }` va en negrita y `{ a: '...', href }` es un enlace que abre en pestaña nueva. `shared/ui/dom.js` (`rich`) los pinta.
 - **Estilos solo en los `.css`.** Nada de `<style>` en `index.html`. Los colores de marca van con tokens (`var(--b)`, `rgba(var(--b-rgb),…)`), nunca escritos a mano.
+- **Íconos propios, no emojis.** Botones, pestañas, títulos, tarjetas y notas usan el set de `js/shared/ui/icons.js` (`PYL.ui.icons.svg/el/dot/hydrate`): SVG de línea 24×24 en dorado fijo (`--ic-gold`; dorado oscuro en el tema claro) que toman el color del botón o la nota cuando son de color. Los datos de `core` guardan el nombre del ícono (`icon: 'target'`), nunca el emoji; los semáforos son `dot` con su tono. Los emojis solo se quedan en lo que sale de la app (mensajes de WhatsApp, resumen y PDF del P&L, prompts). Una prueba de barrido falla si aparece un emoji visible fuera de esas zonas.
 - **IDs únicos en toda la página** y archivos con finales de línea LF.
 
 ### Pruebas en Node

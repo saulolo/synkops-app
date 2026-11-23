@@ -302,7 +302,7 @@
       </div>
       <div class="row">
         <span class="tag tv">Mi score · datos de NovaSociety</span>
-        <button class="btn ghost sm" id="b-new" type="button" title="Vacía el formulario para ingresar otro producto">🧹 Limpiar formulario</button>
+        <button class="btn ghost sm" id="b-new" type="button" title="Vacía el formulario para ingresar otro producto"><span class="ic ic-solo" data-ic="broom"></span>Limpiar formulario</button>
       </div>
     </div>
     <div class="cd-layout">
@@ -332,8 +332,8 @@
     <p class="muted b-sub">Los productos que voy evaluando, guardados en este navegador. Con el lápiz lo abro en Mi candidato para editarlo; con la papelera lo elimino.</p>
     <div class="cd-bar">
       <div class="seg" id="b-views" role="group" aria-label="Vista de la bitácora">
-        <button type="button" data-bview="list" aria-pressed="true">📋 Productos</button>
-        <button type="button" data-bview="stats" aria-pressed="false">📊 Estadísticas</button>
+        <button type="button" data-bview="list" aria-pressed="true"><span class="ic" data-ic="clipboard"></span>Productos</button>
+        <button type="button" data-bview="stats" aria-pressed="false"><span class="ic" data-ic="chart-bar"></span>Estadísticas</button>
       </div>
       <div class="cd-counts" id="b-counts"></div>
     </div>
@@ -932,7 +932,7 @@
       <p class="lead take" id="take">Sube el reporte de órdenes de Dropi (.xlsx o .csv) y la facturación de Meta Ads (.csv). Todo se procesa en este navegador: los archivos no salen de mi computador.</p>
     </div>
     <button class="btn-report hidden" id="btn-report" type="button">
-      <span class="ico" aria-hidden="true">📄</span>
+      <span class="ico" aria-hidden="true"><span class="ic ic-solo" data-ic="file" data-ic-size="20"></span></span>
       <span><b>Descargar informe PDF</b><small>Análisis y plan de acción para compartir</small></span>
     </button>
   </div>
@@ -1025,15 +1025,15 @@
     <p class="proj hidden" id="proj"></p>
 
     <section class="exec" aria-label="Resumen ejecutivo">
-      <button type="button" class="diag-btn" aria-expanded="false" aria-controls="story-panel">📑 Ver Resumen Ejecutivo de la Operación <span class="car" aria-hidden="true">▾</span></button>
+      <button type="button" class="diag-btn" aria-expanded="false" aria-controls="story-panel"><span class="ic" data-ic="file-text"></span>Ver Resumen Ejecutivo de la Operación <span class="car" aria-hidden="true">▾</span></button>
       <div class="diag-panel" id="story-panel">
         <div>
           <div class="diag-body">
             <div class="eyebrow">Historia ejecutiva del periodo</div>
             <p class="story" id="story"></p>
             <div class="actions story-actions">
-              <button class="btn ghost" id="story-copy" type="button">📋 Copiar resumen</button>
-              <button class="btn ghost" id="story-report" type="button">📄 Informe PDF</button>
+              <button class="btn ghost" id="story-copy" type="button"><span class="ic ic-solo" data-ic="clipboard"></span>Copiar resumen</button>
+              <button class="btn ghost" id="story-report" type="button"><span class="ic ic-solo" data-ic="file"></span>Informe PDF</button>
             </div>
           </div>
         </div>
@@ -1045,7 +1045,7 @@
         <h2>De lo cobrado a mi bolsillo</h2>
         <p class="card-note">Cascada P&amp;L del filtro actual. Pasa el cursor por cada barra.</p>
         <div class="chart" id="cascade"></div>
-        <button type="button" class="diag-btn" aria-expanded="false" aria-controls="cdiag-panel">📈 Ver Diagnóstico Financiero de la Cascada <span class="car" aria-hidden="true">▾</span></button>
+        <button type="button" class="diag-btn" aria-expanded="false" aria-controls="cdiag-panel"><span class="ic" data-ic="trend-up"></span>Ver Diagnóstico Financiero de la Cascada <span class="car" aria-hidden="true">▾</span></button>
         <div class="diag-panel" id="cdiag-panel">
           <div>
             <div class="diag-body">
@@ -1071,7 +1071,7 @@
         <p class="card-note" id="funnel-note">Pedidos únicos de Dropi en el filtro actual.</p>
         <div class="funnel" id="funnel"></div>
         <div class="stack" id="stack"></div>
-        <button type="button" class="diag-btn" aria-expanded="false" aria-controls="diag-panel">📊 Ver Diagnóstico vs. Benchmark NovaSociety <span class="car" aria-hidden="true">▾</span></button>
+        <button type="button" class="diag-btn" aria-expanded="false" aria-controls="diag-panel"><span class="ic" data-ic="chart-bar"></span>Ver Diagnóstico vs. Benchmark NovaSociety <span class="car" aria-hidden="true">▾</span></button>
         <div class="diag-panel" id="diag-panel">
           <div>
             <div class="diag-body">
@@ -1211,6 +1211,7 @@
 <script src="js/modules/metawatch/services/metawatch.js"></script>
 <!-- UI: componentes que pintan el DOM -->
 <script src="js/shared/ui/dom.js"></script>
+<script src="js/shared/ui/icons.js"></script>
 <script src="js/shared/ui/tooltip.js"></script>
 <script src="js/shared/ui/feedback.js"></script>
 <script src="js/modules/pnl/ui/upload-zones.js"></script>

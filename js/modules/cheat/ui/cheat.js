@@ -5,15 +5,10 @@
   const PYL = globalThis.PYL;
   const { el } = PYL.ui.dom;
 
-  // Eslabones de una cadena. currentColor = el color del texto del botón.
-  const ICON_CHAIN = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13.5a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10.5a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>';
-  // Barras de una gráfica.
-  const ICON_HARD = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></svg>';
-
   // Los dos atajos. which = clave del estado; id = prefijo de los ids (#ch-<id>-btn…).
   const SHORTCUTS = [
-    { which: 'chain', id: 'c', title: 'Cadena que decide', head: 'La cadena que decide todo', icon: ICON_CHAIN },
-    { which: 'hard', id: 'd', title: 'Métricas duras', head: 'Métricas duras', icon: ICON_HARD },
+    { which: 'chain', id: 'c', title: 'Cadena que decide', head: 'La cadena que decide todo', icon: 'link' },
+    { which: 'hard', id: 'd', title: 'Métricas duras', head: 'Métricas duras', icon: 'chart-bar' },
   ];
 
   // Crea los dos botones y los dos paneles dentro de root (una sola vez). Cada panel deja su `body` vacío para su contenido.
@@ -24,7 +19,7 @@
       const btn = el('button', 'qk-btn ch-btn ch-' + s.id + '-btn'); btn.type = 'button'; btn.id = 'ch-' + s.id + '-btn';
       btn.title = s.title; btn.setAttribute('aria-label', s.title);
       btn.setAttribute('aria-haspopup', 'dialog'); btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-controls', 'ch-' + s.id + '-panel');
-      btn.innerHTML = s.icon;
+      btn.innerHTML = PYL.ui.icons.svg(s.icon, 24); // set propio; currentColor = texto del botón
       btn.addEventListener('click', () => on.toggle(s.which));
 
       const panel = el('div', 'qk-panel ch-panel ch-' + s.id + '-panel'); panel.id = 'ch-' + s.id + '-panel'; panel.hidden = true;
@@ -174,9 +169,9 @@
       lim.append(el('b', 'ch-z-lab', 'Zonas del CPA (genéricas)'));
       for (const [k, text] of ZONE_LABELS) { const p = el('p', 'ch-z-row'); p.append(text + ' ', el('b', null, '$ ' + o.fmt(row.zones[k]))); lim.append(p); }
     }
-    if (row.warn) lim.append(el('p', 'hm-warn', '⚠ ' + row.warn));
+    if (row.warn) { const w = el('p', 'hm-warn'); w.append(PYL.ui.icons.el('alert', 14), row.warn); lim.append(w); }
     z.append(lim, failList('ch-z-diag', o.head[0], row.diag), failList('ch-z-lever', o.head[1], row.lever));
   }
 
-  PYL.ui.cheat = { ICON_CHAIN, ICON_HARD, build, render, chainBuild, chainSel, hardBuild, hardRender };
+  PYL.ui.cheat = { build, render, chainBuild, chainSel, hardBuild, hardRender };
 })();

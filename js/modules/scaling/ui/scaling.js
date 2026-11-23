@@ -11,7 +11,10 @@
   const stepPct = Math.round(M.NS_TEST.step * 100);
 
   const seg = (tag, cls, segments) => { const n = el(tag, cls); rich(n, segments); return n; };
-  const DOT = { r: '🔴', y: '🟡', g: '🟢' };
+  const IC = PYL.ui.icons;
+  // Ícono + texto en un nodo (SPEC 24).
+  const withIc = (node, name, text) => { if (name) node.append(IC.el(name, 14)); node.append(text); return node; };
+  const note = (text) => withIc(el('div', 'note ny'), 'alert', text);
   const digits = (raw) => Number(String(raw).replace(/\D/g, '')) || 0;
 
   // ---------- Barra de las 4 zonas del CPA ----------
@@ -113,7 +116,7 @@
     const paint = () => {
       const t = digits(x.value);
       out.textContent = '';
-      if (!(t > 0)) { out.append(el('div', 'note ny', '⚠️ El CPA tope debe ser mayor que 0')); return; }
+      if (!(t > 0)) { out.append(note('El CPA tope debe ser mayor que 0')); return; }
       const z = T.cpaZones(t);
       out.append(zoneBar(z));
       const ul = el('ul', 'es-zrows');
@@ -192,7 +195,8 @@
       if (br.group !== group) { group = br.group; box = el('div', 'es-grp'); box.append(el('b', 'es-grp-h', group)); w.append(box); }
       const row = el('div', 'es-br es-' + br.light + (lit === br.id ? ' es-on' : ''));
       row.dataset.branch = br.id;
-      row.append(el('span', 'es-dot', DOT[br.light]), el('span', 'es-cond', br.cond.join(' ')), el('span', 'es-arrow', '→'), seg('span', 'es-t', br.t));
+      const dot = el('span', 'es-dot'); dot.append(IC.dot(br.light));
+      row.append(dot, el('span', 'es-cond', br.cond.join(' ')), el('span', 'es-arrow', '→'), seg('span', 'es-t', br.t));
       if (br.dura) row.append(el('span', 'tag tn es-dura', 'Regla dura'));
       if (br.source === 'curso') row.append(el('span', 'tag tv es-src', 'Regla del curso'));
       box.append(row);
@@ -232,7 +236,7 @@
   }
 
   // ---------- Paso 7 · Simulacro ----------
-  const MODES = [{ k: 'practice', t: '🎯 Práctica' }, { k: 'free', t: '🎛️ Juega con los números' }];
+  const MODES = [{ k: 'practice', icon: 'target', t: 'Práctica' }, { k: 'free', icon: 'sliders', t: 'Juega con los números' }];
   const LADDER = C.scaleLadder();
   const lv = (i) => 'N' + (i + 1) + ' · ' + money(LADDER[i]);
   const stat = (label, value) => { const s = el('div', 'es-stat'); s.append(el('small', null, label), el('b', null, value)); return s; };
@@ -276,7 +280,7 @@
     const decs = el('div', 'es-decs');
     for (const a of C.SCALE_ACTIONS) {
       const d = el('button', 'btn ghost es-dec'); d.type = 'button'; d.dataset.action = a.k;
-      d.append(el('span', null, a.icon + ' '), el('b', null, a.t));
+      d.append(IC.el(a.icon, 15, 'ic-solo'), el('b', null, a.t)); // .btn ya pone gap
       if (v.last) {
         d.disabled = true;
         if (a.k === v.last.correct.k) d.classList.add('es-right');
@@ -292,8 +296,8 @@
   function feedback(v, on) {
     const r = v.verdict, L = v.last, w = el('div', 'es-fb es-' + (L.ok ? 'g' : 'r'));
     w.id = 'es-fb';
-    w.append(el('b', 'es-fb-h', L.ok ? '✅ ¡Acertaste!' : '❌ No era esa'));
-    if (!L.ok) w.append(seg('p', 'small', ['Elegiste ', { b: L.chosen.icon + ' ' + L.chosen.t }, '; tocaba ', { b: L.correct.icon + ' ' + L.correct.t }, '.']));
+    w.append(withIc(el('b', 'es-fb-h'), L.ok ? 'check-circle' : 'x-circle', L.ok ? '¡Acertaste!' : 'No era esa'));
+    if (!L.ok) w.append(seg('p', 'small', ['Elegiste ', { b: L.chosen.t }, '; tocaba ', { b: L.correct.t }, '.']));
     const who = r.source === 'curso' ? 'Así lo dice la regla del curso: ' : 'Así lo califica el Lab de NovaSociety: ';
     w.append(seg('p', null, [who, { b: r.veredicto }, '. ', ...r.detalle]));
     w.append(seg('p', 'small muted', ['Los números que deciden: ', ...r.senales]));
@@ -314,7 +318,9 @@
     w.id = 'es-end';
     w.append(el('small', 'es-ex-h', 'Ronda terminada'));
     w.append(seg('p', 'es-ex-v', [{ b: `${v.score.hits} de ${v.score.total} decisiones acertadas` }, ` (${v.score.pct} %)`]));
-    w.append(el('p', 'small', 'Mejor puntaje: ' + (v.best == null ? '—' : v.best + ' %') + (v.best != null && v.score.pct >= v.best ? ' 🏆' : '')));
+    const bp = el('p', 'small', 'Mejor puntaje: ' + (v.best == null ? '—' : v.best + ' %'));
+    if (v.best != null && v.score.pct >= v.best) { bp.append(' '); bp.append(IC.el('trophy', 14)); }
+    w.append(bp);
     const again = el('button', 'btn sm mt-s', 'Otra ronda'); again.type = 'button'; again.id = 'es-again';
     again.addEventListener('click', on.again);
     w.append(again);
@@ -367,12 +373,12 @@
     const out = node.querySelector('#es-free-out');
     out.textContent = '';
     const r = v.verdict, st = el('div', 'es-stats');
-    if (v.err) out.append(el('div', 'note ny', '⚠️ ' + v.err));
+    if (v.err) out.append(note(v.err));
     else {
       const card = el('div', 'es-ex es-' + r.light);
       card.append(el('small', 'es-ex-h', 'Así lo califica el Lab de NovaSociety'));
       const vr = el('p', 'es-ex-v');
-      vr.append(el('span', null, C.SCALE_ACTIONS.find((a) => a.k === r.action).icon + ' '), el('b', null, r.toca), el('span', null, ' · ' + r.veredicto));
+      vr.append(IC.el(C.SCALE_ACTIONS.find((a) => a.k === r.action).icon, 15), el('b', null, r.toca), el('span', null, ' · ' + r.veredicto));
       card.append(vr, seg('p', 'small', r.detalle), seg('p', 'small muted', ['Los números que deciden: ', ...r.senales]), seg('p', 'small', moveTxt(r)));
       out.append(card);
     }
@@ -399,7 +405,7 @@
     w.append(el('h4', null, 'Simulacro'));
     const modes = el('div', 'seg'); modes.id = 'es-modes'; modes.setAttribute('role', 'group'); modes.setAttribute('aria-label', 'Modo del simulacro');
     for (const m of MODES) {
-      const b = el('button', null, m.t); b.type = 'button'; b.dataset.mode = m.k; b.setAttribute('aria-pressed', String(m.k === st.mode));
+      const b = withIc(el('button'), m.icon, m.t); b.type = 'button'; b.dataset.mode = m.k; b.setAttribute('aria-pressed', String(m.k === st.mode));
       b.addEventListener('click', () => on.mode(m.k));
       modes.append(b);
     }

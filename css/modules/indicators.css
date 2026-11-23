@@ -36,8 +36,6 @@ button.ix-card:hover .ix-go,button.ix-card:focus-visible .ix-go{transform:transl
 .ix-row-t{font-weight:700;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ix-row-n{text-align:right}
 .ix-row-t{display:flex;align-items:center;gap:7px}
-.ix-ico{display:inline-flex;flex:none;color:var(--b)}
-.ix-ico svg{display:block}
 
 /* Testeo: dos bloques (Práctica y En Meta) separados por una raya. La escalera de cortes usa los colores de la alerta de la barra:
    amarillo, naranja y rojo; el último corte alcanzado lleva un halo. */

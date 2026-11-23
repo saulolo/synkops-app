@@ -89,7 +89,7 @@
     const rows = Object.keys(ref).map((k) => {
       const dl = summary.delta(k, a, prev), s = st[k];
       return { cells: [
-        td('r-kpi', h('b', null, summary.TIPS[k].h), h('small', null, summary.TIPS[k].p)),
+        td('r-kpi', h('b', null, summary.TIPS[k].emoji + ' ' + summary.TIPS[k].h), h('small', null, summary.TIPS[k].p)),
         td('r-num-c', h('b', null, val[k])),
         td('r-muted', ref[k]),
         td(null, s ? pill(s.level, s.text) : '—'),
