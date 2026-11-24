@@ -319,6 +319,172 @@
     node.append(box);
   }
 
+  // La Caza: frase, dos puertas, selector A/B/C y el detalle del método elegido (ruta, fichas y prompt).
+  // k = método abierto ('a' | 'b' | 'c'). on = { select(k), copy(text) }. No muta estado.
+  function caza(node, data, k, on) {
+    node.textContent = '';
+    const icon = (name, size, cls) => PYL.ui.icons.el(name, size, cls || 'ic-solo');
+    const idx = Math.max(0, data.methods.findIndex((x) => x.k === k));
+    const m = data.methods[idx];
+
+    node.append(seg('cz-lead', data.lead));
+
+    const gates = el('div', 'cz-gates');
+    const from = el('div', 'cz-end'); from.append(el('small', null, 'Lo que ya se vende'));
+    gates.append(from);
+    data.gates.forEach((g) => {
+      gates.append(el('span', 'cz-link'));
+      const c = el('div', 'cz-gate');
+      const top = el('div', 'cz-gh'); top.append(icon(g.icon, 20), el('small', null, 'Puerta ' + g.n));
+      c.append(top, el('b', null, g.t), seg('cz-gd', g.d));
+      gates.append(c);
+    });
+    gates.append(el('span', 'cz-link'));
+    const to = el('div', 'cz-end cz-cand'); to.append(icon('check-circle', 18), el('small', null, 'Candidato'));
+    gates.append(to);
+    node.append(gates);
+
+    const sel = el('div', 'cz-methods'); sel.setAttribute('role', 'group'); sel.setAttribute('aria-label', 'Método de caza');
+    data.methods.forEach((x) => {
+      const b = el('button', 'cz-node' + (x.k === m.k ? ' on' : ''));
+      b.type = 'button'; b.dataset.m = x.k; b.setAttribute('aria-pressed', String(x.k === m.k));
+      const tx = el('span', 'cz-tx'); tx.append(el('b', null, x.t), el('small', null, x.short));
+      b.append(el('span', 'cz-letter', x.letter), icon(x.icon, 20), tx);
+      b.addEventListener('click', () => on.select(x.k));
+      sel.append(b);
+    });
+    node.append(sel);
+
+    const box = el('div', 'cz-det pop');
+    const top = el('div', 'row between');
+    top.append(el('span', 'tag tb', `Método ${m.letter} de ${data.methods.length}`), el('span', 'small', m.where));
+    const h = el('h3', 'mt-s fl-h'); h.append(icon(m.icon, 18, ''), m.t);
+    box.append(top, h, seg('fl-p', m.p));
+
+    const route = el('ol', 'cz-route');
+    m.route.forEach((s, j) => {
+      const li = el('li', 'cz-st' + (s.fork ? ' cz-fork' : '')); li.style.setProperty('--i', String(j));
+      const hd = el('div', 'cz-sh');
+      hd.append(el('span', 'cz-sn', String(j + 1)));
+      if (s.icon) hd.append(icon(s.icon, 16));
+      li.append(hd, el('b', null, s.t));
+      if (s.d) li.append(seg('cz-sd', s.d));
+      if (s.fork) {
+        const outs = el('div', 'cz-outs');
+        [['yes', 'g'], ['no', 'y']].forEach(([w, tone]) => {
+          const o = el('div', 'cz-out ' + tone); o.dataset.out = w;
+          o.append(el('b', null, s[w].t), seg('cz-od', s[w].d));
+          outs.append(o);
+        });
+        li.append(outs);
+      }
+      route.append(li);
+    });
+    box.append(route);
+
+    const checks = el('div', 'cz-checks');
+    m.checks.forEach((r) => {
+      const c = el('div', 'ps-rule');
+      const big = el('div', 'ps-big'); big.append(el('b', null, r.big), el('small', null, r.unit));
+      c.append(big, el('span', 'ps-rt', r.t), seg('ps-rd', r.d));
+      checks.append(c);
+    });
+    box.append(el('h4', 'cz-h', 'Qué miro'), checks);
+
+    const pr = el('div', 'cz-prompt');
+    const ph = el('div', 'row between');
+    ph.append(el('b', null, 'Prompt para DropKiller'));
+    const cp = el('button', 'btn sm'); cp.type = 'button'; cp.id = 'cz-copy';
+    cp.append(icon('copy', 16), 'Copiar prompt');
+    cp.addEventListener('click', () => on.copy(m.prompt));
+    ph.append(cp);
+    pr.append(ph, el('p', 'cz-pt', m.prompt));
+    box.append(pr);
+
+    const acts = el('div', 'row mt');
+    if (idx > 0) { const pv = el('button', 'btn ghost sm', '← Método anterior'); pv.type = 'button'; pv.addEventListener('click', () => on.select(data.methods[idx - 1].k)); acts.append(pv); }
+    if (idx < data.methods.length - 1) { const nx = el('button', 'btn ghost sm', 'Siguiente método →'); nx.type = 'button'; nx.addEventListener('click', () => on.select(data.methods[idx + 1].k)); acts.append(nx); }
+    box.append(acts);
+    node.append(box);
+  }
+
+  // El Espía: frase, la pantalla de una tienda (cinco fichas), selector A/B y el detalle de la entrada elegida.
+  // k = entrada abierta ('a' | 'b'). on = { select(k), copy(text) }. No muta estado.
+  function espia(node, data, k, on) {
+    node.textContent = '';
+    const icon = (name, size, cls) => PYL.ui.icons.el(name, size, cls || 'ic-solo');
+    const idx = Math.max(0, data.modes.findIndex((x) => x.k === k));
+    const m = data.modes[idx];
+
+    node.append(seg('sp-lead', data.lead));
+
+    const screen = el('div', 'sp-screen');
+    const inp = el('div', 'sp-in'); inp.append(icon('search', 16), el('small', null, 'Pego el dominio o cualquier enlace de la tienda'));
+    const grid = el('div', 'sp-tiles');
+    data.screen.forEach((t, i) => {
+      const c = el('div', 'sp-tile'); c.dataset.k = t.k; c.style.setProperty('--i', String(i));
+      c.append(icon(t.icon, 20), el('b', null, t.t), el('small', null, t.d));
+      grid.append(c);
+    });
+    screen.append(inp, grid);
+    node.append(screen);
+
+    const sel = el('div', 'sp-modes'); sel.setAttribute('role', 'group'); sel.setAttribute('aria-label', 'Entrada del espía');
+    data.modes.forEach((x) => {
+      const b = el('button', 'sp-node' + (x.k === m.k ? ' on' : ''));
+      b.type = 'button'; b.dataset.m = x.k; b.setAttribute('aria-pressed', String(x.k === m.k));
+      const tx = el('span', 'sp-tx'); tx.append(el('b', null, x.t), el('small', null, x.short));
+      b.append(el('span', 'sp-letter', x.letter), icon(x.icon, 20), tx);
+      b.addEventListener('click', () => on.select(x.k));
+      sel.append(b);
+    });
+    node.append(sel);
+
+    const box = el('div', 'sp-det');
+    const top = el('div', 'row between');
+    top.append(el('span', 'tag tb', `Entrada ${m.letter} de ${data.modes.length}`), el('span', 'small', m.where));
+    const h = el('h3', 'mt-s fl-h'); h.append(icon(m.icon, 18, ''), m.t);
+    box.append(top, h, seg('fl-p', m.p));
+
+    const route = el('ol', 'sp-route');
+    m.route.forEach((s, j) => {
+      const li = el('li', 'sp-st'); li.style.setProperty('--i', String(j));
+      const hd = el('div', 'sp-sh'); hd.append(el('span', 'sp-sn', String(j + 1)), icon(s.icon, 16));
+      li.append(hd, el('b', null, s.t), seg('sp-sd', s.d));
+      route.append(li);
+    });
+    box.append(route);
+
+    const checks = el('div', 'sp-checks');
+    m.checks.forEach((r) => {
+      const c = el('div', 'ps-rule');
+      const big = el('div', 'ps-big'); big.append(el('b', null, r.big), el('small', null, r.unit));
+      c.append(big, el('span', 'ps-rt', r.t), seg('ps-rd', r.d));
+      checks.append(c);
+    });
+    box.append(el('h4', 'sp-h', 'Qué veo'), checks);
+
+    const ul = el('ul', 'fl-list sp-use');
+    m.use.forEach((x) => { const li = el('li'); rich(li, x); ul.append(li); });
+    box.append(el('h4', 'sp-h', 'Qué hago con lo que veo'), ul);
+
+    const pr = el('div', 'sp-prompt');
+    const ph = el('div', 'row between');
+    ph.append(el('b', null, 'Prompt para DropKiller'));
+    const cp = el('button', 'btn sm'); cp.type = 'button'; cp.id = 'sp-copy';
+    cp.append(icon('copy', 16), 'Copiar prompt');
+    cp.addEventListener('click', () => on.copy(m.prompt));
+    ph.append(cp);
+    pr.append(ph, el('p', 'sp-pt', m.prompt));
+    box.append(pr);
+
+    const acts = el('div', 'row mt');
+    if (idx > 0) { const pv = el('button', 'btn ghost sm', '← Entrada anterior'); pv.type = 'button'; pv.addEventListener('click', () => on.select(data.modes[idx - 1].k)); acts.append(pv); }
+    if (idx < data.modes.length - 1) { const nx = el('button', 'btn ghost sm', 'Siguiente entrada →'); nx.type = 'button'; nx.addEventListener('click', () => on.select(data.modes[idx + 1].k)); acts.append(nx); }
+    box.append(acts);
+    node.append(box);
+  }
+
   // ---------- Fichas de consulta ----------
   function vdo(node, items) {
     node.textContent = '';
@@ -347,5 +513,5 @@
     node.append(ol);
   }
 
-  PYL.ui.search = { flowList, flowStep, progress, result, stages, winner, vdo, strategyTabs, byProvider, pyramidMap, cards, mistakes };
+  PYL.ui.search = { flowList, flowStep, progress, result, stages, winner, vdo, strategyTabs, byProvider, caza, espia, pyramidMap, cards, mistakes };
 })();

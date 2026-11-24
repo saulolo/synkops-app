@@ -423,3 +423,127 @@
   .cd-side{position:static;order:-1}
   .cd-2,.cd-3{grid-template-columns:1fr 1fr}
 }
+
+/* ---------- La Caza (SPEC 25): dos puertas y tres métodos. Solo tokens del tema. ---------- */
+.cz-lead{margin:0 0 16px;font-size:14.5px;color:var(--muted);max-width:760px}
+.cz-lead b{color:var(--ink)}
+.cz-gates{display:grid;grid-template-columns:auto 1fr 1.4fr 1fr 1.4fr 1fr auto;align-items:stretch;gap:0;margin-bottom:18px}
+.cz-end{display:flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:14px;background:var(--bg-2);border:1px dashed var(--line-2);text-align:center}
+.cz-end small{font-size:12.5px;font-weight:800;color:var(--muted)}
+.cz-cand{gap:6px;border-style:solid;border-color:var(--g);background:var(--g-bg)}
+.cz-cand small{color:var(--g-ink)}
+.cz-link{position:relative;align-self:center;height:3px;border-radius:3px;background:var(--line-2);overflow:hidden}
+.cz-link::after{content:"";position:absolute;top:0;left:-40%;width:40%;height:100%;border-radius:3px;background:linear-gradient(90deg,transparent,var(--b),transparent);animation:cz-run 2.4s linear infinite}
+.cz-link:nth-of-type(2)::after{animation-delay:.4s}
+.cz-link:nth-of-type(3)::after{animation-delay:.8s}
+@keyframes cz-run{to{left:100%}}
+.cz-gate{display:flex;flex-direction:column;gap:6px;padding:14px;border-radius:14px;background:var(--card);border:1px solid var(--line);box-shadow:0 0 0 1px rgba(var(--b-rgb),.08) inset}
+.cz-gh{display:flex;align-items:center;gap:8px;color:var(--b-ink)}
+.cz-gh small{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+.cz-gate > b{font-size:15px}
+.cz-gd{margin:0;font-size:13px;color:var(--muted)}
+.cz-gd b{color:var(--ink)}
+
+.cz-methods{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.cz-node{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px;border-radius:16px;background:var(--bg-2);border:1px solid var(--line);transition:border-color .2s,background .2s,transform .2s,box-shadow .2s}
+.cz-node:hover{border-color:var(--b);transform:translateY(-1px);box-shadow:0 4px 18px rgba(var(--b-rgb),.18)}
+.cz-node:focus-visible{outline:2px solid var(--b)}
+.cz-node.on{background:var(--b-bg);border-color:rgba(var(--b-rgb),.6);box-shadow:0 0 0 1px rgba(var(--b-rgb),.35) inset}
+.cz-letter{width:34px;height:34px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-size:16px;font-weight:900;background:var(--card);border:1px solid var(--line-2);color:var(--muted)}
+.cz-node.on .cz-letter{background:linear-gradient(135deg,var(--b),var(--b2));border-color:transparent;color:var(--on-b)}
+.cz-tx{display:flex;flex-direction:column;gap:2px;min-width:0}
+.cz-tx b{font-size:14px;line-height:1.25}
+.cz-tx small{font-size:12px;color:var(--muted)}
+.cz-node.on .cz-tx b{color:var(--b-ink)}
+
+.cz-det{background:var(--bg-2);border:1px solid var(--line);border-radius:16px;padding:18px;animation:cz-in .28s ease-out}
+@keyframes cz-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.cz-route{list-style:none;margin:14px 0 0;padding:0;display:flex;gap:12px;align-items:stretch}
+.cz-st{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:6px;padding:14px;border-radius:14px;background:var(--card);border:1px solid var(--line);animation:cz-in .35s ease-out both;animation-delay:calc(var(--i,0) * 90ms)}
+.cz-sh{display:flex;align-items:center;gap:8px;color:var(--b-ink)}
+.cz-sn{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:900;background:var(--b);color:var(--on-b)}
+.cz-st > b{font-size:14px}
+.cz-sd{margin:0;font-size:13px;color:var(--muted)}
+.cz-sd b{color:var(--ink)}
+.cz-fork{flex:1.8 1 0}
+.cz-outs{display:grid;gap:8px;margin-top:4px}
+.cz-out{padding:10px 12px;border-radius:12px;border:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
+.cz-out b{font-size:13px}
+.cz-od{margin:0;font-size:12.5px;color:var(--muted)}
+.cz-out.g{background:var(--g-bg);border-color:var(--g)}
+.cz-out.g b{color:var(--g-ink)}
+.cz-out.y{background:var(--y-bg);border-color:var(--y)}
+.cz-out.y b{color:var(--y-ink)}
+.cz-h{margin:18px 0 8px;font-size:14px}
+.cz-checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.cz-prompt{margin-top:18px;padding:14px;border-radius:14px;background:var(--card);border:1px solid var(--line)}
+.cz-pt{margin:10px 0 0;white-space:pre-wrap;font-size:13px;line-height:1.55;color:var(--muted);user-select:text}
+
+@media (max-width:900px){
+  .cz-methods{grid-template-columns:1fr}
+  .cz-route{flex-direction:column}
+}
+@media (max-width:720px){
+  .cz-gates{grid-template-columns:1fr}
+  .cz-link{width:3px;height:22px;justify-self:center}
+  .cz-link::after{top:-40%;left:0;width:100%;height:40%;background:linear-gradient(180deg,transparent,var(--b),transparent);animation-name:cz-run-v}
+}
+@keyframes cz-run-v{to{top:100%}}
+@media (prefers-reduced-motion:reduce){
+  .cz-link::after,.cz-det,.cz-st{animation:none}
+  .cz-node{transition:none}
+  .cz-node:hover{transform:none}
+}
+
+/* ---------- El Espía (SPEC 25): la pantalla de una tienda y dos entradas. Solo tokens del tema. ---------- */
+.sp-lead{margin:0 0 16px;font-size:14.5px;color:var(--muted);max-width:760px}
+.sp-lead b{color:var(--ink)}
+.sp-screen{margin-bottom:18px;padding:14px;border-radius:16px;background:var(--bg-2);border:1px solid var(--line)}
+.sp-in{display:flex;align-items:center;gap:8px;padding:9px 12px;margin-bottom:12px;border-radius:12px;background:var(--card);border:1px dashed var(--line-2);color:var(--muted)}
+.sp-in small{font-size:12.5px;font-weight:700}
+.sp-tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.sp-tile{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:5px;padding:13px;border-radius:14px;background:var(--card);border:1px solid var(--line);color:var(--b-ink)}
+.sp-tile b{font-size:14px;color:var(--ink)}
+.sp-tile small{font-size:12px;color:var(--muted)}
+.sp-tile::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(110deg,transparent 30%,rgba(var(--b-rgb),.22) 50%,transparent 70%);transform:translateX(-120%);animation:sp-run 3.6s ease-in-out infinite;animation-delay:calc(var(--i,0) * .35s)}
+@keyframes sp-run{0%{transform:translateX(-120%)}35%,100%{transform:translateX(120%)}}
+
+.sp-modes{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px}
+.sp-node{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px;border-radius:16px;background:var(--bg-2);border:1px solid var(--line);transition:border-color .2s,background .2s,transform .2s,box-shadow .2s}
+.sp-node:hover{border-color:var(--b);transform:translateY(-1px);box-shadow:0 4px 18px rgba(var(--b-rgb),.18)}
+.sp-node:focus-visible{outline:2px solid var(--b)}
+.sp-node.on{background:var(--b-bg);border-color:rgba(var(--b-rgb),.6);box-shadow:0 0 0 1px rgba(var(--b-rgb),.35) inset}
+.sp-letter{width:34px;height:34px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-size:16px;font-weight:900;background:var(--card);border:1px solid var(--line-2);color:var(--muted)}
+.sp-node.on .sp-letter{background:linear-gradient(135deg,var(--b),var(--b2));border-color:transparent;color:var(--on-b)}
+.sp-tx{display:flex;flex-direction:column;gap:2px;min-width:0}
+.sp-tx b{font-size:14px;line-height:1.25}
+.sp-tx small{font-size:12px;color:var(--muted)}
+.sp-node.on .sp-tx b{color:var(--b-ink)}
+
+.sp-det{background:var(--bg-2);border:1px solid var(--line);border-radius:16px;padding:18px;animation:cz-in .28s ease-out}
+.sp-route{list-style:none;margin:14px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.sp-st{display:flex;flex-direction:column;gap:6px;padding:14px;border-radius:14px;background:var(--card);border:1px solid var(--line);animation:cz-in .35s ease-out both;animation-delay:calc(var(--i,0) * 90ms)}
+.sp-sh{display:flex;align-items:center;gap:8px;color:var(--b-ink)}
+.sp-sn{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:900;background:var(--b);color:var(--on-b)}
+.sp-st > b{font-size:14px}
+.sp-sd{margin:0;font-size:13px;color:var(--muted)}
+.sp-sd b{color:var(--ink)}
+.sp-h{margin:18px 0 8px;font-size:14px}
+.sp-checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.sp-use{margin:0}
+.sp-prompt{margin-top:18px;padding:14px;border-radius:14px;background:var(--card);border:1px solid var(--line)}
+.sp-pt{margin:10px 0 0;white-space:pre-wrap;font-size:13px;line-height:1.55;color:var(--muted);user-select:text}
+
+@media (max-width:900px){
+  .sp-tiles{grid-template-columns:repeat(2,1fr)}
+  .sp-modes{grid-template-columns:1fr}
+}
+@media (max-width:720px){
+  .sp-tiles{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  .sp-tile::after{animation:none;display:none}
+  .sp-det,.sp-st{animation:none}
+  .sp-node{transition:none}
+  .sp-node:hover{transform:none}
+}
