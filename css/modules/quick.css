@@ -49,11 +49,17 @@
 .qk-name{font-size:13.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .qk-id{font-size:12px;color:var(--muted)}
 .qk-price{margin-left:4px;font-weight:700;color:var(--g-ink);white-space:nowrap}
-.qk-send{all:unset;cursor:pointer;flex-shrink:0;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:var(--b-ink);border:1px solid var(--line-2);transition:background .2s,color .2s}
-.qk-send:hover{background:var(--b-bg);border-color:var(--b)}
-.qk-send:focus-visible{outline:2px solid var(--b)}
+.qk-edit,.qk-send{all:unset;cursor:pointer;flex-shrink:0;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:var(--b-ink);border:1px solid var(--line-2);transition:background .2s,color .2s}
+.qk-edit:hover,.qk-send:hover,.qk-edit[aria-pressed=true]{background:var(--b-bg);border-color:var(--b)}
+.qk-edit:focus-visible,.qk-send:focus-visible{outline:2px solid var(--b)}
+.qk-send{color:var(--g-ink)}
+.qk-send:hover{background:var(--g-bg);border-color:var(--g)}
+.qk-send:focus-visible{outline-color:var(--g)}
+.qk-row.is-editing{border-color:var(--b)}
+.qk-acts{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.qk-acts .qk-cancel[hidden]{display:none}
 @media (max-width:480px){
   .qk-form{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 56px}
-  .qk-form .field:first-child,.qk-save{grid-column:1/-1}
-  .qk-save{justify-self:end}
+  .qk-form .field:first-child,.qk-acts{grid-column:1/-1}
+  .qk-acts{flex-direction:row;justify-content:flex-end}
 }

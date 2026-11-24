@@ -213,7 +213,8 @@ En esta pestaña hay un **botón flotante** (abajo a la derecha, encima del de P
 - **Precio:** lo escribo como `25000` o `25.000` y se ve como `$ 25.000`.
 - **Imagen:** copio una imagen y, con el panel abierto, presiono **Ctrl+V** (o toco el cuadro para elegir un archivo). Se guarda pequeña, solo como referencia.
 - **Lista:** cada producto muestra miniatura, nombre, ID y precio, con botón de copiar en nombre e ID. Un ID repetido no se guarda.
-- **Ícono de enviar** (a la derecha de cada producto): lleva nombre, ID, precio y foto a **Mi candidato** como producto nuevo. Si Mi candidato tiene algo sin guardar, pregunta antes. El producto se queda en la lista.
+- **Lápiz** (a la izquierda del de enviar): carga ese producto en el formulario de arriba para corregir nombre, ID, precio o imagen. El botón pasa a **Actualizar** (Enter también) y aparece **Cancelar**. El producto se queda en su mismo lugar de la lista. Cerrar el panel, Cancelar, eliminar ese producto o Limpiar salen de la edición sin guardar; tocar el lápiz de otro producto carga ese otro sin preguntar.
+- **Ícono de enviar** (verde, a la derecha de cada producto): lleva nombre, ID, precio y foto a **Mi candidato** como producto nuevo. Si Mi candidato tiene algo sin guardar, pregunta antes. El producto se queda en la lista.
 - **Papelera** (al lado del de enviar): elimina solo ese producto de la lista; pregunta antes, como en la bitácora.
 - **🧹 Limpiar:** pregunta antes y vacía solo esta lista (libera el espacio de las fotos). Lo que ya envié a Mi candidato no se toca.
 

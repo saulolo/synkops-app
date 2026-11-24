@@ -3631,7 +3631,161 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     store['pyl-search'] = previo;
   };
 
-  return lgTest().then(dkTest).then(apTest).then(chTest).then(chCadenaTest).then(chDurasTest).then(hubTest).then(hubTest2).then(hubTest3).then(hubTest4).then(hubTest5).then(tkTest1).then(tkTest2).then(tkTest3).then(tkTest4).then(tkTest5).then(tkTest6).then(tkTest7).then(tkTest8).then(tkTest9).then(ckTest).then(mwTest1).then(mwTest2).then(mwTest3).then(mwTest4).then(ixTest1).then(ixTest2).then(czTest).then(spyTest).then(fresca).then((d2) => {
+  // SPEC 26: Guardado rápido · editar un producto (página aparte con localStorage simulado).
+  const qkTest = async () => {
+    const previo = store['pyl-quick'];
+    const semilla = () => [
+      { id: '300', name: 'Tercero', dropi: '33', createdAt: 300 },
+      { id: '200', name: 'Segundo', dropi: '22', createdAt: 200, price: 25000, photo: 'data:image/png;base64,AAAA' },
+      { id: '100', name: 'Primero', dropi: '11', createdAt: 100, price: 9900 },
+    ];
+    store['pyl-quick'] = JSON.stringify({ items: semilla() });
+    const d = await fresca(), W = d.window, doc = W.document, S = W.PYL.app.state.quick;
+    const $ = (q) => doc.querySelector(q), $$ = (q) => [...doc.querySelectorAll(q)];
+    const tick = () => new Promise((ok) => setTimeout(ok, 20));
+    W.Element.prototype.scrollIntoView = () => {}; // Mi candidato lo usa al recibir el envío; jsdom no lo trae
+    const escribe = (q, v) => { const i = $(q); i.value = v; i.dispatchEvent(new W.Event('input', { bubbles: true })); };
+    const guardado = () => JSON.parse(store['pyl-quick']).items;
+    const lapiz = (id) => $(`#qk-list .qk-row[data-id="${id}"] .qk-edit`);
+    const vacio = () => $('#qk-name').value === '' && $('#qk-dropi').value === '' && $('#qk-price').value === '';
+    const normal = () => $('#qk-save').textContent === 'Guardar' && $('#qk-cancel').hidden && !$('.qk-row.is-editing') && S.editing === null && S.photo === '';
+    const esc = () => doc.dispatchEvent(new W.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    $('#qk-btn').click();
+
+    // Lápiz en cada fila, justo antes de enviar.
+    assert.strictEqual($$('#qk-list .qk-row').length, 3);
+    for (const r of $$('#qk-list .qk-row')) {
+      const e = r.querySelector('.qk-edit');
+      assert.ok(e && e.nextElementSibling === r.querySelector('.qk-send') && e.querySelector('svg.ic-edit') && !e.querySelector('.ic'), 'Lápiz antes de enviar, sin .ic');
+      assert.strictEqual(e.getAttribute('aria-label'), 'Editar ' + r.querySelector('.qk-name').textContent);
+      assert.strictEqual(e.title, 'Editar');
+      assert.strictEqual(e.getAttribute('aria-pressed'), 'false');
+    }
+    assert.ok(normal() && vacio(), 'Fuera de edición: Guardar y Cancelar oculto');
+
+    // Tocar el lápiz carga los campos.
+    lapiz('200').click();
+    assert.strictEqual($('#qk-name').value, 'Segundo');
+    assert.strictEqual($('#qk-dropi').value, '22');
+    assert.strictEqual($('#qk-price').value.replace(/\s/g, ' '), '$ 25.000');
+    assert.ok(!$('#qk-photo .qk-photo-img').hidden && $('#qk-photo .qk-photo-img').src.startsWith('data:image/png'), 'Muestra su imagen');
+    assert.strictEqual(doc.activeElement, $('#qk-name'), 'Foco en Nombre');
+    assert.strictEqual($('#qk-save').textContent, 'Actualizar');
+    assert.ok(!$('#qk-cancel').hidden && $('#qk-cancel').textContent === 'Cancelar');
+    assert.deepStrictEqual($$('.qk-row.is-editing').map((r) => r.dataset.id), ['200']);
+    assert.strictEqual(lapiz('200').getAttribute('aria-pressed'), 'true');
+    assert.strictEqual(S.editing, '200');
+
+    // Actualizar: mismo id, createdAt y posición; la lista no crece; sin error por su propio ID.
+    escribe('#qk-name', ' Segundo editado ');
+    $('#qk-save').click(); await tick();
+    let g = guardado();
+    assert.deepStrictEqual(g.map((x) => x.id), ['300', '200', '100'], 'Misma posición y tamaño');
+    assert.deepStrictEqual(g[1], { id: '200', name: 'Segundo editado', dropi: '22', createdAt: 200, price: 25000, photo: 'data:image/png;base64,AAAA' });
+    assert.ok(/Actualicé "Segundo editado" en el guardado rápido\./.test($('#toast').textContent), 'Avisa en #toast');
+    assert.ok(normal() && vacio(), 'Tras actualizar el formulario queda vacío y en modo normal');
+    assert.strictEqual($('#qk-list .qk-row[data-id="200"] .qk-name').textContent, 'Segundo editado');
+
+    // ID de otro producto: error y sigue en edición, sin tocar nada.
+    lapiz('200').click();
+    escribe('#qk-dropi', '11');
+    $('#toast').textContent = '';
+    $('#qk-save').click(); await tick();
+    assert.ok(/Ese ID ya está guardado\./.test($('#toast').textContent), 'ID de otro producto rechazado');
+    assert.strictEqual(S.editing, '200');
+    assert.strictEqual($('#qk-save').textContent, 'Actualizar');
+    assert.strictEqual(guardado()[1].dropi, '22', 'No se tocó el producto');
+    // Nombre vacío también falla y sigue en edición.
+    escribe('#qk-dropi', '22'); escribe('#qk-name', '');
+    $('#toast').textContent = '';
+    $('#qk-save').click(); await tick();
+    assert.ok(/Falta el nombre/.test($('#toast').textContent) && S.editing === '200');
+    // Enter en un campo actualiza.
+    escribe('#qk-name', 'Con Enter');
+    $('#qk-dropi').dispatchEvent(new W.KeyboardEvent('keydown', { key: 'Enter', bubbles: true })); await tick();
+    assert.strictEqual(guardado()[1].name, 'Con Enter', 'Enter actualiza');
+    assert.ok(normal());
+
+    // Vaciar precio y quitar imagen deja el producto sin price ni photo.
+    lapiz('200').click();
+    escribe('#qk-price', '');
+    $('#qk-root .qk-photo-rm').click();
+    assert.ok($('#qk-photo .qk-photo-img').hidden, 'La imagen se quita igual que al crear');
+    $('#qk-save').click(); await tick();
+    assert.deepStrictEqual(guardado()[1], { id: '200', name: 'Con Enter', dropi: '22', createdAt: 200 }, 'Sin price ni photo');
+
+    // Cancelar.
+    lapiz('100').click();
+    escribe('#qk-name', 'Cambiado a medias');
+    $('#qk-cancel').click();
+    assert.ok(normal() && vacio(), 'Cancelar vacía y sale de edición');
+    assert.strictEqual(guardado()[2].name, 'Primero', 'Cancelar no cambia el producto');
+    assert.ok($('#qk-photo .qk-photo-img').hidden);
+
+    // Cambiar de producto sin preguntar.
+    lapiz('100').click();
+    escribe('#qk-name', 'Sin actualizar');
+    lapiz('300').click();
+    assert.ok(!$('#modal').classList.contains('show'), 'No pregunta');
+    assert.strictEqual($('#qk-name').value, 'Tercero');
+    assert.strictEqual(S.editing, '300');
+    assert.deepStrictEqual($$('.qk-row.is-editing').map((r) => r.dataset.id), ['300']);
+    assert.strictEqual(guardado()[2].name, 'Primero', 'Lo escrito y no actualizado se pierde');
+    // El mismo lápiz lo vuelve a cargar.
+    escribe('#qk-name', 'Otra cosa');
+    lapiz('300').click();
+    assert.strictEqual($('#qk-name').value, 'Tercero', 'Tocar el lápiz del mismo producto lo recarga');
+
+    // Esc cierra el panel y cancela.
+    esc();
+    assert.ok($('#qk-panel').hidden && normal() && vacio(), 'Esc cancela la edición');
+    $('#qk-btn').click();
+    assert.ok(!$('#qk-panel').hidden && normal() && vacio(), 'Al reabrir está en modo normal');
+    // ✕ también.
+    lapiz('300').click(); $('#qk-panel .qk-x').click();
+    assert.ok($('#qk-panel').hidden && normal() && vacio(), '✕ cancela la edición');
+    // El botón flotante y abrir otro flotante también.
+    $('#qk-btn').click(); lapiz('300').click(); $('#qk-btn').click();
+    assert.ok($('#qk-panel').hidden && normal() && vacio(), 'El botón flotante cancela la edición');
+    $('#qk-btn').click(); lapiz('300').click(); $('#dk-btn').click();
+    assert.ok($('#qk-panel').hidden && normal() && vacio(), 'Abrir otro flotante cancela la edición');
+    $('#dk-btn').click();
+    $('#qk-btn').click();
+
+    // Eliminar el producto en edición.
+    lapiz('100').click();
+    $('#qk-list .qk-row[data-id="100"] .qk-del').click(); await tick();
+    $('#modal [data-r="del"]').click(); await tick();
+    assert.ok(normal() && vacio(), 'Eliminar el producto en edición sale del modo');
+    assert.deepStrictEqual(guardado().map((x) => x.id), ['300', '200']);
+    // Eliminar otro no cancela la edición.
+    lapiz('300').click();
+    $('#qk-list .qk-row[data-id="200"] .qk-del').click(); await tick();
+    $('#modal [data-r="del"]').click(); await tick();
+    assert.strictEqual(S.editing, '300', 'Borrar otro producto no cancela');
+    assert.strictEqual($('#qk-name').value, 'Tercero');
+
+    // Enviar a Mi candidato en edición manda lo guardado, no lo escrito.
+    escribe('#qk-name', 'Escrito sin guardar');
+    let enviado = null;
+    doc.addEventListener('rapido:candidato', (e) => { enviado = e.detail; });
+    $('#qk-list .qk-row[data-id="300"] .qk-send').click();
+    assert.deepStrictEqual({ name: enviado.name, dropi: enviado.dropi }, { name: 'Tercero', dropi: '33' }, 'Envía los datos guardados');
+    assert.ok($('#qk-panel').hidden && normal() && vacio(), 'Enviar cierra el panel y cancela la edición');
+
+    // Limpiar sale del modo edición.
+    $('#qk-btn').click();
+    lapiz('300').click();
+    $('#qk-clear').click(); await tick();
+    $('#modal [data-r="clear"]').click(); await tick();
+    assert.ok(normal() && vacio() && S.items.length === 0, 'Limpiar sale de edición con el formulario vacío');
+
+    W.close();
+    store['pyl-quick'] = previo;
+    if (previo === undefined) delete store['pyl-quick'];
+  };
+
+  return lgTest().then(dkTest).then(apTest).then(chTest).then(chCadenaTest).then(chDurasTest).then(hubTest).then(hubTest2).then(hubTest3).then(hubTest4).then(hubTest5).then(tkTest1).then(tkTest2).then(tkTest3).then(tkTest4).then(tkTest5).then(tkTest6).then(tkTest7).then(tkTest8).then(tkTest9).then(ckTest).then(mwTest1).then(mwTest2).then(mwTest3).then(mwTest4).then(ixTest1).then(ixTest2).then(czTest).then(spyTest).then(qkTest).then(fresca).then((d2) => {
     const doc2 = d2.window.document;
     assert.deepStrictEqual([...doc2.querySelectorAll('#b-strats .st-tab')].map((b) => b.textContent.length > 0), [true, true, true, true], 'Estrategias muestra 4 tarjetas');
     assert.deepStrictEqual([...d2.window.PYL.core.search.STRATEGIES.map((x) => x.k)], ['vdo', 'prov', 'caza', 'espia'], 'STRATEGIES = vdo, prov, caza y espia');
