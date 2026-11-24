@@ -202,7 +202,7 @@ Módulo 4 de NovaSociety más el método VDO de DropKiller. La idea: no pregunta
 | 2 | **Mi candidato** | Formulario con foto, ventas, proveedores, anunciantes y costos. Calcula solo el **score /8**, la **utilidad por entrega** y el semáforo **¿Lo testeo?** del método VDO. Al guardar, el producto se queda en el formulario (pasa a "Editando"); solo **🧹 Limpiar formulario** lo vacía. **Costear →** pasa el producto a la pestaña Costeo. |
 | 3 | **Bitácora** | Los productos que voy evaluando. Lápiz = editar, papelera = eliminar, botones para copiar nombre e ID de Dropi. Filtros, búsqueda y vista de estadísticas. |
 | 4 | **¿Es un producto ganador?** | 6 características (2 obligatorias). Las marco y se guardan con el candidato. |
-| 5 | **Estrategias de búsqueda** | Dos caminos para encontrar el producto (ver abajo). |
+| 5 | **Estrategias de búsqueda** | Cuatro caminos para encontrar el producto (ver abajo). |
 | 6 | **Costeo →** | Salta a la pestaña Costeo con los datos del candidato. |
 
 ### ⚡ Guardado rápido
@@ -230,7 +230,7 @@ Junto al Guardado rápido hay un segundo **botón flotante azul** (esquina de ab
 
 ### 🧭 Estrategias de búsqueda
 
-Elijo una de las dos tarjetas de arriba; la app recuerda cuál dejé abierta.
+Elijo una de las cuatro tarjetas de arriba; la app recuerda cuál dejé abierta.
 
 **🎯 Estrategia VDO**: parto de productos que ya están en validación.
 
@@ -252,6 +252,22 @@ En **FastMoss** (enlace directo a [fastmoss.com/es](https://www.fastmoss.com/es)
 
 > [!NOTE]
 > Los números de la estrategia por proveedor (50 / 500 / 15–20) son distintos a los del filtro VDO (máximo 100 en 7 días) a propósito: son métodos diferentes.
+
+**🏹 La Caza**: parto de lo que ya se vende y lo paso por **dos puertas**: (1) que esté en Dropi de mi país con stock y (2) que, sumando todos los ID, esté bajo el techo (hasta 2.000 ventas totales, 100 en 7 días y 10 proveedores). Tres métodos, cada uno con su ruta y un **prompt para copiar** y pegar en Claude con el MCP de DropKiller:
+
+- **A · Se vende afuera pero no aquí**: vende en otros países de Dropi y en Colombia casi nadie.
+- **B · Vende aquí, bajo el techo**: ya se vende en Colombia, pero en pocas cantidades.
+- **C · Explota en TikTok Shop**: lo más vendido allá y cómo está en Dropi Colombia.
+
+Si en A o C no está en Dropi, va a Desarrollo con el laboratorio aliado (Goldbox).
+
+**🕵️ El Espía**: espío tiendas con DropKiller. Pego el dominio o un enlace de la tienda y veo en una pantalla sus **productos top**, sus **anuncios**, sus **apps**, su **tema** y sus **píxeles**. Dos entradas, cada una con su ruta, lo que miro, qué hago con ello y un prompt para copiar:
+
+- **A · Espío una tienda**: parto del dominio de la tienda.
+- **B · Sigo un producto**: veo sus anuncios ganadores en mi país y las tiendas que lo mueven.
+
+> [!NOTE]
+> El texto de La Caza y El Espía es provisional: el Laboratorio de NovaSociety no lo expone por MCP, así que se redactó con la descripción del usuario y las herramientas de DropKiller.
 
 ---
 
@@ -806,6 +822,8 @@ const dropi = core.buildDropi(core.parseCSV(texto));
 const a = core.aggregate(dropi.lines, [], { prod: '__all', from: null, to: null, iva: true, adsOverride: null }, null);
 core.evaluate({ salesTotal: 800, prov: 3, sales7: 40 });   // semáforo VDO de un candidato
 core.BY_PROVIDER.steps.map((s) => s.t);                    // fases de la estrategia por proveedor
+core.cazaMethod('b').prompt;                               // prompt de La Caza, método B
+core.espiaMode('a').prompt;                                // prompt de El Espía, entrada A
 ```
 
 Las pruebas viven en `tests/` y no necesitan runner:

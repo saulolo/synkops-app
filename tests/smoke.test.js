@@ -3546,10 +3546,95 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     });
   };
 
-  return lgTest().then(dkTest).then(apTest).then(chTest).then(chCadenaTest).then(chDurasTest).then(hubTest).then(hubTest2).then(hubTest3).then(hubTest4).then(hubTest5).then(tkTest1).then(tkTest2).then(tkTest3).then(tkTest4).then(tkTest5).then(tkTest6).then(tkTest7).then(tkTest8).then(tkTest9).then(ckTest).then(mwTest1).then(mwTest2).then(mwTest3).then(mwTest4).then(ixTest1).then(ixTest2).then(fresca).then((d2) => {
+  // SPEC 25: estrategia La Caza (página aparte con localStorage simulado, como los rastros de la SPEC 08).
+  const czTest = async () => {
+    const previo = store['pyl-search'];
+    store['pyl-search'] = JSON.stringify({ strat: 'caza', cazaMethod: 'zz' });
+    const d = await fresca(), W = d.window, doc = W.document, S = W.PYL.app.state.search, C = W.PYL.core.search;
+    const $ = (q) => doc.querySelector(q), $$ = (q) => [...doc.querySelectorAll(q)];
+    assert.strictEqual($$('#b-strats .st-tab').length, 4, 'Estrategias muestra 4 tarjetas');
+    assert.ok(/Cuatro caminos/.test($('#b-sec-strat .b-sub').textContent), 'Subtítulo «Cuatro caminos…»');
+    assert.strictEqual(S.strat, 'caza', "strat: 'caza' guardado abre La Caza");
+    assert.ok(!$('#b-st-caza').hidden && $('#b-st-vdo').hidden && $('#b-st-prov').hidden, 'Solo se ve #b-st-caza');
+    assert.strictEqual(S.cazaMethod, 'a', "cazaMethod 'zz' cae en A");
+    assert.strictEqual($$('#b-caza .cz-gate').length, 2, '2 puertas');
+    assert.strictEqual($$('#b-caza .cz-node').length, 3, '3 nodos');
+    assert.strictEqual($('#b-caza .cz-node.on').dataset.m, 'a');
+    assert.ok(/Se vende afuera pero no aquí/.test($('#b-caza .cz-det h3').textContent) && $('#b-caza .cz-fork'), 'Detalle de A con bifurcación');
+    assert.ok($('#b-caza .cz-out.g') && $('#b-caza .cz-out.y') && /Goldbox/.test($('#b-caza .cz-out.y').textContent), 'Salidas verde y amarilla con el aliado');
+    // Cambiar a B y a C.
+    $('#b-caza .cz-node[data-m="b"]').click();
+    assert.strictEqual(S.cazaMethod, 'b');
+    assert.ok(/Vende aquí, bajo el techo/.test($('#b-caza .cz-det h3').textContent) && !$('#b-caza .cz-fork'), 'B sin bifurcación');
+    assert.strictEqual($('#b-caza .cz-node[data-m="b"]').getAttribute('aria-pressed'), 'true');
+    assert.strictEqual(JSON.parse(store['pyl-search']).cazaMethod, 'b', 'Se guarda cazaMethod');
+    $('#b-caza .cz-node[data-m="c"]').click();
+    assert.strictEqual(S.cazaMethod, 'c');
+    assert.ok(/Explota en TikTok Shop/.test($('#b-caza .cz-det h3').textContent) && $('#b-caza .cz-fork'), 'C con bifurcación');
+    assert.deepStrictEqual($$('#b-caza .cz-det .row.mt button').map((b) => b.textContent), ['← Método anterior'], 'Acciones de C');
+    // Copiar prompt.
+    let copiado = null;
+    Object.defineProperty(W.navigator, 'clipboard', { configurable: true, value: { writeText: async (t) => { copiado = t; } } });
+    $('#toast').textContent = '';
+    $('#cz-copy').click();
+    await new Promise((ok) => setTimeout(ok, 20));
+    assert.strictEqual(copiado, C.cazaMethod('c').prompt, 'Copia el prompt del método abierto');
+    assert.ok(/Prompt copiado/.test($('#toast').textContent), 'Avisa en #toast');
+    // Cambiar de estrategia oculta La Caza y la tarjeta queda marcada.
+    $$('#b-strats .st-tab')[0].click();
+    assert.ok($('#b-st-caza').hidden && !$('#b-st-vdo').hidden, 'VDO oculta La Caza');
+    $$('#b-strats .st-tab')[2].click();
+    assert.ok(!$('#b-st-caza').hidden && $$('#b-strats .st-tab')[2].getAttribute('aria-pressed') === 'true', 'La tercera tarjeta abre La Caza');
+    W.close();
+    store['pyl-search'] = previo;
+  };
+
+  // SPEC 25: estrategia El Espía (página aparte con localStorage simulado, como La Caza).
+  const spyTest = async () => {
+    const previo = store['pyl-search'];
+    store['pyl-search'] = JSON.stringify({ strat: 'espia', espiaMode: 'zz' });
+    const d = await fresca(), W = d.window, doc = W.document, S = W.PYL.app.state.search, C = W.PYL.core.search;
+    const $ = (q) => doc.querySelector(q), $$ = (q) => [...doc.querySelectorAll(q)];
+    assert.strictEqual($$('#b-strats .st-tab').length, 4, 'Estrategias muestra 4 tarjetas');
+    assert.strictEqual(S.strat, 'espia', "strat: 'espia' guardado abre El Espía");
+    assert.ok(!$('#b-st-espia').hidden && $('#b-st-vdo').hidden && $('#b-st-prov').hidden && $('#b-st-caza').hidden, 'Solo se ve #b-st-espia');
+    assert.strictEqual($$('#b-strats .st-tab')[3].getAttribute('aria-pressed'), 'true', 'La cuarta tarjeta queda marcada');
+    assert.strictEqual(S.espiaMode, 'a', "espiaMode 'zz' cae en A");
+    assert.deepStrictEqual($$('#b-espia .sp-tile').map((t) => t.dataset.k), ['top', 'ads', 'apps', 'theme', 'pixels'], '5 fichas de la pantalla');
+    assert.strictEqual($$('#b-espia .sp-node').length, 2, '2 entradas');
+    assert.strictEqual($('#b-espia .sp-node.on').dataset.m, 'a');
+    assert.ok(/Espío una tienda/.test($('#b-espia .sp-det h3').textContent) && $$('#b-espia .sp-st').length === 4, 'Detalle de A con 4 pasos');
+    assert.ok($('#b-espia .sp-pt').textContent.includes('[DOMINIO O ENLACE DE LA TIENDA]'), 'Prompt de A con su marcador');
+    // Cambiar a B.
+    $('#b-espia .sp-node[data-m="b"]').click();
+    assert.strictEqual(S.espiaMode, 'b');
+    assert.ok(/Sigo un producto/.test($('#b-espia .sp-det h3').textContent), 'Detalle de B');
+    assert.strictEqual($('#b-espia .sp-node[data-m="b"]').getAttribute('aria-pressed'), 'true');
+    assert.strictEqual(JSON.parse(store['pyl-search']).espiaMode, 'b', 'Se guarda espiaMode');
+    assert.deepStrictEqual($$('#b-espia .sp-det .row.mt button').map((b) => b.textContent), ['← Entrada anterior'], 'Acciones de B');
+    // Copiar prompt.
+    let copiado = null;
+    Object.defineProperty(W.navigator, 'clipboard', { configurable: true, value: { writeText: async (t) => { copiado = t; } } });
+    $('#toast').textContent = '';
+    $('#sp-copy').click();
+    await new Promise((ok) => setTimeout(ok, 20));
+    assert.strictEqual(copiado, C.espiaMode('b').prompt, 'Copia el prompt de la entrada abierta');
+    assert.ok(/Prompt copiado/.test($('#toast').textContent), 'Avisa en #toast');
+    // Siguiente / anterior y cambio de estrategia.
+    $('#b-espia .sp-det .row.mt button').click();
+    assert.strictEqual(S.espiaMode, 'a', '← Entrada anterior vuelve a A');
+    $$('#b-strats .st-tab')[2].click();
+    assert.ok(!$('#b-st-caza').hidden && $('#b-st-espia').hidden, 'La Caza oculta El Espía');
+    $$('#b-strats .st-tab')[3].click();
+    assert.ok(!$('#b-st-espia').hidden && $('#b-st-caza').hidden, 'La cuarta tarjeta vuelve a abrir El Espía');
+    W.close();
+    store['pyl-search'] = previo;
+  };
+
+  return lgTest().then(dkTest).then(apTest).then(chTest).then(chCadenaTest).then(chDurasTest).then(hubTest).then(hubTest2).then(hubTest3).then(hubTest4).then(hubTest5).then(tkTest1).then(tkTest2).then(tkTest3).then(tkTest4).then(tkTest5).then(tkTest6).then(tkTest7).then(tkTest8).then(tkTest9).then(ckTest).then(mwTest1).then(mwTest2).then(mwTest3).then(mwTest4).then(ixTest1).then(ixTest2).then(czTest).then(spyTest).then(fresca).then((d2) => {
     const doc2 = d2.window.document;
-    assert.deepStrictEqual([...doc2.querySelectorAll('#b-strats .st-tab')].map((b) => b.textContent.length > 0), [true, true], 'Estrategias muestra solo 2 tarjetas');
-    assert.deepStrictEqual([...d2.window.PYL.core.search.STRATEGIES.map((x) => x.k)], ['vdo', 'prov'], 'STRATEGIES = vdo y prov');
+    assert.deepStrictEqual([...doc2.querySelectorAll('#b-strats .st-tab')].map((b) => b.textContent.length > 0), [true, true, true, true], 'Estrategias muestra 4 tarjetas');
+    assert.deepStrictEqual([...d2.window.PYL.core.search.STRATEGIES.map((x) => x.k)], ['vdo', 'prov', 'caza', 'espia'], 'STRATEGIES = vdo, prov, caza y espia');
     assert.ok(!doc2.querySelector('#b-st-auto') && !doc2.querySelector('[id^="hu-"]'), 'No existe #b-st-auto ni #hu-');
     assert.ok(!doc2.querySelector('#b-st-vdo').hidden && doc2.querySelector('#b-st-prov').hidden, "strat 'auto' guardado abre VDO");
     assert.ok(!('pyl-auto' in store), 'Se borra pyl-auto una sola vez al cargar');

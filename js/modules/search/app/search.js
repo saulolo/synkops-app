@@ -18,8 +18,10 @@
     filter: saved.filter || 'todos',
     q: '',
     sort: saved.sort || null,
-    strat: saved.strat || 'vdo',    // estrategia de búsqueda abierta: 'vdo' | 'prov'
+    strat: saved.strat || 'vdo',    // estrategia de búsqueda abierta: 'vdo' | 'prov' | 'caza' | 'espia'
     provStep: saved.provStep || 0,  // fase abierta de la estrategia por proveedor
+    cazaMethod: C.cazaMethod(saved.cazaMethod).k, // método abierto de La Caza: 'a' | 'b' | 'c' (lo desconocido cae en 'a')
+    espiaMode: C.espiaMode(saved.espiaMode).k,    // entrada abierta de El Espía: 'a' | 'b' (lo desconocido cae en 'a')
   });
   if (S.editingId && !S.log.some((p) => p.id === S.editingId)) S.editingId = null;
 
@@ -65,7 +67,16 @@
   function renderStrategy() {
     const k = C.STRATEGIES.some((s) => s.k === S.strat) ? S.strat : 'vdo';
     U.strategyTabs($('#b-strats'), C.STRATEGIES, k, (x) => { S.strat = x; persist(); renderStrategy(); });
-    $('#b-st-vdo').hidden = k !== 'vdo'; $('#b-st-prov').hidden = k !== 'prov';
+    $('#b-st-vdo').hidden = k !== 'vdo'; $('#b-st-prov').hidden = k !== 'prov'; $('#b-st-caza').hidden = k !== 'caza'; $('#b-st-espia').hidden = k !== 'espia';
+    const copy = async (text) => { (await PYL.ui.dom.copy(text)) ? toast('Prompt copiado. Pégalo en Claude.', 'ok') : toast('No se pudo copiar', 'error'); };
+    if (k === 'caza') {
+      U.caza($('#b-caza'), C.CAZA, C.cazaMethod(S.cazaMethod).k, { select: (m) => { S.cazaMethod = m; persist(); renderStrategy(); }, copy });
+      return;
+    }
+    if (k === 'espia') {
+      U.espia($('#b-espia'), C.ESPIA, C.espiaMode(S.espiaMode).k, { select: (m) => { S.espiaMode = m; persist(); renderStrategy(); }, copy });
+      return;
+    }
     if (k !== 'prov') return;
     const i = Math.min(Math.max(0, S.provStep), C.BY_PROVIDER.steps.length - 1);
     U.byProvider($('#b-prov'), C.BY_PROVIDER, i, {

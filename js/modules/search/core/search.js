@@ -94,11 +94,13 @@
       avoid: 'Copiar el mismo ángulo: creo ángulos para públicos distintos.' },
   ];
 
-  // Estrategias de búsqueda: dos caminos para llegar a un candidato. La VDO arranca por las ventas
-  // en validación; la de proveedor arranca por el catálogo de proveedores confiables.
+  // Estrategias de búsqueda: tres caminos para llegar a un candidato. La VDO arranca por las ventas
+  // en validación; la de proveedor, por el catálogo de proveedores confiables; La Caza, por lo que ya se vende.
   const STRATEGIES = [
     { k: 'vdo', t: 'Estrategia VDO', icon: 'target', d: 'Parto de productos que ya están en validación y reviso que no estén saturados.' },
     { k: 'prov', t: 'Estrategia por proveedor', icon: 'factory', d: 'Parto de proveedores confiables y busco productos que casi nadie está vendiendo.' },
+    { k: 'caza', t: 'La Caza', icon: 'crosshair', d: 'Parto de lo que ya se vende y lo paso por dos puertas: Dropi de mi país y bajo el techo.' },
+    { k: 'espia', t: 'El Espía', icon: 'eye', d: 'Pego la tienda de un competidor y veo lo que vende, cómo anuncia y con qué está construida.' },
   ];
 
   // Estrategia por proveedor: 4 fases. out = lo que me queda al terminar la fase (embudo).
@@ -139,6 +141,168 @@
         ] },
     ],
   };
+
+  // La Caza: parto de lo que ya se vende y lo paso por dos puertas (Dropi de mi país y bajo el techo).
+  // TEXTO PROVISIONAL: el MCP del Laboratorio no expone La caza; se redactó con la descripción del usuario y lo
+  // que hacen las herramientas de DropKiller. Se reemplaza aquí, sin tocar la UI. Los números salen de LIMITS.
+  const ALLY = BY_PROVIDER.allies[0].t;
+  const CAZA_ASK = [
+    'Hazlo en Colombia, con plataforma DROPI, y dame 5 resultados en una tabla con: nombre, ventas de 7 días, ',
+    'ventas totales (sumando todos los ID del mismo producto), proveedores, stock y el enlace de DropKiller. ',
+    'Para cada uno dime por cuál puerta pasa o se cae: (1) que esté en Dropi Colombia con al menos ',
+    `${n(LIMITS.stock)} unidades de stock y (2) que, sumando todos los ID, tenga como máximo ${n(LIMITS.total.ideal)} ventas totales `,
+    `(límite ${n(LIMITS.total.max)}), ${n(LIMITS.v7.max)} ventas en 7 días y ${n(LIMITS.prov.max)} proveedores. `,
+    'No uses un solo ID: busca el producto por nombre y por foto y suma todos.',
+  ].join('');
+  const CAZA = {
+    lead: ['Con DropKiller conectado, la caza busca ', { b: 'lo que ya se vende' }, ' y lo pasa por dos puertas. Lo que a mano es una tarde, aquí son dos minutos.'],
+    gates: [
+      { k: 'dropi', n: 1, icon: 'package', t: 'Está en Dropi de mi país',
+        d: ['Que exista en Dropi Colombia ', { b: `con stock` }, ` (mínimo ${n(LIMITS.stock)} unidades). Si no está, no lo puedo vender.`] },
+      { k: 'techo', n: 2, icon: 'wall', t: 'Bajo el techo',
+        d: ['Sumando ', { b: 'todos los ID' }, `: máximo ${n(LIMITS.total.ideal)} ventas totales (límite ${n(LIMITS.total.max)}), ${n(LIMITS.v7.max)} en 7 días y ${n(LIMITS.prov.max)} proveedores.`] },
+    ],
+    ally: ALLY,
+    methods: [
+      { k: 'a', letter: 'A', icon: 'globe', t: 'Se vende afuera pero no aquí', short: 'Ya vende en otros países de Dropi y en Colombia todavía no.',
+        where: 'DropKiller → Productos, otro país',
+        p: ['Productos que ya venden en otros países de Dropi (México, Chile, Ecuador, Perú, Guatemala…) y ', { b: 'en Colombia casi nadie los vende' }, '.'],
+        route: [
+          { icon: 'pin', t: 'Elijo un país de afuera', d: ['Un país de Dropi distinto de Colombia.'] },
+          { icon: 'trend-up', t: 'Miro lo que más vende allá', d: ['Lo más vendido en ', { b: '7 días' }, ', con stock y activo.'] },
+          { icon: 'search', t: 'Lo busco en Dropi Colombia', d: ['Por nombre o por foto, ', { b: 'sumando todos los ID' }, '.'] },
+          { fork: true, t: '¿Está en Dropi Colombia?',
+            yes: { t: 'Sí → Puerta 2 (el techo)', d: ['Si está con ventas bajo el techo, es candidato.'] },
+            no: { t: 'No → Desarrollo con laboratorio aliado', d: ['Lo desarrollo con el aliado ', { b: ALLY }, '.'] } },
+        ],
+        checks: [
+          { big: `≥ ${n(LIMITS.v7.min)}`, unit: 'en 7 días', t: 'Ventas afuera', d: ['Que allá ya se mueva en los últimos 7 días.'] },
+          { big: `< ${n(LIMITS.total.min)}`, unit: 'totales aquí', t: 'En Colombia', d: ['Casi nadie lo vende todavía, sumando todos los ID.'] },
+        ],
+        prompt: [
+          'Quiero cazar productos con el método A: se venden afuera pero no en Colombia. ',
+          'Busca en Dropi de otros países (México, Chile, Ecuador, Perú, Guatemala) los productos activos y con stock ',
+          `que más vendieron en los últimos 7 días (al menos ${n(LIMITS.v7.min)} ventas). Luego busca cada uno en Dropi Colombia por nombre y por foto `,
+          `y quédate con los que allá no están o aquí tienen menos de ${n(LIMITS.total.min)} ventas totales. `,
+          CAZA_ASK,
+        ].join('') },
+      { k: 'b', letter: 'B', icon: 'signal-low', t: 'Vende aquí, bajo el techo', short: 'Ya se vende en Colombia, pero en pocas cantidades.',
+        where: 'DropKiller → Productos, Colombia · Dropi',
+        p: ['Productos que ya se venden en Colombia, pero en pocas cantidades: ', { b: 'hay demanda y poca competencia' }, '.'],
+        route: [
+          { icon: 'trend-up', t: 'Miro lo que se mueve aquí', d: ['En Dropi Colombia, en ', { b: '7 días' }, ' o en tendencia.'] },
+          { icon: 'search', t: 'Sumo todos los ID', d: ['Junto las ventas de todos los ID del mismo producto.'] },
+          { icon: 'wall', t: 'Lo paso por el techo', d: ['Ventas, proveedores y stock dentro de los límites.'] },
+          { icon: 'check-circle', t: 'Candidato', d: ['Si pasa, lo anoto en Mi candidato.'] },
+        ],
+        checks: [
+          { big: `${n(LIMITS.v7.min)} – ${n(LIMITS.v7.max)}`, unit: 'en 7 días', t: 'Ventas recientes', d: ['Se mueve, pero sin saturar.'] },
+          { big: `${n(LIMITS.total.min)} – ${n(LIMITS.total.ideal)}`, unit: 'totales', t: 'Ventas totales', d: ['Sumando todos los ID.'] },
+          { big: `≤ ${n(LIMITS.prov.max)}`, unit: 'proveedores', t: 'Competencia', d: ['Pocos vendiéndolo.'] },
+          { big: `≥ ${n(LIMITS.stock)}`, unit: 'unidades', t: 'Stock', d: ['Que el proveedor tenga con qué responder.'] },
+        ],
+        prompt: [
+          'Quiero cazar productos con el método B: ya se venden en Colombia, pero en pocas cantidades. ',
+          'Busca en Dropi Colombia los productos que se están moviendo en los últimos 7 días o están en tendencia, ',
+          `con entre ${n(LIMITS.v7.min)} y ${n(LIMITS.v7.max)} ventas en 7 días y entre ${n(LIMITS.total.min)} y ${n(LIMITS.total.ideal)} ventas totales. `,
+          CAZA_ASK,
+        ].join('') },
+      { k: 'c', letter: 'C', icon: 'rocket', t: 'Explota en TikTok Shop', short: 'Lo más vendido en TikTok Shop y cómo está en Dropi.',
+        where: 'DropKiller → TikTok Shop (EE. UU.)',
+        p: ['Lo más vendido en TikTok Shop de Estados Unidos y ', { b: 'cómo está en Dropi Colombia' }, '.'],
+        route: [
+          { icon: 'rocket', t: 'Miro lo más vendido en TikTok Shop', d: ['Lo que más volumen de ventas tiene en Estados Unidos.'] },
+          { icon: 'search', t: 'Lo busco en Dropi Colombia', d: ['Por nombre o por foto, ', { b: 'sumando todos los ID' }, '.'] },
+          { fork: true, t: '¿Está en Dropi Colombia?',
+            yes: { t: 'Sí → Puerta 2 (el techo)', d: ['Si está bajo el techo, es candidato.'] },
+            no: { t: 'No → Desarrollo con laboratorio aliado', d: ['Lo desarrollo con el aliado ', { b: ALLY }, '.'] } },
+        ],
+        checks: [
+          { big: 'Top', unit: 'en TikTok Shop', t: 'Volumen de ventas', d: ['Lo que más vende, no un número fijo.'] },
+          { big: `≤ ${n(LIMITS.total.ideal)}`, unit: 'totales aquí', t: 'El techo', d: ['Si está en Dropi, ventas totales sumando todos los ID.'] },
+          { big: `≤ ${n(LIMITS.v7.max)}`, unit: 'en 7 días', t: 'El techo', d: ['Y ventas recientes dentro del límite.'] },
+        ],
+        prompt: [
+          'Quiero cazar productos con el método C: explotan en TikTok Shop. ',
+          'Busca en TikTok Shop de Estados Unidos los productos que más venden y revisa cómo están en Dropi Colombia, por nombre y por foto. ',
+          'Si no están en Dropi, márcalos como «para desarrollo con laboratorio aliado». ',
+          CAZA_ASK,
+        ].join('') },
+    ],
+  };
+  const cazaMethod = (k) => CAZA.methods.find((m) => m.k === k) || CAZA.methods[0];
+
+  // El Espía: espío tiendas con DropKiller. Una entrada por tienda y otra por producto.
+  // TEXTO PROVISIONAL: el MCP del Laboratorio no expone El Espía; se redactó con la descripción del usuario y lo que
+  // hacen las herramientas de DropKiller. Se reemplaza aquí, sin tocar la UI. Los números salen de LIMITS.
+  const SPY_STORE = '[DOMINIO O ENLACE DE LA TIENDA]';
+  const SPY_PRODUCT = '[NOMBRE DEL PRODUCTO]';
+  const SPY_SOURCE = 'Con enlaces de DropKiller. Si DropKiller no tiene algún dato (por ejemplo píxeles, o anuncios de una tienda que no rastrea), dímelo y no lo inventes.';
+  const ESPIA = {
+    lead: ['Con DropKiller conectado, el espía muestra los ', { b: 'anuncios ganadores de mi país' }, ' de un producto y ', { b: 'las tiendas que lo están moviendo' }, '.'],
+    screen: [
+      { k: 'top', icon: 'trophy', t: 'Productos top', d: 'Lo que más vende la tienda.' },
+      { k: 'ads', icon: 'megaphone', t: 'Anuncios', d: 'Los que tiene activos y hace cuánto.' },
+      { k: 'apps', icon: 'gem', t: 'Apps', d: 'Con qué herramientas vende.' },
+      { k: 'theme', icon: 'store', t: 'Tema', d: 'Cómo se ve la tienda por dentro.' },
+      { k: 'pixels', icon: 'target', t: 'Píxeles', d: 'Qué plataformas mide.' },
+    ],
+    modes: [
+      { k: 'a', letter: 'A', icon: 'store', t: 'Espío una tienda', short: 'Pego su dominio o un enlace y sale todo en una pantalla.',
+        where: 'DropKiller → Tiendas',
+        p: ['Pego el ', { b: 'dominio o cualquier enlace' }, ' de la tienda y sale todo en una sola pantalla: sus productos top, sus anuncios, sus apps, su tema y sus píxeles.'],
+        route: [
+          { icon: 'search', t: 'Pego el dominio', d: ['O cualquier enlace de la tienda que quiero espiar.'] },
+          { icon: 'trophy', t: 'Miro sus productos top', d: ['Lo que más vende: ahí está lo que le funciona.'] },
+          { icon: 'megaphone', t: 'Miro sus anuncios', d: ['Los activos hace ', { b: `más de ${n(LIMITS.adDays)} días` }, ' son los que le dan plata.'] },
+          { icon: 'store', t: 'Miro cómo está construida', d: ['Su tema, sus apps y sus píxeles.'] },
+        ],
+        checks: [
+          { big: 'Top', unit: 'productos', t: 'Productos top', d: ['Qué vende más la tienda. Me sirve para ', { b: 'encontrar candidatos' }, '.'] },
+          { big: `> ${n(LIMITS.adDays)}`, unit: 'días activo', t: 'Anuncios', d: ['Un anuncio que sigue activo es un anuncio rentable. Veo su ángulo y su creativo.'] },
+          { big: 'Apps', unit: 'instaladas', t: 'Apps', d: ['Qué usa para vender (ofertas, reseñas, formulario) y qué puedo copiar.'] },
+          { big: 'Tema', unit: 'de Shopify', t: 'Tema', d: ['Cómo armó la página: orden, secciones y estilo.'] },
+          { big: 'Píxeles', unit: 'de seguimiento', t: 'Píxeles', d: ['En qué plataformas mide: Meta, TikTok u otras.'] },
+        ],
+        use: [
+          ['Si sus productos top son otros, ', { b: 'anoto los que me interesan' }, ' y los paso por las puertas de La Caza.'],
+          ['Del anuncio más viejo copio el ', { b: 'ángulo y el gancho' }, ' de los primeros 3 segundos.'],
+          ['De sus apps y su tema copio lo que baje la fricción de mi página.'],
+        ],
+        prompt: [
+          `Espía la tienda ${SPY_STORE} con DropKiller. Dame, en Colombia: sus productos top (los que más venden), `,
+          `sus anuncios (cuántos están activos y cuáles llevan más de ${n(LIMITS.adDays)} días activos), `,
+          'las apps que tiene instaladas (qué hace cada una), su tema de Shopify y sus píxeles. ',
+          SPY_SOURCE,
+        ].join('') },
+      { k: 'b', letter: 'B', icon: 'search', t: 'Sigo un producto', short: 'Veo sus anuncios ganadores en mi país y quién lo mueve.',
+        where: 'DropKiller → Anuncios y Tiendas, mi país',
+        p: ['Parto de un producto que ya elegí: veo sus ', { b: 'anuncios ganadores en mi país' }, ' y las ', { b: 'tiendas que lo están moviendo' }, '.'],
+        route: [
+          { icon: 'search', t: 'Busco el producto', d: ['Por nombre, en DropKiller.'] },
+          { icon: 'megaphone', t: 'Veo sus anuncios ganadores', d: ['En mi país, los activos hace ', { b: `más de ${n(LIMITS.adDays)} días` }, '.'] },
+          { icon: 'store', t: 'Veo las tiendas que lo mueven', d: ['Menos de ', { b: `${n(LIMITS.advertisers)} anunciantes activos` }, ' es señal de que no está saturado.'] },
+          { icon: 'eye', t: 'Espío cada tienda', d: ['Como en la entrada A: sus productos, anuncios, apps, tema y píxeles.'] },
+        ],
+        checks: [
+          { big: `> ${n(LIMITS.adDays)}`, unit: 'días activo', t: 'Anuncios ganadores', d: ['Los que siguen corriendo en mi país.'] },
+          { big: `< ${n(LIMITS.advertisers)}`, unit: 'anunciantes', t: 'Tiendas que lo mueven', d: ['Anunciantes activos, no anuncios.'] },
+          { big: 'Cómo', unit: 'está hecha', t: 'Construcción', d: ['Tema y apps de cada tienda que lo vende.'] },
+        ],
+        use: [
+          ['Veo ', { b: 'quién lo vende y cómo' }, ': si todos lo hacen igual, busco otro ángulo.'],
+          ['De los anuncios más viejos saco ángulos y ganchos para mis creativos.'],
+          ['Con las tiendas que lo mueven miro qué ofertas y apps usan en su página.'],
+        ],
+        prompt: [
+          `Con DropKiller, sigue este producto en Colombia: ${SPY_PRODUCT}. Dame sus anuncios ganadores en Colombia `,
+          `(los activos hace más de ${n(LIMITS.adDays)} días) y las tiendas que lo están moviendo; de cada tienda, `,
+          'su tema de Shopify y sus apps. Dime cuántos anunciantes activos lo venden. ',
+          SPY_SOURCE,
+        ].join('') },
+    ],
+  };
+  const espiaMode = (k) => ESPIA.modes.find((m) => m.k === k) || ESPIA.modes[0];
 
   // Producto ganador: lo primero que reviso de un candidato. must = sin esto no lo puedo vender.
   const WINNER_GROUPS = [
@@ -462,7 +626,7 @@
   };
 
   core.search = {
-    LIMITS, STAGES, stage, stageRange, PYRAMID, VDO, STRATEGIES, BY_PROVIDER, WINNER, WINNER_GROUPS, winnerCheck, FLOW, TOOLS, RESEARCH, MISTAKES,
+    LIMITS, STAGES, stage, stageRange, PYRAMID, VDO, STRATEGIES, BY_PROVIDER, CAZA, cazaMethod, ESPIA, espiaMode, WINNER, WINNER_GROUPS, winnerCheck, FLOW, TOOLS, RESEARCH, MISTAKES,
     COUNTRIES, STATUS, MSP, mspLevel, VALUE, SATURATION, COST_DEFAULTS, SCORE_MAX, SCORE_LEVELS, FILTERS,
     unitCost, priceFor, marginLevel, competition, ageMonths, scoreParts, score, scoreLevel, evaluate, list, stats, unsaved,
   };

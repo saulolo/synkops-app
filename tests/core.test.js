@@ -11,7 +11,7 @@ const caso = (nombre, fn) => casos.push([nombre, fn]);
 
 caso('exporta todas las funciones del núcleo aplanadas', () => {
   const claves = Object.keys(core).sort().join(',');
-  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CH_CPA_READ,CH_HELP,CH_SIDES,CK_DAYS,CK_MONTHS,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,HOME_EPOCH,HOME_NAME,HOME_QUOTES,HOME_SEED,HOME_SLOTS,HUB_DEFAULTS,HUB_VERSION,IX_VERSION,LADDER_BLOCKS,LANDING,LEVELS,LG_ACCOUNTS,LG_BANK,LG_CATALOG,LG_DAYS,LG_NEQUI,LG_PARTS,LG_STAGES,LG_STORE,LG_TEMPLATES,LIMITS,MARGIN,MISTAKES,MSP,MW_API,MW_EVERY,MW_PI_TYPES,MW_SALE_TYPES,MW_VERSION,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TK_HISTORY_DAYS,TK_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cellVal,chChain,chHard,chPlat,ckAngles,ckDate,ckDay,ckLabel,ckTime,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,evaluate,fill,fmt,fullTitle,funnel,homeDay,homeGreeting,homeHello,homeOrder,homePick,homeSlot,hubAdd,hubCheck,hubClean,hubDefaults,hubDomain,hubFavicon,hubInitials,hubLoad,hubOrder,hubRemove,hubSet,hubUrl,isDropi,isMetrics,ixFunnel,ixLoad,ixPnl,ixTasks,ixTesting,key,kpis,lgForm,lgFromCand,lgMessage,lgMoney,lgMoneyText,lgPhone,lgPrefill,lgTemplate,lgValues,list,marginLevel,matchProduct,mspLevel,mwAction,mwAlerts,mwCut,mwError,mwK,mwLoad,mwPhoto,mwRow,mwRows,mwTotals,mwVerdict,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,tkAdd,tkAddDays,tkAddSub,tkCanCarry,tkCarry,tkCarrySource,tkDateLabel,tkDayDate,tkDayKey,tkDayLabel,tkDelete,tkDeleteSub,tkEdit,tkEditSub,tkEmpty,tkIsHour,tkLoad,tkMove,tkMoveSub,tkParseHour,tkPastDays,tkProgress,tkRollOver,tkSetAll,tkSetHour,tkShortDate,tkTasksOf,tkToggle,tkToggleCollapsed,tkToggleSub,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
+  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CAZA,CH_CPA_READ,CH_HELP,CH_SIDES,CK_DAYS,CK_MONTHS,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,ESPIA,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,HOME_EPOCH,HOME_NAME,HOME_QUOTES,HOME_SEED,HOME_SLOTS,HUB_DEFAULTS,HUB_VERSION,IX_VERSION,LADDER_BLOCKS,LANDING,LEVELS,LG_ACCOUNTS,LG_BANK,LG_CATALOG,LG_DAYS,LG_NEQUI,LG_PARTS,LG_STAGES,LG_STORE,LG_TEMPLATES,LIMITS,MARGIN,MISTAKES,MSP,MW_API,MW_EVERY,MW_PI_TYPES,MW_SALE_TYPES,MW_VERSION,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TK_HISTORY_DAYS,TK_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cazaMethod,cellVal,chChain,chHard,chPlat,ckAngles,ckDate,ckDay,ckLabel,ckTime,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,espiaMode,evaluate,fill,fmt,fullTitle,funnel,homeDay,homeGreeting,homeHello,homeOrder,homePick,homeSlot,hubAdd,hubCheck,hubClean,hubDefaults,hubDomain,hubFavicon,hubInitials,hubLoad,hubOrder,hubRemove,hubSet,hubUrl,isDropi,isMetrics,ixFunnel,ixLoad,ixPnl,ixTasks,ixTesting,key,kpis,lgForm,lgFromCand,lgMessage,lgMoney,lgMoneyText,lgPhone,lgPrefill,lgTemplate,lgValues,list,marginLevel,matchProduct,mspLevel,mwAction,mwAlerts,mwCut,mwError,mwK,mwLoad,mwPhoto,mwRow,mwRows,mwTotals,mwVerdict,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,tkAdd,tkAddDays,tkAddSub,tkCanCarry,tkCarry,tkCarrySource,tkDateLabel,tkDayDate,tkDayKey,tkDayLabel,tkDelete,tkDeleteSub,tkEdit,tkEditSub,tkEmpty,tkIsHour,tkLoad,tkMove,tkMoveSub,tkParseHour,tkPastDays,tkProgress,tkRollOver,tkSetAll,tkSetHour,tkShortDate,tkTasksOf,tkToggle,tkToggleCollapsed,tkToggleSub,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
 });
 
 caso('Costeo: proveedor 30.000 da precio $99.900 y tope $21.617', () => {
@@ -2498,6 +2498,58 @@ caso('Indicadores: ixTasks conteo, 5 días y racha', () => {
   // subtareas cuentan: tarea hecha con subtarea pendiente = día no cumplido
   const e = core.ixTasks(tkNote({ [D]: [tkTask('x', true, [{ id: 's', text: 's', done: false }])] }), D);
   assert.deepStrictEqual([e.done, e.total, e.streak], [1, 2, 0]);
+});
+
+// SPEC 25: estrategia La Caza (texto provisional en CAZA; los números salen de LIMITS).
+caso('La Caza: estrategias, puertas, métodos, bifurcaciones, prompts y cazaMethod', () => {
+  const { STRATEGIES, CAZA, LIMITS, BY_PROVIDER, cazaMethod } = core;
+  const n = (v) => Number(v).toLocaleString('es-CO');
+  assert.deepStrictEqual(STRATEGIES.map((s) => s.k), ['vdo', 'prov', 'caza', 'espia']);
+  assert.strictEqual(STRATEGIES[2].icon, 'crosshair');
+  require('../js/shared/ui/icons.js');
+  assert.ok(globalThis.PYL.ui.icons.NAMES.includes('crosshair'), 'crosshair en icons.NAMES');
+  assert.strictEqual(CAZA.gates.length, 2);
+  assert.deepStrictEqual(CAZA.methods.map((m) => [m.k, m.letter]), [['a', 'A'], ['b', 'B'], ['c', 'C']]);
+  const ally = BY_PROVIDER.allies[0].t;
+  assert.strictEqual(CAZA.ally, ally);
+  for (const m of CAZA.methods) {
+    const fork = m.route.find((s) => s.fork);
+    if (m.k === 'b') assert.ok(!fork, 'B sin bifurcación');
+    else {
+      assert.strictEqual(m.route[m.route.length - 1], fork, 'el fork es el último paso');
+      assert.ok(fork.yes && fork.no, 'yes y no');
+      assert.ok(JSON.stringify(fork.no).includes(ally), 'no nombra al aliado');
+    }
+    assert.ok(m.prompt && m.prompt.includes('Colombia') && m.prompt.includes('Dropi') && m.prompt.includes('5 resultados'), 'prompt ' + m.k);
+  }
+  assert.ok(cazaMethod('a').prompt.includes(n(LIMITS.v7.min)));
+  for (const k of ['b', 'c']) {
+    const p = cazaMethod(k).prompt;
+    for (const v of [LIMITS.total.ideal, LIMITS.v7.max, LIMITS.prov.max]) assert.ok(p.includes(n(v)), `${k} lleva ${n(v)}`);
+  }
+  assert.strictEqual(cazaMethod('x').k, 'a');
+  assert.strictEqual(cazaMethod('c').k, 'c');
+});
+
+// SPEC 25: estrategia El Espía (texto provisional en ESPIA; los números salen de LIMITS).
+caso('El Espía: estrategia, pantalla, entradas, prompts con marcador y espiaMode', () => {
+  const { STRATEGIES, ESPIA, LIMITS, espiaMode } = core;
+  const n = (v) => Number(v).toLocaleString('es-CO');
+  assert.strictEqual(STRATEGIES[3].k, 'espia');
+  assert.strictEqual(STRATEGIES[3].icon, 'eye');
+  require('../js/shared/ui/icons.js');
+  assert.ok(globalThis.PYL.ui.icons.NAMES.includes('eye'), 'eye en icons.NAMES');
+  assert.deepStrictEqual(ESPIA.screen.map((s) => s.k), ['top', 'ads', 'apps', 'theme', 'pixels']);
+  assert.deepStrictEqual(ESPIA.modes.map((m) => [m.k, m.letter]), [['a', 'A'], ['b', 'B']]);
+  for (const m of ESPIA.modes) {
+    assert.ok(m.prompt.includes('Colombia') && m.prompt.includes('DropKiller'), 'prompt ' + m.k);
+    assert.ok(m.prompt.includes(n(LIMITS.adDays)), `${m.k} lleva ${n(LIMITS.adDays)}`);
+    assert.ok(m.route.length >= 3 && m.checks.length >= 3 && m.use.length >= 2 && !m.route.some((s) => s.fork), 'ruta, fichas y lecturas sin fork en ' + m.k);
+  }
+  assert.ok(ESPIA.modes[0].prompt.includes('[DOMINIO O ENLACE DE LA TIENDA]'));
+  assert.ok(ESPIA.modes[1].prompt.includes('[NOMBRE DEL PRODUCTO]'));
+  assert.strictEqual(espiaMode('x').k, 'a');
+  assert.strictEqual(espiaMode('b').k, 'b');
 });
 
 // SPEC 24: el emoji salió de los datos de core; queda el nombre de un ícono del set propio (js/shared/ui/icons.js,
