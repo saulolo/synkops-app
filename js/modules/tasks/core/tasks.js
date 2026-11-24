@@ -6,6 +6,7 @@
 
   const TK_VERSION = 1;
   const TK_HISTORY_DAYS = 5; // días pasados que se conservan como historial
+  const TK_ALERT_MAX = 3; // textos que lista el aviso por hora (SPEC 27); el resto va como «…y N más»
 
   // Tablas propias: Intl en español da «nov.» o días en minúscula según el runtime.
   const DAYS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
@@ -193,6 +194,25 @@
     });
   };
 
+  // Pasa la subtarea a otra tarea del mismo día, en la posición `toIndex` (limitada a [0, m], m = subtareas del destino).
+  // Conserva id, texto y done; el destino queda expandido (sin `collapsed`). Misma tarea → usar tkMoveSub.
+  // Falta origen, destino o subtarea, índice no entero, misma tarea u otro día → la misma nota.
+  const tkMoveSubTo = (note, fromTaskId, subId, toTaskId, toIndex) => {
+    if (!Number.isInteger(toIndex) || fromTaskId === toTaskId) return note;
+    const day = findDay(note, fromTaskId);
+    if (day === undefined || findDay(note, toTaskId) !== day) return note;
+    const tasks = note.days[day];
+    const from = tasks.find((t) => t.id === fromTaskId);
+    const sub = from.subtasks.find((s) => s.id === subId);
+    if (!sub) return note;
+    const { collapsed, ...to } = tasks.find((t) => t.id === toTaskId);
+    const subs = [...to.subtasks];
+    subs.splice(Math.min(Math.max(toIndex, 0), subs.length), 0, sub);
+    const nextFrom = { ...from, subtasks: from.subtasks.filter((s) => s.id !== subId) };
+    const nextTo = { ...to, subtasks: subs };
+    return withDay(note, day, tasks.map((t) => (t.id === fromTaskId ? nextFrom : t.id === toTaskId ? nextTo : t)));
+  };
+
   // Borrar una tarea se lleva sus subtareas.
   const tkDelete = (note, taskId) => {
     const day = findDay(note, taskId);
@@ -268,6 +288,24 @@
     return { done, total, percent: total === 0 ? 0 : Math.round((done / total) * 100) };
   };
 
+  // ---- Aviso por hora (SPEC 27) ----
+
+  // Tareas de `today` sin hacer con hora `hour`, en el orden de la lista. Las subtareas no cuentan.
+  const tkDueAlert = (note, today, hour) => tkTasksOf(note, today).filter((t) => !t.done && t.hour === hour);
+
+  // Milisegundos hasta el próximo HH:00:00.000 local (siempre > 0: en punto devuelve 1 h).
+  const tkMsToNextHour = (now) => {
+    const next = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + 1, 0, 0, 0);
+    return next.getTime() - now.getTime();
+  };
+
+  // 'Es hora: 14:00 · A · B · C · …y 2 más'.
+  const tkAlertText = (hour, tasks) => {
+    const parts = [`Es hora: ${pad(hour)}:00`, ...tasks.slice(0, TK_ALERT_MAX).map((t) => t.text)];
+    if (tasks.length > TK_ALERT_MAX) parts.push(`…y ${tasks.length - TK_ALERT_MAX} más`);
+    return parts.join(' · ');
+  };
+
   // ---- Guardado ----
   // Reglas del validador original (isNote de validate-stored-data.ts), sin ventana ni migraciones.
 
@@ -293,29 +331,31 @@
     && Object.entries(v.days).every(([day, tasks]) => DAY_KEY.test(day) && Array.isArray(tasks) && tasks.every(isTask))
     && (v.lastCarryOver === undefined || (typeof v.lastCarryOver === 'string' && DAY_KEY.test(v.lastCarryOver)));
 
-  // Lee el texto crudo de pyl-tasks → { ok, note, collapsed }. Sin clave (null) → ok con nota vacía.
+  // Lee el texto crudo de pyl-tasks → { ok, note, collapsed, alerts }. Sin clave (null) → ok con nota vacía.
   // JSON roto, `v` distinta o cualquier regla rota → ok: false y nota vacía (app guarda el crudo aparte).
+  // `alerts` (SPEC 27) es opcional: ausente o no booleano → false, sin invalidar la nota.
   // `today` queda en la firma por paridad con el original (allí migraba v1 a hoy); app aplica tkRollOver después.
   const tkLoad = (raw, today) => {
-    const empty = (ok) => ({ ok, note: tkEmpty(), collapsed: false });
+    const empty = (ok) => ({ ok, note: tkEmpty(), collapsed: false, alerts: false });
     if (raw == null) return empty(true);
     let data;
     try { data = JSON.parse(raw); } catch (e) { return empty(false); }
     if (!isObj(data) || data.v !== TK_VERSION || !isNote(data.note)) return empty(false);
     const { days, lastCarryOver } = data.note;
     const note = lastCarryOver === undefined ? { days } : { days, lastCarryOver };
-    return { ok: true, note, collapsed: data.collapsed === true };
+    return { ok: true, note, collapsed: data.collapsed === true, alerts: data.alerts === true };
   };
 
   core.tasks = {
-    TK_VERSION, TK_HISTORY_DAYS,
+    TK_VERSION, TK_HISTORY_DAYS, TK_ALERT_MAX,
     tkDayKey, tkDayDate, tkAddDays, tkDayLabel, tkPastDays,
     tkDateLabel, tkShortDate,
     tkIsHour, tkParseHour,
     tkEmpty, tkTasksOf,
-    tkAdd, tkAddSub, tkToggle, tkToggleSub, tkSetAll, tkEdit, tkEditSub, tkSetHour, tkMove, tkMoveSub, tkDelete, tkDeleteSub, tkToggleCollapsed,
+    tkAdd, tkAddSub, tkToggle, tkToggleSub, tkSetAll, tkEdit, tkEditSub, tkSetHour, tkMove, tkMoveSub, tkMoveSubTo, tkDelete, tkDeleteSub, tkToggleCollapsed,
     tkRollOver, tkCarrySource, tkCanCarry, tkCarry,
     tkProgress,
+    tkDueAlert, tkMsToNextHour, tkAlertText,
     tkLoad,
   };
 })();

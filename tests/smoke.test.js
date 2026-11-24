@@ -216,7 +216,9 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.deepStrictEqual(tabs.map((t) => [t.classList.contains('is-on'), t.getAttribute('aria-pressed')]), [[false, 'false'], [true, 'true'], [false, 'false']], 'Al cargar la pestaña activa es Hoy');
     assert.ok(document.getElementById('tk-new') && !document.getElementById('tk-history').classList.contains('is-on'), '«+» y reloj apagado');
     // Progreso vacío, lista vacía y pie inerte.
-    assert.strictEqual(document.getElementById('tk-count').textContent, '0 de 0 hechas');
+    // SPEC 27: sin «N de M hechas» ni anillo; queda la barra.
+    assert.ok(!document.getElementById('tk-count') && !document.querySelector('#tk-root .tk-ring'), 'Sin contador ni anillo en el renglón del progreso');
+    assert.strictEqual(document.getElementById('tk-bar').style.width, '0%', 'Barra vacía');
     assert.ok(document.getElementById('tk-all').hidden, 'Doble check oculto sin tareas');
     assert.strictEqual(document.querySelectorAll('#tk-list .tk-task').length, 0, 'Lista vacía');
     const foot = [...tk.querySelectorAll('#tk-foot button')];
@@ -224,7 +226,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.ok(foot.every((b) => b.getAttribute('aria-disabled') === 'true'), 'Pie inerte (aria-disabled)');
     // Estado inicial.
     const T = PYL.app.state.tasks;
-    assert.deepStrictEqual(JSON.parse(JSON.stringify(T)), { note: { days: {} }, day: hoy, adding: false, menu: null, about: false }, 'app.state.tasks arranca vacío en Hoy');
+    assert.deepStrictEqual(JSON.parse(JSON.stringify(T)), { note: { days: {} }, day: hoy, adding: false, menu: null, about: false, alerts: false }, 'app.state.tasks arranca vacío en Hoy');
   }
 
   // 1c. SPEC 18: tarjeta de Inicio (saludo, frase, Synkops, eyebrow, slogan, descripción y dos botones).
@@ -2772,7 +2774,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     const hoy = C.tkDayKey(new W.Date());
     // Sin clave: load da null y tkLoad arranca con la nota vacía (válida, sin copia de respaldo).
     assert.strictEqual(S.load(), null, 'Sin pyl-tasks, load da null');
-    assert.deepStrictEqual(JSON.parse(JSON.stringify(C.tkLoad(S.load(), hoy))), { ok: true, note: { days: {} }, collapsed: false }, 'Sin clave arranca vacía');
+    assert.deepStrictEqual(JSON.parse(JSON.stringify(C.tkLoad(S.load(), hoy))), { ok: true, note: { days: {} }, collapsed: false, alerts: false }, 'Sin clave arranca vacía');
     // Guardar escribe { v, note, collapsed } y load devuelve el texto tal cual.
     const datos = { v: 1, note: { days: { [hoy]: [] } }, collapsed: true };
     assert.strictEqual(S.save(datos), true);
@@ -2820,7 +2822,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.deepStrictEqual(textos(), ['Comprar pan']);
     assert.strictEqual($('#tk-list .tk-task .tk-hour').textContent, String(ahora), 'Badge con la hora actual');
     assert.ok(text.value === '' && hour.value === '' && D.activeElement === hour, 'Campos vacíos y foco en la hora');
-    assert.strictEqual($('#tk-count').textContent, '0 de 1 hechas');
+    assert.strictEqual($('#tk-bar').style.width, '0%');
     assert.ok(!$('#tk-all').hidden && $('#tk-all').title === 'Marcar todas', 'Con tareas aparece «Marcar todas»');
     // Con hora escrita: va al final.
     tipea(hour, '9'); tipea(text, 'Llamar al banco');
@@ -2828,7 +2830,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.deepStrictEqual(textos(), ['Comprar pan', 'Llamar al banco'], 'La nueva va al final');
     assert.deepStrictEqual($$('#tk-list .tk-hour').map((h) => h.textContent), [String(ahora), '9']);
     assert.ok($$('#tk-list .tk-task').every((t) => t.dataset.id && t.querySelector('.tk-row').dataset.id === t.dataset.id), 'Cada fila lleva data-id');
-    assert.strictEqual($('#tk-count').textContent, '0 de 2 hechas');
+    assert.strictEqual($('#tk-bar').style.width, '0%');
     // Hora inválida: marca el campo y no crea nada.
     tipea(hour, '25'); tipea(text, 'No va');
     key(text, 'Enter');
@@ -2867,15 +2869,14 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     fila(0).querySelector('.tk-check').click();
     assert.ok(fila(0).querySelector('.tk-check').classList.contains('is-on') && fila(0).querySelector('.tk-check').getAttribute('aria-pressed') === 'true', 'Casilla marcada');
     assert.ok(fila(0).querySelector('.tk-text').classList.contains('is-done') && fila(0).querySelector('.tk-hour').classList.contains('is-done'), 'Hecha: texto y hora con .is-done');
-    assert.strictEqual($('#tk-count').textContent, '1 de 3 hechas');
-    assert.strictEqual(D.querySelector('.tk-ring-fill').style.strokeDashoffset, '67', 'Anillo: 100 − 33 %');
+    assert.strictEqual($('#tk-bar').style.width, '33%');
     assert.strictEqual($('#tk-bar').style.width, '33%');
     // Doble check: marca todas y pasa a «Desmarcar todas»; otra vez, desmarca.
     $('#tk-all').click();
-    assert.strictEqual($('#tk-count').textContent, '3 de 3 hechas');
+    assert.strictEqual($('#tk-bar').style.width, '100%');
     assert.ok($('#tk-all').title === 'Desmarcar todas' && $('#tk-all').classList.contains('is-on'), 'Cambia a «Desmarcar todas» (.is-on)');
     $('#tk-all').click();
-    assert.ok($('#tk-count').textContent === '0 de 3 hechas' && $('#tk-all').title === 'Marcar todas', 'Desmarca todo');
+    assert.ok($('#tk-bar').style.width === '0%' && $('#tk-all').title === 'Marcar todas', 'Desmarca todo');
     // Doble clic en el texto: Enter guarda (recortado); Esc cancela; vacío conserva.
     dbl(fila(1).querySelector('.tk-text'));
     let inp = fila(1).querySelector('.tk-edit-in');
@@ -2914,7 +2915,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     // Papelera: borra sin preguntar.
     fila(1).querySelector('.tk-del').click();
     assert.deepStrictEqual(textos(), ['Uno', 'Tres por blur'], 'La papelera borra sin preguntar');
-    assert.strictEqual($('#tk-count').textContent, '0 de 2 hechas');
+    assert.strictEqual($('#tk-bar').style.width, '0%');
     assert.strictEqual(S.note.days[S.day].length, 2);
     W.close();
     delete store['pyl-tasks'];
@@ -2975,7 +2976,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.ok(!chip().classList.contains('is-complete') && chip().textContent === '', 'Con 1 de 2 sin .is-complete ni texto');
     assert.ok(fila(0).querySelector('.tk-sub-row .tk-check').classList.contains('is-on') && fila(0).querySelector('.tk-sub-text').classList.contains('is-done'), 'Subtarea marcada y tachada');
     assert.ok(!fila(0).querySelector('.tk-task-row > .tk-check').classList.contains('is-on'), 'Marcar subtarea no marca la tarea');
-    assert.strictEqual($('#tk-count').textContent, '1 de 4 hechas', 'El progreso cuenta tareas y subtareas');
+    assert.strictEqual($('#tk-bar').style.width, '25%', 'El progreso cuenta tareas y subtareas');
     fila(0).querySelectorAll('.tk-sub-row .tk-check')[1].click();
     assert.ok(chip().getAttribute('aria-label').includes('2 de 2 hechas') && chip().classList.contains('is-complete'), 'Todas hechas: chevron en acento');
     // Marcar la tarea no marca sus subtareas.
@@ -3023,7 +3024,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     key(fila(0).querySelector('.tk-sub-in'), 'Escape');
     // Borrar la tarea se lleva sus subtareas.
     fila(0).querySelector('.tk-del').click();
-    assert.ok($$('#tk-list .tk-task').length === 1 && $('#tk-count').textContent === '0 de 1 hechas', 'Borrar la tarea se lleva sus subtareas');
+    assert.ok($$('#tk-list .tk-task').length === 1 && $('#tk-bar').style.width === '0%', 'Borrar la tarea se lleva sus subtareas');
     W.close();
     delete store['pyl-tasks'];
   };
@@ -3093,7 +3094,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     assert.ok(hoy[0].id !== 'a' && hoy[0].subtasks[0].id !== 'as' && !hoy[0].done && !hoy[0].subtasks[0].done, 'Ids nuevos y todo sin marcar');
     assert.ok(S.note.days[tkDk(-1)][0].done, 'El original no cambia');
     assert.ok($('#tk-carry').hidden && S.note.lastCarryOver === tkDk(0), 'Desaparece y fija lastCarryOver');
-    assert.strictEqual($('#tk-count').textContent, '0 de 2 hechas');
+    assert.strictEqual($('#tk-bar').style.width, '0%');
     $('#tk-list .tk-del').click();
     assert.ok(textos().length === 0 && $('#tk-carry').hidden, 'Una vez por día: borrar las copias no lo trae de vuelta');
     W.close();
@@ -3388,10 +3389,13 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     ptr(D, 'pointercancel', 400);
     assert.ok(subDom().join() === 'X,Z,Y' && subNota().join() === 'X,Z,Y', 'pointercancel devuelve el orden');
     await tick(0);
-    // Con una sola subtarea no arrastra.
+    // SPEC 27: la única subtarea de una tarea se levanta porque el día tiene 2 tareas (puede pasar a otra); Esc la devuelve.
     ptr(tarea(1).querySelector('.tk-sub-text'), 'pointerdown', 40); ptr(D, 'pointermove', 120);
-    assert.ok(!list.classList.contains('is-dragging'), 'Con una sola subtarea no arrastra');
+    assert.ok(list.classList.contains('is-dragging'), 'Con una sola subtarea y 2 tareas en el día, se levanta');
+    key(D.activeElement || D.body, 'Escape');
     ptr(D, 'pointerup', 120);
+    assert.ok(subDom(1).join() === 'W' && subDom().join() === 'X,Z,Y' && subNota(1).join() === 'W', 'Esc la devuelve a su tarea');
+    await tick(0);
     // Guardado tras recargar.
     await tick(350);
     assert.deepStrictEqual(JSON.parse(store['pyl-tasks']).note.days[S.day][0].subtasks.map((s) => s.text), ['X', 'Z', 'Y'], 'El orden de las subtareas queda guardado');
@@ -3403,6 +3407,286 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     await tick(350);
     assert.ok(S.note === nota && S.menu === null && !S.about && !S.adding, 'Los botones del pie no cambian nada');
     W.close();
+    delete store['pyl-tasks'];
+  };
+
+  // 8s2. Mis tareas · switch del aviso por hora y su sonido (SPEC 27, paso 2). Audio simulado y localStorage simulado.
+  const tkTest10 = async () => {
+    delete store['pyl-tasks'];
+    let p = await tkPage();
+    let { W, D, $, $$, tick, S } = p;
+    const sw = () => $('#tk-alert');
+    const estado = () => [sw().getAttribute('aria-checked'), sw().title, sw().getAttribute('aria-label')];
+    const OFF = ['false', 'Activar aviso por hora', 'Activar aviso por hora'], ON = ['true', 'Desactivar aviso por hora', 'Desactivar aviso por hora'];
+    // Audio junto a #tk-root.
+    const audio = $('#tk-audio');
+    assert.ok(audio && audio.tagName === 'AUDIO' && audio.getAttribute('src') === 'sounds/tarea.mp3' && audio.getAttribute('preload') === 'auto', '<audio id="tk-audio" src="sounds/tarea.mp3" preload="auto">');
+    assert.ok(audio.parentElement === $('#tk-rail') && audio.previousElementSibling === $('#tk-root'), '#tk-audio va junto a #tk-root');
+    // Switch: botón nativo (Enter y Espacio los da el navegador), a la izquierda del renglón del progreso (donde estaba el anillo).
+    assert.ok(sw().tagName === 'BUTTON' && sw().type === 'button' && sw().getAttribute('role') === 'switch', '<button type="button" role="switch">');
+    assert.ok(sw().parentElement === $('.tk-prog') && $('.tk-prog').firstElementChild === sw() && $('.tk-prog').lastElementChild === $('#tk-all'), 'En .tk-prog: switch a la izquierda, #tk-all a la derecha');
+    assert.ok(sw().querySelector('svg.ic-bell') && sw().querySelector('.tk-sw .tk-sw-knob'), 'Campana y píldora');
+    assert.deepStrictEqual(estado(), OFF, 'Apagado por defecto');
+    assert.strictEqual(S.alerts, false);
+    // Visible en Ayer, Hoy y Mañana con el día vacío (el historial se prueba en tkTest11, con un día abierto).
+    for (const tab of $$('#tk-tabs .tk-tab')) { tab.click(); assert.ok(!sw().hidden && sw().isConnected && $('.tk-prog').firstElementChild === sw(), 'Visible con el día vacío en ' + tab.textContent); }
+    $$('#tk-tabs .tk-tab')[1].click();
+    // Clic: enciende, suena una vez sin #toast; apagar no suena.
+    let plays = 0;
+    audio.play = () => { plays++; return Promise.reject(new Error('NotAllowedError')); }; // bloqueado: no ensucia la consola
+    $('#toast').textContent = '';
+    sw().click();
+    assert.deepStrictEqual(estado(), ON, 'Clic enciende');
+    assert.ok(S.alerts === true && sw().classList.contains('is-on'));
+    assert.strictEqual(plays, 1, 'Encender suena una vez (vista previa)');
+    assert.strictEqual($('#toast').textContent, '', 'La vista previa no saca #toast');
+    sw().click();
+    assert.deepStrictEqual(estado(), OFF, 'Clic apaga');
+    assert.strictEqual(plays, 1, 'Apagar no suena');
+    // Guarda alerts con el guardado de 300 ms.
+    sw().click();
+    assert.strictEqual(store['pyl-tasks'], undefined, 'No guarda al instante');
+    await tick(350);
+    assert.strictEqual(JSON.parse(store['pyl-tasks']).alerts, true, 'pyl-tasks guarda alerts: true');
+    // Si el mp3 falta (error del <audio>), no vuelve a intentar y no lanza.
+    audio.dispatchEvent(new W.Event('error'));
+    sw().click(); sw().click();
+    assert.strictEqual(plays, 2, 'Con error del audio no se vuelve a intentar');
+    assert.deepStrictEqual(estado(), ON, 'El switch sigue funcionando');
+    await tick(350);
+    W.close();
+    // Recargar con alerts: true arranca encendido.
+    p = await tkPage();
+    assert.deepStrictEqual([p.$('#tk-alert').getAttribute('aria-checked'), p.S.alerts], ['true', true], 'Recargar conserva el switch encendido');
+    p.W.close();
+    // Sin alerts o con un valor no booleano: arranca apagado sin perder las tareas.
+    for (const a of [undefined, 'sí']) {
+      store['pyl-tasks'] = JSON.stringify({ v: 1, note: { days: { [tkDk(0)]: [tkT('a', 'Uno')] } }, ...(a === undefined ? {} : { alerts: a }) });
+      p = await tkPage();
+      assert.deepStrictEqual([p.$('#tk-alert').getAttribute('aria-checked'), p.S.alerts, p.textos()], ['false', false, ['Uno']], 'alerts ' + JSON.stringify(a) + ' → apagado y conserva las tareas');
+      p.W.close();
+    }
+    delete store['pyl-tasks'];
+  };
+
+  // 8s3. Mis tareas · aviso por hora (SPEC 27, paso 3). Date y setTimeout simulados; audio simulado.
+  const tkTest11 = async () => {
+    const ahora = new Date().getHours();
+    const T = (id, text, hour, done = false, extra = {}) => tkT(id, text, { hour, done, ...extra });
+    // Al cargar no avisa de la hora en curso aunque haya una tarea pendiente a esa hora.
+    store['pyl-tasks'] = JSON.stringify({ v: 1, alerts: true, note: { days: { [tkDk(0)]: [T('n', 'Ahora', ahora)] } } });
+    let p = await tkPage();
+    assert.ok(!/Es hora/.test(p.$('#toast').textContent), 'Al cargar no hay aviso de horas ya pasadas');
+    p.W.close();
+    store['pyl-tasks'] = JSON.stringify({ v: 1, alerts: true, note: { days: {
+      [tkDk(0)]: [
+        T('a', 'Pan', 14), T('h', 'Hecha', 14, true), T('o', 'Otra', 15, false, { subtasks: [{ id: 's', text: 'Sub', done: false }] }),
+        ...['A', 'B', 'C', 'D', 'E'].map((t) => T('c' + t, t, 16)),
+      ],
+      [tkDk(1)]: [T('m', 'Mañana', 14), T('m2', 'Mañana 17', 17)],
+      [tkDk(-1)]: [T('y', 'Ayer', 17)],
+      [tkDk(-3)]: [T('v', 'Viejo', 9)],
+    } } });
+    p = await tkPage();
+    const { W, D, $, $$, S } = p;
+    const RealDate = W.Date, realSet = W.setTimeout;
+    const hoy = new RealDate();
+    const pon = (h, m = 0, sec = 0) => {
+      const fixed = new RealDate(hoy.getFullYear(), hoy.getMonth(), hoy.getDate(), h, m, sec).getTime();
+      W.Date = class extends RealDate { constructor(...a) { if (a.length) super(...a); else super(fixed); } static now() { return fixed; } };
+    };
+    // Solo el temporizador del aviso se captura; los demás (guardado, toast, medianoche) corren normal.
+    let prog = [];
+    W.setTimeout = (fn, ms, ...r) => { if (fn && fn.name === 'fireAlert') { prog.push({ fn, ms }); return 0; } return realSet(fn, ms, ...r); };
+    const vuelve = () => D.dispatchEvent(new W.Event('visibilitychange'));
+    const dispara = () => { const t = prog[prog.length - 1]; prog = []; t.fn(); };
+    let plays = 0;
+    $('#tk-audio').play = () => { plays++; return Promise.resolve(); };
+    const limpia = () => { $('#toast').textContent = ''; };
+    // Programa con tkMsToNextHour al volver a la pestaña, sin avisar.
+    pon(13, 30); limpia(); vuelve();
+    assert.deepStrictEqual([prog.length, prog[0].ms, plays, $('#toast').textContent], [1, 1800000, 0, ''], 'visibilitychange reprograma a la próxima hora en punto sin avisar');
+    // 14:00: suena una vez y #toast con la pendiente de hoy (sin la hecha ni la de mañana).
+    pon(14, 0); dispara();
+    assert.strictEqual(plays, 1, 'A las 14:00 suena una vez');
+    assert.strictEqual($('#toast').textContent, 'Es hora: 14:00 · Pan', '#toast con solo las pendientes de hoy');
+    assert.deepStrictEqual([prog.length, prog[0].ms], [1, 3600000], 'Tras disparar se reprograma a la siguiente hora en punto');
+    // 15:00: la tarea con subtareas avisa por su hora; las subtareas no cuentan.
+    limpia(); pon(15, 0); dispara();
+    assert.deepStrictEqual([plays, $('#toast').textContent], [2, 'Es hora: 15:00 · Otra'], 'Solo la tarea, no la subtarea');
+    // 16:00: cinco a la misma hora → un solo sonido y 3 textos + «…y 2 más».
+    limpia(); pon(16, 0); dispara();
+    assert.deepStrictEqual([plays, $('#toast').textContent], [3, 'Es hora: 16:00 · A · B · C · …y 2 más'], 'Varias a la misma hora: un solo aviso');
+    // 17:00: solo hay tareas de ayer y mañana a esa hora → nada.
+    limpia(); pon(17, 0); dispara();
+    assert.deepStrictEqual([plays, $('#toast').textContent], [3, ''], 'Tareas de otros días no avisan');
+    // Con la pestaña de día en Mañana (y en Ayer) avisa por las de hoy; no cambia de día ni mueve el foco.
+    for (const i of [2, 0]) {
+      $$('#tk-tabs .tk-tab')[i].click();
+      const dia = S.day, foco = D.activeElement;
+      limpia(); pon(13, 59); vuelve(); pon(14, 10); dispara();
+      assert.strictEqual($('#toast').textContent, 'Es hora: 14:00 · Pan', 'Despierta 14:10: avisa de las 14 con la pestaña en ' + $$('#tk-tabs .tk-tab')[i].textContent);
+      assert.ok(S.day === dia && D.activeElement === foco, 'No cambia de día ni de foco');
+    }
+    // Con un día del historial abierto, también.
+    $('#tk-history').click();
+    $$('#tk-history-menu .tk-mi').find((b) => b.dataset.day === tkDk(-3)).click();
+    assert.strictEqual(S.day, tkDk(-3), 'Día del historial abierto');
+    assert.ok(!$('#tk-alert').hidden && $('.tk-prog').firstElementChild === $('#tk-alert'), 'El switch sigue a la izquierda con un día del historial abierto');
+    limpia(); pon(13, 59); vuelve(); pon(14, 0); dispara();
+    assert.ok($('#toast').textContent === 'Es hora: 14:00 · Pan' && S.day === tkDk(-3), 'Con el historial abierto avisa por las de hoy y no cambia de día');
+    $$('#tk-tabs .tk-tab')[1].click();
+    // Disparo tarde (15:02 de un temporizador de las 14): nada, y reprograma a las 16:00.
+    const antes = plays;
+    limpia(); pon(13, 59); vuelve(); pon(15, 2); dispara();
+    assert.deepStrictEqual([plays, $('#toast').textContent], [antes, ''], 'Disparo con la hora ya cambiada no avisa');
+    assert.strictEqual(prog[0].ms, 58 * 60000, 'Reprograma desde la hora actual');
+    // Temporizador adelantado (13:59:59): no avisa y reprograma a las 14:00 en punto.
+    limpia(); pon(13, 59); vuelve(); pon(13, 59, 59); dispara();
+    assert.deepStrictEqual([plays, $('#toast').textContent, prog[0].ms], [antes, '', 1000], 'Adelantado: nada y vuelve a programar');
+    // Sin el mp3 (error del audio): no suena pero el #toast sale igual.
+    $('#tk-audio').dispatchEvent(new W.Event('error'));
+    limpia(); pon(14, 0); dispara();
+    assert.deepStrictEqual([plays, $('#toast').textContent], [antes, 'Es hora: 14:00 · Pan'], 'Sin mp3: sin sonido y con #toast');
+    // Switch apagado: nada.
+    $('#tk-alert').click();
+    assert.strictEqual(S.alerts, false);
+    limpia(); pon(13, 59); vuelve(); pon(14, 0); dispara();
+    assert.deepStrictEqual([plays, $('#toast').textContent], [antes, ''], 'Con el switch apagado no suena ni sale #toast');
+    W.setTimeout = realSet; W.Date = RealDate;
+    W.close();
+    delete store['pyl-tasks'];
+  };
+
+  // 8s4. Mis tareas · pasar una subtarea a otra tarea del mismo día (SPEC 27, paso 4).
+  // jsdom no mide: geometría simulada en el orden del DOM (fila de tarea 40 px, cada subtarea 40 px debajo de su tarea).
+  const tkTest12 = async () => {
+    const sub = (id, text, done = false) => ({ id, text, done });
+    store['pyl-tasks'] = JSON.stringify({ v: 1, note: { days: {
+      [tkDk(0)]: [
+        tkT('a', 'A', { subtasks: [sub('x', 'X'), sub('y', 'Y', true)] }),
+        tkT('b', 'B', { subtasks: [sub('w', 'W')] }),
+        tkT('c', 'C'),
+        tkT('d', 'D', { collapsed: true, subtasks: [sub('v', 'V')] }),
+      ],
+      [tkDk(1)]: [tkT('m', 'Mañana', { subtasks: [sub('n', 'N')] })],
+    } } });
+    const { W, D, $, $$, key, tick, S } = await tkPage();
+    const list = $('#tk-list');
+    const tareas = () => [...list.children].filter((n) => n.classList.contains('tk-task'));
+    W.HTMLElement.prototype.getBoundingClientRect = function () {
+      const r = (top, h) => ({ top, bottom: top + h, height: h, left: 0, right: 200, width: 200 });
+      if (this === list) return r(0, 1000);
+      let y = 0;
+      const m = new Map();
+      for (const w of tareas()) {
+        const top = y;
+        m.set(w.querySelector('.tk-task-row'), r(y, 40)); y += 40;
+        for (const s of [...w.children].filter((n) => n.classList.contains('tk-subs'))) {
+          const st = y;
+          for (const row of s.querySelectorAll('.tk-sub-row')) { m.set(row, r(y, 40)); y += 40; }
+          m.set(s, r(st, y - st));
+        }
+        m.set(w, r(top, y - top));
+      }
+      return m.get(this) || r(0, 0);
+    };
+    const ptr = (el, type, y) => {
+      const e = new W.MouseEvent(type, { bubbles: true, cancelable: true, button: 0, clientX: 10, clientY: y });
+      Object.defineProperty(e, 'pointerId', { value: 1 });
+      Object.defineProperty(e, 'isPrimary', { value: true });
+      el.dispatchEvent(e);
+    };
+    const T = (id) => tareas().find((w) => w.dataset.id === id);
+    const subDom = (id) => [...T(id).querySelectorAll('.tk-sub-row .tk-sub-text')].map((n) => n.textContent);
+    const subTxt = (id, text) => [...T(id).querySelectorAll('.tk-sub-row .tk-sub-text')].find((n) => n.textContent === text);
+    const nota = (id) => JSON.parse(JSON.stringify(S.note.days[S.day].find((t) => t.id === id)));
+    const subNota = (id) => nota(id).subtasks.map((s) => s.text);
+    const chev = (id) => T(id).querySelector('.tk-task-row > .tk-sub-toggle');
+    // Layout: A 0–40 (X 40–80, Y 80–120) · B 120–160 (W 160–200) · C 200–240 · D 240–280 (contraída).
+    // 1. X sobre las subtareas de B: queda después de W; se pinta en vivo dentro de B.
+    const x = subTxt('a', 'X').closest('.tk-sub-row');
+    ptr(subTxt('a', 'X'), 'pointerdown', 60); ptr(D, 'pointermove', 190);
+    assert.ok(list.classList.contains('is-dragging') && x.classList.contains('is-dragging'), 'La subtarea se levanta');
+    assert.deepStrictEqual([subDom('a'), subDom('b')], [['Y'], ['W', 'X']], 'Se pinta en vivo en el grupo destino');
+    assert.ok(T('b').classList.contains('is-drop'), 'La tarea destino se resalta');
+    assert.deepStrictEqual([subNota('a'), subNota('b')], [['X', 'Y'], ['W']], 'La nota no cambia hasta soltar');
+    ptr(D, 'pointerup', 190);
+    assert.deepStrictEqual([subNota('a'), subNota('b')], [['Y'], ['W', 'X']], 'Al soltar pasa a B (tkMoveSubTo)');
+    assert.ok(!list.querySelector('.is-drop, .is-dragging, .tk-subs-tmp'), 'Limpia clases y bloques temporales');
+    assert.strictEqual(chev('b').getAttribute('aria-label'), 'Contraer subtareas (0 de 2 hechas)', 'Chevron del destino al día');
+    assert.ok(chev('a').getAttribute('aria-label') === 'Contraer subtareas (1 de 1 hechas)' && chev('a').classList.contains('is-complete'), 'Chevron del origen al día');
+    await tick(0);
+    // 2. Y (única subtarea de A; el día tiene 4 tareas) entre W y X; conserva done; A pierde el chevron.
+    // Layout: A 0–40 (Y 40–80) · B 80–120 (W 120–160, X 160–200) · C · D.
+    ptr(subTxt('a', 'Y'), 'pointerdown', 60); ptr(D, 'pointermove', 160);
+    assert.deepStrictEqual(subDom('b'), ['W', 'Y', 'X'], 'Hueco entre las subtareas de otra tarea');
+    ptr(D, 'pointerup', 160);
+    assert.deepStrictEqual([subNota('a'), subNota('b')], [[], ['W', 'Y', 'X']], 'Queda entre ellas');
+    assert.deepStrictEqual(nota('b').subtasks[1], { id: 'y', text: 'Y', done: true }, 'Conserva id, texto y done');
+    assert.ok(!chev('a') && !T('a').querySelector('.tk-subs'), 'La tarea origen sin subtareas pierde el chevron');
+    assert.ok(!chev('b').classList.contains('is-complete') && chev('b').getAttribute('aria-label') === 'Contraer subtareas (1 de 3 hechas)');
+    await tick(0);
+    // 3. X sobre la fila de C (sin subtareas): pasa a ser su última subtarea.
+    // Layout: A 0–40 · B 40–80 (W 80–120, Y 120–160, X 160–200) · C 200–240 · D 240–280.
+    ptr(subTxt('b', 'X'), 'pointerdown', 180); ptr(D, 'pointermove', 225);
+    assert.ok(T('c').querySelector('.tk-subs-tmp') && subDom('c').join() === 'X' && T('c').classList.contains('is-drop'), 'Bloque temporal en C');
+    ptr(D, 'pointerup', 225);
+    assert.deepStrictEqual([subNota('b'), subNota('c')], [['W', 'Y'], ['X']], 'Pasa a C');
+    assert.ok(chev('c') && !chev('c').classList.contains('is-collapsed'), 'C con chevron, expandida');
+    await tick(0);
+    // 4. W sobre la fila de D (contraída): queda como su última subtarea y D queda expandida.
+    // Layout: A 0–40 · B 40–80 (W 80–120, Y 120–160) · C 160–200 (X 200–240) · D 240–280.
+    ptr(subTxt('b', 'W'), 'pointerdown', 100); ptr(D, 'pointermove', 260);
+    assert.strictEqual(subDom('d').join(), 'W', 'Se pinta en un bloque temporal de D');
+    ptr(D, 'pointerup', 260);
+    assert.deepStrictEqual([subNota('b'), subNota('d'), 'collapsed' in nota('d')], [['Y'], ['V', 'W'], false], 'D: al final y expandida');
+    assert.deepStrictEqual([subDom('d'), chev('d').classList.contains('is-collapsed')], [['V', 'W'], false], 'D se ve expandida');
+    await tick(0);
+    // 5. Esc devuelve todo: la fila pintada en otro grupo y la expansión temporal de una tarea contraída; no guarda.
+    $$('#tk-list .tk-task')[3].querySelector('.tk-sub-toggle').click(); // contrae D
+    await tick(300);
+    assert.ok(nota('d').collapsed && !T('d').querySelector('.tk-subs'), 'D contraída');
+    await tick(350);
+    const guardado = store['pyl-tasks'];
+    // Layout: A 0–40 · B 40–80 (Y 80–120) · C 120–160 (X 160–200) · D 200–240.
+    ptr(subTxt('b', 'Y'), 'pointerdown', 100); ptr(D, 'pointermove', 195);
+    assert.deepStrictEqual([subDom('b'), subDom('c')], [[], ['X', 'Y']], 'Pintada en C');
+    ptr(D, 'pointermove', 225);
+    assert.ok(T('d').querySelector('.tk-subs-tmp') && subDom('c').join() === 'X', 'Pasa al bloque temporal de D y sale de C');
+    key(D.activeElement || D.body, 'Escape');
+    ptr(D, 'pointerup', 225);
+    assert.deepStrictEqual([subDom('b'), subDom('c'), subDom('d')], [['Y'], ['X'], []], 'Esc devuelve la subtarea a su tarea');
+    assert.ok(!T('d').querySelector('.tk-subs') && chev('d').classList.contains('is-collapsed'), 'D vuelve a estar contraída, sin bloque temporal');
+    assert.ok(!list.querySelector('.is-drop, .is-dragging'), 'Sin clases de arrastre');
+    assert.deepStrictEqual([subNota('b'), subNota('c'), subNota('d')], [['Y'], ['X'], ['V', 'W']], 'La nota no cambia');
+    await tick(350);
+    assert.strictEqual(store['pyl-tasks'], guardado, 'Esc no guarda');
+    // 6. Soltar de vuelta en su sitio no guarda.
+    ptr(subTxt('b', 'Y'), 'pointerdown', 100); ptr(D, 'pointermove', 195); ptr(D, 'pointermove', 70);
+    assert.deepStrictEqual([subDom('b'), subDom('c')], [['Y'], ['X']], 'De vuelta en su grupo');
+    ptr(D, 'pointerup', 70);
+    await tick(350);
+    assert.strictEqual(store['pyl-tasks'], guardado, 'Soltar en el mismo sitio no guarda');
+    // 7. Lo movido queda guardado; mañana no cambia (no cruza días).
+    const g = JSON.parse(guardado).note.days;
+    assert.deepStrictEqual(g[tkDk(0)].map((t) => [t.id, t.subtasks.map((s) => s.id)]), [['a', []], ['b', ['y']], ['c', ['x']], ['d', ['v', 'w']]], 'Guardado');
+    assert.deepStrictEqual(g[tkDk(1)][0].subtasks.map((s) => s.id), ['n'], 'Otro día intacto');
+    // 8. Arrastrar una tarea sigue llevándose sus subtareas.
+    ptr(T('c').querySelector('.tk-text'), 'pointerdown', 140); ptr(D, 'pointermove', 260);
+    assert.deepStrictEqual(tareas().map((w) => w.dataset.id), ['a', 'b', 'd', 'c'], 'La tarea se mueve');
+    ptr(D, 'pointerup', 260);
+    assert.deepStrictEqual(subNota('c'), ['X'], 'Con sus subtareas');
+    W.close();
+    // 9. Un día de una sola tarea con una sola subtarea: no se levanta.
+    store['pyl-tasks'] = JSON.stringify({ v: 1, note: { days: { [tkDk(0)]: [tkT('a', 'A', { subtasks: [sub('x', 'X')] })] } } });
+    const p = await tkPage();
+    const s0 = p.$('#tk-list .tk-sub-text');
+    const ev = (el, type, y) => { const e = new p.W.MouseEvent(type, { bubbles: true, cancelable: true, button: 0, clientX: 10, clientY: y }); Object.defineProperty(e, 'pointerId', { value: 1 }); el.dispatchEvent(e); };
+    ev(s0, 'pointerdown', 60); ev(p.D, 'pointermove', 200);
+    assert.ok(!p.$('#tk-list').classList.contains('is-dragging'), 'Una tarea con una subtarea: no se levanta');
+    ev(p.D, 'pointerup', 200);
+    p.W.close();
     delete store['pyl-tasks'];
   };
 
@@ -3516,7 +3800,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
       D.querySelector('#tk-list .tk-task .tk-check').click();
       assert.ok(/1 de 2 hechas hoy/.test(txt('tasks')) && /^50%/.test(card('tasks').querySelector('.ix-ring-c').textContent), 'Marcar una tarea actualiza sin recargar');
       assert.strictEqual(card('tasks').querySelector('.ix-ring-fill').style.strokeDashoffset, '50', 'Anillo a la mitad');
-      assert.strictEqual(D.querySelector('#tk-count').textContent.replace(' hechas', ''), '1 de 2', 'Igual que Mis tareas');
+      assert.strictEqual(D.querySelector('#tk-bar').style.width, '50%', 'Igual que la barra de Mis tareas');
       D.querySelector('#tk-all').click();
       assert.ok(/2 de 2 hechas hoy/.test(txt('tasks')) && /^100%/.test(card('tasks').querySelector('.ix-ring-c').textContent) && card('tasks').querySelector('.ix-ring-fill.ix-done') && /Todo hecho/.test(txt('tasks')), 'Todo hecho: 100 % y anillo en verde');
       // Clic: cada tarjeta abre su pestaña; la de tareas baja a Mis tareas y enfoca «+».
@@ -3785,7 +4069,7 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     if (previo === undefined) delete store['pyl-quick'];
   };
 
-  return lgTest().then(dkTest).then(apTest).then(chTest).then(chCadenaTest).then(chDurasTest).then(hubTest).then(hubTest2).then(hubTest3).then(hubTest4).then(hubTest5).then(tkTest1).then(tkTest2).then(tkTest3).then(tkTest4).then(tkTest5).then(tkTest6).then(tkTest7).then(tkTest8).then(tkTest9).then(ckTest).then(mwTest1).then(mwTest2).then(mwTest3).then(mwTest4).then(ixTest1).then(ixTest2).then(czTest).then(spyTest).then(qkTest).then(fresca).then((d2) => {
+  return lgTest().then(dkTest).then(apTest).then(chTest).then(chCadenaTest).then(chDurasTest).then(hubTest).then(hubTest2).then(hubTest3).then(hubTest4).then(hubTest5).then(tkTest1).then(tkTest2).then(tkTest3).then(tkTest4).then(tkTest5).then(tkTest6).then(tkTest7).then(tkTest8).then(tkTest9).then(tkTest10).then(tkTest11).then(tkTest12).then(ckTest).then(mwTest1).then(mwTest2).then(mwTest3).then(mwTest4).then(ixTest1).then(ixTest2).then(czTest).then(spyTest).then(qkTest).then(fresca).then((d2) => {
     const doc2 = d2.window.document;
     assert.deepStrictEqual([...doc2.querySelectorAll('#b-strats .st-tab')].map((b) => b.textContent.length > 0), [true, true, true, true], 'Estrategias muestra 4 tarjetas');
     assert.deepStrictEqual([...d2.window.PYL.core.search.STRATEGIES.map((x) => x.k)], ['vdo', 'prov', 'caza', 'espia'], 'STRATEGIES = vdo, prov, caza y espia');

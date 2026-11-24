@@ -44,14 +44,20 @@
 .tk-mi.is-on{color:var(--b)}
 .tk-menu-empty{padding:6px 10px;color:var(--muted);font-size:12.5px}
 
-/* Progreso: anillo (medidor, no spinner), «N de M hechas», doble check y barra de 3 px. */
+/* Progreso: switch del aviso a la izquierda, doble check a la derecha y barra de 3 px debajo (sin «N de M hechas» ni anillo desde la SPEC 27). */
 .tk-prog{display:flex;align-items:center;gap:6px;padding:10px 12px 6px 14px}
-.tk-ring{flex:none;transform:rotate(-90deg)}
-.tk-ring circle{fill:none;stroke-width:2.5}
-.tk-ring-track{stroke:var(--tk-track)}
-.tk-ring-fill{stroke:var(--b);stroke-dasharray:100;stroke-dashoffset:100;transition:stroke-dashoffset .3s ease}
-.tk-count{margin-left:auto;font-size:11px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
-#tk-all{margin:-4px 0}
+#tk-all{margin:-4px 0 -4px auto}
+/* Switch del aviso por hora (SPEC 27): píldora y, a su derecha, la campana, a la izquierda del renglón; nunca se encoge.
+   Pista neutra y botón blanco; encendido = pista en acento y botón a la derecha. */
+.tk-alert{flex:none;display:inline-flex;align-items:center;gap:5px;margin:-4px 0 -4px -4px;padding:3px 4px;border:0;border-radius:7px;
+  background:transparent;color:var(--muted);cursor:pointer;transition:background .15s,color .15s}
+.tk-alert:hover{background:var(--tk-hover);color:var(--ink)}
+.tk-alert:focus-visible{outline:2px solid var(--b);outline-offset:2px}
+.tk-alert.is-on{color:var(--b)}
+.tk-sw{position:relative;flex:none;width:26px;height:14px;border-radius:7px;background:color-mix(in srgb,var(--ink) 22%,transparent);transition:background .15s}
+.tk-sw-knob{position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.35);transition:transform .15s}
+.tk-alert.is-on .tk-sw{background:var(--b)}
+.tk-alert.is-on .tk-sw-knob{transform:translateX(12px)}
 .tk-bar{margin:0 14px 6px;height:3px;border-radius:2px;background:var(--tk-track);overflow:hidden}
 .tk-bar-fill{height:3px;width:0;border-radius:2px;background:var(--b);transition:width .3s ease}
 
@@ -91,6 +97,9 @@
 .tk-list.is-dragging .tk-acts{display:none}
 .tk-task.is-dragging,.tk-sub-row.is-dragging{position:relative;z-index:5;border-radius:8px;background:var(--card);
   box-shadow:0 10px 24px rgba(0,0,0,.35),0 0 0 1px var(--b)}
+/* Subtarea pasando a otra tarea (SPEC 27): la tarea destino se resalta con un fondo suave del acento. */
+.tk-task.is-drop>.tk-task-row{background:rgba(var(--b-rgb),.08)}
+.tk-task.is-drop>.tk-subs{border-left-color:rgba(var(--b-rgb),.5)}
 
 /* Campos que reemplazan al texto o a la hora al editar (doble clic). */
 .tk-edit-in{flex:1;min-width:0;margin:0 -6px;padding:0 6px;border:0;outline:0;border-radius:6px;background:var(--tk-track);
@@ -178,7 +187,7 @@
   .tk-rail .tk-kbd{display:none}
 }
 @media (prefers-reduced-motion:reduce){
-  .tk-ring-fill,.tk-bar-fill,.tk-row,.tk-sub-toggle,.tk-sub-toggle svg{transition:none}
+  .tk-bar-fill,.tk-row,.tk-sub-toggle,.tk-sub-toggle svg,.tk-alert,.tk-sw,.tk-sw-knob{transition:none}
   .tk-task-row.has-subs:not(:has(input)):hover{transform:none}
   .tk-task,.tk-sub-row{transition:none!important} /* sin deslizamiento FLIP al arrastrar */
 }

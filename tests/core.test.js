@@ -11,7 +11,7 @@ const caso = (nombre, fn) => casos.push([nombre, fn]);
 
 caso('exporta todas las funciones del núcleo aplanadas', () => {
   const claves = Object.keys(core).sort().join(',');
-  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CAZA,CH_CPA_READ,CH_HELP,CH_SIDES,CK_DAYS,CK_MONTHS,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,ESPIA,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,HOME_EPOCH,HOME_NAME,HOME_QUOTES,HOME_SEED,HOME_SLOTS,HUB_DEFAULTS,HUB_VERSION,IX_VERSION,LADDER_BLOCKS,LANDING,LEVELS,LG_ACCOUNTS,LG_BANK,LG_CATALOG,LG_DAYS,LG_NEQUI,LG_PARTS,LG_STAGES,LG_STORE,LG_TEMPLATES,LIMITS,MARGIN,MISTAKES,MSP,MW_API,MW_EVERY,MW_PI_TYPES,MW_SALE_TYPES,MW_VERSION,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TK_HISTORY_DAYS,TK_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cazaMethod,cellVal,chChain,chHard,chPlat,ckAngles,ckDate,ckDay,ckLabel,ckTime,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,espiaMode,evaluate,fill,fmt,fullTitle,funnel,homeDay,homeGreeting,homeHello,homeOrder,homePick,homeSlot,hubAdd,hubCheck,hubClean,hubDefaults,hubDomain,hubFavicon,hubInitials,hubLoad,hubOrder,hubRemove,hubSet,hubUrl,isDropi,isMetrics,ixFunnel,ixLoad,ixPnl,ixTasks,ixTesting,key,kpis,lgForm,lgFromCand,lgMessage,lgMoney,lgMoneyText,lgPhone,lgPrefill,lgTemplate,lgValues,list,marginLevel,matchProduct,mspLevel,mwAction,mwAlerts,mwCut,mwError,mwK,mwLoad,mwPhoto,mwRow,mwRows,mwTotals,mwVerdict,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,quickUpdate,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,tkAdd,tkAddDays,tkAddSub,tkCanCarry,tkCarry,tkCarrySource,tkDateLabel,tkDayDate,tkDayKey,tkDayLabel,tkDelete,tkDeleteSub,tkEdit,tkEditSub,tkEmpty,tkIsHour,tkLoad,tkMove,tkMoveSub,tkParseHour,tkPastDays,tkProgress,tkRollOver,tkSetAll,tkSetHour,tkShortDate,tkTasksOf,tkToggle,tkToggleCollapsed,tkToggleSub,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
+  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CAZA,CH_CPA_READ,CH_HELP,CH_SIDES,CK_DAYS,CK_MONTHS,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,ESPIA,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,HOME_EPOCH,HOME_NAME,HOME_QUOTES,HOME_SEED,HOME_SLOTS,HUB_DEFAULTS,HUB_VERSION,IX_VERSION,LADDER_BLOCKS,LANDING,LEVELS,LG_ACCOUNTS,LG_BANK,LG_CATALOG,LG_DAYS,LG_NEQUI,LG_PARTS,LG_STAGES,LG_STORE,LG_TEMPLATES,LIMITS,MARGIN,MISTAKES,MSP,MW_API,MW_EVERY,MW_PI_TYPES,MW_SALE_TYPES,MW_VERSION,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TK_ALERT_MAX,TK_HISTORY_DAYS,TK_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cazaMethod,cellVal,chChain,chHard,chPlat,ckAngles,ckDate,ckDay,ckLabel,ckTime,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,espiaMode,evaluate,fill,fmt,fullTitle,funnel,homeDay,homeGreeting,homeHello,homeOrder,homePick,homeSlot,hubAdd,hubCheck,hubClean,hubDefaults,hubDomain,hubFavicon,hubInitials,hubLoad,hubOrder,hubRemove,hubSet,hubUrl,isDropi,isMetrics,ixFunnel,ixLoad,ixPnl,ixTasks,ixTesting,key,kpis,lgForm,lgFromCand,lgMessage,lgMoney,lgMoneyText,lgPhone,lgPrefill,lgTemplate,lgValues,list,marginLevel,matchProduct,mspLevel,mwAction,mwAlerts,mwCut,mwError,mwK,mwLoad,mwPhoto,mwRow,mwRows,mwTotals,mwVerdict,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,quickUpdate,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,tkAdd,tkAddDays,tkAddSub,tkAlertText,tkCanCarry,tkCarry,tkCarrySource,tkDateLabel,tkDayDate,tkDayKey,tkDayLabel,tkDelete,tkDeleteSub,tkDueAlert,tkEdit,tkEditSub,tkEmpty,tkIsHour,tkLoad,tkMove,tkMoveSub,tkMoveSubTo,tkMsToNextHour,tkParseHour,tkPastDays,tkProgress,tkRollOver,tkSetAll,tkSetHour,tkShortDate,tkTasksOf,tkToggle,tkToggleCollapsed,tkToggleSub,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
 });
 
 caso('Costeo: proveedor 30.000 da precio $99.900 y tope $21.617', () => {
@@ -1999,6 +1999,50 @@ caso('Mis tareas: tkMoveSub reordena dentro de su tarea y limita el índice', ()
   assert.strictEqual(core.tkMoveSub(n, 'b', 'w', 3), n, 'Una sola subtarea');
 });
 
+caso('Mis tareas: tkMoveSubTo pasa una subtarea a otra tarea del mismo día (SPEC 27)', () => {
+  let n = tkOf('a', 'b', 'c', 'd');
+  for (const s of ['x', 'y']) n = core.tkAddSub(n, 'a', s.toUpperCase(), s);
+  for (const s of ['v', 'w']) n = core.tkAddSub(n, 'b', s.toUpperCase(), s);
+  n = core.tkAddSub(n, 'd', 'U', 'u');
+  n = core.tkToggleCollapsed(n, 'd');
+  n = core.tkToggleSub(n, 'a', 'x');
+  const otro = tkAdd(n, 'otro día', 'e', tkAt(9), undefined, '2026-11-13');
+  n = otro;
+  const subs = (note, id) => tkT(note).find((t) => t.id === id).subtasks.map((s) => s.id);
+  assert.deepStrictEqual(subs(core.tkMoveSubTo(n, 'a', 'x', 'b', 0), 'b'), ['x', 'v', 'w'], 'Al principio');
+  assert.deepStrictEqual(subs(core.tkMoveSubTo(n, 'a', 'x', 'b', 1), 'b'), ['v', 'x', 'w'], 'En medio');
+  assert.deepStrictEqual(subs(core.tkMoveSubTo(n, 'a', 'x', 'b', 2), 'b'), ['v', 'w', 'x'], 'Al final');
+  assert.deepStrictEqual(subs(core.tkMoveSubTo(n, 'a', 'x', 'b', 99), 'b'), ['v', 'w', 'x'], 'Índice alto → al final');
+  assert.deepStrictEqual(subs(core.tkMoveSubTo(n, 'a', 'x', 'b', -3), 'b'), ['x', 'v', 'w'], 'Índice negativo → al principio');
+  const m = core.tkMoveSubTo(n, 'a', 'x', 'b', 1);
+  assert.deepStrictEqual(subs(m, 'a'), ['y'], 'Sale del origen');
+  assert.deepStrictEqual(tkT(m).find((t) => t.id === 'b').subtasks[1], { id: 'x', text: 'X', done: true }, 'Conserva id, texto y done');
+  assert.deepStrictEqual(tkIds(m), ['a', 'b', 'c', 'd'], 'No reordena tareas');
+  assert.strictEqual(tkT(m).find((t) => t.id === 'c'), tkT(n).find((t) => t.id === 'c'), 'No toca otras tareas');
+  assert.strictEqual(m.days['2026-11-13'], n.days['2026-11-13'], 'No toca otros días');
+  // Destino sin subtareas o contraído: queda expandido (sin collapsed).
+  assert.deepStrictEqual(subs(core.tkMoveSubTo(n, 'a', 'y', 'c', 0), 'c'), ['y'], 'Destino sin subtareas');
+  const col = core.tkMoveSubTo(n, 'a', 'y', 'd', 5);
+  const d = tkT(col).find((t) => t.id === 'd');
+  assert.deepStrictEqual([d.subtasks.map((s) => s.id), 'collapsed' in d], [['u', 'y'], false], 'Destino contraído: al final y expandido');
+  // Origen queda sin subtareas.
+  const vacio = core.tkMoveSubTo(core.tkMoveSubTo(n, 'a', 'x', 'c', 0), 'a', 'y', 'c', 1);
+  assert.deepStrictEqual([subs(vacio, 'a'), subs(vacio, 'c')], [[], ['x', 'y']], 'El origen puede quedar sin subtareas');
+  // No muta.
+  const before = JSON.stringify(n);
+  core.tkMoveSubTo(n, 'a', 'x', 'd', 0);
+  assert.strictEqual(JSON.stringify(n), before, 'No muta');
+  // Sin cambios: misma nota.
+  assert.strictEqual(core.tkMoveSubTo(n, 'a', 'x', 'a', 1), n, 'Misma tarea');
+  assert.strictEqual(core.tkMoveSubTo(n, 'a', 'x', 'e', 0), n, 'Otro día');
+  assert.strictEqual(core.tkMoveSubTo(n, 'e', 'x', 'a', 0), n, 'Origen de otro día');
+  assert.strictEqual(core.tkMoveSubTo(n, 'nope', 'x', 'b', 0), n, 'Origen inexistente');
+  assert.strictEqual(core.tkMoveSubTo(n, 'a', 'x', 'nope', 0), n, 'Destino inexistente');
+  assert.strictEqual(core.tkMoveSubTo(n, 'a', 'nope', 'b', 0), n, 'Subtarea inexistente');
+  assert.strictEqual(core.tkMoveSubTo(n, 'a', 'v', 'b', 0), n, 'Subtarea de otra tarea');
+  assert.strictEqual(core.tkMoveSubTo(n, 'a', 'x', 'b', 0.5), n, 'Índice no entero');
+});
+
 caso('Mis tareas: tkSetHour', () => {
   assert.strictEqual(tkT(core.tkSetHour(tkBase(), 't1', 7))[0].hour, 7);
   const n = tkBase();
@@ -2195,14 +2239,14 @@ caso('Mis tareas: tkCarry copia sin marcar, con ids nuevos y una vez por día', 
 const tkRawTask = () => ({ id: 't1', hour: 13, text: 'Comprar pan', done: false, createdAt: '2026-11-12T18:40:00.000Z', subtasks: [{ id: 's1', text: 'Integral', done: true }] });
 const tkValid = () => ({ v: 1, note: { days: { [TKH]: [tkRawTask()] } }, collapsed: false });
 const tkLoadOf = (data) => core.tkLoad(JSON.stringify(data), TKH);
-const tkBad = (data, msg) => assert.deepStrictEqual(tkLoadOf(data), { ok: false, note: { days: {} }, collapsed: false }, msg);
+const tkBad = (data, msg) => assert.deepStrictEqual(tkLoadOf(data), { ok: false, note: { days: {} }, collapsed: false, alerts: false }, msg);
 const tkPatch = (patch) => { const d = tkValid(); d.note.days[TKH][0] = { ...d.note.days[TKH][0], ...patch }; return d; };
 
 caso('Mis tareas: tkLoad acepta datos válidos y arranca vacía sin clave', () => {
-  assert.deepStrictEqual(core.tkLoad(null, TKH), { ok: true, note: { days: {} }, collapsed: false }, 'Sin clave');
-  assert.deepStrictEqual(core.tkLoad(undefined, TKH), { ok: true, note: { days: {} }, collapsed: false });
+  assert.deepStrictEqual(core.tkLoad(null, TKH), { ok: true, note: { days: {} }, collapsed: false, alerts: false }, 'Sin clave');
+  assert.deepStrictEqual(core.tkLoad(undefined, TKH), { ok: true, note: { days: {} }, collapsed: false, alerts: false });
   const d = tkValid();
-  assert.deepStrictEqual(tkLoadOf(d), { ok: true, note: d.note, collapsed: false });
+  assert.deepStrictEqual(tkLoadOf(d), { ok: true, note: d.note, collapsed: false, alerts: false });
   assert.strictEqual(tkLoadOf({ ...tkValid(), collapsed: true }).collapsed, true);
   for (const c of [undefined, 'yes', 1, null]) {
     const r = tkLoadOf({ ...tkValid(), collapsed: c });
@@ -2227,7 +2271,7 @@ caso('Mis tareas: tkLoad acepta datos válidos y arranca vacía sin clave', () =
 
 caso('Mis tareas: tkLoad rechaza datos rotos y devuelve la nota vacía', () => {
   for (const raw of ['{', 'hola', '', 'null', '[]', '"x"', '{}']) {
-    assert.deepStrictEqual(core.tkLoad(raw, TKH), { ok: false, note: { days: {} }, collapsed: false }, 'Crudo: ' + JSON.stringify(raw));
+    assert.deepStrictEqual(core.tkLoad(raw, TKH), { ok: false, note: { days: {} }, collapsed: false, alerts: false }, 'Crudo: ' + JSON.stringify(raw));
   }
   tkBad({ ...tkValid(), v: 2 }, 'v distinta');
   tkBad({ ...tkValid(), v: '1' }, 'v como texto');
@@ -2249,6 +2293,51 @@ caso('Mis tareas: tkLoad rechaza datos rotos y devuelve la nota vacía', () => {
     ['sin createdAt', { createdAt: undefined }], ['subtareas no array', { subtasks: null }],
     ['subtarea vacía', { subtasks: [{ id: 's', text: '', done: false }] }], ['collapsed raro', { collapsed: 'yes' }],
   ]) tkBad(tkPatch(patch), name);
+});
+
+caso('Mis tareas: tkLoad lee alerts sin invalidar la nota (SPEC 27)', () => {
+  const on = tkLoadOf({ ...tkValid(), alerts: true });
+  assert.deepStrictEqual([on.ok, on.alerts], [true, true], 'alerts: true');
+  assert.deepStrictEqual(on.note, tkValid().note, 'Conserva las tareas');
+  assert.deepStrictEqual([tkLoadOf(tkValid()).ok, tkLoadOf(tkValid()).alerts], [true, false], 'Ausente → false');
+  for (const a of ['sí', 1, null, 'true', false]) {
+    const r = tkLoadOf({ ...tkValid(), alerts: a });
+    assert.deepStrictEqual([r.ok, r.alerts], [true, false], 'alerts raro → false: ' + JSON.stringify(a));
+    assert.deepStrictEqual(r.note, tkValid().note, 'No pierde las tareas: ' + JSON.stringify(a));
+  }
+});
+
+// ---- Mis tareas: aviso por hora (SPEC 27) ----
+const tkAl = (id, hour, done = false) => ({ id, hour, text: `texto ${id}`, done, subtasks: [], createdAt: '2026-11-14T08:00:00.000Z' });
+
+caso('Mis tareas: tkDueAlert solo da pendientes de hoy a esa hora, en el orden de la lista', () => {
+  const sub = { ...tkAl('s', 15), subtasks: [{ id: 'x', text: 'sub', done: false }] };
+  const note = tkNote({
+    [TKH]: [tkAl('b', 14), tkAl('hecha', 14, true), tkAl('otra', 15), tkAl('a', 14), sub],
+    [TKY]: [tkAl('ayer', 14)],
+    [core.tkAddDays(TKH, 1)]: [tkAl('mañana', 14)],
+  });
+  assert.deepStrictEqual(core.tkDueAlert(note, TKH, 14).map((t) => t.id), ['b', 'a'], 'Solo hoy, pendientes, en orden');
+  assert.deepStrictEqual(core.tkDueAlert(note, TKH, 15).map((t) => t.id), ['otra', 's'], 'Otra hora');
+  assert.deepStrictEqual(core.tkDueAlert(note, TKH, 9), [], 'Sin tareas a esa hora');
+  assert.deepStrictEqual(core.tkDueAlert(tkNote({}), TKH, 14), [], 'Día sin tareas');
+  assert.deepStrictEqual(core.tkDueAlert(tkNote({ [TKH]: [tkAl('h', 14, true)] }), TKH, 14), [], 'Hecha no avisa');
+});
+
+caso('Mis tareas: tkMsToNextHour hasta el próximo HH:00 local', () => {
+  assert.strictEqual(core.tkMsToNextHour(new Date(2026, 10, 14, 13, 59, 59, 999)), 1, '13:59:59.999 → 1 ms');
+  assert.strictEqual(core.tkMsToNextHour(new Date(2026, 10, 14, 14, 0, 0, 0)), 3600000, 'En punto → 1 h');
+  assert.strictEqual(core.tkMsToNextHour(new Date(2026, 10, 14, 14, 30, 0, 0)), 1800000, 'Mitad de hora');
+  assert.strictEqual(core.tkMsToNextHour(new Date(2026, 10, 14, 23, 45, 0, 0)), 900000, 'Cruza medianoche');
+});
+
+caso('Mis tareas: tkAlertText lista hasta TK_ALERT_MAX textos', () => {
+  assert.strictEqual(core.TK_ALERT_MAX, 3);
+  const ts = ['A', 'B', 'C', 'D', 'E'].map((t) => ({ text: t }));
+  assert.strictEqual(core.tkAlertText(14, ts.slice(0, 1)), 'Es hora: 14:00 · A');
+  assert.strictEqual(core.tkAlertText(14, ts.slice(0, 3)), 'Es hora: 14:00 · A · B · C');
+  assert.strictEqual(core.tkAlertText(14, ts), 'Es hora: 14:00 · A · B · C · …y 2 más');
+  assert.strictEqual(core.tkAlertText(9, ts.slice(0, 1)), 'Es hora: 09:00 · A', 'Hora con dos dígitos');
 });
 
 // ---- Reloj de la barra (SPEC 20) ----
