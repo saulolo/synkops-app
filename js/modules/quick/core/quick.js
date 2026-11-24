@@ -6,11 +6,12 @@
   const clean = (v) => String(v == null ? '' : v).trim();
 
   // entry = { name, dropi }. Devuelve { ok: true } o { ok: false, msg }.
-  const quickCheck = (items, entry) => {
+  // exceptId (opcional): ese producto no cuenta como ID repetido (al editarlo).
+  const quickCheck = (items, entry, exceptId) => {
     const name = clean(entry && entry.name), dropi = clean(entry && entry.dropi);
     if (!name) return { ok: false, msg: 'Falta el nombre del producto.' };
     if (!dropi) return { ok: false, msg: 'Falta el ID Dropi.' };
-    if ((items || []).some((x) => clean(x.dropi) === dropi)) return { ok: false, msg: 'Ese ID ya está guardado.' };
+    if ((items || []).some((x) => (exceptId == null || x.id !== exceptId) && clean(x.dropi) === dropi)) return { ok: false, msg: 'Ese ID ya está guardado.' };
     return { ok: true };
   };
 
@@ -34,5 +35,19 @@
   // Lista nueva sin el producto de ese id. No toca la lista recibida.
   const quickRemove = (items, id) => (items || []).filter((x) => x.id !== id);
 
-  core.quick = { quickCheck, quickAdd, quickPrice, quickRemove };
+  // Lista nueva con el producto `id` reemplazado por entry = { name, dropi, price?, photo? }.
+  // Conserva id, createdAt y posición; price/photo vacíos se quitan. Id inexistente → misma lista.
+  const quickUpdate = (items, id, entry) => {
+    const list = items || [];
+    if (!list.some((x) => x.id === id)) return list;
+    return list.map((x) => {
+      if (x.id !== id) return x;
+      const item = { id: x.id, name: clean(entry.name), dropi: clean(entry.dropi), createdAt: x.createdAt };
+      if (entry.price > 0) item.price = entry.price;
+      if (entry.photo) item.photo = entry.photo;
+      return item;
+    });
+  };
+
+  core.quick = { quickCheck, quickAdd, quickPrice, quickRemove, quickUpdate };
 })();

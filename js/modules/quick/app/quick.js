@@ -10,7 +10,8 @@
   const S = (PYL.app.state.quick = {
     open: false,                                          // panel abierto (no se guarda)
     items: (saved.items || []).filter((p) => p && p.id),  // el más nuevo primero
-    photo: '',                                            // imagen del formulario aún sin guardar (no se guarda)
+    photo: '',                                            // imagen del formulario aún sin guardar (en edición arranca con la del producto; no se guarda)
+    editing: null,                                        // id del producto que se edita en el formulario (no se guarda)
   });
 
   const root = $('#qk-root');
@@ -22,16 +23,40 @@
     return false;
   };
 
+  // Sale del modo edición sin guardar: vacía el formulario y la imagen. No repinta (quien llama repinta). Sin edición no toca nada.
+  function cancelEdit() {
+    if (S.editing == null) return;
+    S.editing = null; S.photo = ''; U.reset(root);
+  }
+
   const setOpen = (open) => {
-    S.open = open; render();
+    S.open = open;
+    if (!open) cancelEdit();
+    render();
     if (open) { document.dispatchEvent(new CustomEvent('flotante:abierto', { detail: { id: 'qk' } })); U.focus(root); }
   };
+
+  // Lápiz de una fila: carga ese producto en el formulario (sin preguntar si ya había otro en edición).
+  function edit(id) {
+    const p = S.items.find((x) => x.id === id);
+    if (!p) return;
+    S.editing = id; S.photo = p.photo || '';
+    render(); U.fill(root, p);
+  }
 
   function save() {
     const form = U.read(root);
     const entry = { name: form.name, dropi: form.dropi, price: C.quickPrice(form.price), photo: S.photo };
-    const chk = C.quickCheck(S.items, entry);
+    const chk = C.quickCheck(S.items, entry, S.editing == null ? undefined : S.editing);
     if (!chk.ok) { toast(chk.msg, 'error'); U.focus(root); return; }
+    if (S.editing != null) {
+      S.items = C.quickUpdate(S.items, S.editing, entry);
+      S.editing = null; S.photo = '';
+      const ok = persist();
+      U.reset(root); render();
+      if (ok) toast(`Actualicé "${entry.name.trim()}" en el guardado rápido.`, 'ok');
+      return;
+    }
     S.items = C.quickAdd(S.items, entry, Date.now());
     S.photo = '';
     const ok = persist();
@@ -51,6 +76,7 @@
       `¿Borro ${n === 1 ? 'el producto guardado' : `los ${n} productos guardados`} aquí? No se puede deshacer. Lo que ya envié a Mi candidato no se toca.`,
       [{ r: 'clear', label: 'Limpiar' }]);
     if (r !== 'clear') return;
+    cancelEdit();
     S.items = []; persist(); render();
     toast('Guardado rápido limpio.', 'ok');
   }
@@ -61,6 +87,7 @@
     if (!p) return;
     const r = await PYL.ui.feedback.ask('Eliminar producto', `¿Elimino "${p.name}" del guardado rápido? No se puede deshacer.`, [{ r: 'del', label: 'Eliminar' }]);
     if (r !== 'del') return;
+    if (S.editing === id) cancelEdit();
     S.items = C.quickRemove(S.items, id); persist(); render();
     toast(`Eliminé "${p.name}" del guardado rápido.`, 'ok');
   }
@@ -80,6 +107,8 @@
     toggle: () => setOpen(!S.open),
     close: () => setOpen(false),
     save,
+    cancel: () => { cancelEdit(); render(); },
+    edit,
     photo,
     photoClear: () => { S.photo = ''; render(); },
     clear,

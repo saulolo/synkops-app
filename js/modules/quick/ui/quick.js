@@ -1,6 +1,6 @@
 // Guardado rápido (pestaña Buscar producto): botón flotante con numerito y panel pequeño para anotar
 // productos al vuelo (nombre, ID Dropi, imagen). Recibe datos y callbacks; no guarda estado.
-// on = { toggle(), close(), save(), photo(file), photoClear(), clear(), copy(text), send(id), del(id) }.
+// on = { toggle(), close(), save(), cancel(), photo(file), photoClear(), clear(), copy(text), edit(id), send(id), del(id) }.
 (() => {
   const PYL = globalThis.PYL;
   const { el } = PYL.ui.dom;
@@ -66,7 +66,11 @@
 
     const save = el('button', 'btn sm qk-save', 'Guardar'); save.type = 'button'; save.id = 'qk-save';
     save.addEventListener('click', on.save);
-    form.append(fn.box, fd.box, fp.box, photoBox, save);
+    // Cancelar solo se ve editando un producto; comparte celda con Guardar/Actualizar.
+    const cancel = el('button', 'btn ghost sm qk-cancel', 'Cancelar'); cancel.type = 'button'; cancel.id = 'qk-cancel'; cancel.hidden = true;
+    cancel.addEventListener('click', on.cancel);
+    const acts = el('div', 'qk-acts'); acts.append(cancel, save);
+    form.append(fn.box, fd.box, fp.box, photoBox, acts);
 
     // Pegar una imagen (captura o copia) con el panel abierto, sin importar dónde esté el foco:
     // el pegado llega al elemento enfocado, y al pasar el cursor por la imagen no hay foco en el panel.
@@ -92,11 +96,12 @@
 
     panel.append(head, form, bar, list);
     root.append(panel, btn);
-    root._qk = { on, btn, count, panel, name: fn.x, dropi: fd.x, price: fp.x, img, empty, rm, clear, list };
+    root._qk = { on, btn, count, panel, name: fn.x, dropi: fd.x, price: fp.x, img, empty, rm, clear, list, save, cancel };
   }
 
-  function row(it, on) {
-    const r = el('div', 'qk-row');
+  function row(it, on, editing) {
+    const r = el('div', 'qk-row'); r.dataset.id = it.id;
+    r.classList.toggle('is-editing', editing);
     if (it.photo) { const im = el('img', 'qk-thumb'); im.src = it.photo; im.alt = ''; r.append(im); }
     else { const e = el('span', 'qk-thumb qk-thumb-empty'); e.append(PYL.ui.icons.el('package', 16, 'ic-solo')); r.append(e); }
 
@@ -105,6 +110,11 @@
     const dl = el('div', 'qk-line qk-id'); dl.append(el('span', null, 'ID ' + it.dropi), copyBtn(() => it.dropi, 'ID Dropi', 'inline'));
     if (it.price) dl.append(el('span', 'qk-price', PYL.core.format.fmt(it.price, 'cop')));
     info.append(nl, dl);
+
+    // Lápiz: carga el producto en el formulario de arriba para corregirlo.
+    const edit = el('button', 'qk-edit'); edit.type = 'button'; edit.innerHTML = PYL.ui.icons.svg('edit', 17);
+    edit.title = 'Editar'; edit.setAttribute('aria-label', 'Editar ' + it.name); edit.setAttribute('aria-pressed', String(editing));
+    edit.addEventListener('click', () => on.edit(it.id));
 
     // Ícono a la derecha de cada producto: lo manda a Mi candidato.
     const send = el('button', 'qk-send'); send.type = 'button'; send.innerHTML = PYL.ui.icons.svg('send', 17);
@@ -116,11 +126,11 @@
     del.title = 'Eliminar del guardado rápido'; del.setAttribute('aria-label', 'Eliminar ' + it.name + ' del guardado rápido');
     del.addEventListener('click', () => on.del(it.id));
 
-    r.append(info, send, del);
+    r.append(info, edit, send, del);
     return r;
   }
 
-  // v = { open, items, photo }: repinta botón, numerito, panel, vista previa de la imagen y lista.
+  // v = { open, items, photo, editing }: repinta botón, numerito, panel, vista previa de la imagen y lista.
   function render(root, v) {
     const k = root._qk;
     k.btn.setAttribute('aria-expanded', String(!!v.open));
@@ -134,9 +144,12 @@
     k.img.hidden = !v.photo; k.img.src = v.photo || '';
     k.empty.hidden = !!v.photo; k.rm.hidden = !v.photo;
 
+    k.save.textContent = v.editing ? 'Actualizar' : 'Guardar';
+    k.cancel.hidden = !v.editing;
+
     k.list.textContent = '';
     if (!n) k.list.append(el('p', 'qk-none', 'Aún no hay productos guardados.'));
-    else v.items.forEach((it) => k.list.append(row(it, k.on)));
+    else v.items.forEach((it) => k.list.append(row(it, k.on, it.id === v.editing)));
   }
 
   // Valores escritos en el formulario (el precio sale como texto; modules/quick/app/quick.js lo convierte con core.quick.quickPrice).
@@ -147,7 +160,15 @@
     const k = root._qk; k.name.value = ''; k.dropi.value = ''; k.price.value = ''; k.name.focus();
   }
 
+  // Pone un producto guardado en los campos (precio como $ 25.000) y deja el cursor en Nombre. La imagen la pinta render.
+  function fill(root, item) {
+    const k = root._qk;
+    k.name.value = item.name || ''; k.dropi.value = item.dropi || '';
+    k.price.value = item.price ? PYL.core.format.fmt(item.price, 'cop') : '';
+    k.name.focus();
+  }
+
   const focus = (root) => root._qk.name.focus();
 
-  PYL.ui.quick = { build, render, read, reset, focus };
+  PYL.ui.quick = { build, render, read, reset, fill, focus };
 })();

@@ -1,6 +1,6 @@
 # SPEC 25 — Estrategias «La Caza» y «El Espía» en Buscar producto
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 09, SPEC 24
 > **Fecha:** 2026-11-24
 > **Objetivo:** Agregar «La Caza» (tercera) y «El Espía» (cuarta) como estrategias de búsqueda en Buscar producto. La Caza explica de forma interactiva sus dos puertas y sus tres métodos (A, B, C); El Espía explica sus dos entradas (por tienda y por producto) y lo que muestra de cada tienda. Cada método trae un prompt fijo para usar con el MCP de DropKiller.
