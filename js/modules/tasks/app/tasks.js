@@ -19,6 +19,7 @@
     adding: false,     // fila de añadir abierta
     menu: null,        // 'gear' | 'history' | null
     about: false,      // capa «Acerca de» abierta
+    alerts: loaded.alerts, // aviso sonoro por hora (SPEC 27); se guarda en pyl-tasks
   });
 
   // Ids únicos en toda la nota. crypto.randomUUID puede faltar en file:// según el navegador: hay respaldo.
@@ -35,7 +36,7 @@
     if (!dirty) return;
     dirty = false;
     // Sin espacio: avisa y conserva el estado en pantalla.
-    if (!store.save({ v: C.TK_VERSION, note: S.note })) PYL.ui.feedback.toast('No se pudo guardar: hay muy poco espacio', 'error');
+    if (!store.save({ v: C.TK_VERSION, note: S.note, alerts: S.alerts })) PYL.ui.feedback.toast('No se pudo guardar: hay muy poco espacio', 'error');
   };
   const scheduleSave = () => {
     dirty = true;
@@ -97,6 +98,27 @@
     gear() { if (S.menu === 'gear') closeMenu(false); else openMenu('gear'); },
     about() { closeMenu(false); setAbout(true); },
     aboutClose() { setAbout(false); },
+    // Switch del aviso por hora: al encender suena una vez como vista previa (sin #toast); al apagar, nada.
+    alert() {
+      S.alerts = !S.alerts;
+      U.alertSwitch(root, S.alerts);
+      if (S.alerts) ring();
+      scheduleSave();
+    },
+  };
+
+  // Sonido del aviso (#tk-audio, mismo trato que #mw-audio de Cortes): si el mp3 falta, el <audio> dispara error y
+  // no se vuelve a intentar; un play() rechazado (Chrome sin un clic desde que cargó la página) se ignora.
+  const audio = document.getElementById('tk-audio');
+  let audioBad = false;
+  if (audio) audio.addEventListener('error', () => { audioBad = true; });
+  const ring = () => {
+    if (!audio || audioBad || audio.error) return;
+    try {
+      audio.currentTime = 0;
+      const p = audio.play();
+      if (p && typeof p.catch === 'function') p.catch(() => {});
+    } catch (e) { /* sin audio */ }
   };
 
   // «Acerca de»: se cierra con ×, Esc o clic en el fondo; el foco vuelve al engranaje.
@@ -110,6 +132,7 @@
   }
 
   U.shell(root, on);
+  U.alertSwitch(root, S.alerts);
   const list = U.createList(root.querySelector('#tk-list'), on);
   root.querySelector('#tk-about').addEventListener('pointerdown', (e) => { if (e.target === e.currentTarget) setAbout(false); });
 
@@ -152,8 +175,8 @@
 
   // ---- Reordenar arrastrando (eventos de puntero, como el original; no HTML5 drag and drop: rompería el doble clic) ----
   // La fila sigue al puntero con translateY; el DOM se reordena en vivo y las demás se deslizan (FLIP).
-  // Las subtareas se arrastran igual, dentro de su tarea. Mientras se arrastra, el repintado de la lista espera;
-  // al soltar se guarda con tkMove o tkMoveSub.
+  // Las subtareas se arrastran igual, dentro de su tarea o hacia otra tarea del mismo día (SPEC 27). Mientras se arrastra,
+  // el repintado de la lista espera; al soltar se guarda con tkMove, tkMoveSub o tkMoveSubTo.
   const listEl = root.querySelector('#tk-list');
   const DRAG_THRESHOLD = 4, EDGE_ZONE = 36, MAX_SCROLL_STEP = 14;
   let drag = null, suppressClick = false;
@@ -161,7 +184,8 @@
   const raf = (fn) => (typeof requestAnimationFrame === 'function' ? requestAnimationFrame(fn) : null);
 
   // Dos clases de arrastre con el mismo comportamiento: una tarea entre las tareas del día, o una subtarea entre las
-  // subtareas de su tarea (no cambia de tarea). box = contenedor donde se reordena; items() = filas que se reordenan.
+  // subtareas de su tarea o de otra del mismo día. box = contenedor donde se reordena (en una subtarea cambia al pasar
+  // a otra tarea; home = su bloque de origen); items() = filas que se reordenan.
   const subNodes = (box) => [...box.children].filter((n) => n.classList.contains('tk-sub-row'));
 
   const onPress = (e) => {
@@ -174,10 +198,12 @@
     if (!wrap || wrap.parentElement !== listEl) return;
     const base = { id: wrap.dataset.id, pointerId: e.pointerId, downX: e.clientX, downY: e.clientY, clientY: e.clientY, grab: 0, active: false, raf: null, stale: false };
     if (subRow) {
-      // Subtarea: con 2 o más en su tarea.
+      // Subtarea: con 2 o más en su tarea, o si el día tiene 2 o más tareas (puede pasar a otra, SPEC 27).
       const box = subRow.parentElement;
-      if (subNodes(box).length < 2) return;
-      drag = { ...base, sub: subRow.dataset.sub, node: subRow, box, items: () => subNodes(box) };
+      if (subNodes(box).length < 2 && C.tkTasksOf(S.note, S.day).length < 2) return;
+      // box cambia si la fila pasa a otra tarea; home = su bloque de origen (para devolverla al cancelar).
+      const d = { ...base, sub: subRow.dataset.sub, node: subRow, box, home: box, items: () => subNodes(d.box) };
+      drag = d;
     } else if (t.closest('.tk-task-row')) {
       // Tarea: con 2 o más en el día.
       if (C.tkTasksOf(S.note, S.day).length < 2) return;
@@ -227,8 +253,18 @@
     const { node, items } = drag;
     node.style.transform = '';
     const list = listEl.getBoundingClientRect();
-    const own = drag.box.getBoundingClientRect();
     const height = node.getBoundingClientRect().height;
+    // Subtarea (SPEC 27): si el puntero sale de su grupo y queda sobre otra tarea, la fila pasa a ese grupo.
+    if (drag.sub) {
+      const target = dropTarget(drag.clientY, height);
+      if (target) {
+        const top = Math.min(Math.max(drag.clientY - drag.grab, list.top), Math.max(list.top, list.bottom - height));
+        moveToBox(target, top + height / 2);
+        node.style.transform = `translateY(${top - node.getBoundingClientRect().top}px)`;
+        return;
+      }
+    }
+    const own = drag.box.getBoundingClientRect();
     // Puede salirse media fila de su bloque: así su centro pasa el de la primera o la última y llega a esas posiciones.
     const lo = Math.max(list.top, own.top - height / 2), hi = Math.min(list.bottom, own.bottom + height / 2);
     const top = Math.min(Math.max(drag.clientY - drag.grab, lo), Math.max(lo, hi - height));
@@ -251,6 +287,64 @@
       for (const n of moved) { n.style.transition = 'transform 140ms ease'; n.style.transform = ''; }
     }
     node.style.transform = `translateY(${top - node.getBoundingClientRect().top}px)`;
+  }
+
+  // ---- Subtarea a otra tarea del mismo día (SPEC 27) ----
+  // Mientras el puntero siga en el grupo donde está la fila (± media fila), se reordena ahí como antes (devuelve null).
+  // Si no, busca destino bajo el puntero: el grupo de origen (aunque haya quedado vacío), las subtareas visibles de otra
+  // tarea o la fila de una tarea sin subtareas o contraída (bloque temporal al final; al soltar queda expandida).
+  // Sin destino, la fila se queda en su grupo actual.
+  const within = (r, y, pad = 0) => y >= r.top - pad && y < r.bottom + pad;
+  function dropTarget(y, height) {
+    if (within(drag.box.getBoundingClientRect(), y, height / 2)) return null;
+    if (drag.home !== drag.box && drag.home.isConnected && within(drag.home.getBoundingClientRect(), y, height / 2)) return drag.home;
+    const tasks = C.tkTasksOf(S.note, S.day);
+    for (const wrap of taskNodes()) {
+      const subs = [...wrap.children].find((n) => n.classList.contains('tk-subs'));
+      if (subs && subs !== drag.box && subs !== drag.home && subNodes(subs).length && within(subs.getBoundingClientRect(), y)) return subs;
+      const task = tasks.find((t) => t.id === wrap.dataset.id);
+      const row = wrap.querySelector('.tk-task-row');
+      if (task && wrap !== drag.home.parentElement && (!task.subtasks.length || task.collapsed) && within(row.getBoundingClientRect(), y)) {
+        if (subs === drag.box) return null; // ya está en su bloque
+        return subs || 'new:' + wrap.dataset.id;
+      }
+    }
+    return null;
+  }
+
+  // Pasa la fila arrastrada al grupo `target` (un .tk-subs, o 'new:<id>' = bloque temporal en esa tarea), en el hueco
+  // que le toca según `center`. Las tareas se deslizan (FLIP) porque cambia el alto de los grupos.
+  function moveToBox(target, center) {
+    const { node } = drag;
+    const wraps = taskNodes().filter((w) => !w.contains(node));
+    const before = wraps.map((w) => w.getBoundingClientRect().top);
+    let box = target;
+    if (typeof target === 'string') {
+      const wrap = taskNodes().find((w) => w.dataset.id === target.slice(4));
+      box = document.createElement('div');
+      box.className = 'tk-subs tk-subs-tmp';
+      wrap.append(box);
+    }
+    const prev = drag.box;
+    const others = subNodes(box).filter((n) => n !== node);
+    const index = others.filter((n) => { const r = n.getBoundingClientRect(); return r.top + r.height / 2 < center; }).length;
+    box.insertBefore(node, others[index] || box.querySelector('.tk-sub-add'));
+    drag.box = box;
+    leaveBox(prev);
+    for (const w of taskNodes()) w.classList.toggle('is-drop', w.contains(box) && box !== drag.home);
+    const moved = [];
+    wraps.forEach((w, i) => {
+      w.style.transition = 'none';
+      w.style.transform = '';
+      const delta = before[i] - w.getBoundingClientRect().top;
+      if (delta !== 0) { w.style.transform = `translateY(${delta}px)`; moved.push(w); }
+    });
+    void listEl.offsetHeight;
+    for (const w of moved) { w.style.transition = 'transform 140ms ease'; w.style.transform = ''; }
+  }
+  // Un bloque temporal que quedó vacío se quita (la tarea vuelve a como estaba).
+  function leaveBox(box) {
+    if (box && box.classList.contains('tk-subs-tmp') && !subNodes(box).length) box.remove();
   }
 
   // Cerca del borde de la lista (franjas de 36 px) la desplaza sola, hasta 14 px por fotograma.
@@ -286,12 +380,25 @@
     try { listEl.releasePointerCapture(st.pointerId); } catch { /* ya liberada */ }
     listEl.classList.remove('is-dragging');
     for (const n of st.items()) { n.classList.remove('is-dragging'); n.style.transform = ''; n.style.transition = ''; }
+    for (const w of taskNodes()) { w.classList.remove('is-drop'); w.style.transform = ''; w.style.transition = ''; }
     // Si no se guarda (cancelado, sin cambio o la lista cambió mientras tanto), el repintado devuelve el orden de la nota.
     // commit con la misma posición devuelve false (tkMove/tkMoveSub dan la misma nota).
-    const next = !save || st.stale ? S.note : st.sub ? C.tkMoveSub(S.note, st.id, st.sub, to) : C.tkMove(S.note, st.id, to);
+    // Una subtarea soltada en otra tarea se guarda en una sola operación (tkMoveSubTo).
+    // En una tarea contraída el bloque temporal solo tiene la fila arrastrada: va al final de sus subtareas.
+    const toId = st.sub && st.box.closest('.tk-task').dataset.id;
+    const toTask = toId && C.tkTasksOf(S.note, S.day).find((t) => t.id === toId);
+    const toSub = st.box.classList.contains('tk-subs-tmp') && toTask ? toTask.subtasks.length : to;
+    const next = !save || st.stale ? S.note
+      : !st.sub ? C.tkMove(S.note, st.id, to)
+        : toId === st.id ? C.tkMoveSub(S.note, st.id, st.sub, to) : C.tkMoveSubTo(S.note, st.id, st.sub, toId, toSub);
     if (commit(next)) return;
-    // La fila de la tarea no cambió y la lista reusa su nodo: las subtareas se devuelven a mano a su orden.
-    if (st.sub) { const add = st.box.querySelector('.tk-sub-add'); for (const n of st.order) st.box.insertBefore(n, add); }
+    // Las filas de las tareas no cambiaron y la lista reusa sus nodos: las subtareas se devuelven a mano a su bloque
+    // de origen y en su orden (también la que se pintó en otro grupo); el bloque temporal de una tarea destino se quita.
+    if (st.sub) {
+      const add = st.home.querySelector('.tk-sub-add');
+      for (const n of st.order) st.home.insertBefore(n, add);
+      leaveBox(st.box);
+    }
     render();
   }
 
@@ -363,8 +470,38 @@
     if (document.visibilityState !== 'visible') return;
     checkDay();
     scheduleMidnight();
+    scheduleAlert(); // desde la hora actual, sin avisar
   });
   scheduleMidnight();
+
+  // ---- Aviso por hora (SPEC 27): a cada HH:00, sonido + #toast si hoy hay tareas pendientes con hora HH. ----
+  // Temporizador encadenado (nunca setInterval) que corre también con la pestaña oculta. Al disparar se comprueba que la
+  // hora local siga siendo la programada: Chrome retrasa los temporizadores en segundo plano y el PC puede suspenderse,
+  // y un aviso perdido no se recupera (despierta 14:10 → avisa de las 14; 15:02 → nada de las 14).
+  let alertTimer = null, alertAt = null; // alertAt = { day, hour } de la hora en punto programada
+  const scheduleAlert = () => {
+    clearTimeout(alertTimer);
+    const now = new Date();
+    const ms = C.tkMsToNextHour(now);
+    const at = new Date(now.getTime() + ms);
+    alertAt = { day: C.tkDayKey(at), hour: at.getHours() };
+    alertTimer = setTimeout(fireAlert, ms);
+  };
+  function fireAlert() {
+    const now = new Date(), due = alertAt;
+    if (due && C.tkDayKey(now) === due.day && now.getHours() === due.hour) alertNow(due.hour);
+    scheduleAlert();
+  }
+  // Mira las tareas de hoy sin importar la pestaña de día abierta; varias a la misma hora dan un solo aviso.
+  // El #toast sale aunque el sonido no suene. No cambia de pestaña ni de día ni mueve el foco.
+  function alertNow(hour) {
+    if (!S.alerts) return;
+    const due = C.tkDueAlert(S.note, todayKey(), hour);
+    if (!due.length) return;
+    ring();
+    PYL.ui.feedback.toast(C.tkAlertText(hour, due));
+  }
+  scheduleAlert(); // al cargar no avisa de horas ya pasadas: solo programa la próxima
 
   render();
 })();

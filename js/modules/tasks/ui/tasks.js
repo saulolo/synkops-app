@@ -34,11 +34,7 @@
       </div>
     </div>
     <div class="tk-prog">
-      <svg class="tk-ring" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
-        <circle class="tk-ring-track" cx="7" cy="7" r="5.5" pathLength="100"/>
-        <circle class="tk-ring-fill" cx="7" cy="7" r="5.5" pathLength="100"/>
-      </svg>
-      <span class="tk-count" id="tk-count"></span>
+      <button class="tk-alert" type="button" id="tk-alert" data-act="alert" role="switch" aria-checked="false"><span class="tk-sw" aria-hidden="true"><span class="tk-sw-knob"></span></span>${I('bell', 14)}</button>
       <button class="tk-ib tk-sm" type="button" id="tk-all" data-act="all">${I('check-check', 14)}</button>
     </div>
     <div class="tk-bar"><div class="tk-bar-fill" id="tk-bar"></div></div>
@@ -86,9 +82,9 @@
     q(root, '#tk-history').classList.toggle('is-on', !keys.includes(active));
   };
 
-  // Anillo, «N de M hechas», doble check (marcar o desmarcar todas; oculto sin tareas) y barra.
+  // Doble check (marcar o desmarcar todas; oculto sin tareas) y barra. Sin «N de M hechas» ni anillo (SPEC 27):
+  // el Pulso de tareas de Inicio ya lo muestra.
   const progress = (root, { done, total, percent }) => {
-    q(root, '#tk-count').textContent = `${done} de ${total} hechas`;
     const all = q(root, '#tk-all');
     const markAll = done < total;
     const label = markAll ? 'Marcar todas' : 'Desmarcar todas';
@@ -98,7 +94,16 @@
     all.classList.toggle('is-on', !markAll);
     all.hidden = total === 0;
     q(root, '#tk-bar').style.width = `${percent}%`;
-    q(root, '.tk-ring-fill').style.strokeDashoffset = String(100 - percent);
+  };
+
+  // Switch del aviso por hora (SPEC 27): estado en aria-checked; etiqueta y title dicen lo que hará el clic.
+  const alertSwitch = (root, on) => {
+    const sw = q(root, '#tk-alert');
+    const label = on ? 'Desactivar aviso por hora' : 'Activar aviso por hora';
+    sw.setAttribute('aria-checked', String(on));
+    sw.setAttribute('aria-label', label);
+    sw.title = label;
+    sw.classList.toggle('is-on', on);
   };
 
   // ---- Menús (engranaje y días anteriores) ----
@@ -409,5 +414,5 @@
     return { render, openAdd: add.open, closeAdd: add.close, carry: (visible) => { carryEl.hidden = !visible; } };
   };
 
-  PYL.ui.tasks = { shell, days, progress, historyItems, menuShow, menuMove, menuHas, about, createList };
+  PYL.ui.tasks = { shell, days, progress, alertSwitch, historyItems, menuShow, menuMove, menuHas, about, createList };
 })();
