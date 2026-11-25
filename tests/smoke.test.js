@@ -4069,7 +4069,53 @@ JSDOM.fromFile(path.join(__dirname, '..', 'index.html'), {
     if (previo === undefined) delete store['pyl-quick'];
   };
 
-  return lgTest().then(dkTest).then(apTest).then(chTest).then(chCadenaTest).then(chDurasTest).then(hubTest).then(hubTest2).then(hubTest3).then(hubTest4).then(hubTest5).then(tkTest1).then(tkTest2).then(tkTest3).then(tkTest4).then(tkTest5).then(tkTest6).then(tkTest7).then(tkTest8).then(tkTest9).then(tkTest10).then(tkTest11).then(tkTest12).then(ckTest).then(mwTest1).then(mwTest2).then(mwTest3).then(mwTest4).then(ixTest1).then(ixTest2).then(czTest).then(spyTest).then(qkTest).then(fresca).then((d2) => {
+  // SPEC 28: semáforo de proveedores en el paso 3 del Flujograma DropKiller (página aparte, flujo en el paso 1).
+  const pvTest = async () => {
+    const previo = store['pyl-search'];
+    store['pyl-search'] = JSON.stringify({ active: 0, done: {} });
+    const d = await fresca(), W = d.window, doc = W.document, C = W.PYL.core.search;
+    const $$ = (q) => [...doc.querySelectorAll(q)];
+    assert.strictEqual(doc.querySelector('#b-sec-flow h2').textContent, 'Búsqueda con DropKiller', 'Título de la sección');
+    assert.ok(/Búsqueda con DropKiller/.test(doc.querySelector('.b-route a[href="#b-sec-flow"]').textContent), 'Enlace 1 de la ruta');
+    assert.ok(!/Flujograma DropKiller/.test(doc.querySelector('#v-buscar').textContent), 'No queda «Flujograma DropKiller» visible');
+    const nodos = $$('#b-flow .fl-node');
+    assert.strictEqual(nodos.length, C.FLOW.length, 'Un nodo por paso del flujograma');
+    const iSumar = C.FLOW.findIndex((s) => s.k === 'sumar');
+    assert.strictEqual(iSumar, 2, 'Sumar ventas y contar proveedores es el paso 3');
+    C.FLOW.forEach((s, i) => {
+      $$('#b-flow .fl-node')[i].click();
+      const z = doc.querySelectorAll('#b-step .fl-zones');
+      if (s.k === 'radar') {
+        const t = doc.querySelector('#b-step').textContent;
+        assert.ok(/Ad Library con filtro Colombia/.test(t) && /WhatsApp, tienda Shopify, landing propia/.test(t), 'El paso 6 cuenta anunciantes en Colombia');
+        assert.ok(/8 anunciantes o menos en Colombia/.test(doc.querySelector('#b-step .fl-decide').textContent), 'Puerta del paso 6');
+        assert.ok(/8 anunciantes o menos/.test($$('#b-flow .fl-item')[i].querySelector('.fl-gate').textContent), 'La puerta también sale en la lista del flujo');
+      }
+      if (i !== iSumar) { assert.strictEqual(z.length, 0, `El paso ${i + 1} no trae semáforo`); return; }
+      assert.strictEqual(z.length, 1, 'El paso 3 trae un semáforo');
+      const box = z[0];
+      assert.strictEqual(box.querySelector('.fl-zones-h').textContent, 'Proveedores en Dropi');
+      const bar = box.querySelector('.fl-zones-bar');
+      assert.strictEqual(bar.getAttribute('aria-hidden'), 'true', 'La barra es decorativa');
+      const segs = [...bar.querySelectorAll('.fl-zones-seg')];
+      assert.deepStrictEqual(segs.map((x) => x.dataset.tone), ['g', 'y', 'o', 'r']);
+      assert.deepStrictEqual(segs.map((x) => x.querySelector('.fl-zones-range').textContent), ['1 – 3', '4 – 6', '7 – 10', '11 +']);
+      assert.deepStrictEqual(segs.map((x) => x.querySelector('.fl-zones-name').textContent), ['Ideal', 'Aceptable', 'Cuidado', 'Descarto']);
+      const items = [...box.querySelectorAll('.fl-zones-list > li')];
+      assert.strictEqual(items.length, 4, '4 líneas bajo la barra');
+      assert.ok(items.every((li) => li.querySelector('.fl-zones-dot')), 'Cada línea con su punto');
+      assert.deepStrictEqual(items.map((li) => li.querySelector('.fl-zones-tx > b').textContent), ['Ideal · 1 – 3: ', 'Aceptable · 4 – 6: ', 'Cuidado · 7 – 10: ', 'Descarto · 11 +: ']);
+      assert.ok(/candidato a privatizar/.test(items[0].textContent) && /Vuelvo a los filtros/.test(items[3].textContent), 'Textos de las zonas');
+      const ex = [...doc.querySelectorAll('#b-step .fl-detail > *')];
+      assert.ok(ex.indexOf(box) < ex.findIndex((n) => /Caso real/.test(n.textContent) && n.classList.contains('note')), 'El semáforo va antes del «Caso real»');
+      assert.ok(/máximo 6 proveedores \(hasta 10 con cuidado\)/.test(doc.querySelector('#b-step .fl-decide').textContent), 'Puerta del paso 3');
+    });
+    W.close();
+    store['pyl-search'] = previo;
+    if (previo === undefined) delete store['pyl-search'];
+  };
+
+  return lgTest().then(dkTest).then(apTest).then(chTest).then(chCadenaTest).then(chDurasTest).then(hubTest).then(hubTest2).then(hubTest3).then(hubTest4).then(hubTest5).then(tkTest1).then(tkTest2).then(tkTest3).then(tkTest4).then(tkTest5).then(tkTest6).then(tkTest7).then(tkTest8).then(tkTest9).then(tkTest10).then(tkTest11).then(tkTest12).then(ckTest).then(mwTest1).then(mwTest2).then(mwTest3).then(mwTest4).then(ixTest1).then(ixTest2).then(czTest).then(spyTest).then(qkTest).then(pvTest).then(fresca).then((d2) => {
     const doc2 = d2.window.document;
     assert.deepStrictEqual([...doc2.querySelectorAll('#b-strats .st-tab')].map((b) => b.textContent.length > 0), [true, true, true, true], 'Estrategias muestra 4 tarjetas');
     assert.deepStrictEqual([...d2.window.PYL.core.search.STRATEGIES.map((x) => x.k)], ['vdo', 'prov', 'caza', 'espia'], 'STRATEGIES = vdo, prov, caza y espia');

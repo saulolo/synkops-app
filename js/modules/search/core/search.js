@@ -10,8 +10,8 @@
     total: { min: 100, ideal: 2000, max: 3000 }, // ventas totales: validación 100–2.000; 3.000 es el límite
     v7: { min: 10, max: 100 },                   // ventas de los últimos 7 días
     v30: { min: 100, max: 500 },                 // ventas de los últimos 30 días
-    prov: { ideal: 5, max: 10 },                 // proveedores en Dropi
-    advertisers: 5,                              // menos de 5 anunciantes activos
+    prov: { ideal: 3, max: 6, risk: 10 },        // proveedores en Dropi: 1–3 ideal, 4–6 aceptable, 7–10 cuidado, 11+ descarto
+    advertisers: { ideal: 5, max: 8 },           // anunciantes en Colombia: 1–5 poca competencia, 6–8 hay pelea, 9+ mucha
     adDays: 7,                                   // anuncio activo más de 7 días = rentable
     stock: 80,                                   // stock mínimo del proveedor
     restock: 5,                                  // veces restockeado, máximo
@@ -37,6 +37,27 @@
   ];
 
   const stage = (total) => (total == null || !isFinite(total) || total < 0 ? null : STAGES.find((s) => total <= s.upTo));
+
+  // Semáforo de proveedores (SPEC 28): 4 zonas contiguas en orden; `to: null` = sin tope. Rangos de LIMITS.prov.
+  const P = LIMITS.prov;
+  const PROV_ZONES = [
+    { k: 'ideal', tone: 'g', t: 'Ideal', from: 1, to: P.ideal,
+      d: ['Poca competencia: entro con ventaja. Con uno solo es ', { b: 'candidato a privatizar' }, '.'] },
+    { k: 'ok', tone: 'y', t: 'Aceptable', from: P.ideal + 1, to: P.max,
+      d: ['Ya hay competencia, pero todavía hay espacio: ', { b: 'lo testeo' }, '.'] },
+    { k: 'risk', tone: 'o', t: 'Cuidado', from: P.max + 1, to: P.risk,
+      d: ['Mercado peleado: ', { b: 'analizo bien el producto' }, ' (ventas recientes, anuncios, precio) antes de decidir.'] },
+    { k: 'out', tone: 'r', t: 'Descarto', from: P.risk + 1, to: null,
+      d: ['Muy competido: gana el que más plata pierde en anuncios. ', { b: 'Vuelvo a los filtros.' }] },
+  ];
+
+  // Zona de un número de proveedores (entero ≥ 1); 0, negativo, no numérico o null → null.
+  const provZone = (v) => {
+    if (v == null || v === '' || typeof v === 'boolean') return null;
+    const x = Number(v);
+    if (!Number.isInteger(x) || x < 1) return null;
+    return PROV_ZONES.find((z) => z.to == null || x <= z.to);
+  };
 
   // Rango "desde–hasta" de cada etapa, para las etiquetas de la barra.
   const stageRange = (s) => {
@@ -88,9 +109,9 @@
   const VDO = [
     { k: 'V', t: 'Validación', rule: [`Entre `, { b: `${n(LIMITS.total.min)} y ${n(LIMITS.total.ideal)} ventas totales` }, ', sumando todos los proveedores.'],
       avoid: `Más de ${n(LIMITS.total.ideal)}: ya está en escalado y alguien lo domina.` },
-    { k: 'D', t: 'Demanda', rule: ['Menos de ', { b: `${LIMITS.prov.ideal} proveedores` }, ` (máximo ${LIMITS.prov.max}, y ya es mucho). Con uno solo es candidato a privatizar.`],
+    { k: 'D', t: 'Demanda', rule: ['Máximo ', { b: `${LIMITS.prov.ideal} proveedores` }, ` (aceptable hasta ${LIMITS.prov.max}; de ${LIMITS.prov.max + 1} a ${LIMITS.prov.risk}, con cuidado). Con uno solo es candidato a privatizar.`],
       avoid: 'Decenas de proveedores: cientos de dropshippers vendiendo lo mismo.' },
-    { k: 'O', t: 'Oferta', rule: ['Menos de ', { b: `${LIMITS.advertisers} anunciantes activos` }, ' (anunciantes, no anuncios). Miro si mandan a landing o a WhatsApp.'],
+    { k: 'O', t: 'Oferta', rule: ['Máximo ', { b: `${LIMITS.advertisers.ideal} anunciantes activos` }, ` (anunciantes, no anuncios; de ${LIMITS.advertisers.ideal + 1} a ${LIMITS.advertisers.max} hay pelea, más de ${LIMITS.advertisers.max} es mucha competencia). Miro si mandan a landing o a WhatsApp.`],
       avoid: 'Copiar el mismo ángulo: creo ángulos para públicos distintos.' },
   ];
 
@@ -281,12 +302,12 @@
         route: [
           { icon: 'search', t: 'Busco el producto', d: ['Por nombre, en DropKiller.'] },
           { icon: 'megaphone', t: 'Veo sus anuncios ganadores', d: ['En mi país, los activos hace ', { b: `más de ${n(LIMITS.adDays)} días` }, '.'] },
-          { icon: 'store', t: 'Veo las tiendas que lo mueven', d: ['Menos de ', { b: `${n(LIMITS.advertisers)} anunciantes activos` }, ' es señal de que no está saturado.'] },
+          { icon: 'store', t: 'Veo las tiendas que lo mueven', d: ['Hasta ', { b: `${n(LIMITS.advertisers.ideal)} anunciantes activos` }, ' es señal de que no está saturado.'] },
           { icon: 'eye', t: 'Espío cada tienda', d: ['Como en la entrada A: sus productos, anuncios, apps, tema y píxeles.'] },
         ],
         checks: [
           { big: `> ${n(LIMITS.adDays)}`, unit: 'días activo', t: 'Anuncios ganadores', d: ['Los que siguen corriendo en mi país.'] },
-          { big: `< ${n(LIMITS.advertisers)}`, unit: 'anunciantes', t: 'Tiendas que lo mueven', d: ['Anunciantes activos, no anuncios.'] },
+          { big: `≤ ${n(LIMITS.advertisers.ideal)}`, unit: 'anunciantes', t: 'Tiendas que lo mueven', d: ['Anunciantes activos, no anuncios.'] },
           { big: 'Cómo', unit: 'está hecha', t: 'Construcción', d: ['Tema y apps de cada tienda que lo vende.'] },
         ],
         use: [
@@ -357,21 +378,27 @@
       example: ['Ácido glicólico: buenas ventas, pero solo lo tenían 2 proveedores y menos de 3.000 ventas totales. Mercado abierto.'] },
     { k: 'sumar', t: 'Sumar ventas y contar proveedores', where: 'Resultado de Buscar similares',
       p: ['Sumo las ventas de ', { b: 'todos' }, ' los proveedores y los cuento. Con eso sé si de verdad está en validación o ya está saturado. Lo anoto en "Mi candidato", más abajo.'],
+      zones: PROV_ZONES, // semáforo de proveedores (SPEC 28): solo este paso lo trae
       example: ['Detector de fugas: 300 ventas y un solo proveedor en Colombia. Validado y sin competencia.'],
-      gate: { q: `¿Total entre ${n(LIMITS.total.min)} y ${n(LIMITS.total.max)} y máximo ${LIMITS.prov.max} proveedores?`, no: 'Descarto y vuelvo a los filtros.' } },
+      gate: { q: `¿Total entre ${n(LIMITS.total.min)} y ${n(LIMITS.total.max)} y máximo ${LIMITS.prov.max} proveedores (hasta ${LIMITS.prov.risk} con cuidado)?`, no: 'Descarto y vuelvo a los filtros.' } },
     { k: 'ia', t: 'IA de saturación', where: 'DropKiller → Productos seguidos → abrir el producto',
       p: ['La IA calcula el porcentaje de saturación:'],
       list: [[{ b: 'Verde:' }, ' todavía hay espacio.'], [{ b: 'Amarillo:' }, ' hay pelea, pero entro.'], [{ b: 'Rojo:' }, ' ya es tarde, lo evito.']],
       gate: { q: '¿Verde o amarillo?', no: 'Rojo: descarto.' } },
     { k: 'ads', t: 'AdsKiller', where: 'DropKiller → AdsKiller',
       p: ['Biblioteca de anuncios solo de e-commerce. Busco el producto ', { b: 'por imagen' }, ' (captura del módulo de productos) y ', { b: 'excluyo Colombia' }, ' para ver cómo lo pautan afuera.'],
-      list: [['Estado: ', { b: 'activo' }], ['Días activos: ', { b: `más de ${LIMITS.adDays}` }, ' (en cualquier país). Si sigue activo, se vende bien. Anoto el del anuncio más viejo.'], ['Duplicados: mínimo 2 o 3 (funnel hacking). Miro qué otros productos pauta ese anunciante.'], ['Luego filtro solo mi país y cuento ', { b: 'anunciantes' }, `, no anuncios (tiendas distintas): ideal menos de ${LIMITS.advertisers}.`]],
+      list: [['Estado: ', { b: 'activo' }], ['Días activos: ', { b: `más de ${LIMITS.adDays}` }, ' (en cualquier país). Si sigue activo, se vende bien. Anoto el del anuncio más viejo.'], ['Duplicados: mínimo 2 o 3 (funnel hacking). Miro qué otros productos pauta ese anunciante.'], ['Los anunciantes de Colombia los cuento en el ', { b: 'paso 6' }, ', en la Ad Library con filtro Colombia.']],
       example: ['Pack Detox: tienda en España escalando con 110 anuncios solo de imágenes. No siempre hace falta video.'],
       gate: { q: `¿Hay anuncios activos hace más de ${LIMITS.adDays} días?`, no: 'Todavía no demuestra que es rentable: lo guardo para después.' } },
     { k: 'radar', t: 'Store Radar y Ad Library', where: 'DropKiller → Store Radar · Biblioteca de anuncios de Meta',
-      p: ['Busco tiendas de afuera que ya lo escalan y los ángulos que usan.'],
-      list: [['Store Radar: oculto Colombia, ', { b: 'anuncios activos mínimo 50' }, ', ', { b: 'productos 1 a 30' }, '. Miro USA, UK y España.'], ['Abro la tienda: tema, apps, anuncios que escala y fecha de creación.'], ['Ad Library: copys, página y días activos (más de 7). ¿Mandan a landing o a WhatsApp?'], ['Extensión Rayos X sobre una tienda Shopify: best-sellers y todos sus anuncios, aunque los escondan en varias fanpages.']],
-      example: ['Cura Natural: tienda en México con 1 producto y 167 anuncios activos. No existía en Colombia.'] },
+      p: ['Busco tiendas de afuera que ya lo escalan y los ángulos que usan, y cuento quién lo vende ya en Colombia.'],
+      list: [['Store Radar: oculto Colombia, ', { b: 'anuncios activos mínimo 50' }, ', ', { b: 'productos 1 a 30' }, '. Miro USA, UK y España.'], ['Abro la tienda: tema, apps, anuncios que escala y fecha de creación.'],
+        ['Ad Library afuera: copys, página y días activos (más de 7).'],
+        ['Ad Library con ', { b: 'filtro Colombia' }, ': busco el producto y reviso los anuncios que salen. Cuento ', { b: 'anunciantes' }, ' (tiendas o personas distintas), no anuncios, y anoto a dónde mandan: ', { b: 'WhatsApp, tienda Shopify, landing propia' }, ' u otra. Lo anoto en "Mi candidato" (Anunciantes en mi mercado).'],
+        [{ b: `Hasta ${LIMITS.advertisers.ideal}` }, ' anunciantes: poca competencia. ', { b: `De ${LIMITS.advertisers.ideal + 1} a ${LIMITS.advertisers.max}` }, ': hay pelea, entro solo con un ángulo distinto. ', { b: `Más de ${LIMITS.advertisers.max}` }, ': mucha competencia, no lo testeo.'],
+        ['Extensión Rayos X sobre una tienda Shopify: best-sellers y todos sus anuncios, aunque los escondan en varias fanpages.']],
+      example: ['Cura Natural: tienda en México con 1 producto y 167 anuncios activos. No existía en Colombia.'],
+      gate: { q: `¿${LIMITS.advertisers.max} anunciantes o menos en Colombia?`, no: 'Mucha competencia: no lo testeo y vuelvo a los filtros.' } },
     { k: 'dropi', t: 'Validar en Dropi', where: 'Dropi → buscar el producto',
       p: ['Antes de gastar un peso confirmo la bodega:'],
       list: [['Stock ', { b: `mínimo ${LIMITS.stock}` }, ' unidades.'], ['Proveedor confiable (verificado) y el ID más barato entre los similares.'], [{ b: `Mínimo ${LIMITS.creatives} creativos` }, ' listos para el testeo.']],
@@ -402,7 +429,7 @@
     ['Elegir por intuición', 'Me enamoro del producto sin datos de demanda.'],
     ['Copiar a ciegas', 'Lanzo lo "bonito" de TikTok sin saber si vende o ya está quemado.'],
     ['Testear a ciegas', 'Un testeo cuesta de 10 a 30 USD y al novato le toma unos 10 pegar un ganador: 100 a 300 USD perdidos por no usar los datos.'],
-    ['Ignorar la saturación', 'Con 15 proveedores o más gana el que más plata está dispuesto a perder en anuncios.'],
+    ['Ignorar la saturación', `Con más de ${LIMITS.prov.risk} proveedores gana el que más plata está dispuesto a perder en anuncios.`],
     ['Márgenes ajustados', 'No contar fletes, devoluciones y CPA. Por eso siempre paso por el Costeo.'],
     ['No leer reseñas', 'No investigar los dolores en Reddit y Amazon.'],
   ];
@@ -533,10 +560,10 @@
     }
     const comp = competition(v7);
     if (comp) add('v7', 'Ventas 7 días', comp.tone, [`${n(v7)}: `, { b: comp.t.toLowerCase() }, '.']);
-    if (prov != null) add('prov', 'Proveedores', prov <= L.prov.ideal ? 'g' : prov <= L.prov.max ? 'y' : 'r',
-      prov === 1 ? ['Uno solo: ', { b: 'candidato a privatizar.' }] : prov <= L.prov.ideal ? [`${prov}: pocos, bien.`] : prov <= L.prov.max ? [`${prov}: ya son muchos (ideal menos de ${L.prov.ideal}).`] : [`${prov}: saturado (máx. ${L.prov.max}).`]);
-    if (adv != null) add('advertisers', 'Anunciantes en mi mercado', adv < L.advertisers ? 'g' : 'y',
-      adv < L.advertisers ? [`${adv}: poca competencia.`] : [`${adv}: hay pelea; entro con un ángulo distinto.`]);
+    if (prov != null) add('prov', 'Proveedores', prov <= L.prov.max ? 'g' : prov <= L.prov.risk ? 'y' : 'r',
+      prov === 1 ? ['Uno solo: ', { b: 'candidato a privatizar.' }] : prov <= L.prov.ideal ? [`${prov}: pocos, ideal.`] : prov <= L.prov.max ? [`${prov}: aceptable (ideal hasta ${L.prov.ideal}).`] : prov <= L.prov.risk ? [`${prov}: cuidado, analízalo bien (ideal hasta ${L.prov.ideal}).`] : [`${prov}: muy competido (máx. ${L.prov.risk}).`]);
+    if (adv != null) add('advertisers', 'Anunciantes en mi mercado', adv <= L.advertisers.ideal ? 'g' : adv <= L.advertisers.max ? 'y' : 'r',
+      adv <= L.advertisers.ideal ? [`${adv}: poca competencia.`] : adv <= L.advertisers.max ? [`${adv}: hay pelea; entro con un ángulo distinto.`] : [`${adv}: mucha competencia (máx. ${L.advertisers.max}).`]);
     if (days != null) add('adDays', 'Anuncio activo', days > L.adDays ? 'g' : 'y',
       days > L.adDays ? [`${days} días: es rentable.`] : [`${days} días: todavía no demuestra que es rentable.`]);
     if (c.ia) add('ia', 'IA de saturación', c.ia, { g: ['Verde: hay espacio.'], y: ['Amarillo: hay pelea, pero entro.'], r: ['Rojo: ya es tarde.'] }[c.ia]);
@@ -626,7 +653,7 @@
   };
 
   core.search = {
-    LIMITS, STAGES, stage, stageRange, PYRAMID, VDO, STRATEGIES, BY_PROVIDER, CAZA, cazaMethod, ESPIA, espiaMode, WINNER, WINNER_GROUPS, winnerCheck, FLOW, TOOLS, RESEARCH, MISTAKES,
+    LIMITS, PROV_ZONES, provZone, STAGES, stage, stageRange, PYRAMID, VDO, STRATEGIES, BY_PROVIDER, CAZA, cazaMethod, ESPIA, espiaMode, WINNER, WINNER_GROUPS, winnerCheck, FLOW, TOOLS, RESEARCH, MISTAKES,
     COUNTRIES, STATUS, MSP, mspLevel, VALUE, SATURATION, COST_DEFAULTS, SCORE_MAX, SCORE_LEVELS, FILTERS,
     unitCost, priceFor, marginLevel, competition, ageMonths, scoreParts, score, scoreLevel, evaluate, list, stats, unsaved,
   };

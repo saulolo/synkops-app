@@ -30,6 +30,33 @@
     });
   }
 
+  // Semáforo de proveedores (SPEC 28): barra de 4 segmentos (decorativa) y lista con el texto completo de cada zona.
+  const zoneRange = (z) => (z.to == null ? `${z.from} +` : `${z.from} – ${z.to}`);
+  function zones(list) {
+    const box = el('div', 'fl-zones mt-s');
+    box.append(el('b', 'fl-zones-h', 'Proveedores en Dropi'));
+    const bar = el('div', 'fl-zones-bar');
+    bar.setAttribute('aria-hidden', 'true');
+    list.forEach((z) => {
+      const c = el('div', 'fl-zones-seg');
+      c.dataset.tone = z.tone;
+      c.append(el('span', 'fl-zones-fill'), el('span', 'fl-zones-range', zoneRange(z)), el('span', 'fl-zones-name', z.t));
+      bar.append(c);
+    });
+    const ul = el('ul', 'fl-zones-list');
+    list.forEach((z) => {
+      const li = el('li', 'fl-zones-item');
+      li.dataset.tone = z.tone;
+      const tx = el('span', 'fl-zones-tx');
+      tx.append(el('b', null, `${z.t} · ${zoneRange(z)}: `));
+      const d = el('span'); rich(d, z.d); tx.append(d);
+      li.append(el('i', 'fl-zones-dot'), tx);
+      ul.append(li);
+    });
+    box.append(bar, ul);
+    return box;
+  }
+
   // Detalle del paso activo.
   function flowStep(node, s, i, total, isDone, on) {
     node.textContent = '';
@@ -53,6 +80,7 @@
       s.list.forEach((x) => { const li = el('li'); rich(li, x); ul.append(li); });
       box.append(ul);
     }
+    if (s.zones) box.append(zones(s.zones));
     if (s.example) { const ex = el('div', 'note nb mt-s'); const sp = el('span'); rich(sp, s.example); ex.append(el('b', null, 'Caso real: '), sp); box.append(ex); }
     if (s.gate) {
       const g = el('div', 'fl-decide mt-s');
