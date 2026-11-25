@@ -198,7 +198,7 @@ Módulo 4 de NovaSociety más el método VDO de DropKiller. La idea: no pregunta
 
 | # | Parte | Qué hago ahí |
 |:-:|---|---|
-| 1 | **Flujograma DropKiller** | 7 pasos con sus filtros (ventas totales 100–2.000, 7 días 10–100, 30 días 100–500, stock mínimo 80…). Cada rombo es una decisión: si la respuesta es no, descarto. Marco los pasos hechos. |
+| 1 | **Búsqueda con DropKiller** | 8 pasos con sus filtros (ventas totales 100–2.000, 7 días 10–100, 30 días 100–500, stock mínimo 80…). Cada rombo es una decisión: si la respuesta es no, descarto. Marco los pasos hechos. El paso 3 trae el **semáforo de proveedores** en Dropi: 1–3 ideal (verde), 4–6 aceptable (amarillo), 7–10 cuidado (naranja) y 11 o más descarto (rojo). En el paso 6, en la Ad Library con filtro Colombia, cuento los **anunciantes** (tiendas o personas distintas, no anuncios) y a dónde mandan (WhatsApp, Shopify, landing propia): hasta 5 poca competencia, de 6 a 8 hay pelea, más de 8 no lo testeo. |
 | 2 | **Mi candidato** | Formulario con foto, ventas, proveedores, anunciantes y costos. Calcula solo el **score /8**, la **utilidad por entrega** y el semáforo **¿Lo testeo?** del método VDO. Al guardar, el producto se queda en el formulario (pasa a "Editando"); solo **🧹 Limpiar formulario** lo vacía. **Costear →** pasa el producto a la pestaña Costeo. |
 | 3 | **Bitácora** | Los productos que voy evaluando. Lápiz = editar, papelera = eliminar, botones para copiar nombre e ID de Dropi. Filtros, búsqueda y vista de estadísticas. |
 | 4 | **¿Es un producto ganador?** | 6 características (2 obligatorias). Las marco y se guardan con el candidato. |
@@ -236,8 +236,8 @@ Elijo una de las cuatro tarjetas de arriba; la app recuerda cuál dejé abierta.
 **🎯 Estrategia VDO**: parto de productos que ya están en validación.
 
 - **V**alidación: 100 a 2.000 ventas totales, sumando todos los proveedores.
-- **D**emanda: menos de 5 proveedores (máximo 10).
-- **O**ferta: menos de 5 anunciantes activos.
+- **D**emanda: máximo 3 proveedores (aceptable hasta 6; de 7 a 10, con cuidado).
+- **O**ferta: máximo 5 anunciantes activos (de 6 a 8 hay pelea; más de 8, mucha competencia).
 - Además: la **pirámide del producto ganador** (producto y oferta 50%, creativos 30%, landing 20%) y el **ciclo de vida** del producto (nuevo, validación, escalado, saturado, quemado).
 
 **🏭 Estrategia por proveedor**: parto de proveedores confiables y busco productos que casi nadie vende.
@@ -254,7 +254,7 @@ En **FastMoss** (enlace directo a [fastmoss.com/es](https://www.fastmoss.com/es)
 > [!NOTE]
 > Los números de la estrategia por proveedor (50 / 500 / 15–20) son distintos a los del filtro VDO (máximo 100 en 7 días) a propósito: son métodos diferentes.
 
-**🏹 La Caza**: parto de lo que ya se vende y lo paso por **dos puertas**: (1) que esté en Dropi de mi país con stock y (2) que, sumando todos los ID, esté bajo el techo (hasta 2.000 ventas totales, 100 en 7 días y 10 proveedores). Tres métodos, cada uno con su ruta y un **prompt para copiar** y pegar en Claude con el MCP de DropKiller:
+**🏹 La Caza**: parto de lo que ya se vende y lo paso por **dos puertas**: (1) que esté en Dropi de mi país con stock y (2) que, sumando todos los ID, esté bajo el techo (hasta 2.000 ventas totales, 100 en 7 días y 6 proveedores). Tres métodos, cada uno con su ruta y un **prompt para copiar** y pegar en Claude con el MCP de DropKiller:
 
 - **A · Se vende afuera pero no aquí**: vende en otros países de Dropi y en Colombia casi nadie.
 - **B · Vende aquí, bajo el techo**: ya se vende en Colombia, pero en pocas cantidades.

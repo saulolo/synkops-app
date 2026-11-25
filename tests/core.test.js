@@ -11,7 +11,7 @@ const caso = (nombre, fn) => casos.push([nombre, fn]);
 
 caso('exporta todas las funciones del núcleo aplanadas', () => {
   const claves = Object.keys(core).sort().join(',');
-  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CAZA,CH_CPA_READ,CH_HELP,CH_SIDES,CK_DAYS,CK_MONTHS,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,ESPIA,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,HOME_EPOCH,HOME_NAME,HOME_QUOTES,HOME_SEED,HOME_SLOTS,HUB_DEFAULTS,HUB_VERSION,IX_VERSION,LADDER_BLOCKS,LANDING,LEVELS,LG_ACCOUNTS,LG_BANK,LG_CATALOG,LG_DAYS,LG_NEQUI,LG_PARTS,LG_STAGES,LG_STORE,LG_TEMPLATES,LIMITS,MARGIN,MISTAKES,MSP,MW_API,MW_EVERY,MW_PI_TYPES,MW_SALE_TYPES,MW_VERSION,NS_TEST,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TK_ALERT_MAX,TK_HISTORY_DAYS,TK_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cazaMethod,cellVal,chChain,chHard,chPlat,ckAngles,ckDate,ckDay,ckLabel,ckTime,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,espiaMode,evaluate,fill,fmt,fullTitle,funnel,homeDay,homeGreeting,homeHello,homeOrder,homePick,homeSlot,hubAdd,hubCheck,hubClean,hubDefaults,hubDomain,hubFavicon,hubInitials,hubLoad,hubOrder,hubRemove,hubSet,hubUrl,isDropi,isMetrics,ixFunnel,ixLoad,ixPnl,ixTasks,ixTesting,key,kpis,lgForm,lgFromCand,lgMessage,lgMoney,lgMoneyText,lgPhone,lgPrefill,lgTemplate,lgValues,list,marginLevel,matchProduct,mspLevel,mwAction,mwAlerts,mwCut,mwError,mwK,mwLoad,mwPhoto,mwRow,mwRows,mwTotals,mwVerdict,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,quickAdd,quickCheck,quickPrice,quickRemove,quickUpdate,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,tkAdd,tkAddDays,tkAddSub,tkAlertText,tkCanCarry,tkCarry,tkCarrySource,tkDateLabel,tkDayDate,tkDayKey,tkDayLabel,tkDelete,tkDeleteSub,tkDueAlert,tkEdit,tkEditSub,tkEmpty,tkIsHour,tkLoad,tkMove,tkMoveSub,tkMoveSubTo,tkMsToNextHour,tkParseHour,tkPastDays,tkProgress,tkRollOver,tkSetAll,tkSetHour,tkShortDate,tkTasksOf,tkToggle,tkToggleCollapsed,tkToggleSub,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
+  assert.strictEqual(claves, 'ABO_STEPS,ADS,AD_STRATEGIES,AP_DEFAULTS,BASE_FORMULA,BASE_HEAD,BASE_METRICS,BY_PROVIDER,CAZA,CH_CPA_READ,CH_HELP,CH_SIDES,CK_DAYS,CK_MONTHS,COST_DEFAULTS,COUNTRIES,CPA_ZONES,CTR_UNIQUE_WARN,DK_DEFAULTS,DK_OPEN_CAT,DK_TOT_TOLERANCE,ESPIA,EXCLUDED,F,FAIL_HEAD,FILTERS,FLOW,GENERIC_CPA,GOALS,HARD_METRICS,HEADERS,HOME_EPOCH,HOME_NAME,HOME_QUOTES,HOME_SEED,HOME_SLOTS,HUB_DEFAULTS,HUB_VERSION,IX_VERSION,LADDER_BLOCKS,LANDING,LEVELS,LG_ACCOUNTS,LG_BANK,LG_CATALOG,LG_DAYS,LG_NEQUI,LG_PARTS,LG_STAGES,LG_STORE,LG_TEMPLATES,LIMITS,MARGIN,MISTAKES,MSP,MW_API,MW_EVERY,MW_PI_TYPES,MW_SALE_TYPES,MW_VERSION,NS_TEST,PROV_ZONES,PYRAMID,RESEARCH,SATURATION,SCALE_ACTIONS,SCALE_CASES,SCALE_DAYS,SCALE_FREE,SCALE_GUARDS,SCALE_MAP,SCALE_METHODS,SCALE_PRACTICE,SCALE_RULES,SCALING_PARTS,SCORE_LEVELS,SCORE_MAX,SIM_DEFAULTS,SIM_SCENARIOS,SIM_STEP,STAGES,STATUS,STEPS,STRATEGIES,SURF_HEAD,SURF_STEPS,TESTING_PARTS,TEST_ACTIONS,TEST_BEST_SINCE,TEST_CASES,TEST_CHAIN,TEST_CUTS,TEST_HEAD,TEST_PRACTICE,TEST_RULES,TEST_SCALE_NOTE,TEST_STEPS,TEST_VERSION,TK_ALERT_MAX,TK_HISTORY_DAYS,TK_VERSION,TOOLS,URL_BASE,VALUE,VDO,WINNER,WINNER_GROUPS,actions,addDays,adsView,ageMonths,aggregate,apImport,apPlaceholders,apPrompt,apValues,budgetSteps,buildDropi,buildExport,buildMeta,buildMetrics,buildTemplate,campaignName,cascade,cazaMethod,cellVal,chChain,chHard,chPlat,ckAngles,ckDate,ckDay,ckLabel,ckTime,classify,competition,copText,count,cpaZones,cycles,defaultSlug,dkN,dkPlaceholders,dkPrompt,dkValues,espiaMode,evaluate,fill,fmt,fullTitle,funnel,homeDay,homeGreeting,homeHello,homeOrder,homePick,homeSlot,hubAdd,hubCheck,hubClean,hubDefaults,hubDomain,hubFavicon,hubInitials,hubLoad,hubOrder,hubRemove,hubSet,hubUrl,isDropi,isMetrics,ixFunnel,ixLoad,ixPnl,ixTasks,ixTesting,key,kpis,lgForm,lgFromCand,lgMessage,lgMoney,lgMoneyText,lgPhone,lgPrefill,lgTemplate,lgValues,list,marginLevel,matchProduct,mspLevel,mwAction,mwAlerts,mwCut,mwError,mwK,mwLoad,mwPhoto,mwRow,mwRows,mwTotals,mwVerdict,nf,norm,num,offerTexts,parseCSV,periodLabel,practiceBest,practiceDecide,practiceNew,practiceNext,practiceOrder,practiceShow,practiceView,previous,previousRange,priceFor,prices,products,progress,projectedVsPrevious,projection,provZone,quickAdd,quickCheck,quickPrice,quickRemove,quickUpdate,roundLike,rowCells,scaleCheck,scaleFree,scaleGuard,scaleLadder,scaleMethod,scalePracticeBest,scalePracticeDecide,scalePracticeNew,scalePracticeNext,scalePracticeOrder,scalePracticeShow,scalePracticeView,scaleVerdict,scaleZone,scalingPart,score,scoreLevel,scoreParts,short,simAt,simBroken,simChain,simCheck,simEnd,simExpect,simLoad,simNum,simRng,simRun,simulate,slugify,stage,stageRange,stats,story,strategy,testBar,testCheck,testDay,testFree,testRange,testVerdict,testingPart,tkAdd,tkAddDays,tkAddSub,tkAlertText,tkCanCarry,tkCarry,tkCarrySource,tkDateLabel,tkDayDate,tkDayKey,tkDayLabel,tkDelete,tkDeleteSub,tkDueAlert,tkEdit,tkEditSub,tkEmpty,tkIsHour,tkLoad,tkMove,tkMoveSub,tkMoveSubTo,tkMsToNextHour,tkParseHour,tkPastDays,tkProgress,tkRollOver,tkSetAll,tkSetHour,tkShortDate,tkTasksOf,tkToggle,tkToggleCollapsed,tkToggleSub,toISO,todayISO,unitBase,unitCost,unitEconomics,unsaved,verdict,view,weeks,winnerCheck,words,writeRegistro');
 });
 
 caso('Costeo: proveedor 30.000 da precio $99.900 y tope $21.617', () => {
@@ -2637,6 +2637,77 @@ caso('La Caza: estrategias, puertas, métodos, bifurcaciones, prompts y cazaMeth
   }
   assert.strictEqual(cazaMethod('x').k, 'a');
   assert.strictEqual(cazaMethod('c').k, 'c');
+});
+
+// SPEC 28: semáforo de proveedores (zonas contiguas desde LIMITS.prov).
+caso('Semáforo de proveedores: LIMITS.prov, PROV_ZONES contiguas y provZone en los bordes', () => {
+  const { LIMITS, PROV_ZONES, provZone } = core;
+  assert.deepStrictEqual({ ...LIMITS.prov }, { ideal: 3, max: 6, risk: 10 });
+  assert.deepStrictEqual(PROV_ZONES.map((z) => [z.k, z.tone, z.t, z.from, z.to]),
+    [['ideal', 'g', 'Ideal', 1, 3], ['ok', 'y', 'Aceptable', 4, 6], ['risk', 'o', 'Cuidado', 7, 10], ['out', 'r', 'Descarto', 11, null]]);
+  for (let i = 1; i < PROV_ZONES.length; i++) assert.strictEqual(PROV_ZONES[i].from, PROV_ZONES[i - 1].to + 1, 'contigua ' + PROV_ZONES[i].k);
+  assert.strictEqual(PROV_ZONES[PROV_ZONES.length - 1].to, null);
+  const txt = (d) => d.map((s) => (typeof s === 'string' ? s : s.b)).join('');
+  assert.deepStrictEqual(PROV_ZONES.map((z) => txt(z.d)), [
+    'Poca competencia: entro con ventaja. Con uno solo es candidato a privatizar.',
+    'Ya hay competencia, pero todavía hay espacio: lo testeo.',
+    'Mercado peleado: analizo bien el producto (ventas recientes, anuncios, precio) antes de decidir.',
+    'Muy competido: gana el que más plata pierde en anuncios. Vuelvo a los filtros.',
+  ]);
+  const k = (v) => (provZone(v) ? provZone(v).k : null);
+  assert.deepStrictEqual([1, 3, 4, 6, 7, 10, 11, 40].map(k), ['ideal', 'ideal', 'ok', 'ok', 'risk', 'risk', 'out', 'out']);
+  for (const v of [0, -2, null, undefined, '', 'abc', 2.5, NaN]) assert.strictEqual(provZone(v), null, 'sin zona: ' + String(v));
+});
+
+caso('Semáforo de proveedores: evaluador, puerta del paso 3, ficha VDO, error común y La Caza leen LIMITS.prov', () => {
+  const { LIMITS, evaluate, FLOW, VDO, MISTAKES, cazaMethod } = core;
+  const P = LIMITS.prov;
+  const txt = (d) => d.map((s) => (typeof s === 'string' ? s : s.b)).join('');
+  const row = (prov) => evaluate({ prov }, 0).checks.find((c) => c.k === 'prov');
+  assert.deepStrictEqual([1, 3, 4, 6, 7, 10, 11].map((v) => row(v).tone), ['g', 'g', 'g', 'g', 'y', 'y', 'r']);
+  assert.strictEqual(txt(row(1).text), 'Uno solo: candidato a privatizar.');
+  assert.strictEqual(txt(row(2).text), '2: pocos, ideal.');
+  assert.strictEqual(txt(row(5).text), `5: aceptable (ideal hasta ${P.ideal}).`);
+  assert.strictEqual(txt(row(8).text), `8: cuidado, analízalo bien (ideal hasta ${P.ideal}).`);
+  assert.strictEqual(txt(row(11).text), `11: muy competido (máx. ${P.risk}).`);
+  const sumar = FLOW.find((s) => s.k === 'sumar');
+  assert.ok(sumar.gate.q.includes(`máximo ${P.max} proveedores (hasta ${P.risk} con cuidado)`), sumar.gate.q);
+  assert.strictEqual(sumar.gate.no, 'Descarto y vuelvo a los filtros.');
+  assert.strictEqual(txt(VDO.find((v) => v.k === 'D').rule),
+    `Máximo ${P.ideal} proveedores (aceptable hasta ${P.max}; de ${P.max + 1} a ${P.risk}, con cuidado). Con uno solo es candidato a privatizar.`);
+  assert.strictEqual(MISTAKES.find((m) => m[0] === 'Ignorar la saturación')[1],
+    `Con más de ${P.risk} proveedores gana el que más plata está dispuesto a perder en anuncios.`);
+  for (const k of ['b', 'c']) assert.ok(cazaMethod(k).prompt.includes(`${P.max} proveedores`), `La Caza ${k}: ${P.max} proveedores`);
+});
+
+caso('Anunciantes en Colombia: LIMITS.advertisers, pasos 5 y 6, VDO, El Espía y evaluador', () => {
+  const { LIMITS, FLOW, VDO, ESPIA, evaluate } = core;
+  const A = LIMITS.advertisers;
+  assert.deepStrictEqual({ ...A }, { ideal: 5, max: 8 });
+  const txt = (d) => d.map((s) => (typeof s === 'string' ? s : s.b)).join('');
+  const datos = JSON.stringify({ FLOW, VDO, ESPIA, CAZA: core.CAZA, MISTAKES: core.MISTAKES });
+  assert.ok(!datos.includes('[object Object]') && !datos.includes('undefined'), 'Ningún texto con [object Object] ni undefined');
+  const ads = FLOW.find((s) => s.k === 'ads'), radar = FLOW.find((s) => s.k === 'radar');
+  assert.strictEqual(FLOW.indexOf(radar), 5, 'Store Radar y Ad Library es el paso 6');
+  assert.strictEqual(txt(ads.list[ads.list.length - 1]), 'Los anunciantes de Colombia los cuento en el paso 6, en la Ad Library con filtro Colombia.');
+  assert.ok(!/anunciantes/.test(ads.gate.q), 'La puerta del paso 5 no cambia');
+  assert.strictEqual(txt(radar.p), 'Busco tiendas de afuera que ya lo escalan y los ángulos que usan, y cuento quién lo vende ya en Colombia.');
+  const items = radar.list.map(txt);
+  assert.ok(items.includes('Ad Library afuera: copys, página y días activos (más de 7).'));
+  assert.ok(items.includes('Ad Library con filtro Colombia: busco el producto y reviso los anuncios que salen. Cuento anunciantes (tiendas o personas distintas), no anuncios, y anoto a dónde mandan: WhatsApp, tienda Shopify, landing propia u otra. Lo anoto en "Mi candidato" (Anunciantes en mi mercado).'));
+  assert.ok(items.includes(`Hasta ${A.ideal} anunciantes: poca competencia. De ${A.ideal + 1} a ${A.max}: hay pelea, entro solo con un ángulo distinto. Más de ${A.max}: mucha competencia, no lo testeo.`));
+  assert.deepStrictEqual({ ...radar.gate }, { q: `¿${A.max} anunciantes o menos en Colombia?`, no: 'Mucha competencia: no lo testeo y vuelvo a los filtros.' });
+  assert.ok(!radar.zones, 'El paso 6 no trae semáforo de colores');
+  assert.strictEqual(txt(VDO.find((v) => v.k === 'O').rule),
+    `Máximo ${A.ideal} anunciantes activos (anunciantes, no anuncios; de ${A.ideal + 1} a ${A.max} hay pelea, más de ${A.max} es mucha competencia). Miro si mandan a landing o a WhatsApp.`);
+  const b = ESPIA.modes.find((m) => m.k === 'b');
+  assert.strictEqual(txt(b.route.find((r) => r.icon === 'store').d), `Hasta ${A.ideal} anunciantes activos es señal de que no está saturado.`);
+  assert.strictEqual(b.checks.find((c) => c.unit === 'anunciantes').big, `≤ ${A.ideal}`);
+  const row = (v) => evaluate({ advertisers: v }, 0).checks.find((c) => c.k === 'advertisers');
+  assert.deepStrictEqual([0, 5, 6, 8, 9].map((v) => row(v).tone), ['g', 'g', 'y', 'y', 'r']);
+  assert.strictEqual(txt(row(0).text), '0: poca competencia.');
+  assert.strictEqual(txt(row(6).text), '6: hay pelea; entro con un ángulo distinto.');
+  assert.strictEqual(txt(row(9).text), `9: mucha competencia (máx. ${A.max}).`);
 });
 
 // SPEC 25: estrategia El Espía (texto provisional en ESPIA; los números salen de LIMITS).
